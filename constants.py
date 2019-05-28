@@ -17,7 +17,6 @@ DEFAULT_OUTPUT_PATH = "/gm_results"
 PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 
 
-
 # register module
 def register():
     pass
@@ -25,6 +24,3 @@ def register():
 # unregister module
 def unregister():
     pass
-
-if __name__ == "__main__":
-    register()

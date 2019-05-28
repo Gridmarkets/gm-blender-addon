@@ -245,6 +245,3 @@ def unregister():
     for pcoll in preview_collections.values():
         bpy.utils.previews.remove(pcoll)
     preview_collections.clear()
-
-if __name__ == "__main__":
-    register()

@@ -100,6 +100,3 @@ def unregister():
         
     # delete addon properties
     del bpy.types.Scene.props
-
-if __name__ == "__main__":
-    register()
