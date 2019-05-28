@@ -105,34 +105,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         # Portal manager link
         row = layout.row(align=True)
         row.operator(GRIDMARKETS_OT_Open_Manager_Portal.bl_idname)        
-        
 
-class GRIDMARKETS_PT_Authorization(bpy.types.Panel):
-    """The plugin's authorization sub panel."""
-    
-    bl_idname = "gridmarkets_Authorization_sub_panel"
-    bl_label = "Authorization"
-    bl_space_type = "PROPERTIES"   
-    bl_region_type = "WINDOW"
-    bl_context = "render"
-    bl_parent_id = "gridmarkets_main_panel"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        # Create two columns, by using a split layout.
-        split = layout.split(factor=0.5)
-        
-        # First column
-        col = split.column()
-        col.label(text = "Email:")
-        col.label(text = "Access Key:")
-        
-        # Second column, aligned
-        col = split.column()
-        col.prop(scene.props, "auth_email", text = "")
-        col.prop(scene.props, "auth_key", text = "")
 
 class GRIDMARKETS_PT_Job_Info(bpy.types.Panel):
     """The plugin's job info sub panel."""
@@ -231,7 +204,6 @@ classes = (
     GRIDMARKETS_OT_Render,
     GRIDMARKETS_OT_Open_Manager_Portal,
     GRIDMARKETS_PT_Main,
-    GRIDMARKETS_PT_Authorization,
     GRIDMARKETS_PT_Job_Info,
     GRIDMARKETS_PT_Render_Settings,
     GRIDMARKETS_PT_Output_Settings

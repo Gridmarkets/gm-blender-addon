@@ -4,22 +4,6 @@ import constants
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """Class to represent the main state of the plugin. Holds all the properties that are accessable via the interface."""
     
-    # users email
-    auth_email: bpy.props.StringProperty(
-        name="Email",
-        description="Your Gridmarkts account email",
-        default="",
-        maxlen=1024,
-        )
-    
-    # users access key
-    auth_key: bpy.props.StringProperty(
-        name="Access Key",
-        description="Your Gridmarkets Access Key. This is different from your password and can be found by opening the Gridmarkts mangager portal and viewing your profile detials",
-        default="",
-        maxlen=1024,
-        )
-    
     # project name
     project_name: bpy.props.StringProperty(
         name="Project Name",

@@ -16,7 +16,7 @@ import sys
 import importlib
 
 # list of modules to import
-modulesNames = ['constants', 'properties', 'gridmarketsPlugin']
+modulesNames = ['constants', 'properties', 'addon_preferences', 'gridmarketsPlugin']
 
 # append this folder to sys.path so local dependencies can be found
 sys.path.append(os.path.dirname(__file__))

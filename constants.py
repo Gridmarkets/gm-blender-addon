@@ -1,3 +1,6 @@
+# the addons package name
+ADDON_PACKAGE_NAME = "GridmarketsBlenderAddon"
+
 # the icons folder contains custom icons for the UI
 ICONS_FOLDER = "icons"
 
