@@ -1,11 +1,11 @@
 bl_info = {
-    "name": "Gridmarkets Blender Plugin",
-    "description": "A plugin which allows users to submit Blender jobs to the Gridmarkets render farm from within Blender.",
+    "name": "Gridmarkets Blender Add-on",
+    "description": "Allows users to submit Blender jobs to the Gridmarkets render farm from within Blender.",
     "author": "Oliver Dawes",
     "version": (0, 3, 2),
     "blender": (2, 80, 0),
     "location": "3D View > Tools",
-    "warning": "", # used for warning icon and text in addons panel
+    "warning": "", # used for warning icon and text in add-ons panel
     "wiki_url": "https://www.gridmarkets.com/",
     "tracker_url": "",
     "category": "Render"
@@ -16,7 +16,7 @@ import sys
 import importlib
 
 # list of modules to import
-modulesNames = ['constants', 'properties', 'addon_preferences', 'gridmarketsPlugin']
+modulesNames = ['constants', 'properties', 'addon_preferences', 'gridmarkets_blender_addon']
 
 # append this folder to sys.path so local dependencies can be found
 sys.path.append(os.path.dirname(__file__))
