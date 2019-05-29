@@ -1,2 +1,6 @@
+# ignore addon dependencies
 gridmarkets_blender_addon/lib/
 gridmarkets_blender_addon/wheel/
+
+# ignore PyCharm IDE project settings
+/.idea
