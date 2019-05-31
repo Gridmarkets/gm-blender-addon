@@ -16,14 +16,6 @@ from setuptools import setup, find_packages
 
 
 # Global Constants
-HERE = pathlib.Path(__file__).resolve().parent
-ADDON_FOLDER = HERE / 'gridmarkets_blender_addon'
-DEFAULT_LIB_FOLDER = ADDON_FOLDER / 'lib'
-
-DIST_FOLDER = HERE / 'dist'
-DEFAULT_DIST_OUTPUT_LOCATION = (DIST_FOLDER / 'gridmarkets_blender_addon')
-DEFAULT_ZIP_OUTPUT_LOCATION = DEFAULT_DIST_OUTPUT_LOCATION.with_suffix('.zip')
-
 # import readme text for long description
 readme = open('README.md', 'r')
 README_TEXT = readme.read()
@@ -38,6 +30,14 @@ URL = 'https://www.gridmarkets.com/'
 EMAIL = 'olliedawes@gmail.com'
 AUTHOR = 'Ollie Dawes'
 VERSION = '0.3.4'
+
+# file paths
+HERE = pathlib.Path(__file__).resolve().parent
+ADDON_FOLDER = HERE / NAME
+DEFAULT_LIB_FOLDER = ADDON_FOLDER / 'lib'
+DIST_FOLDER = HERE / 'dist'
+DEFAULT_DIST_OUTPUT_LOCATION = (DIST_FOLDER / NAME)
+DEFAULT_ZIP_OUTPUT_LOCATION = DEFAULT_DIST_OUTPUT_LOCATION.with_suffix('.zip')
 
 requirements = [
     'https://gm-envoy-client-docs.netlify.com/downloads/gridmarkets_envoy_client-0.6.0-py2.py3-none-any.whl',
@@ -104,8 +104,8 @@ class Bzip(Command):
         shutil.make_archive(
             self.path, # zip file name
             'zip',  # the archive format - or tar, bztar, gztar
-            root_dir=ADDON_FOLDER,  # root for archive - current working dir if None
-            base_dir=None)  # start archiving from here - cwd if None too
+            root_dir=ADDON_FOLDER.parent,  # root for archive - current working dir if None
+            base_dir=ADDON_FOLDER.stem)  # start archiving from here - cwd if None too
 
 
 class Fdist(Bzip):
