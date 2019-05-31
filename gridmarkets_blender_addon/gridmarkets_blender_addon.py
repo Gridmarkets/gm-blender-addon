@@ -30,7 +30,7 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
         props = scene.props
         
         # create an instance of Envoy client
-        client = EnvoyClient(email = props.auth_email, access_key = props.auth_key)
+        client = EnvoyClient(email = addon_prefs.auth_email, access_key = addon_prefs.auth_accessKey)
         
         # create a project
         # project files root folder path
