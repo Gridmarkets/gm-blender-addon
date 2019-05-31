@@ -58,7 +58,10 @@ class BuildDependencies(Command):
 
     def finalize_options(self):
         # use default lib path unless one is explicitly provided by the user
-        self.lib_path = self.lib_path or DEFAULT_LIB_FOLDER
+        if self.lib_path:
+            self.lib_path = pathlib.Path(self.path)
+        else:
+            self.lib_path = DEFAULT_LIB_FOLDER
 
     def run(self):
         log.info('Installing packages to: %s', self.lib_path)
@@ -95,7 +98,10 @@ class Bzip(Command):
 
     def finalize_options(self):
         # use default path unless one is explicitly provided by the user
-        self.path = self.path or DEFAULT_DIST_OUTPUT_LOCATION
+        if self.path:
+            self.path = pathlib.Path(self.path)
+        else:
+            self.path = DEFAULT_DIST_OUTPUT_LOCATION
 
     def run(self):
         # create the dist folder if it does not exist yet
@@ -121,19 +127,23 @@ class Fdist(Bzip):
 
     def finalize_options(self):
         # use default path unless one is explicitly provided by the user
-        self.path = self.path or DEFAULT_DIST_OUTPUT_LOCATION
+        if self.path:
+            self.path = pathlib.Path(self.path)
+        else:
+            self.path = DIST_FOLDER
 
     def run(self):
-
         # delete the output folder if it already exists
-        if os.path.exists(self.path):
-            shutil.rmtree(self.path, ignore_errors=True)
+        if os.path.exists(self.path / NAME):
+            log.info('Add-on already exists in directory. Removing old add-on.')
+            shutil.rmtree(self.path / NAME, ignore_errors=True)
 
         # re-generate the zipped add-on
         self.run_command('bzip')
 
-        print('Unzipping the add-on to {}.'.format(self.path))
+        log.info('Extracting add-on to: %s', self.path)
 
+        # extract add-on to folder
         with zipfile.ZipFile(DEFAULT_ZIP_OUTPUT_LOCATION, 'r') as zip_ref:
             zip_ref.extractall(self.path)
 
