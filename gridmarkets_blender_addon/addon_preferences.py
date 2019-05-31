@@ -1,6 +1,7 @@
 import bpy
 import constants
 
+
 class AddonPreferences(bpy.types.AddonPreferences):
     """ 
     This class holds the user's preferences for the addon. They are set in the 
@@ -13,7 +14,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
     # user's email
     auth_email: bpy.props.StringProperty(
         name="Email",
-        description="Your Gridmarkts account email",
+        description="Your Gridmarkets account email",
         default="",
         maxlen=1024,
         )
@@ -22,8 +23,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
     auth_accessKey: bpy.props.StringProperty(
         name="Access Key",
         description="Your Gridmarkets access key. This is different from your "
-            "password and can be found by opening the Gridmarkts mangager "
-            "portal and viewing your profile detials",
+            "password and can be found by opening the Gridmarkets mangager "
+            "portal and viewing your profile details",
         default="",
         maxlen=1024,
         subtype='PASSWORD'
