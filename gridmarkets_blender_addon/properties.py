@@ -82,7 +82,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default = "",
         maxlen=200,
         )
-        
+
+
 def register():
     from bpy.utils import register_class
     
@@ -91,6 +92,7 @@ def register():
     
     # register addon properties
     bpy.types.Scene.props = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_Addon_Properties)
+
 
 def unregister():
     from bpy.utils import unregister_class
