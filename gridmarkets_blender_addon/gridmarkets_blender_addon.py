@@ -4,7 +4,10 @@ import bpy
 import constants
 import properties
 
-from gridmarkets import EnvoyClient, Project, Job, WatchFile
+from .lib.gridmarkets.envoy_client import EnvoyClient
+from .lib.gridmarkets.project import Project
+from .lib.gridmarkets.job import Job
+from .lib.gridmarkets.watch_file import WatchFile
 
 # ------------------------------------------------------------------------
 #    Global Variables
