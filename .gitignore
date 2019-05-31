@@ -4,3 +4,6 @@ gridmarkets_blender_addon/wheel/
 
 # ignore PyCharm IDE project settings
 /.idea
+
+# ignore the default dist output folder
+/dist
