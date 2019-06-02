@@ -18,6 +18,8 @@ output to the ./dist directory by default.
 You can then import this into Blender by going `edit -> preferences -> Add-ons -> install`. Then you will be able to 
 active the add-on by searching `gridmarkets blender addon` and ticking it's checkbox.
 
+![image showing how to reload scripts inside Blender](static/blender_addon_install_walkthrough.gif)
+
 ### Implicit Instillation for Development
 To save having to repack the add-on as a .zip and installing it into blender after each change you can either use 
 `python .\setup.py fdist -d "path\to\blender addons\"` to directly install the add-on into blender (it will replace any 
