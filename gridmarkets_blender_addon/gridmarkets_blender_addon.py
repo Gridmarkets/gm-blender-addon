@@ -13,16 +13,20 @@ from .lib.gridmarkets.job import Job
 from .lib.gridmarkets.watch_file import WatchFile
 from .lib.gridmarkets.errors import *
 
+
 # ------------------------------------------------------------------------
 #    Global Variables
 # ------------------------------------------------------------------------
 
+
 # Used to store any previews for images (In this case the Gridmarkets custom icon)
 preview_collections = {}
+
 
 # ------------------------------------------------------------------------
 #    Operators
 # ------------------------------------------------------------------------
+
 
 class GRIDMARKETS_OT_Render(bpy.types.Operator):
     """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
@@ -86,14 +90,12 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             # any other paths passed will be ignored
             project.add_folders(pack_location)
 
-            # add the main project file (which doesnt get uploaded when using add_folders for some reason)
-            project.add_files(str(pack_location / blender_file))
-
             JOB_NAME = PropertySanitizer.getJobName(props)
             PRODUCT_TYPE = 'blender'
             PRODUCT_VERSION = '2.80'
             OPERATION = 'render'
-            RENDER_FILE = str(pathlib.Path(project_name) / relative_packed_file_location)# note the path is relative to the project name
+            # note the path is relative to the project name
+            RENDER_FILE = str(pathlib.Path(project_name) / relative_packed_file_location).replace('\\', '/')
             FRAMES = PropertySanitizer.getFrameRange(scene, props)
             OUTPUT_PREFIX = PropertySanitizer.getOutputPrefix(props)
             OUTPUT_FORMAT = scene.render.image_settings.file_format
@@ -112,7 +114,7 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             )
 
             # add job to project
-            #project.add_jobs(job)
+            project.add_jobs(job)
 
             # submit project
             resp = client.submit_project(project) # returns project name
@@ -160,7 +162,8 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             return False
 
         return True
-    
+
+
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
     """Class to represent the 'Open Manager Portal' operation. Opens the portal in the users browser."""
     
@@ -173,9 +176,11 @@ class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
         bpy.ops.wm.url_open(url=constants.RENDER_MANAGER_URL)
         return {"FINISHED"}
 
+
 # ------------------------------------------------------------------------
 #    Panels
 # ------------------------------------------------------------------------
+
 
 class GRIDMARKETS_PT_Main(bpy.types.Panel):
     """Class to represent the plugins main panel. Contains all sub panels as well as 'Render' and 'Open Manager Portal' buttons."""
@@ -283,7 +288,8 @@ class GRIDMARKETS_PT_Render_Settings(bpy.types.Panel):
         col.prop(scene.props, "render_frame_start")
         col.prop(scene.props, "render_frame_end")
         col.prop(scene.props, "render_frame_step")
-        
+
+
 class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
     """The plugin's output settings sub panel."""
     
@@ -302,9 +308,11 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         col.prop(scene.props, "output_path")
         col.prop(scene.props, "output_prefix")
 
+
 # ------------------------------------------------------------------------
 #    Registration
 # ------------------------------------------------------------------------
+
 classes = (
     GRIDMARKETS_OT_Render,
     GRIDMARKETS_OT_Open_Manager_Portal,
@@ -313,6 +321,7 @@ classes = (
     GRIDMARKETS_PT_Render_Settings,
     GRIDMARKETS_PT_Output_Settings
 )
+
 
 def registerIcons():
     from bpy.utils import previews
@@ -329,6 +338,7 @@ def registerIcons():
 
     preview_collections["main"] = pcoll
 
+
 def register():
     from bpy.utils import register_class
     
@@ -338,6 +348,7 @@ def register():
     # register classes
     for cls in classes:
         register_class(cls)
+
 
 def unregister():
     from bpy.utils import unregister_class
