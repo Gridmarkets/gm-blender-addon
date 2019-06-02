@@ -1,8 +1,10 @@
 import os
 import bpy
+import pathlib
 
 import constants
 import properties
+import utils
 from property_sanitizer import PropertySanitizer
 
 from .lib.gridmarkets.envoy_client import EnvoyClient
@@ -21,6 +23,7 @@ preview_collections = {}
 # ------------------------------------------------------------------------
 #    Operators
 # ------------------------------------------------------------------------
+
 class GRIDMARKETS_OT_Render(bpy.types.Operator):
     """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
     
@@ -31,10 +34,10 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
         scene = context.scene
         props = scene.props
 
-        # get the addon preferences
+        # get the add-on preferences
         addon_prefs = bpy.context.preferences.addons[__package__].preferences
 
-        # validate the addon preferences
+        # validate the add-on preferences
         if not self.validate_credentials(self, addon_prefs.auth_email, addon_prefs.auth_accessKey):
             return {'FINISHED'}
 
@@ -50,33 +53,47 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             project_name = props.project_name
 
             # download output results to local path
-            # this is optional to be passed, if not passed, by default results will get downloaded under `gm_results` folder under project files path
+            # this is optional to be passed, if not passed, by default results will get downloaded under `gm_results`
+            # folder under project files path
             results_download_path = props.output_path
 
             # WARNING project constructor does not yet support custom output path
             project = Project(project_path, project_name)
 
             # get the name of the blender file
-            blenderFile = bpy.path.basename(bpy.context.blend_data.filepath)
+            blender_file = bpy.path.basename(bpy.context.blend_data.filepath)
 
-            # check the scene has been saved
-            if not isinstance(blenderFile, str) or len(blenderFile) <= 0:
+            # check if the scene has been saved
+            if not isinstance(blender_file, str) or len(blender_file) <= 0:
                 self.report({'WARNING'}, ".blend file must be saved first.")
                 return {'FINISHED'}
-
-            # add files to project
-            # only files and folders within the project path can be added, use relative or full path
-            # any other paths passed will be ignored
-            project.add_files(blenderFile)
 
             # if project name is empty the project will be named after the .blend file
             project_name = project.name
 
-            JOB_NAME = properties.PropertySanitizer.getJobName(props)
+            pack_location = pathlib.Path(project_path) / \
+                            pathlib.Path(constants.TEMP_FILES_FOLDER) / \
+                            pathlib.Path(project_name)
+
+            packed_file_location = pack_location / pathlib.Path(blender_file)
+            relative_packed_file_location = packed_file_location.relative_to(pathlib.Path(project_path))
+
+            # create packed file
+            utils.pack_blend_file(bpy.context.blend_data.filepath, str(pack_location))
+
+            # add files to project
+            # only files and folders within the project path can be added, use relative or full path
+            # any other paths passed will be ignored
+            project.add_folders(pack_location)
+
+            # add the main project file (which doesnt get uploaded when using add_folders for some reason)
+            project.add_files(str(pack_location / blender_file))
+
+            JOB_NAME = PropertySanitizer.getJobName(props)
             PRODUCT_TYPE = 'blender'
             PRODUCT_VERSION = '2.80'
             OPERATION = 'render'
-            RENDER_FILE = ("{0}/" + blenderFile).format(project_name)  # note the path is relative to the project name
+            RENDER_FILE = str(pathlib.Path(project_name) / relative_packed_file_location)# note the path is relative to the project name
             FRAMES = PropertySanitizer.getFrameRange(scene, props)
             OUTPUT_PREFIX = PropertySanitizer.getOutputPrefix(props)
             OUTPUT_FORMAT = scene.render.image_settings.file_format
@@ -95,19 +112,12 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             )
 
             # add job to project
-            project.add_jobs(job)
+            #project.add_jobs(job)
 
             # submit project
             resp = client.submit_project(project) # returns project name
             print("Response:")
             print(resp)
-
-            # get product resolver
-            #resolver = client.get_product_resolver()
-
-            # get all products
-            #products = resolver.get_all_types()
-            #print(products)
 
         except AuthenticationError as e:
             self.report({'ERROR'}, "Authentication Error: " + e.user_message)
@@ -119,6 +129,7 @@ class GRIDMARKETS_OT_Render(bpy.types.Operator):
             self.report({'ERROR'}, "API Error: " + e.user_message)
         
         return {'FINISHED'}
+
 
     @staticmethod
     def validate_credentials(self, auth_email, auth_accessKey):
