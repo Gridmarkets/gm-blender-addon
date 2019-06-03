@@ -56,11 +56,6 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             # name of project is optional, if not passed inferred from project root folder
             project_name = props.project_name
 
-            # download output results to local path
-            # this is optional to be passed, if not passed, by default results will get downloaded under `gm_results`
-            # folder under project files path
-            results_download_path = props.output_path
-
             # WARNING project constructor does not yet support custom output path
             project = Project(project_path, project_name)
 
