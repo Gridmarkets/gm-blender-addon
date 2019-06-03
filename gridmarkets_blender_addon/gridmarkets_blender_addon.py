@@ -28,11 +28,11 @@ preview_collections = {}
 # ------------------------------------------------------------------------
 
 
-class GRIDMARKETS_OT_Render(bpy.types.Operator):
+class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
     
     bl_idname = "gridmarkets.render"
-    bl_label = "Render"
+    bl_label = "Submit"
 
     def execute(self, context):
         scene = context.scene
@@ -208,9 +208,9 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         # display Gridmarkets icon and version
         layout.label(text=versionStr, icon_value=iconGM.icon_id)
         
-        # 'Render' button
+        # 'Submit' button
         row = layout.row(align=True)
-        row.operator(GRIDMARKETS_OT_Render.bl_idname)
+        row.operator(GRIDMARKETS_OT_Submit.bl_idname)
         
         # Portal manager link
         row = layout.row(align=True)
@@ -314,7 +314,7 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
 # ------------------------------------------------------------------------
 
 classes = (
-    GRIDMARKETS_OT_Render,
+    GRIDMARKETS_OT_Submit,
     GRIDMARKETS_OT_Open_Manager_Portal,
     GRIDMARKETS_PT_Main,
     GRIDMARKETS_PT_Job_Info,

@@ -59,7 +59,7 @@ The current .blend file must be save before the add-on can submit the project to
 - ~~Handle dependencies outside of the project root.~~
 - ~~Handle linked blender files which themselves have their own dependencies.~~
 - support blender 2.79
-- Currently the add-on re-packs and re-uploads the entire project for each render, it should detect which files have .
+- Currently the add-on re-packs and re-uploads the entire project for each render, it should detect which files have
   been updated and act accordingly.
 - Remove the requirement to save the current .blend file before submitting
 - Clean up temp files generated from packing the project.
