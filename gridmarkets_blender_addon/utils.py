@@ -47,7 +47,6 @@ def pack_blend_file(blend_file, target):
     """
 
     blender_exe = str(bpy.app.binary_path)
-    blend_file = bpy.data.filepath
 
     # Create the subprocess which will get the dependencies.
     # This must be done using a subprocess since there is a bug with the blender_asset_tracer.trace module in that it
