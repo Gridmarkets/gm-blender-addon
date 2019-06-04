@@ -1,11 +1,12 @@
 import os
 import bpy
 import pathlib
-import tempfile
 
 import constants
 import properties
 import utils
+
+from temp_directory_manager import TempDirectoryManager
 from property_sanitizer import PropertySanitizer
 
 from .lib.gridmarkets.envoy_client import EnvoyClient
@@ -14,15 +15,13 @@ from .lib.gridmarkets.job import Job
 from .lib.gridmarkets.watch_file import WatchFile
 from .lib.gridmarkets.errors import *
 
-
 # ------------------------------------------------------------------------
 #    Global Variables
 # ------------------------------------------------------------------------
 
-
 # Used to store any previews for images (In this case the Gridmarkets custom icon)
 preview_collections = {}
-
+temp_dir_manager = TempDirectoryManager()
 
 # ------------------------------------------------------------------------
 #    Operators
@@ -34,9 +33,6 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     
     bl_idname = "gridmarkets.render"
     bl_label = "Submit"
-
-    # create a temporary directory to pack the files into
-    temp_dir = None
 
     def execute(self, context):
         scene = context.scene
@@ -71,11 +67,9 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                                          "render files will not automatically download.")
 
             # create a new temp directory
-            GRIDMARKETS_OT_Submit.initialise_temp_dir()
+            temp_dir_path = temp_dir_manager.get_temp_directory()
 
-            temp_dir = pathlib.Path(GRIDMARKETS_OT_Submit.temp_dir.name)
-
-            blend_file_path = temp_dir / blend_file_name
+            blend_file_path = temp_dir_path / blend_file_name
 
             # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
             # or if it has been modified since it's last save then the submitted .blend file will represent the
@@ -84,7 +78,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                                         compress=True)
 
             # create directory to contain packed project
-            packed_dir = temp_dir / project_name
+            packed_dir = temp_dir_path / project_name
             os.mkdir(str(packed_dir))
 
             # pack the .blend file to the pack directory
@@ -97,6 +91,10 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
             # create the project
             project = Project(str(packed_dir), project_name)
+
+            # associate this project with the temp directory so the temp directory can be removed once the project is
+            # complete
+            temp_dir_manager.associate_project(temp_dir_path, project)
 
             # add files to project
             # only files and folders within the project path can be added, use relative or full path
@@ -155,14 +153,9 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             self.report({'ERROR'}, "Invalid Request Error: " + e.user_message)
         except APIError as e:
             self.report({'ERROR'}, "API Error: " + str(e.user_message))
-        
+
         return {'FINISHED'}
 
-    @staticmethod
-    def initialise_temp_dir():
-        if GRIDMARKETS_OT_Submit.temp_dir is not None:
-            GRIDMARKETS_OT_Submit.temp_dir.cleanup()
-        GRIDMARKETS_OT_Submit.temp_dir = tempfile.TemporaryDirectory(prefix='gm-temp-dir-')
 
     @staticmethod
     def validate_credentials(self, auth_email, auth_accessKey):
@@ -197,7 +190,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
     """Class to represent the 'Open Manager Portal' operation. Opens the portal in the users browser."""
-    
+
     bl_idname = "gridmarkets.open_portal"
     bl_label = "Open Manager Portal"
     bl_options = {'REGISTER', 'UNDO'}
@@ -382,6 +375,7 @@ def register():
 
 
 def unregister():
+
     from bpy.utils import unregister_class
     
     # unregister classes
