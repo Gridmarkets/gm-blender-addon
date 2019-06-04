@@ -66,6 +66,10 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 blend_file_name = 'main_GM_blend_file_packed.blend'
                 project_name = PropertySanitizer.getProjectName(props)
 
+                # warn user that the file is not saved
+                self.report({'WARNING'}, "The current blender scene has not been saved. The scene will submit but any "
+                                         "render files will not automatically download.")
+
             # create a new temp directory
             GRIDMARKETS_OT_Submit.initialise_temp_dir()
 
