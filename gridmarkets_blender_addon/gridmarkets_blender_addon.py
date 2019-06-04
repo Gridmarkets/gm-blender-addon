@@ -1,6 +1,7 @@
 import os
 import bpy
 import pathlib
+import tempfile
 
 import constants
 import properties
@@ -34,6 +35,9 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     bl_idname = "gridmarkets.render"
     bl_label = "Submit"
 
+    # create a temporary directory to pack the files into
+    temp_dir = None
+
     def execute(self, context):
         scene = context.scene
         props = scene.props
@@ -49,48 +53,66 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             # create an instance of Envoy client
             client = EnvoyClient(email = addon_prefs.auth_email, access_key = addon_prefs.auth_accessKey)
 
-            # create a project
-            # project files root folder path
-            project_path = bpy.path.abspath("//")
+            blend_file_name = None
+            project_name = None
 
-            # name of project is optional, if not passed inferred from project root folder
-            project_name = props.project_name
+            # if the file has been saved
+            if bpy.context.blend_data.is_saved:
+                # use the name of the saved .blend file
+                blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+                project_name = PropertySanitizer.getProjectName(props, default_project_name=blend_file_name)
+            else:
+                # otherwise create a name for the packed .blend file
+                blend_file_name = 'main_GM_blend_file_packed.blend'
+                project_name = PropertySanitizer.getProjectName(props)
 
-            # WARNING project constructor does not yet support custom output path
-            project = Project(project_path, project_name)
+            # create a new temp directory
+            GRIDMARKETS_OT_Submit.initialise_temp_dir()
 
-            # get the name of the blender file
-            blender_file = bpy.path.basename(bpy.context.blend_data.filepath)
+            temp_dir = pathlib.Path(GRIDMARKETS_OT_Submit.temp_dir.name)
 
-            # check if the scene has been saved
-            if not isinstance(blender_file, str) or len(blender_file) <= 0:
-                self.report({'WARNING'}, ".blend file must be saved first.")
-                return {'FINISHED'}
+            blend_file_path = temp_dir / blend_file_name
 
-            # if project name is empty the project will be named after the .blend file
-            project_name = project.name
+            # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
+            # or if it has been modified since it's last save then the submitted .blend file will represent the
+            # current state of the scene
+            bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
+                                        compress=True)
 
-            pack_location = pathlib.Path(project_path) / \
-                            pathlib.Path(constants.TEMP_FILES_FOLDER) / \
-                            pathlib.Path(project_name)
+            # create directory to contain packed project
+            packed_dir = temp_dir / project_name
+            os.mkdir(str(packed_dir))
 
-            packed_file_location = pack_location / pathlib.Path(blender_file)
-            relative_packed_file_location = packed_file_location.relative_to(pathlib.Path(project_path))
+            # pack the .blend file to the pack directory
+            utils.pack_blend_file(str(blend_file_path), str(packed_dir))
 
-            # create packed file
-            utils.pack_blend_file(bpy.context.blend_data.filepath, str(pack_location))
+            # create the project
+            project = Project(str(packed_dir), project_name)
 
             # add files to project
             # only files and folders within the project path can be added, use relative or full path
             # any other paths passed will be ignored
-            project.add_folders(pack_location)
+            project.add_folders(str(packed_dir))
+
+            if bpy.context.blend_data.is_saved:
+                # add watch file
+                output_pattern = '{0}/.+'.format(project.remote_output_folder)
+
+                # download path
+                download_path = str(pathlib.Path(bpy.context.blend_data.filepath).parent / 'gm_results')
+
+                # create a watch file
+                watch_file = WatchFile(output_pattern, download_path)
+
+                # add watch files, this will auto download results to the defined `download_path`
+                project.add_watch_files(watch_file)
 
             JOB_NAME = PropertySanitizer.getJobName(props)
             PRODUCT_TYPE = 'blender'
             PRODUCT_VERSION = '2.80'
             OPERATION = 'render'
             # note the path is relative to the project name
-            RENDER_FILE = str(pathlib.Path(project_name) / relative_packed_file_location).replace('\\', '/')
+            RENDER_FILE = str(pathlib.Path(project_name) / blend_file_name).replace('\\', '/')
             FRAMES = PropertySanitizer.getFrameRange(scene, props)
             OUTPUT_PREFIX = PropertySanitizer.getOutputPrefix(props)
             OUTPUT_FORMAT = scene.render.image_settings.file_format
@@ -102,17 +124,17 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 PRODUCT_VERSION,
                 OPERATION,
                 RENDER_FILE,
-                frames = FRAMES,
-                output_prefix = OUTPUT_PREFIX,
-                output_format = OUTPUT_FORMAT,
-                engine = RENDER_ENGINE
+                frames=FRAMES,
+                output_prefix=OUTPUT_PREFIX,
+                output_format=OUTPUT_FORMAT,
+                engine=RENDER_ENGINE
             )
 
             # add job to project
             project.add_jobs(job)
 
             # submit project
-            resp = client.submit_project(project) # returns project name
+            resp = client.submit_project(project)  # returns project name
             print("Response:")
             print(resp)
 
@@ -127,6 +149,11 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         
         return {'FINISHED'}
 
+    @staticmethod
+    def initialise_temp_dir():
+        if GRIDMARKETS_OT_Submit.temp_dir is not None:
+            GRIDMARKETS_OT_Submit.temp_dir.cleanup()
+        GRIDMARKETS_OT_Submit.temp_dir = tempfile.TemporaryDirectory(prefix='gm-temp-dir-')
 
     @staticmethod
     def validate_credentials(self, auth_email, auth_accessKey):
