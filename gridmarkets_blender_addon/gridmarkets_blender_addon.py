@@ -123,7 +123,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         except InvalidRequestError as e:
             self.report({'ERROR'}, "Invalid Request Error: " + e.user_message)
         except APIError as e:
-            self.report({'ERROR'}, "API Error: " + e.user_message)
+            self.report({'ERROR'}, "API Error: " + str(e.user_message))
         
         return {'FINISHED'}
 
