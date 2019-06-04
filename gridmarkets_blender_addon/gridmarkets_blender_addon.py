@@ -90,6 +90,11 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             # pack the .blend file to the pack directory
             utils.pack_blend_file(str(blend_file_path), str(packed_dir))
 
+            # delete pack-info.txt if it exists
+            pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
+            if pack_info_file.is_file():
+                pack_info_file.unlink()
+
             # create the project
             project = Project(str(packed_dir), project_name)
 
