@@ -5,6 +5,18 @@ class PropertySanitizer():
     """ Helper class which provides useful methods for getting and validating the values of user input fields"""
 
     @staticmethod
+    def getProjectName(props, default_project_name = 'Project-' + uuid.uuid4().hex):
+        """ returns the project name or the default provided name if the user has not entered a name yet"""
+
+        project_name = props.project_name
+
+        # check if the project name has not been entered
+        if not isinstance(project_name, str) or len(project_name) <= 0:
+            return default_project_name
+
+        return project_name
+
+    @staticmethod
     def getJobName(props):
 
         jobName = props.submission_label
