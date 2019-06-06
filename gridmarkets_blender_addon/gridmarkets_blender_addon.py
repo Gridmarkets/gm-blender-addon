@@ -57,11 +57,11 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             if bpy.context.blend_data.is_saved:
                 # use the name of the saved .blend file
                 blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-                project_name = PropertySanitizer.getProjectName(props, default_project_name=blend_file_name)
+                project_name = PropertySanitizer.get_project_name(props, default_project_name=blend_file_name)
             else:
                 # otherwise create a name for the packed .blend file
                 blend_file_name = 'main_GM_blend_file_packed.blend'
-                project_name = PropertySanitizer.getProjectName(props)
+                project_name = PropertySanitizer.get_project_name(props)
 
                 # warn user that the file is not saved
                 self.report({'WARNING'}, "The current blender scene has not been saved. The scene will submit but any "
@@ -115,14 +115,14 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 # add watch files, this will auto download results to the defined `download_path`
                 project.add_watch_files(watch_file)
 
-            JOB_NAME = PropertySanitizer.getJobName(props)
+            JOB_NAME = PropertySanitizer.get_job_name(props)
             PRODUCT_TYPE = 'blender'
             PRODUCT_VERSION = '2.80'
             OPERATION = 'render'
             # note the path is relative to the project name
             RENDER_FILE = str(pathlib.Path(project_name) / blend_file_name).replace('\\', '/')
-            FRAMES = PropertySanitizer.getFrameRanges(scene, props)
-            OUTPUT_PREFIX = PropertySanitizer.getOutputPrefix(props)
+            FRAMES = PropertySanitizer.get_frame_ranges(scene, props)
+            OUTPUT_PREFIX = PropertySanitizer.get_output_prefix(props)
             OUTPUT_FORMAT = scene.render.image_settings.file_format
             RENDER_ENGINE = scene.render.engine
 

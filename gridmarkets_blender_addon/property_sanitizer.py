@@ -5,7 +5,7 @@ class PropertySanitizer():
     """ Helper class which provides useful methods for getting and validating the values of user input fields"""
 
     @staticmethod
-    def getProjectName(props, default_project_name = 'Project-' + uuid.uuid4().hex):
+    def get_project_name(props, default_project_name ='Project-' + uuid.uuid4().hex):
         """ returns the project name or the default provided name if the user has not entered a name yet"""
 
         project_name = props.project_name
@@ -17,19 +17,20 @@ class PropertySanitizer():
         return project_name
 
     @staticmethod
-    def getJobName(props):
 
-        jobName = props.submission_label
+    def get_job_name(props):
+
+        job_name = props.submission_label
 
         # check if the job name has been entered
-        if not isinstance(jobName, str) or len(jobName) <= 0:
+        if not isinstance(job_name, str) or len(job_name) <= 0:
             return 'job-' + uuid.uuid4().hex
 
-        return jobName
+        return job_name
 
 
     @staticmethod
-    def getFrameRanges(scene, props):
+    def get_frame_ranges(scene, props):
         """ returns the frame settings in a format suitable for the API (1 255 1)"""
 
         # use scene frame settings unless the user has overridden them
@@ -49,7 +50,7 @@ class PropertySanitizer():
             return str(scene.frame_start) + ' ' + str(scene.frame_end) + ' ' + str(scene.frame_step)
 
     @staticmethod
-    def getOutputPrefix(props):
+    def get_output_prefix(props):
 
         outputPrefix = props.output_prefix
 
