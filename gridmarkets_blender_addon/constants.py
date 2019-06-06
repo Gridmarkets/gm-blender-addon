@@ -19,6 +19,10 @@ DEFAULT_OUTPUT_PATH = "/gm_results"
 # plugin versioning
 PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 
+FRAME_RANGE_PREFIX = 'range_'
+DEFAULT_FRAME_RANGE_START_VALUE = 1
+DEFAULT_FRAME_RANGE_END_VALUE = 255
+DEFAULT_FRAME_RANGE_STEP_VALUE = 1
 
 # register module
 def register():

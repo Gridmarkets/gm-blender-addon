@@ -71,3 +71,46 @@ def pack_blend_file(blend_file, target):
 
     p.wait()
 
+
+def create_unique_object_name(objects, name_prefix = ""):
+    """ Creates a unique name of the form [name_prefix][x] where x is some unique positive integer.
+
+    :param objects: the existing list of objects that this new name must not collide with. Objects in said list may or
+                    may not have .name attributes or follow the provided naming scheme
+    :type objects: list
+    :param name_prefix: a optional prefix to append before the unique number
+    :type name_prefix: str
+    :return: the unique name
+    :rtype: str
+    """
+
+    prefix_length = len(name_prefix)
+
+    # compile a list of used numeric integer suffixes
+    used_suffixes = []
+    for element in objects:
+        if hasattr(element, 'name') and isinstance(element.name, str) and element.name.startswith(name_prefix):
+            element_suffix = element.name[prefix_length:]
+            if element_suffix.isdigit():
+                try:
+                    element_suffix = int(element_suffix)
+
+                    if element_suffix >= 0:
+                        used_suffixes.append(element_suffix)
+
+                except ValueError:
+                    pass
+
+    # remove duplicates
+    used_suffixes = list(set(used_suffixes))
+
+    # sort
+    used_suffixes.sort()
+
+    # find a number which has not been used yet
+    i = 0
+    while i in used_suffixes:
+        i = i+1
+
+    return name_prefix + str(i)
+
