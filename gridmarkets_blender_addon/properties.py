@@ -144,12 +144,12 @@ def set_default_frame_ranges():
         item.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
 
 
-def _on_register():
+def _on_register(scene):
     """ Called when the add-on is registered """
     set_default_frame_ranges()
 
     # remove the handler once it has completed as it is no longer needed
-    bpy.app.handlers.scene_update_post.remove(_on_register)
+    bpy.app.handlers.depsgraph_update_post.remove(_on_register)
 
 
 @bpy.app.handlers.persistent
