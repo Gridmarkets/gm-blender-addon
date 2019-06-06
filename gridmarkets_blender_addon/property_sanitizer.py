@@ -27,14 +27,24 @@ class PropertySanitizer():
 
         return jobName
 
+
     @staticmethod
-    def getFrameRange(scene, props):
+    def getFrameRanges(scene, props):
         """ returns the frame settings in a format suitable for the API (1 255 1)"""
 
         # use scene frame settings unless the user has overridden them
-        if props.override_project_render_settings:
-            return str(props.render_frame_start) + ' ' + str(props.render_frame_end) + ' ' + str(
-                props.render_frame_step)
+        if props.use_custom_frame_ranges:
+
+            # filter disabled frame ranges
+            frame_ranges = filter( lambda frame_range: frame_range.enabled, props.frame_ranges)
+
+            # join the frame_start, frame_end and frame_step properties
+            frame_ranges = map( lambda r: ' '.join([str(r.frame_start), str(r.frame_end), str(r.frame_step)]),
+                                frame_ranges)
+
+            # join all frame ranges together
+            return ','.join(frame_ranges)
+
         else:
             return str(scene.frame_start) + ' ' + str(scene.frame_end) + ' ' + str(scene.frame_step)
 

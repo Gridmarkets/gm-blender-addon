@@ -121,7 +121,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             OPERATION = 'render'
             # note the path is relative to the project name
             RENDER_FILE = str(pathlib.Path(project_name) / blend_file_name).replace('\\', '/')
-            FRAMES = PropertySanitizer.getFrameRange(scene, props)
+            FRAMES = PropertySanitizer.getFrameRanges(scene, props)
             OUTPUT_PREFIX = PropertySanitizer.getOutputPrefix(props)
             OUTPUT_FORMAT = scene.render.image_settings.file_format
             RENDER_ENGINE = scene.render.engine
