@@ -1,4 +1,7 @@
+import bpy
+import pathlib
 import uuid
+import constants
 
 
 class PropertySanitizer():
@@ -17,7 +20,21 @@ class PropertySanitizer():
         return project_name
 
     @staticmethod
+    def get_output_path(context, props):
+        """ Returns the output path provided by the user """
 
+        output_path = props.output_path
+
+        # check if the project name has not been entered
+        if not isinstance(output_path, str) or len(output_path) <= 0:
+            output_path = constants.DEFAULT_OUTPUT_PATH
+
+        # convert path to absolute format (if not already in it)
+        output_path = pathlib.Path(bpy.path.abspath(output_path))
+
+        return output_path
+
+    @staticmethod
     def get_job_name(props):
 
         job_name = props.submission_label

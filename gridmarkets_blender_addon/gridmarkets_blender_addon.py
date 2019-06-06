@@ -107,7 +107,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 output_pattern = '{0}/.+'.format(project.remote_output_folder)
 
                 # download path
-                download_path = str(pathlib.Path(bpy.context.blend_data.filepath).parent / 'gm_results')
+                download_path = str(PropertySanitizer.get_output_path(context, props))
 
                 # create a watch file
                 watch_file = WatchFile(output_pattern, download_path)
