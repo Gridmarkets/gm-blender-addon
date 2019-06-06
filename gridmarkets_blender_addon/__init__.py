@@ -16,7 +16,7 @@ import sys
 import importlib
 
 # list of modules to import
-modulesNames = ['constants', 'properties', 'addon_preferences', 'gridmarkets_blender_addon']
+modulesNames = ['constants', 'icon_loader', 'properties', 'addon_preferences', 'gridmarkets_blender_addon']
 
 # append this folder to sys.path so local dependencies can be found
 sys.path.append(os.path.dirname(__file__))

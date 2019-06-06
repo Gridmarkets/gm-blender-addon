@@ -1,15 +1,16 @@
 import bpy
+import constants
 
 
 class GRIDMARKETS_PT_Render_settings(bpy.types.Panel):
     """Create a Panel containing render related settings, such as frame range(s)"""
 
-    bl_idname = 'gridmarkets_render_settings_sub_panel'
-    bl_label = "Render Settings"
-    bl_space_type = "PROPERTIES"
-    bl_region_type = "WINDOW"
-    bl_context = "render"
-    bl_parent_id = "gridmarkets_main_panel"
+    bl_idname = constants.PANEL_RENDER_SETTINGS_ID_NAME
+    bl_label = constants.PANEL_RENDER_SETTINGS_LABEL
+    bl_space_type = constants.PANEL_SPACE_TYPE
+    bl_region_type = constants.PANEL_REGION_TYPE
+    bl_context = constants.PANEL_CONTEXT
+    bl_parent_id = constants.PANEL_MAIN_ID_NAME
 
     def draw(self, context):
         layout = self.layout

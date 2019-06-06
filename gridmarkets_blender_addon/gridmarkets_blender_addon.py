@@ -6,8 +6,13 @@ import constants
 import properties
 import utils
 
+from panels.main import GRIDMARKETS_PT_Main
+from panels.job_info import GRIDMARKETS_PT_Job_Info
 from panels.render_settings import GRIDMARKETS_PT_Render_settings
+from panels.output_settings import GRIDMARKETS_PT_Output_Settings
+
 from temp_directory_manager import TempDirectoryManager
+from icon_loader import IconLoader
 from property_sanitizer import PropertySanitizer
 
 from .lib.gridmarkets.envoy_client import EnvoyClient
@@ -20,8 +25,6 @@ from .lib.gridmarkets.errors import *
 #    Global Variables
 # ------------------------------------------------------------------------
 
-# Used to store any previews for images (In this case the Gridmarkets custom icon)
-preview_collections = {}
 temp_dir_manager = TempDirectoryManager()
 
 # ------------------------------------------------------------------------
@@ -32,8 +35,8 @@ temp_dir_manager = TempDirectoryManager()
 class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
     
-    bl_idname = "gridmarkets.render"
-    bl_label = "Submit"
+    bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
+    bl_label = constants.OPERATOR_SUBMIT_LABEL
 
     def execute(self, context):
         scene = context.scene
@@ -192,8 +195,8 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
     """Class to represent the 'Open Manager Portal' operation. Opens the portal in the users browser."""
 
-    bl_idname = "gridmarkets.open_portal"
-    bl_label = "Open Manager Portal"
+    bl_idname = constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME
+    bl_label = constants.OPERATOR_OPEN_MANAGER_PORTAL_LABEL
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -205,8 +208,8 @@ class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
 class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the frame range list menu """
 
-    bl_idname = "gridmarkets.list_action"
-    bl_label = "List Action"
+    bl_idname = constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME
+    bl_label = constants.OPERATOR_FRAME_RANGE_ACTIONS_LABEL
 
     action: bpy.props.EnumProperty(
         items=(
@@ -262,8 +265,8 @@ class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
 
 
 class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
-    bl_idname = "gridmarkets.edit_frame_range"
-    bl_label = "Edit Frame Range"
+    bl_idname = constants.OPERATOR_EDIT_FRAME_RANGE_ID_NAME
+    bl_label = constants.OPERATOR_EDIT_FRAME_RANGE_LABEL
     bl_options = {'UNDO'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
@@ -342,9 +345,9 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
 
         # force region to redraw otherwise the list wont update until next event (mouse over, etc)
         for area in bpy.context.screen.areas:
-            if area.type == 'PROPERTIES':
+            if area.type == constants.PANEL_SPACE_TYPE:
                 for region in area.regions:
-                    if region.type == 'WINDOW':
+                    if region.type == constants.PANEL_REGION_TYPE:
                         region.tag_redraw()
 
         return {'FINISHED'}
@@ -378,102 +381,6 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         col.prop(self, "frame_start")
         col.prop(self, "frame_end")
         col.prop(self, "frame_step")
-
-# ------------------------------------------------------------------------
-#    Panels
-# ------------------------------------------------------------------------
-
-
-class GRIDMARKETS_PT_Main(bpy.types.Panel):
-    """Class to represent the plugins main panel. Contains all sub panels as well as 'Render' and 'Open Manager Portal' buttons."""
-    
-    bl_idname = "gridmarkets_main_panel"
-    bl_label = "GridMarkets"
-    bl_space_type = "PROPERTIES"
-    bl_region_type = "WINDOW"
-    bl_context = "render"
-
-    @classmethod
-    def poll(self,context):
-        return True #context.object is not None
-
-    def draw(self, context):
-        layout = self.layout
-        
-        # get the Gridmarkets icon
-        pcoll = preview_collections["main"]
-        iconGM = pcoll["my_icon"]
-        
-        # get the plugin version as a string
-        versionStr = 'Gridmarkets v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
-        
-        # display Gridmarkets icon and version
-        layout.label(text=versionStr, icon_value=iconGM.icon_id)
-        
-        # 'Submit' button
-        row = layout.row(align=True)
-        row.operator(GRIDMARKETS_OT_Submit.bl_idname)
-        
-        # Portal manager link
-        row = layout.row(align=True)
-        row.operator(GRIDMARKETS_OT_Open_Manager_Portal.bl_idname)        
-
-
-class GRIDMARKETS_PT_Job_Info(bpy.types.Panel):
-    """The plugin's job info sub panel."""
-    
-    bl_idname = "gridmarkets_job_info_sub_panel"
-    bl_label = "Job Info"
-    bl_space_type = "PROPERTIES"   
-    bl_region_type = "WINDOW"
-    bl_context = "render"
-    bl_parent_id = "gridmarkets_main_panel"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        # Create two columns, by using a split layout.
-        split = layout.split(factor=0.5)
-        
-        # First column
-        col = split.column()
-        col.label(text = "Project Name:")
-        col.label(text = "Submission Label:")
-        col.label(text = "Artist Name:")
-        col.label(text = "Submission Comment:")
-        col.label(text = "Blender Version:")
-        col.label(text = "Render Engine:")
-        
-        # Second column, aligned
-        col = split.column()
-        col.prop(scene.props, "project_name", text = "")
-        col.prop(scene.props, "submission_label", text = "")
-        col.prop(scene.props, "artist_name", text = "")
-        col.prop(scene.props, "submission_comment", text = "")
-        
-        col.alignment = 'RIGHT'
-        col.label(text=bpy.app.version_string)
-        col.label(text=bpy.context.scene.render.engine)
-
-
-class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
-    """The plugin's output settings sub panel."""
-    
-    bl_idname = "gridmarkets_output_settings_sub_panel"
-    bl_label = "Output Settings"
-    bl_space_type = "PROPERTIES"   
-    bl_region_type = "WINDOW"
-    bl_context = "render"
-    bl_parent_id = "gridmarkets_main_panel"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        col = layout.column()
-        col.prop(scene.props, "output_path")
-        col.prop(scene.props, "output_prefix")
 
 # ------------------------------------------------------------------------
 #    Lists
@@ -518,27 +425,8 @@ classes = (
 )
 
 
-def registerIcons():
-    from bpy.utils import previews
-    
-    # register icons
-    pcoll = bpy.utils.previews.new()
-
-    # path to the folder where the icon is
-    # the path is calculated relative to this py file inside the addon folder
-    my_icons_dir = os.path.join(os.path.dirname(__file__), constants.ICONS_FOLDER)
-
-    # load a preview thumbnail of the icon and store in the previews collection
-    pcoll.load("my_icon", os.path.join(my_icons_dir, constants.LOGO_ICON_FILE_NAME), 'IMAGE')
-
-    preview_collections["main"] = pcoll
-
-
 def register():
     from bpy.utils import register_class
-    
-    # register custom icons
-    registerIcons()
     
     # register classes
     for cls in classes:
@@ -546,14 +434,8 @@ def register():
 
 
 def unregister():
-
     from bpy.utils import unregister_class
     
     # unregister classes
     for cls in reversed(classes):
         unregister_class(cls)
-    
-    # clear the preview collections object of icons
-    for pcoll in preview_collections.values():
-        bpy.utils.previews.remove(pcoll)
-    preview_collections.clear()

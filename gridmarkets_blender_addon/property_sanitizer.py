@@ -45,7 +45,6 @@ class PropertySanitizer():
 
         return job_name
 
-
     @staticmethod
     def get_frame_ranges(scene, props):
         """ returns the frame settings in a format suitable for the API (1 255 1)"""
