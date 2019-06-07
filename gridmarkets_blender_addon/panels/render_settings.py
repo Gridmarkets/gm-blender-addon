@@ -29,12 +29,12 @@ class GRIDMARKETS_PT_Render_settings(bpy.types.Panel):
         col.active = active
 
         sub = col.column(align=True)
-        sub.operator("gridmarkets.list_action", icon='MODIFIER', text="").action = 'EDIT'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='MODIFIER', text="").action = 'EDIT'
 
         sub = col.column(align=True)
-        sub.operator("gridmarkets.list_action", icon='ADD', text="").action = 'ADD'
-        sub.operator("gridmarkets.list_action", icon='REMOVE', text="").action = 'REMOVE'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='ADD', text="").action = 'ADD'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
 
         sub = col.column(align=True)
-        sub.operator("gridmarkets.list_action", icon='TRIA_UP', text="").action = 'UP'
-        sub.operator("gridmarkets.list_action", icon='TRIA_DOWN', text="").action = 'DOWN'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
