@@ -43,6 +43,8 @@ add-on's source code use `F3` (or `Cmd + F` on MacOs) in Blender to open up the 
 ## Using the Add-on
 The add-on panel can be found under `Render -> Gridmarkets` in the Properties menu.
 
+![image showing the main panel for the add-on](static/addon_overview.png)
+
 ### Authentication
 Once the add-on is installed a user can provide their Gridmarkets email and access key in the preferences section found
 directly under the add-on in the Add-ons panel. 
@@ -53,7 +55,9 @@ For Blender to remember a users credentials between sessions they must click the
 the above image.
 
 ### Submitting a Project
-The current .blend file must be save before the add-on can submit the project to Gridmarkets.
+There is no requirement to save the .blend file before submitting, the add-on will automatically save a copy of the
+currently open scene to a temporary directory. It will then create a packed version of the same file using BAT and 
+upload via the API. 
 
 ## todo
 - ~~Handle dependencies outside of the project root.~~
@@ -61,8 +65,11 @@ The current .blend file must be save before the add-on can submit the project to
 - support blender 2.79
 - Currently the add-on re-packs and re-uploads the entire project for each render, it should detect which files have
   been updated and act accordingly.
-- Remove the requirement to save the current .blend file before submitting
-- Clean up temp files generated from packing the project.
+- ~~Remove the requirement to save the current .blend file before submitting~~
+- ~~Allow the user to specify multiple frame ranges~~
+- Add job status feedback to the user so they know the add-on is working as intended
+- Clean up temp files generated from packing the project. (partially done, all temp folders will now be deleted once 
+  blender is closed but they could be deleted sooner if we check that the files have finished uploading to envoy)
 - [Extension] it would be possible to render single frames in a distributed way by creating a fake animation where each
   frame is the same and then re-combining the frames client side. Very usefull for artists who are trying to create 
   still images.
