@@ -23,7 +23,7 @@ class FrameRangeProps(bpy.types.PropertyGroup):
 
         self['frame_end'] = value
 
-    range_name: bpy.props.StringProperty(
+    name: bpy.props.StringProperty(
         name="Range Name",
         description="Adding a name to your frame ranges makes them searchable",
         default="",

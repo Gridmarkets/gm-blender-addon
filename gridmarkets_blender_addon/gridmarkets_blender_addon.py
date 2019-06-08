@@ -416,10 +416,11 @@ class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
                 bpy.ops.gridmarkets.edit_frame_range('INVOKE_DEFAULT')
 
         if self.action == 'ADD':
+
             # add a frame range to the list
             frame_range = selected_job.frame_ranges.add()
 
-            frame_range.project_name = utils.create_unique_object_name(selected_job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+            frame_range.name = utils.create_unique_object_name(selected_job.frame_ranges, constants.FRAME_RANGE_PREFIX)
             frame_range.enabled = True
             frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
             frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
@@ -436,7 +437,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
-    range_name: bpy.props.StringProperty(
+    name: bpy.props.StringProperty(
         name="Range Name",
         description="Adding a name to your frame ranges makes them searchable",
         default="",
@@ -487,7 +488,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
 
         # set values for popup field inputs to default to
-        self.range_name = frame_range.name
+        self.name = frame_range.name
         self.enabled = frame_range.enabled
         self.frame_start = frame_range.frame_start
         self.frame_end = frame_range.frame_end
@@ -505,7 +506,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         # add a frame range to the list
         frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
 
-        frame_range.name = self.range_name
+        frame_range.name = self.name
         frame_range.enabled = True
         frame_range.frame_start = self.frame_start
         frame_range.frame_end = self.frame_end
@@ -527,8 +528,8 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
 
         # frame_range name
         row = box.row()
-        row.label(text="Range name")
-        row.prop(self, "range_name", text="")
+        row.label(text="Name")
+        row.prop(self, "name", text="")
 
         # is frame_range enabled
         row = box.row()
