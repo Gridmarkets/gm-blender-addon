@@ -21,6 +21,7 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         layout = self.layout
         props = bpy.context.scene.props
         selected_job = props.jobs[props.selected_job]
+        frame_range_count = len(selected_job.frame_ranges)
 
         enabled = selected_job.use_custom_frame_ranges
 
@@ -41,11 +42,16 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
 
         remove = sub.row()
         # prevent the user removing the last frame range for a job
-        if len(selected_job.frame_ranges) < 2:
+        if frame_range_count < 2:
             remove.enabled = False
         remove.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
 
         sub = col.column(align=True)
+
+        # disable up / down buttons if only one frame range
+        if frame_range_count < 2:
+            sub.enabled = False
+
         sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
         sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
 
