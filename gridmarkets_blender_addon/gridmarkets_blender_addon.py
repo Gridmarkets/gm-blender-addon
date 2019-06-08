@@ -297,12 +297,12 @@ class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
             # add a frame range to the list
             job = props.jobs.add()
 
-            job.name = utils.create_unique_object_name(props.jobs, constants.JOB_PREFIX)
+            job.name = utils.create_unique_object_name(props.jobs, name_prefix=constants.JOB_PREFIX)
 
             job.use_custom_frame_ranges = False
 
             frame_range = job.frame_ranges.add()
-            frame_range.name = utils.create_unique_object_name(job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+            frame_range.name = utils.create_unique_object_name(job.frame_ranges, name_prefix=constants.FRAME_RANGE_PREFIX)
             frame_range.enabled = True
             frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
             frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
@@ -331,7 +331,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         props = context.scene.props
 
         # set the default project name
-        self.project_name = utils.create_unique_object_name(props.projects, constants.PROJECT_PREFIX)
+        self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
 
         # create popup
         return context.window_manager.invoke_props_dialog(self, width=400)
@@ -420,7 +420,7 @@ class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
             # add a frame range to the list
             frame_range = selected_job.frame_ranges.add()
 
-            frame_range.name = utils.create_unique_object_name(selected_job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+            frame_range.name = utils.create_unique_object_name(selected_job.frame_ranges, name_prefix=constants.FRAME_RANGE_PREFIX)
             frame_range.enabled = True
             frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
             frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE

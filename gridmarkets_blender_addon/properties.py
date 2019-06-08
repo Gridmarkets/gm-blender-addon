@@ -159,7 +159,7 @@ def set_default_job():
         job.use_custom_frame_ranges = False
 
         frame_range = job.frame_ranges.add()
-        frame_range.name = create_unique_object_name(job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+        frame_range.name = create_unique_object_name(job.frame_ranges, name_prefix=constants.FRAME_RANGE_PREFIX)
         frame_range.enabled = True
         frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
         frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
