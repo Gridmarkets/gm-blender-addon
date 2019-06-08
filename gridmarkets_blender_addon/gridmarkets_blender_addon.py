@@ -396,17 +396,22 @@ class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
         except IndexError:
             pass
         else:
-            if self.action == 'DOWN' and index < len(proselected_jobps.frame_ranges) - 1:
+            if self.action == 'DOWN' and index < len(selected_job.frame_ranges) - 1:
                 selected_job.selected_frame_range += 1
 
             elif self.action == 'UP' and index >= 1:
                 selected_job.selected_frame_range -= 1
 
             elif self.action == 'REMOVE':
+                # never remove the last frame range
+                if len(selected_job.frame_ranges) < 2:
+                    return {"FINISHED"}
+
                 selected_job.frame_ranges.remove(index)
 
                 if selected_job.selected_frame_range > 0:
                     selected_job.selected_frame_range -= 1
+
             elif self.action == 'EDIT':
                 bpy.ops.gridmarkets.edit_frame_range('INVOKE_DEFAULT')
 
