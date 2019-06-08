@@ -298,6 +298,16 @@ class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
             job = props.jobs.add()
 
             job.name = utils.create_unique_object_name(props.jobs, constants.JOB_PREFIX)
+
+            job.use_custom_frame_ranges = False
+
+            frame_range = job.frame_ranges.add()
+            frame_range.name = utils.create_unique_object_name(job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+            frame_range.enabled = True
+            frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
+            frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
+            frame_range.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
+
             props.selected_job = len(props.jobs) - 1
 
         return {"FINISHED"}
