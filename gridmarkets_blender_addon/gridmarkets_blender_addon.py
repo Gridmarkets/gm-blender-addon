@@ -564,13 +564,13 @@ class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
 class GRIDMARKETS_UL_project(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        layout.label(text=item.name, icon='FILE_BLEND')
+        layout.label(text=item.name, icon=constants.PROJECT_ICON)
 
 
 class GRIDMARKETS_UL_job(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        layout.prop(item, "name", text="", emboss=False)
+        layout.prop(item, "name", text="", icon=constants.JOB_ICON, emboss=False)
 
 
 # ------------------------------------------------------------------------

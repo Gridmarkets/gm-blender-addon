@@ -27,6 +27,9 @@ PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
 
+PROJECT_ICON = 'BLEND_FILE'
+JOB_ICON = 'ALEMBIC'
+
 
 FRAME_RANGE_PREFIX = 'range_'
 DEFAULT_FRAME_RANGE_START_VALUE = 1
