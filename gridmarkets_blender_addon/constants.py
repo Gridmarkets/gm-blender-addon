@@ -27,7 +27,7 @@ PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
 
-PROJECT_ICON = 'BLEND_FILE'
+PROJECT_ICON = 'FILE_BLEND'
 JOB_ICON = 'ALEMBIC'
 
 
