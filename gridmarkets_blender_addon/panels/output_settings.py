@@ -19,3 +19,24 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         col = layout.column()
         col.prop(scene.props, "output_path")
         col.prop(scene.props, "output_prefix")
+
+
+classes = (
+    GRIDMARKETS_PT_Output_Settings,
+)
+
+
+def register():
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)

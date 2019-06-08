@@ -6,11 +6,6 @@ import constants
 import properties
 import utils
 
-from panels.main import GRIDMARKETS_PT_Main
-from panels.job_info import GRIDMARKETS_PT_Job_Info
-from panels.render_settings import GRIDMARKETS_PT_Render_settings
-from panels.output_settings import GRIDMARKETS_PT_Output_Settings
-
 from temp_directory_manager import TempDirectoryManager
 from icon_loader import IconLoader
 from property_sanitizer import PropertySanitizer
@@ -418,10 +413,6 @@ classes = (
     GRIDMARKETS_OT_frame_range_actions,
     GRIDMARKETS_OT_edit_frame_range,
     GRIDMARKETS_UL_frame_range,
-    GRIDMARKETS_PT_Main,
-    GRIDMARKETS_PT_Job_Info,
-    GRIDMARKETS_PT_Render_settings,
-    GRIDMARKETS_PT_Output_Settings
 )
 
 

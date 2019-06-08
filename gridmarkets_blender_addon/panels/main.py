@@ -39,3 +39,24 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         # Portal manager link
         row = layout.row(align=True)
         row.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME)
+
+
+classes = (
+    GRIDMARKETS_PT_Main,
+)
+
+
+def register():
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)

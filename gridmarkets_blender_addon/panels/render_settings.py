@@ -38,3 +38,24 @@ class GRIDMARKETS_PT_Render_settings(bpy.types.Panel):
         sub = col.column(align=True)
         sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
         sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+
+
+classes = (
+    GRIDMARKETS_PT_Render_settings,
+)
+
+
+def register():
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)
