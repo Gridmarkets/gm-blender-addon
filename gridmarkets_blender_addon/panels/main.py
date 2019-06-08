@@ -48,7 +48,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         # submit button
         row = layout.row(align=True)
         if project_count < 1 or job_count < 1:
-            row.active=False
+            row.enabled=False
         row.operator(constants.OPERATOR_SUBMIT_ID_NAME)
 
         # Portal manager link

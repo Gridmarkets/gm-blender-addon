@@ -22,16 +22,16 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         props = bpy.context.scene.props
         selected_job = props.jobs[props.selected_job]
 
-        active = selected_job.use_custom_frame_ranges
+        enabled = selected_job.use_custom_frame_ranges
 
         layout.prop(selected_job, "use_custom_frame_ranges")
 
         row = layout.row()
-        row.active = active
+        row.active = enabled
         row.template_list("GRIDMARKETS_UL_frame_range", "", selected_job, "frame_ranges", selected_job, "selected_frame_range", rows=5)
 
         col = row.column()
-        col.active = active
+        col.active = enabled
 
         sub = col.column(align=True)
         sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='MODIFIER', text="").action = 'EDIT'

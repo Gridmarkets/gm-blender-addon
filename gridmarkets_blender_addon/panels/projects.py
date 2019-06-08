@@ -26,7 +26,7 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
 
         # disable up and down buttons if there are less than 2 projects
         if project_count < 2:
-            sub.active = False
+            sub.enabled = False
 
         sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
         sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
@@ -39,7 +39,7 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
 
         # disable remove button if there are no projects to remove
         if project_count <= 0:
-            sub.active = False
+            sub.enabled = False
 
         sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='REMOVE', text="Remove Project").action = 'REMOVE'
 

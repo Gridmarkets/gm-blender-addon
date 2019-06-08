@@ -28,7 +28,7 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
 
         # disable remove button if there are no projects to remove
         if job_count <= 0:
-            sub2.active = False
+            sub2.enabled = False
 
         sub2.operator(constants.OPERATOR_JOB_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
 
@@ -36,7 +36,7 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
 
         # disable up and down buttons if there are less than 2 projects
         if job_count < 2:
-            sub.active = False
+            sub.enabled = False
 
         sub.operator(constants.OPERATOR_JOB_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
         sub.operator(constants.OPERATOR_JOB_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
