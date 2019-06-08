@@ -200,6 +200,161 @@ class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
         return {"FINISHED"}
 
 
+class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
+    """Class to represent the 'Cost Calculator' operation. Opens the cost calculator page in the users browser."""
+
+    bl_idname = constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME
+    bl_label = constants.OPERATOR_OPEN_COST_CALCULATOR_LABEL
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # open the render manager url in the users browser
+        bpy.ops.wm.url_open(url=constants.COST_CALCULATOR_URL)
+        return {"FINISHED"}
+
+
+class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
+    """ Contains actions that can be performed on the project list menu """
+
+    bl_idname = constants.OPERATOR_PROJECT_ACTIONS_ID_NAME
+    bl_label = constants.OPERATOR_PROJECT_ACTIONS_LABEL
+
+    action: bpy.props.EnumProperty(
+        items=(
+            ('UP', "Up", ""),
+            ('DOWN', "Down", ""),
+            ('REMOVE', "Remove", ""),
+            ('UPLOAD', "Upload", "")
+        )
+    )
+
+    def invoke(self, context, event):
+        props = context.scene.props
+        index = props.selected_project
+
+        # if the currently selected project does not exist then the only allowed action is 'ADD'
+        try:
+            item = props.projects[index]
+        except IndexError:
+            pass
+        else:
+            if self.action == 'DOWN' and index < len(props.projects) - 1:
+                props.selected_project += 1
+
+            elif self.action == 'UP' and index >= 1:
+                props.selected_project -= 1
+
+            elif self.action == 'REMOVE':
+                props.projects.remove(index)
+
+                if props.selected_project > 0:
+                    props.selected_project -= 1
+
+        if self.action == 'UPLOAD':
+            bpy.ops.gridmarkets.upload_project('INVOKE_DEFAULT')
+
+        return {"FINISHED"}
+
+
+class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
+    """ Contains actions that can be performed on the project list menu """
+
+    bl_idname = constants.OPERATOR_JOB_ACTIONS_ID_NAME
+    bl_label = constants.OPERATOR_JOB_ACTIONS_LABEL
+
+    action: bpy.props.EnumProperty(
+        items=(
+            ('UP', "Up", ""),
+            ('DOWN', "Down", ""),
+            ('REMOVE', "Remove", ""),
+            ('ADD', "Add", "")
+        )
+    )
+
+    def invoke(self, context, event):
+        props = context.scene.props
+        index = props.selected_job
+
+        # if the currently selected project does not exist then the only allowed action is 'ADD'
+        try:
+            item = props.jobs[index]
+        except IndexError:
+            pass
+        else:
+            if self.action == 'DOWN' and index < len(props.jobs) - 1:
+                props.selected_job += 1
+
+            elif self.action == 'UP' and index >= 1:
+                props.selected_job -= 1
+
+            elif self.action == 'REMOVE':
+                props.jobs.remove(index)
+
+                if props.selected_job > 0:
+                    props.selected_job -= 1
+
+        if self.action == 'ADD':
+            # add a frame range to the list
+            job = props.jobs.add()
+
+            job.name = utils.create_unique_object_name(props.jobs, constants.JOB_PREFIX)
+            props.selected_job = len(props.jobs) - 1
+
+        return {"FINISHED"}
+
+
+class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
+    bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
+    bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
+    bl_icon = 'BLEND_FILE'
+    bl_options = {'UNDO'}
+
+    # getters, setters and properties are all copied from <properties.FrameRangeProps>
+    project_name: bpy.props.StringProperty(
+        name="Project Name",
+        description="The name of your project",
+        default="",
+        maxlen=256
+    )
+
+    def invoke(self, context, event):
+        props = context.scene.props
+
+        # set the default project name
+        self.project_name = utils.create_unique_object_name(props.projects, constants.PROJECT_PREFIX)
+
+        # create popup
+        return context.window_manager.invoke_props_dialog(self, width=400)
+
+    def execute(self, context):
+        """ Called after the user clicks the 'ok' button on the popup """
+
+        props = context.scene.props
+
+        # add a project to the list
+        project = props.projects.add()
+
+        project.name = self.project_name
+
+        props.selected_project = len(props.projects) - 1
+
+        # force region to redraw otherwise the list wont update until next event (mouse over, etc)
+        for area in bpy.context.screen.areas:
+            if area.type == constants.PANEL_SPACE_TYPE:
+                for region in area.regions:
+                    if region.type == constants.PANEL_REGION_TYPE:
+                        region.tag_redraw()
+
+        return {'FINISHED'}
+
+    def draw(self, context):
+        layout = self.layout
+
+        # project name
+        layout.prop(self, "project_name")
+
+
+
 class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the frame range list menu """
 
@@ -218,43 +373,44 @@ class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
 
     def invoke(self, context, event):
         props = context.scene.props
-        index = props.selected_frame_range
+        selected_job = props.jobs[props.selected_job]
+        index = selected_job.selected_frame_range
 
         # do not perform any action if disabled
-        if not props.use_custom_frame_ranges:
+        if not selected_job.use_custom_frame_ranges:
             return {"FINISHED"}
 
         # if the currently selected frame_range does not exist then the only allowed action is 'ADD'
         try:
-            item = props.frame_ranges[index]
+            item = selected_job.frame_ranges[index]
         except IndexError:
             pass
         else:
-            if self.action == 'DOWN' and index < len(props.frame_ranges) - 1:
-                props.selected_frame_range += 1
+            if self.action == 'DOWN' and index < len(proselected_jobps.frame_ranges) - 1:
+                selected_job.selected_frame_range += 1
 
             elif self.action == 'UP' and index >= 1:
-                props.selected_frame_range -= 1
+                selected_job.selected_frame_range -= 1
 
             elif self.action == 'REMOVE':
-                props.frame_ranges.remove(index)
+                selected_job.frame_ranges.remove(index)
 
-                if props.selected_frame_range > 0:
-                    props.selected_frame_range -= 1
+                if selected_job.selected_frame_range > 0:
+                    selected_job.selected_frame_range -= 1
             elif self.action == 'EDIT':
                 bpy.ops.gridmarkets.edit_frame_range('INVOKE_DEFAULT')
 
         if self.action == 'ADD':
             # add a frame range to the list
-            frame_range = props.frame_ranges.add()
+            frame_range = selected_job.frame_ranges.add()
 
-            frame_range.name = utils.create_unique_object_name(props.frame_ranges, constants.FRAME_RANGE_PREFIX)
+            frame_range.project_name = utils.create_unique_object_name(selected_job.frame_ranges, constants.FRAME_RANGE_PREFIX)
             frame_range.enabled = True
             frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
             frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
             frame_range.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
 
-            props.selected_frame_range = len(props.frame_ranges) - 1
+            selected_job.selected_frame_range = len(selected_job.frame_ranges) - 1
 
         return {"FINISHED"}
 
@@ -305,14 +461,15 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
 
     def invoke(self, context, event):
 
+        props = context.scene.props
+        selected_job = props.selected_job
+
         # don't create popup if custom frame ranges are not enabled
-        if not context.scene.props.use_custom_frame_ranges:
+        if not selected_job.use_custom_frame_ranges:
             return {"FINISHED"}
 
-        props = context.scene.props
-
         # Set the field input's to match the values of the frame range
-        frame_range = props.frame_ranges[props.selected_frame_range]
+        frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
 
         # set values for popup field inputs to default to
         self.range_name = frame_range.name
@@ -328,9 +485,10 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         """ Called after the user clicks the 'ok' button on the popup """
 
         props = context.scene.props
+        selected_job = props.jobs[props.selected_job]
 
         # add a frame range to the list
-        frame_range = props.frame_ranges[props.selected_frame_range]
+        frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
 
         frame_range.name = self.range_name
         frame_range.enabled = True
@@ -402,6 +560,19 @@ class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
     def invoke(self, context, event):
         pass
 
+
+class GRIDMARKETS_UL_project(bpy.types.UIList):
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        layout.label(text=item.name, icon='FILE_BLEND')
+
+
+class GRIDMARKETS_UL_job(bpy.types.UIList):
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        layout.prop(item, "name", text="", emboss=False)
+
+
 # ------------------------------------------------------------------------
 #    Registration
 # ------------------------------------------------------------------------
@@ -410,9 +581,15 @@ class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
 classes = (
     GRIDMARKETS_OT_Submit,
     GRIDMARKETS_OT_Open_Manager_Portal,
+    GRIDMARKETS_OT_Open_Cost_Calculator,
+    GRIDMARKETS_OT_project_actions,
+    GRIDMARKETS_OT_upload_project,
+    GRIDMARKETS_OT_job_actions,
     GRIDMARKETS_OT_frame_range_actions,
     GRIDMARKETS_OT_edit_frame_range,
     GRIDMARKETS_UL_frame_range,
+    GRIDMARKETS_UL_project,
+    GRIDMARKETS_UL_job
 )
 
 

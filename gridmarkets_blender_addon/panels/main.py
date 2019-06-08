@@ -18,27 +18,50 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
     def poll(self, context):
         return True  # context.object is not None
 
-    def draw(self, context):
+    def draw_header(self, context):
         layout = self.layout
 
         # get the Gridmarkets icon
         preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
         iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
 
+        # display Gridmarkets icon and version
+        layout.label(text="", icon_value=iconGM.icon_id)
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.props
+        project_count = len(props.projects)
+        job_count = len(props.jobs)
+
         # get the plugin version as a string
         versionStr = 'Gridmarkets v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
             constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
 
-        # display Gridmarkets icon and version
-        layout.label(text=versionStr, icon_value=iconGM.icon_id)
+        # display help message
+        if project_count < 1:
+            layout.label(text='You must upload a project before you can submit', icon='INFO')
 
-        # 'Submit' button
+        elif job_count < 1:
+            layout.label(text='You must create a job before you can submit', icon='INFO')
+
+        # submit button
         row = layout.row(align=True)
+        if project_count < 1 or job_count < 1:
+            row.active=False
         row.operator(constants.OPERATOR_SUBMIT_ID_NAME)
 
         # Portal manager link
         row = layout.row(align=True)
         row.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME)
+
+        # Cost calculator
+        row = layout.row(align=True)
+        row.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME)
+
+        row = layout.row(align=True)
+        row.enabled = False
+        row.label(text=versionStr)
 
 
 classes = (

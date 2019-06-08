@@ -2,28 +2,33 @@ import bpy
 import constants
 
 
-class GRIDMARKETS_PT_Render_settings(bpy.types.Panel):
-    """Create a Panel containing render related settings, such as frame range(s)"""
+class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
+    """Create a Panel containing the frame ranges for a job """
 
-    bl_idname = constants.PANEL_RENDER_SETTINGS_ID_NAME
-    bl_label = constants.PANEL_RENDER_SETTINGS_LABEL
+    bl_idname = constants.PANEL_FRAME_RANGES_ID_NAME
+    bl_label = constants.PANEL_FRAME_RANGES_LABEL
     bl_space_type = constants.PANEL_SPACE_TYPE
     bl_region_type = constants.PANEL_REGION_TYPE
     bl_context = constants.PANEL_CONTEXT
-    bl_parent_id = constants.PANEL_MAIN_ID_NAME
+    bl_parent_id = constants.PANEL_JOBS_ID_NAME
+
+    @classmethod
+    def poll(self, context):
+        job_count = len(context.scene.props.jobs)
+        return job_count > 0
 
     def draw(self, context):
         layout = self.layout
         props = bpy.context.scene.props
-        active = props.use_custom_frame_ranges
+        selected_job = props.jobs[props.selected_job]
 
-        row = layout.row()
+        active = selected_job.use_custom_frame_ranges
 
-        row.prop(props, "use_custom_frame_ranges")
+        layout.prop(selected_job, "use_custom_frame_ranges")
 
         row = layout.row()
         row.active = active
-        row.template_list("GRIDMARKETS_UL_frame_range", "", props, "frame_ranges", props, "selected_frame_range", rows=5)
+        row.template_list("GRIDMARKETS_UL_frame_range", "", selected_job, "frame_ranges", selected_job, "selected_frame_range", rows=5)
 
         col = row.column()
         col.active = active
@@ -41,7 +46,7 @@ class GRIDMARKETS_PT_Render_settings(bpy.types.Panel):
 
 
 classes = (
-    GRIDMARKETS_PT_Render_settings,
+    GRIDMARKETS_PT_frame_ranges,
 )
 
 

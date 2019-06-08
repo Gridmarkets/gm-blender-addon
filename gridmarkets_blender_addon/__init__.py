@@ -23,8 +23,9 @@ modulesNames = ['constants',
                 'gridmarkets_blender_addon',
                 'panels.main',
                 'panels.projects',
-                'panels.job_info',
-                'panels.render_settings',
+                'panels.jobs',
+                #'panels.job_info',
+                'panels.frame_ranges',
                 'panels.output_settings']
 
 # append this folder to sys.path so local dependencies can be found

@@ -61,27 +61,60 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         min=1
     )
 
+class ProjectProps(bpy.types.PropertyGroup):
+
+    name: bpy.props.StringProperty(
+        name="Name",
+        description="The name of your project as it will appear in envoy",
+        default="",
+        maxlen=256
+    )
+
+
+class JobProps(bpy.types.PropertyGroup):
+
+    name: bpy.props.StringProperty(
+        name="Name",
+        description="The name of the job",
+        default="",
+        maxlen=256
+    )
+
+    # use project settings or overrided settings
+    use_custom_frame_ranges: bpy.props.BoolProperty(
+        name="Use custom frame ranges",
+        description="Choose between rendering custom frame ranges or using blenders standard animation frame range "
+                    "settings",
+        default=False,
+    )
+
+    # frame range collection
+    frame_ranges: bpy.props.CollectionProperty(
+        type=FrameRangeProps
+    )
+
+    selected_frame_range: bpy.props.IntProperty()
+
+    # output path
+    output_path: bpy.props.StringProperty(
+        name="Output Path",
+        description="",
+        default=constants.DEFAULT_OUTPUT_PATH,
+        subtype='DIR_PATH'
+    )
+
+    # prefix for output files
+    output_prefix: bpy.props.StringProperty(
+        name="Output Prefix",
+        description="",
+        default="",
+        maxlen=200,
+    )
+
 
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessable via the interface.
     """
-    
-    # project name
-    project_name: bpy.props.StringProperty(
-        name="Project Name",
-        description="The name of the project is optional, if it's not passed it will be inferred from project's root " 
-                    "folder",
-        default="",
-        maxlen=1024,
-        )
-    
-    # submission label
-    submission_label: bpy.props.StringProperty(
-        name="Submission Label",
-        description="A string identifier for the submission (optional)",
-        default="",
-        maxlen=1024,
-        )
     
     # artist name
     artist_name: bpy.props.StringProperty(
@@ -98,55 +131,44 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default="",
         maxlen=1024,
         )
-    
-    # use project settings or overrided settings
-    use_custom_frame_ranges: bpy.props.BoolProperty(
-        name="Use custom frame ranges",
-        description="Choose between rendering custom frame ranges or using blenders standard animation frame range "
-                    "settings",
-        default = False,
-        )
 
-    frame_ranges: bpy.props.CollectionProperty(
-        type=FrameRangeProps
+    # project collection
+    projects: bpy.props.CollectionProperty(
+        type=ProjectProps
     )
 
-    selected_frame_range: bpy.props.IntProperty()
-    
-    # output path
-    output_path: bpy.props.StringProperty(
-        name="Output Path",
-        description="",
-        default = constants.DEFAULT_OUTPUT_PATH,
-        subtype = 'DIR_PATH'
-        )
-    
-    # prefix for output files
-    output_prefix: bpy.props.StringProperty(
-        name="Output Prefix",
-        description="",
-        default = "",
-        maxlen=200,
-        )
+    selected_project: bpy.props.IntProperty()
+
+    # job collection
+    jobs: bpy.props.CollectionProperty(
+        type=JobProps
+    )
+
+    selected_job: bpy.props.IntProperty()
 
 
-def set_default_frame_ranges():
-    """" Sets the default value for GRIDMARKETS_PROPS_Addon_Properties.frame_ranges """
-    frame_ranges = bpy.context.scene.props.frame_ranges
+def set_default_job():
+    """" Adds a default job to GRIDMARKETS_PROPS_Addon_Properties.jobs """
+    jobs = bpy.context.scene.props.jobs
 
     # set default value if <bpy.context.scene.props.frame_ranges> is empty
-    if not frame_ranges:
-        item = frame_ranges.add()
-        item.name = create_unique_object_name(frame_ranges, constants.FRAME_RANGE_PREFIX)
-        item.enabled = True
-        item.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
-        item.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
-        item.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
+    if not jobs:
+        job = jobs.add()
+        job.name = 'default job'
+
+        job.use_custom_frame_ranges = False
+
+        frame_range = job.frame_ranges.add()
+        frame_range.name = create_unique_object_name(job.frame_ranges, constants.FRAME_RANGE_PREFIX)
+        frame_range.enabled = True
+        frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
+        frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
+        frame_range.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
 
 
 def _on_register(scene):
     """ Called when the add-on is registered """
-    set_default_frame_ranges()
+    set_default_job()
 
     # remove the handler once it has completed as it is no longer needed
     bpy.app.handlers.depsgraph_update_post.remove(_on_register)
@@ -161,15 +183,23 @@ def _on_file_loaded(scene):
     - opening any Blender file
     """
 
-    set_default_frame_ranges()
+    set_default_job()
+
+
+classes = (
+    FrameRangeProps,
+    ProjectProps,
+    JobProps,
+    GRIDMARKETS_PROPS_Addon_Properties,
+)
 
 
 def register():
     from bpy.utils import register_class
-    
-    # register properties
-    register_class(FrameRangeProps)
-    register_class(GRIDMARKETS_PROPS_Addon_Properties)
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
 
     # register add-on properties
     bpy.types.Scene.props = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_Addon_Properties)
@@ -182,12 +212,13 @@ def register():
 def unregister():
     from bpy.utils import unregister_class
 
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)
+
     # remove handler
     bpy.app.handlers.load_post.remove(_on_file_loaded)
 
-    # unregister properties
-    unregister_class(GRIDMARKETS_PROPS_Addon_Properties)
-    unregister_class(FrameRangeProps)
-
     # delete add-on properties
     del bpy.types.Scene.props
+

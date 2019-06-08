@@ -12,6 +12,11 @@ class GRIDMARKETS_PT_Job_Info(bpy.types.Panel):
     bl_context = constants.PANEL_CONTEXT
     bl_parent_id = constants.PANEL_MAIN_ID_NAME
 
+    @classmethod
+    def poll(self, context):
+        project_count = len(context.scene.props.projects)
+        return project_count > 0
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -38,6 +43,10 @@ class GRIDMARKETS_PT_Job_Info(bpy.types.Panel):
         col.alignment = 'RIGHT'
         col.label(text=bpy.app.version_string)
         col.label(text=bpy.context.scene.render.engine)
+
+        # 'Submit' button
+        row = layout.row(align=True)
+        row.operator(constants.OPERATOR_SUBMIT_ID_NAME)
 
 
 classes = (

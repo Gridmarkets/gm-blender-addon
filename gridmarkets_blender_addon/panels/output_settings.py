@@ -10,15 +10,22 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
     bl_space_type = constants.PANEL_SPACE_TYPE
     bl_region_type = constants.PANEL_REGION_TYPE
     bl_context = constants.PANEL_CONTEXT
-    bl_parent_id = constants.PANEL_MAIN_ID_NAME
+    bl_parent_id = constants.PANEL_JOBS_ID_NAME
+
+    @classmethod
+    def poll(self, context):
+        job_count = len(context.scene.props.jobs)
+        return job_count > 0
 
     def draw(self, context):
         layout = self.layout
         scene = context.scene
+        props = scene.props
+        job = props.jobs[props.selected_job]
 
         col = layout.column()
-        col.prop(scene.props, "output_path")
-        col.prop(scene.props, "output_prefix")
+        col.prop(job, "output_path")
+        col.prop(job, "output_prefix")
 
 
 classes = (
