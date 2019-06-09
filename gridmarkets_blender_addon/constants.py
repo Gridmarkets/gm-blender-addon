@@ -30,6 +30,8 @@ JOB_PREFIX = 'Job_'
 PROJECT_ICON = 'FILE_BLEND'
 JOB_ICON = 'ALEMBIC'
 
+AUTHENTICATION_HELP_MESSAGE = "\nEnter your Gridmarkets credentials by going to: Edit -> Preferences -> Add-ons -> " \
+                              "Gridmarkets Blender Add-on -> preferences"
 
 FRAME_RANGE_PREFIX = 'range_'
 DEFAULT_FRAME_RANGE_START_VALUE = 1

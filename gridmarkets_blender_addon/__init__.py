@@ -19,6 +19,7 @@ import importlib
 modulesNames = ['constants',
                 'icon_loader',
                 'properties',
+                'property_sanitizer',
                 'addon_preferences',
                 'gridmarkets_blender_addon',
                 'panels.main',

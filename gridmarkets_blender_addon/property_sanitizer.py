@@ -4,8 +4,81 @@ import uuid
 import constants
 
 
+class ValidationResponse():
+
+    def __init__(self, error_message=None):
+
+        self._error_message = error_message
+
+        if error_message == None:
+            self._is_valid = True
+        else:
+            self._is_valid = False
+
+    def is_valid(self):
+        """ Did the validation method pass
+
+        :return: is the validation response valid
+        :rtype: bool
+        """
+
+        return self._is_valid
+
+    def is_invalid(self):
+        """ Did the validation method fail
+
+        :return: opposite of is_valid
+        :rtype: bool
+        """
+
+        return not self.is_valid()
+
+    def get_error_message(self):
+        """ Getter
+
+        :return: The error message explaining why validation failed
+        :rtype: str
+        """
+        return self._error_message
+
+
 class PropertySanitizer():
     """ Helper class which provides useful methods for getting and validating the values of user input fields"""
+
+    @staticmethod
+    def validate_credentials():
+        """ Validator
+
+        :return: Whether or not the user's authentication credentials are valid
+        :rtype: ValidationResponse
+        """
+
+        # get the add-on preferences
+        addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+
+        hasEmail = False
+        hasKey = False
+
+        # check an email address has been entered
+        if isinstance(addon_prefs.auth_email, str) and len(addon_prefs.auth_email) > 0:
+            hasEmail = True
+
+        # check a auth key has been entered
+        if isinstance(addon_prefs.auth_accessKey, str) and len(addon_prefs.auth_accessKey) > 0:
+            hasKey = True
+
+        # validate
+        if (not hasEmail and not hasKey):
+            return ValidationResponse("No Gridmarkets email address or access key provided." +
+                                      constants.AUTHENTICATION_HELP_MESSAGE)
+        elif (not hasEmail):
+            return ValidationResponse("No Gridmarketes email address provided." + constants.AUTHENTICATION_HELP_MESSAGE)
+
+        elif (not hasKey):
+            return ValidationResponse("No Gridmarketes access key provided." + constants.AUTHENTICATION_HELP_MESSAGE)
+
+        return ValidationResponse()
+
 
     @staticmethod
     def get_project_name(props, default_project_name ='Project-' + uuid.uuid4().hex):
@@ -77,3 +150,11 @@ class PropertySanitizer():
             return "0"
 
         return outputPrefix
+
+
+def register():
+    pass
+
+
+def unregister():
+    pass
