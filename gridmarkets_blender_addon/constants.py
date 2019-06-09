@@ -13,6 +13,8 @@ MAIN_COLLECTION_ID = "main"
 # directory for the add-on to output temporary files
 TEMP_FILES_FOLDER = ".gm_temp_files"
 
+BLEND_FILE_EXTENSION = ".blend"
+
 # the url of the render manager
 RENDER_MANAGER_URL = "https://portal.gridmarkets.com/init/member_plugin/index"
 

@@ -301,8 +301,21 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     def invoke(self, context, event):
         props = context.scene.props
 
-        # set the default project name
-        self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
+        # if the file has been saved use the name of the file as the prefix
+        if bpy.context.blend_data.is_saved:
+            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+
+            print("blend_file_name", blend_file_name)
+
+            if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
+                print("blend_file_name", blend_file_name)
+                blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
+
+            print("blend_file_name", blend_file_name)
+
+            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
+        else:
+            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
 
         # create popup
         return context.window_manager.invoke_props_dialog(self, width=400)
@@ -353,8 +366,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
             # pack the .blend file to the pack directory
             utils.pack_blend_file(str(blend_file_path), str(packed_dir))
-
-            print("packed_dir:", packed_dir)
 
             # delete pack-info.txt if it exists
             pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
