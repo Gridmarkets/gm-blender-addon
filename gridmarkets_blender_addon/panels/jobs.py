@@ -17,6 +17,8 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
         props = bpy.context.scene.props
         job_count = len(props.jobs)
 
+        layout.label(text='Preset Jobs')
+
         row = layout.row()
         row.template_list("GRIDMARKETS_UL_job", "", props, "jobs", props, "selected_job", rows=1)
 
