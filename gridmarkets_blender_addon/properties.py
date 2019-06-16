@@ -112,9 +112,29 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
 
+
+def _get_projects(scene, context):
+    """ Returns a list of items representing project options """
+
+    props = context.scene.props
+
+    project_options = [
+        # it is always an option to upload as a new project
+        ('new project', "New Project", ""),  # (value, label, description)
+    ]
+
+    # iterate through uploaded projects and add them as options
+    for i, project in enumerate(props.projects):
+        project_options.append((i, project.name, ''))
+
+    return project_options
+
+
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessable via the interface.
     """
+
+
     
     # artist name
     artist_name: bpy.props.StringProperty(
@@ -138,6 +158,13 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     )
 
     selected_project: bpy.props.IntProperty()
+
+    # projects enum
+    project_options: bpy.props.EnumProperty(
+        name="Projects",
+        description="Apply Data to attribute.",
+        items=_get_projects
+    )
 
     # job collection
     jobs: bpy.props.CollectionProperty(
