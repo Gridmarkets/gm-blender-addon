@@ -5,7 +5,8 @@ ADDON_PACKAGE_NAME = "gridmarkets_blender_addon"
 ICONS_FOLDER = "icons"
 
 # the name of the gridmarkets logo file
-LOGO_ICON_FILE_NAME = "logo.png"
+GM_COLOURED_LOGO = "logo.png"
+GM_GREYSCALE_LOGO = "logo_greyscale.png"
 
 GRIDMARKETS_LOGO_ID = "gridmarkets_logo"
 MAIN_COLLECTION_ID = "main"
