@@ -198,7 +198,8 @@ def _on_register(scene):
     set_default_job()
 
     # remove the handler once it has completed as it is no longer needed
-    bpy.app.handlers.depsgraph_update_post.remove(_on_register)
+    if _on_register in bpy.app.handlers.depsgraph_update_post:
+        bpy.app.handlers.depsgraph_update_post.remove(_on_register)
 
 
 @bpy.app.handlers.persistent
@@ -244,7 +245,8 @@ def unregister():
         unregister_class(cls)
 
     # remove handler
-    bpy.app.handlers.load_post.remove(_on_file_loaded)
+    if _on_file_loaded in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(_on_file_loaded)
 
     # delete add-on properties
     del bpy.types.Scene.props
