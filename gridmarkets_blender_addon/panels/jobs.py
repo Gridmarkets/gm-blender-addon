@@ -20,7 +20,7 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
         layout.label(text='Preset Jobs')
 
         row = layout.row()
-        row.template_list("GRIDMARKETS_UL_job", "", props, "jobs", props, "selected_job", rows=1)
+        row.template_list("GRIDMARKETS_UL_job", "", props, "jobs", props, "selected_job", rows=3)
 
         col = row.column()
 
