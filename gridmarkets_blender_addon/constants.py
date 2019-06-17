@@ -21,6 +21,9 @@ RENDER_MANAGER_URL = "https://portal.gridmarkets.com/init/member_plugin/index"
 
 COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
+# TODO need an actual help url
+HELP_URL = "https://www.gridmarkets.com/"
+
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
 
@@ -71,6 +74,8 @@ OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME = "gridmarkets.open_portal"
 OPERATOR_OPEN_MANAGER_PORTAL_LABEL = "Open Manager Portal"
 OPERATOR_OPEN_COST_CALCULATOR_ID_NAME = "gridmarkets.open_cost_calculator"
 OPERATOR_OPEN_COST_CALCULATOR_LABEL = "Cost Calculator"
+OPERATOR_OPEN_HELP_URL_ID_NAME = "gridmarkets.open_help_url"
+OPERATOR_OPEN_HELP_URL_LABEL = "Help"
 OPERATOR_PROJECT_ACTIONS_ID_NAME = "gridmarkets.project_list_actions"
 OPERATOR_PROJECT_ACTIONS_LABEL = "Project Actions"
 OPERATOR_JOB_ACTIONS_ID_NAME= "gridmarkets.job_list_actions"

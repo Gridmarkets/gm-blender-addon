@@ -183,6 +183,18 @@ class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
         bpy.ops.wm.url_open(url=constants.COST_CALCULATOR_URL)
         return {"FINISHED"}
 
+class GRIDMARKETS_OT_open_help_url(bpy.types.Operator):
+    """Class to represent the 'Help' operation. Opens the plugins help page in the user's browser."""
+
+    bl_idname = constants.OPERATOR_OPEN_HELP_URL_ID_NAME
+    bl_label = constants.OPERATOR_OPEN_HELP_URL_LABEL
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # open the render manager url in the users browser
+        bpy.ops.wm.url_open(url=constants.HELP_URL)
+        return {"FINISHED"}
+
 
 class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the project list menu """
@@ -660,6 +672,7 @@ classes = (
     GRIDMARKETS_OT_Submit,
     GRIDMARKETS_OT_Open_Manager_Portal,
     GRIDMARKETS_OT_Open_Cost_Calculator,
+    GRIDMARKETS_OT_open_help_url,
     GRIDMARKETS_OT_project_actions,
     GRIDMARKETS_OT_upload_project,
     GRIDMARKETS_OT_job_actions,

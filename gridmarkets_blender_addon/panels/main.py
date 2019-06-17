@@ -62,6 +62,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         row = layout.row(align=True)
         row.enabled = False
         row.label(text=versionStr)
+        row.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon='HELP')
 
 
 classes = (
