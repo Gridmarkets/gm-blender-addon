@@ -35,7 +35,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         job_count = len(props.jobs)
 
         # get the plugin version as a string
-        versionStr = 'Gridmarkets v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
+        versionStr = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
             constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
 
         # display help message
