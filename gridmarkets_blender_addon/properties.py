@@ -113,28 +113,47 @@ class JobProps(bpy.types.PropertyGroup):
 
 
 
-def _get_projects(scene, context):
+def _get_project_options(scene, context):
     """ Returns a list of items representing project options """
 
     props = context.scene.props
 
     project_options = [
         # it is always an option to upload as a new project
-        ('new project', "New Project", ""),  # (value, label, description)
+        (constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_LABEL,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION,
+         'FILE_NEW', 0)
     ]
 
     # iterate through uploaded projects and add them as options
     for i, project in enumerate(props.projects):
-        project_options.append((i, project.name, ''))
+        project_options.append((str(i + 1), project.name, '', '', i + 1))
 
     return project_options
+
+def _get_job_options(scene, context):
+    """ Returns a list of items representing project options """
+
+    props = context.scene.props
+
+    job_options = [
+        (constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE,
+         constants.JOB_OPTIONS_BLENDERS_SETTINGS_LABEL,
+         constants.JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION,
+         'BLENDER', 0)
+    ]
+
+    # iterate through uploaded projects and add them as options
+    for i, job in enumerate(props.jobs):
+        job_options.append((str(i + 1), job.name, '', constants.JOB_ICON, i + 1))
+
+    return job_options
 
 
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessable via the interface.
     """
-
-
     
     # artist name
     artist_name: bpy.props.StringProperty(
@@ -161,9 +180,9 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     # projects enum
     project_options: bpy.props.EnumProperty(
-        name="Projects",
-        description="Apply Data to attribute.",
-        items=_get_projects
+        name="Project",
+        description="The list of possible projects to use on submit",
+        items=_get_project_options
     )
 
     # job collection
@@ -172,6 +191,13 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     )
 
     selected_job: bpy.props.IntProperty()
+
+    # jobs enum
+    job_options: bpy.props.EnumProperty(
+        name="Job",
+        description="The list of possible jobs to use on submit",
+        items=_get_job_options
+    )
 
 
 def set_default_job():

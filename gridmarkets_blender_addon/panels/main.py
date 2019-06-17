@@ -2,7 +2,6 @@ import bpy
 import constants
 from icon_loader import IconLoader
 
-
 class GRIDMARKETS_PT_Main(bpy.types.Panel):
     """Class to represent the plugins main panel. Contains all sub panels as well as 'Render' and 'Open Manager Portal'
     buttons.
@@ -30,38 +29,37 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animating of properties
+
         props = context.scene.props
-        project_count = len(props.projects)
-        job_count = len(props.jobs)
 
         # get the plugin version as a string
-        versionStr = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
+        version_str = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
             constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
 
-        # display help message
-        if project_count < 1:
-            layout.label(text='You must upload a project before you can submit', icon='INFO')
+        # version label
+        row = layout.row(align=True)
+        row.enabled = False
+        row.label(text=version_str)
 
-        elif job_count < 1:
-            layout.label(text='You must create a job before you can submit', icon='INFO')
+        layout.prop(props, "project_options")
+        layout.prop(props, "job_options")
 
         # submit button
         row = layout.row(align=True)
-        if project_count < 1 or job_count < 1:
-            row.enabled=False
-        row.operator(constants.OPERATOR_SUBMIT_ID_NAME)
+        row.scale_y = 2.5
+        row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
+
+        layout.separator_spacer()
 
         # Portal manager link
         row = layout.row(align=True)
-        row.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME)
+        row.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon='URL')
 
         # Cost calculator
-        row = layout.row(align=True)
-        row.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME)
-
-        row = layout.row(align=True)
-        row.enabled = False
-        row.label(text=versionStr)
+        row = layout.row()
+        row.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon='URL')
         row.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon='HELP')
 
 
