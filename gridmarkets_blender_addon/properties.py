@@ -1,6 +1,5 @@
 import bpy
 import constants
-from utils import create_unique_object_name
 
 
 class FrameRangeProps(bpy.types.PropertyGroup):
