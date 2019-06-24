@@ -271,6 +271,13 @@ class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
                 props.selected_job -= 1
 
             elif self.action == 'REMOVE':
+                # the static default options value's are not necessarily a number
+                if props.job_options.isnumeric():
+                    selected_job_option = int(props.job_options)
+
+                    if selected_job_option == index + constants.JOB_OPTIONS_STATIC_COUNT:
+                        props.property_unset("job_options")
+
                 props.jobs.remove(index)
 
                 if props.selected_job > 0:
@@ -280,8 +287,8 @@ class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
             # add a frame range to the list
             job = props.jobs.add()
 
+            job.id = utils.get_unique_id(props.jobs)
             job.name = utils.create_unique_object_name(props.jobs, name_prefix=constants.JOB_PREFIX)
-
             job.use_custom_frame_ranges = False
 
             frame_range = job.frame_ranges.add()
@@ -686,7 +693,7 @@ classes = (
 
 def register():
     from bpy.utils import register_class
-    
+
     # register classes
     for cls in classes:
         register_class(cls)
@@ -694,7 +701,7 @@ def register():
 
 def unregister():
     from bpy.utils import unregister_class
-    
+
     # unregister classes
     for cls in reversed(classes):
         unregister_class(cls)

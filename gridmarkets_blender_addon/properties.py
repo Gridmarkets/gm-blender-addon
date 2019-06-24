@@ -73,6 +73,12 @@ class ProjectProps(bpy.types.PropertyGroup):
 
 class JobProps(bpy.types.PropertyGroup):
 
+    id: bpy.props.IntProperty(
+        name="ID",
+        description="A integer that is unique across all existing jobs",
+        min= 0
+    )
+
     name: bpy.props.StringProperty(
         name="Name",
         description="The name of the job",
@@ -146,7 +152,7 @@ def _get_job_options(scene, context):
 
     # iterate through uploaded projects and add them as options
     for i, job in enumerate(props.jobs):
-        job_options.append((str(i + 1), job.name, '', constants.JOB_ICON, i + 1))
+        job_options.append((str(i + 1), job.name, '', constants.JOB_ICON, job.id))
 
     return job_options
 
