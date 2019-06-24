@@ -10,11 +10,11 @@ from temp_directory_manager import TempDirectoryManager
 from icon_loader import IconLoader
 from property_sanitizer import PropertySanitizer
 
-from .lib.gridmarkets.envoy_client import EnvoyClient
-from .lib.gridmarkets.project import Project
-from .lib.gridmarkets.job import Job
-from .lib.gridmarkets.watch_file import WatchFile
-from .lib.gridmarkets.errors import *
+from gridmarkets.envoy_client import EnvoyClient
+from gridmarkets.project import Project
+from gridmarkets.job import Job
+from gridmarkets.watch_file import WatchFile
+from gridmarkets.errors import *
 
 # ------------------------------------------------------------------------
 #    Global Variables
