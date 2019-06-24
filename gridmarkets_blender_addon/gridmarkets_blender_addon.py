@@ -159,7 +159,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
 
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
-    """Class to represent the 'Open Manager Portal' operation. Opens the portal in the users browser."""
+    """Class to represent the 'Open Manager Portal' operation. Opens the portal in the user's browser."""
 
     bl_idname = constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME
     bl_label = constants.OPERATOR_OPEN_MANAGER_PORTAL_LABEL
@@ -172,7 +172,7 @@ class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
 
 
 class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
-    """Class to represent the 'Cost Calculator' operation. Opens the cost calculator page in the users browser."""
+    """Class to represent the 'Cost Calculator' operation. Opens the cost calculator page in the user's browser."""
 
     bl_idname = constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME
     bl_label = constants.OPERATOR_OPEN_COST_CALCULATOR_LABEL
