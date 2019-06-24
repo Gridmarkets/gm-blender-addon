@@ -228,8 +228,17 @@ class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
                 props.selected_project -= 1
 
             elif self.action == 'REMOVE':
+                # the static default options value's are not necessarily a number
+                if props.project_options.isnumeric():
+                    selected_project_option = int(props.project_options)
+
+                    if selected_project_option == index + constants.PROJECT_OPTIONS_STATIC_COUNT:
+                        props.property_unset("project_options")
+
+
                 props.projects.remove(index)
 
+                # select the previous project if the selected project isn't already the first in the list
                 if props.selected_project > 0:
                     props.selected_project -= 1
 
@@ -426,6 +435,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         # add a project to the list
         project = props.projects.add()
 
+        project.id = utils.get_unique_id(props.projects)
         project.name = self.project_name
 
         # select the new project

@@ -49,10 +49,10 @@ PANEL_MAIN_ID_NAME = "gridmarkets_main_panel"
 PANEL_MAIN_ID_LABEL = "GridMarkets"
 
 PANEL_PROJECTS_ID_NAME = "gridmarkets_projects_sub_panel"
-PANEL_PROJECTS_LABEL = "Projects"
+PANEL_PROJECTS_LABEL = "Uploaded Projects"
 
 PANEL_JOBS_ID_NAME = "gridmarkets_jobs_sub_panel"
-PANEL_JOBS_LABEL = "Jobs"
+PANEL_JOBS_LABEL = "Custom Jobs"
 
 PANEL_JOBS_INFO_ID_NAME = "gridmarkets_job_info_sub_panel"
 PANEL_JOBS_INFO_LABEL = "Job Info"
@@ -88,10 +88,12 @@ OPERATOR_EDIT_FRAME_RANGE_ID_NAME = "gridmarkets.edit_frame_range"
 OPERATOR_EDIT_FRAME_RANGE_LABEL = "Edit Frame Range"
 
 # enum values
+PROJECT_OPTIONS_STATIC_COUNT = 1
 PROJECT_OPTIONS_NEW_PROJECT_VALUE = 'NEW_PROJECT'
 PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'As New Project'
 PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project to Gridmarkets'
 
+JOB_OPTIONS_STATIC_COUNT = 1
 JOB_OPTIONS_BLENDERS_SETTINGS_VALUE = "BLENDER_JOB_SETTINGS"
 JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Blender's Render Settings"
 JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when determining the job options."

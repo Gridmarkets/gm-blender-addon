@@ -63,6 +63,12 @@ class FrameRangeProps(bpy.types.PropertyGroup):
 
 class ProjectProps(bpy.types.PropertyGroup):
 
+    id: bpy.props.IntProperty(
+        name="ID",
+        description="A integer that is unique across all existing projects",
+        min=0
+    )
+
     name: bpy.props.StringProperty(
         name="Name",
         description="The name of your project as it will appear in envoy",
@@ -134,7 +140,7 @@ def _get_project_options(scene, context):
 
     # iterate through uploaded projects and add them as options
     for i, project in enumerate(props.projects):
-        project_options.append((str(i + 1), project.name, '', '', i + 1))
+        project_options.append((str(i + 1), project.name, '', '', project.id))
 
     return project_options
 
