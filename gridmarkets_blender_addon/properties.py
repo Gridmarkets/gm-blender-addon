@@ -212,46 +212,6 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     )
 
 
-def set_default_job():
-    """" Adds a default job to GRIDMARKETS_PROPS_Addon_Properties.jobs """
-    jobs = bpy.context.scene.props.jobs
-
-    # set default value if <bpy.context.scene.props.frame_ranges> is empty
-    if not jobs:
-        job = jobs.add()
-        job.name = 'default job'
-
-        job.use_custom_frame_ranges = False
-
-        frame_range = job.frame_ranges.add()
-        frame_range.name = create_unique_object_name(job.frame_ranges, name_prefix=constants.FRAME_RANGE_PREFIX)
-        frame_range.enabled = True
-        frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
-        frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
-        frame_range.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
-
-
-def _on_register(scene):
-    """ Called when the add-on is registered """
-    set_default_job()
-
-    # remove the handler once it has completed as it is no longer needed
-    if _on_register in bpy.app.handlers.depsgraph_update_post:
-        bpy.app.handlers.depsgraph_update_post.remove(_on_register)
-
-
-@bpy.app.handlers.persistent
-def _on_file_loaded(scene):
-    """ This handler is needed to set the default value for <bpy.context.scene.props.frame_ranges> after any of the
-    following events:
-    - opening Blender
-    - reloading the start-up file via the keys Ctrl N
-    - opening any Blender file
-    """
-
-    set_default_job()
-
-
 classes = (
     FrameRangeProps,
     ProjectProps,
@@ -270,10 +230,6 @@ def register():
     # register add-on properties
     bpy.types.Scene.props = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_Addon_Properties)
 
-    # add handler
-    bpy.app.handlers.depsgraph_update_post.append(_on_register)
-    bpy.app.handlers.load_post.append(_on_file_loaded)
-
 
 def unregister():
     from bpy.utils import unregister_class
@@ -281,10 +237,6 @@ def unregister():
     # unregister classes
     for cls in reversed(classes):
         unregister_class(cls)
-
-    # remove handler
-    if _on_file_loaded in bpy.app.handlers.load_post:
-        bpy.app.handlers.load_post.remove(_on_file_loaded)
 
     # delete add-on properties
     del bpy.types.Scene.props
