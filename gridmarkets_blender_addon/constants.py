@@ -89,11 +89,11 @@ OPERATOR_EDIT_FRAME_RANGE_LABEL = "Edit Frame Range"
 
 # enum values
 PROJECT_OPTIONS_NEW_PROJECT_VALUE = 'NEW_PROJECT'
-PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'New Project'
-PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project'
+PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'As New Project'
+PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project to Gridmarkets'
 
 JOB_OPTIONS_BLENDERS_SETTINGS_VALUE = "BLENDER_JOB_SETTINGS"
-JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Use Blender's settings"
+JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Blender's Render Settings"
 JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when determining the job options."
 
 

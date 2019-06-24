@@ -43,15 +43,24 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         row.enabled = False
         row.label(text=version_str)
 
-        layout.prop(props, "project_options")
-        layout.prop(props, "job_options")
+        # submit box
+        box = layout.box()
+        row = box.row()
+
+        # project options
+        col1 = row.column(align=True)
+        col1.label(text="Project")
+        col1.prop(props, "project_options", text="")
+
+        # job options
+        col2 = row.column(align=True)
+        col2.label(text="Job")
+        col2.prop(props, "job_options", text="")
 
         # submit button
-        row = layout.row(align=True)
+        row = box.row(align=True)
         row.scale_y = 2.5
         row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
-
-        layout.separator_spacer()
 
         # Portal manager link
         row = layout.row(align=True)
