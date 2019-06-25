@@ -232,6 +232,7 @@ class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
                 if props.project_options.isnumeric():
                     selected_project_option = int(props.project_options)
 
+                    # reset the pulldown list if the selected option is going to be deleted
                     if selected_project_option == index + constants.PROJECT_OPTIONS_STATIC_COUNT:
                         props.property_unset("project_options")
 
@@ -241,6 +242,7 @@ class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
                 # select the previous project if the selected project isn't already the first in the list
                 if props.selected_project > 0:
                     props.selected_project -= 1
+
 
         if self.action == 'UPLOAD':
             bpy.ops.gridmarkets.upload_project('INVOKE_DEFAULT')
