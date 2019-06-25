@@ -5,10 +5,12 @@ import pathlib
 import constants
 import properties
 import utils
+import utils_blender
 
 from temp_directory_manager import TempDirectoryManager
 from icon_loader import IconLoader
 from property_sanitizer import PropertySanitizer
+from invalid_input_error import InvalidInputError
 
 from gridmarkets.envoy_client import EnvoyClient
 from gridmarkets.project import Project
@@ -29,123 +31,15 @@ temp_dir_manager = TempDirectoryManager()
 
 class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
-    
+
     bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
     bl_label = constants.OPERATOR_SUBMIT_LABEL
 
     def execute(self, context):
-        scene = context.scene
-        props = scene.props
-
-        # get the add-on preferences
-        addon_prefs = bpy.context.preferences.addons[__package__].preferences
-
-        # validate the add-on preferences
-        validation_response = PropertySanitizer.validate_credentials()
-        if validation_response.is_invalid() :
-            self.report({'ERROR_INVALID_INPUT'}, validation_response.get_error_message())
-            return {'FINISHED'}
-
         try:
-            # create an instance of Envoy client
-            client = EnvoyClient(email = addon_prefs.auth_email, access_key = addon_prefs.auth_accessKey)
-
-            blend_file_name = None
-            project_name = None
-
-            # if the file has been saved
-            if bpy.context.blend_data.is_saved:
-                # use the name of the saved .blend file
-                blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-                project_name = PropertySanitizer.get_project_name(props, default_project_name=blend_file_name)
-            else:
-                # otherwise create a name for the packed .blend file
-                blend_file_name = 'main_GM_blend_file_packed.blend'
-                project_name = PropertySanitizer.get_project_name(props)
-
-                # warn user that the file is not saved
-                self.report({'WARNING'}, "The current blender scene has not been saved. The scene will submit but any "
-                                         "render files will not automatically download.")
-
-            # create a new temp directory
-            temp_dir_path = temp_dir_manager.get_temp_directory()
-
-            blend_file_path = temp_dir_path / blend_file_name
-
-            # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-            # or if it has been modified since it's last save then the submitted .blend file will represent the
-            # current state of the scene
-            bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                        compress=True)
-
-            # create directory to contain packed project
-            packed_dir = temp_dir_path / project_name
-            os.mkdir(str(packed_dir))
-
-            # pack the .blend file to the pack directory
-            utils.pack_blend_file(str(blend_file_path), str(packed_dir))
-
-            # delete pack-info.txt if it exists
-            pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
-            if pack_info_file.is_file():
-                pack_info_file.unlink()
-
-            # create the project
-            project = Project(str(packed_dir), project_name)
-
-            # associate this project with the temp directory so the temp directory can be removed once the project is
-            # complete
-            temp_dir_manager.associate_project(temp_dir_path, project)
-
-            # add files to project
-            # only files and folders within the project path can be added, use relative or full path
-            # any other paths passed will be ignored
-            project.add_folders(str(packed_dir))
-
-            if bpy.context.blend_data.is_saved:
-                # add watch file
-                output_pattern = '{0}/.+'.format(project.remote_output_folder)
-
-                # download path
-                download_path = str(PropertySanitizer.get_output_path(context, props))
-
-                # create a watch file
-                watch_file = WatchFile(output_pattern, download_path)
-
-                # add watch files, this will auto download results to the defined `download_path`
-                project.add_watch_files(watch_file)
-
-            JOB_NAME = PropertySanitizer.get_job_name(props)
-            PRODUCT_TYPE = 'blender'
-            PRODUCT_VERSION = '2.80'
-            OPERATION = 'render'
-            # note the path is relative to the project name
-            RENDER_FILE = str(pathlib.Path(project_name) / blend_file_name).replace('\\', '/')
-            FRAMES = PropertySanitizer.get_frame_ranges(scene, props)
-            OUTPUT_PREFIX = PropertySanitizer.get_output_prefix(props)
-            OUTPUT_FORMAT = scene.render.image_settings.file_format
-            RENDER_ENGINE = scene.render.engine
-
-            job = Job(
-                JOB_NAME,
-                PRODUCT_TYPE,
-                PRODUCT_VERSION,
-                OPERATION,
-                RENDER_FILE,
-                frames=FRAMES,
-                output_prefix=OUTPUT_PREFIX,
-                output_format=OUTPUT_FORMAT,
-                engine=RENDER_ENGINE
-            )
-
-            # add job to project
-            project.add_jobs(job)
-
-            # submit project
-            resp = client.submit_project(project)  # returns project name
-            print("Response:")
-            print(resp)
-
+            utils_blender.submit_job(context, temp_dir_manager)
+        except InvalidInputError as e:
+            self.report({'ERROR_INVALID_INPUT'}, e.user_message())
         except AuthenticationError as e:
             self.report({'ERROR'}, "Authentication Error: " + e.user_message)
         except InsufficientCreditsError as e:
@@ -154,7 +48,6 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             self.report({'ERROR'}, "Invalid Request Error: " + e.user_message)
         except APIError as e:
             self.report({'ERROR'}, "API Error: " + str(e.user_message))
-
         return {'FINISHED'}
 
 
@@ -244,6 +137,7 @@ class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
                     props.selected_project -= 1
 
 
+
         if self.action == 'UPLOAD':
             bpy.ops.gridmarkets.upload_project('INVOKE_DEFAULT')
 
@@ -286,6 +180,7 @@ class GRIDMARKETS_OT_job_actions(bpy.types.Operator):
                 if props.job_options.isnumeric():
                     selected_job_option = int(props.job_options)
 
+                    # reset the pulldown list if the selected option is going to be deleted
                     if selected_job_option == index + constants.JOB_OPTIONS_STATIC_COUNT:
                         props.property_unset("job_options")
 

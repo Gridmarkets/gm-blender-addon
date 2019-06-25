@@ -98,6 +98,10 @@ JOB_OPTIONS_BLENDERS_SETTINGS_VALUE = "BLENDER_JOB_SETTINGS"
 JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Blender's Render Settings"
 JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when determining the job options."
 
+# API constants
+JOB_PRODUCT_TYPE = "blender"
+JOB_PRODUCT_VERSION = "2.80"
+JOB_OPERATION = "render"
 
 # register module
 def register():

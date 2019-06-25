@@ -60,6 +60,7 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         min=1
     )
 
+
 class ProjectProps(bpy.types.PropertyGroup):
 
     id: bpy.props.IntProperty(
