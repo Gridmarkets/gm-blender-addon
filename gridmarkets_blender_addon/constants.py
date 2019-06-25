@@ -58,7 +58,7 @@ PANEL_JOBS_INFO_ID_NAME = "gridmarkets_job_info_sub_panel"
 PANEL_JOBS_INFO_LABEL = "Job Info"
 
 PANEL_FRAME_RANGES_ID_NAME = "gridmarkets_render_settings_sub_panel"
-PANEL_FRAME_RANGES_LABEL = "Render Settings"
+PANEL_FRAME_RANGES_LABEL = "Custom Frame Ranges"
 
 PANEL_OUTPUT_SETTINGS_ID_NAME = "gridmarkets_output_settings_sub_panel"
 PANEL_OUTPUT_SETTINGS_LABEL = "Output Settings"

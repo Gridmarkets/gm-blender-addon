@@ -17,6 +17,11 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         job_count = len(context.scene.props.jobs)
         return job_count > 0
 
+    def draw_header(self, context):
+        props = bpy.context.scene.props
+        selected_job = props.jobs[props.selected_job]
+        self.layout.prop(selected_job, "use_custom_frame_ranges", text='')
+
     def draw(self, context):
         layout = self.layout
         props = bpy.context.scene.props
@@ -24,8 +29,6 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         frame_range_count = len(selected_job.frame_ranges)
 
         enabled = selected_job.use_custom_frame_ranges
-
-        layout.prop(selected_job, "use_custom_frame_ranges")
 
         row = layout.row()
         row.active = enabled
