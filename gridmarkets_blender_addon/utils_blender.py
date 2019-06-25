@@ -86,7 +86,7 @@ def get_new_envoy_client():
     addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
     # validate the authentication credentials
-    validation_response = validate_credentials(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
+    validate_credentials(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
 
     # return the new client
     return EnvoyClient(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
