@@ -4,9 +4,9 @@ A Blender add-on for uploading Blender Projects to Gridmarkets and for specifyin
 ## Installing the Add-on
 
 ### Installing Dependencies
-The add-on depends on the gridmarkets api library and blender-asset-tracer (BAT). Use `python ./setup.py deps` to 
-install the dependencies to the `gridmarkets_blender_addon/lib` directory. Dependencies **must** be installed before using 
-`bzip` or `fdist` as these will not currently check to make sure libraries are downloaded.
+The add-on depends on the gridmarkets api library and blender-asset-tracer (BAT). Use `python setup.py wheels` to 
+install the wheel dependencies to the `gridmarkets_blender_addon/lib` directory. Dependencies **must** be installed 
+before using `bzip` or `fdist` as these will not currently check to make sure libraries are downloaded.
 
 ### Building .Zip File
 To build the add-on as a .zip file that can be imported into blender run `python ./setup.py bzip`. The .zip will be 
