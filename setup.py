@@ -40,7 +40,7 @@ DEFAULT_DIST_OUTPUT_LOCATION = (DIST_FOLDER / NAME)
 DEFAULT_ZIP_OUTPUT_LOCATION = DEFAULT_DIST_OUTPUT_LOCATION.with_suffix('.zip')
 
 requirements = [
-    'https://gm-envoy-client-docs.netlify.com/downloads/gridmarkets_envoy_client-0.6.0-py2.py3-none-any.whl',
+    'https://gm-envoy-client-docs.netlify.com/downloads/gridmarkets_envoy_client-0.7.0-py2.py3-none-any.whl',
     'blender-asset-tracer',
 ]
 
