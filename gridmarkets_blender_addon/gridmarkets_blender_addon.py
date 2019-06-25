@@ -355,72 +355,12 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         scene = context.scene
         props = scene.props
 
-        # get the add-on preferences
-        addon_prefs = bpy.context.preferences.addons[__package__].preferences
-
-        # validate the add-on preferences
-        validation_response = PropertySanitizer.validate_credentials()
-
-        if validation_response.is_invalid():
-            self.report({'ERROR_INVALID_INPUT'}, validation_response.get_error_message())
-            return {'FINISHED'}
-
         try:
-            # create an instance of Envoy client
-            client = EnvoyClient(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
-
-            blend_file_name = None
-
-            # if the file has been saved
-            if bpy.context.blend_data.is_saved:
-                # use the name of the saved .blend file
-                blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-            else:
-                # otherwise create a name for the packed .blend file
-                blend_file_name = 'main_GM_blend_file_packed.blend'
-
-            # create a new temp directory
-            temp_dir_path = temp_dir_manager.get_temp_directory()
-
-            blend_file_path = temp_dir_path / blend_file_name
-
-            # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-            # or if it has been modified since it's last save then the submitted .blend file will represent the
-            # current state of the scene
-            bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                        compress=True)
-
-            # create directory to contain packed project
-            packed_dir = temp_dir_path / self.project_name
-            os.mkdir(str(packed_dir))
-
-            # pack the .blend file to the pack directory
-            utils.pack_blend_file(str(blend_file_path), str(packed_dir))
-
-            # delete pack-info.txt if it exists
-            pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
-            if pack_info_file.is_file():
-                pack_info_file.unlink()
-
-            # create the project
-            project = Project(str(packed_dir), self.project_name)
-
-            # associate this project with the temp directory so the temp directory can be removed once the project is
-            # complete
-            temp_dir_manager.associate_project(temp_dir_path, project)
-
-            # add files to project
-            # only files and folders within the project path can be added, use relative or full path
-            # any other paths passed will be ignored
-            project.add_folders(str(packed_dir))
-
-            # submit project
-            resp = client.submit_project(project)  # returns project name
-            print("Response:")
-            print(resp)
-
+            utils_blender.upload_project(self.project_name, temp_dir_manager)
             self._add_project_to_list(props)
 
+        except InvalidInputError as e:
+            self.report({'ERROR_INVALID_INPUT'}, e.user_message())
         except AuthenticationError as e:
             self.report({'ERROR'}, "Authentication Error: " + e.user_message)
         except InsufficientCreditsError as e:
