@@ -511,13 +511,13 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
     def invoke(self, context, event):
 
         props = context.scene.props
-        selected_job = props.selected_job
+        selected_job = props.jobs[props.selected_job]
 
         # don't create popup if custom frame ranges are not enabled
         if not selected_job.use_custom_frame_ranges:
             return {"FINISHED"}
 
-        # Set the field input's to match the values of the frame range
+        # Select the selected frame range for the selected job
         frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
 
         # set values for popup field inputs to default to
