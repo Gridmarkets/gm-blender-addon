@@ -1,5 +1,6 @@
 import bpy
 import pathlib
+import os
 import uuid
 import constants
 
@@ -9,7 +10,7 @@ class PropertySanitizer():
     """ Helper class which provides useful methods for getting and validating the values of user input fields"""
 
     @staticmethod
-    def validate_credentials(auth_email, auth_accessKey):
+    def validate_credentials(email, access_key):
         """ Validator
 
         :return: Whether or not the user's authentication credentials are valid
@@ -20,11 +21,11 @@ class PropertySanitizer():
         hasKey = False
 
         # check an email address has been entered
-        if isinstance(auth_email, str) and len(auth_email) > 0:
+        if isinstance(email, str) and len(email) > 0:
             hasEmail = True
 
         # check a auth key has been entered
-        if isinstance(auth_accessKey, str) and len(auth_accessKey) > 0:
+        if isinstance(access_key, str) and len(access_key) > 0:
             hasKey = True
 
         # validate
@@ -41,11 +42,11 @@ class PropertySanitizer():
         from gridmarkets.envoy_client import EnvoyClient
         from gridmarkets.errors import AuthenticationError
 
-        client = EnvoyClient(email=auth_email, access_key=auth_accessKey)
+        client = EnvoyClient(email=email, access_key=access_key)
         try:
             is_auth_valid = client.validate_auth()
         except AuthenticationError as e:
-            return ValidationResponse("AuthenticationError: " + e.user_message + os.linesep +
+            return ValidationResponse("AuthenticationError: " + str(e.user_message) + os.linesep +
                                       constants.AUTHENTICATION_HELP_MESSAGE)
 
         return ValidationResponse()
