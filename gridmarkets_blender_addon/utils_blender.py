@@ -17,10 +17,11 @@ from gridmarkets.job import Job
 from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
-from blender_asset_tracer import trace
+from blender_asset_tracer import trace, pack
 from blender_asset_tracer.pack.progress import Callback
 
 import collections
+
 
 def trace_blend_file(blend_file_path):
     """ Finds all the dependencies for a given .blend file
@@ -42,6 +43,40 @@ def trace_blend_file(blend_file_path):
             dependencies[str(file_path)].add(assetPath)
 
     return dependencies
+
+
+def pack_blend_file(blend_file_path, target_dir_path):
+    """ Packs a Blender .blend file to a target folder using blender_asset_tracer
+
+    :param blend_file_path: The .blend file to pack
+    :type blend_file_path: str
+    :param target_dir_path: The path to the directory which will contain the packed files
+    :type target_dir_path: str
+    """
+
+    blend_file_path = pathlib.Path(blend_file_path)
+    project_root_path = blend_file_path.parent
+    target_dir_path = pathlib.Path(target_dir_path)
+
+    # create packer
+    with pack.Packer(blend_file_path,
+                     project_root_path,
+                     target_dir_path,
+                     noop=False,            # no-op mode, only shows what will be done
+                     compress=False,
+                     relative_only=False
+                     ) as packer:
+
+        # plan the packing operation (must be called before execute)
+        packer.strategise()
+
+        # attempt to pack the project
+        try:
+            packer.execute()
+        except pack.transfer.FileTransferError as ex:
+            print("%d files couldn't be copied, starting with %s",
+                  len(ex.files_remaining), ex.files_remaining[0])
+            raise SystemExit(1)
 
 
 def validate_credentials(email = None, access_key = None):
