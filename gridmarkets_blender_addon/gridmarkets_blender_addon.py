@@ -1,11 +1,13 @@
-import os
 import bpy
-import pathlib
+from bpy_extras.io_utils import ImportHelper
+import os
+
 
 import constants
 import properties
 import utils
 import utils_blender
+
 
 from temp_directory_manager import TempDirectoryManager
 from icon_loader import IconLoader
@@ -76,6 +78,7 @@ class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
         bpy.ops.wm.url_open(url=constants.COST_CALCULATOR_URL)
         return {"FINISHED"}
 
+
 class GRIDMARKETS_OT_open_help_url(bpy.types.Operator):
     """Class to represent the 'Help' operation. Opens the plugins help page in the user's browser."""
 
@@ -87,7 +90,6 @@ class GRIDMARKETS_OT_open_help_url(bpy.types.Operator):
         # open the render manager url in the users browser
         bpy.ops.wm.url_open(url=constants.HELP_URL)
         return {"FINISHED"}
-
 
 class GRIDMARKETS_OT_project_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the project list menu """
@@ -479,6 +481,30 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         col.prop(self, "frame_end")
         col.prop(self, "frame_step")
 
+
+class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
+    bl_idname = constants.OPERATOR_TRACE_PROJECT_ID_NAME
+    bl_label = constants.OPERATOR_TRACE_PROJECT_LABEL
+    bl_icon = 'BLEND_FILE'
+    bl_options = {'UNDO'}
+
+    _all_blend_file = '*.blend'
+
+    # filters the files the user is able to select
+    filter_glob: bpy.props.StringProperty(
+        default = _all_blend_file,
+        options={'HIDDEN'}
+    )
+
+    def execute(self, context):
+        """ Run for every file selected by the user """
+
+        filename, extension = os.path.splitext(self.filepath)
+        utils_blender.trace_project_dependencies(self.filepath)
+
+        return {'FINISHED'}
+
+
 # ------------------------------------------------------------------------
 #    Lists
 # ------------------------------------------------------------------------
@@ -532,6 +558,7 @@ classes = (
     GRIDMARKETS_OT_job_actions,
     GRIDMARKETS_OT_frame_range_actions,
     GRIDMARKETS_OT_edit_frame_range,
+    GRIDMARKETS_OT_trace_project,
     GRIDMARKETS_UL_frame_range,
     GRIDMARKETS_UL_project,
     GRIDMARKETS_UL_job

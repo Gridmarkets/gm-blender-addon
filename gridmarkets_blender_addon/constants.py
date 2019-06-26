@@ -86,6 +86,8 @@ OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME = "gridmarkets.frame_range_list_actions"
 OPERATOR_FRAME_RANGE_ACTIONS_LABEL = "List Actions"
 OPERATOR_EDIT_FRAME_RANGE_ID_NAME = "gridmarkets.edit_frame_range"
 OPERATOR_EDIT_FRAME_RANGE_LABEL = "Edit Frame Range"
+OPERATOR_TRACE_PROJECT_ID_NAME = "gridmarkets.trace_blend_file"
+OPERATOR_TRACE_PROJECT_LABEL = "Trace .blend file"
 
 # enum values
 PROJECT_OPTIONS_STATIC_COUNT = 1

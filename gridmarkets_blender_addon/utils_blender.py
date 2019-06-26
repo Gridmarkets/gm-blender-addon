@@ -17,6 +17,33 @@ from gridmarkets.job import Job
 from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
+from blender_asset_tracer import trace
+from blender_asset_tracer.pack.progress import Callback
+
+import collections
+
+def trace_project_dependencies(blend_file_path):
+    """ Finds all the dependencies for a given .blend file
+
+    :param blend_file_path: the .blend file to inspect
+    :type blend_file_path: str
+    :return: A dictionary of .blend files and their sets of dependencies
+    :rtype: dictionary
+    """
+
+    # the dependencies as a mapping from the blend file to its set of dependencies.
+    dependencies = collections.defaultdict(set)
+
+    # Find the dependencies
+    for usage in trace.deps(pathlib.Path(blend_file_path)):
+        file_path = usage.block.bfile.filepath.absolute()
+        for assetPath in usage.files():
+            asset_path = assetPath.resolve()
+            dependencies[str(file_path)].add(assetPath)
+
+    return dependencies
+
+
 def validate_credentials(email = None, access_key = None):
     """Blender specific authentication validator, uses the gridmarkets validate_auth() function internally but adds
         additional checks and blender specific error messages.
