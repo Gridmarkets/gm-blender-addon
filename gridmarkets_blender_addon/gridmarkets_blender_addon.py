@@ -500,7 +500,7 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
         """ Run for every file selected by the user """
 
         filename, extension = os.path.splitext(self.filepath)
-        utils_blender.trace_project_dependencies(self.filepath)
+        utils_blender.trace_blend_file(self.filepath)
 
         return {'FINISHED'}
 

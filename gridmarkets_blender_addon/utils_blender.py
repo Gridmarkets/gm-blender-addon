@@ -22,7 +22,7 @@ from blender_asset_tracer.pack.progress import Callback
 
 import collections
 
-def trace_project_dependencies(blend_file_path):
+def trace_blend_file(blend_file_path):
     """ Finds all the dependencies for a given .blend file
 
     :param blend_file_path: the .blend file to inspect
