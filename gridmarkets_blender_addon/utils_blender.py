@@ -189,7 +189,7 @@ def upload_project(project_name, temp_dir_manager):
     os.mkdir(str(packed_dir))
 
     # pack the .blend file to the pack directory
-    utils.pack_blend_file(str(blend_file_path), str(packed_dir))
+    pack_blend_file(str(blend_file_path), str(packed_dir))
 
     # delete pack-info.txt if it exists
     pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
