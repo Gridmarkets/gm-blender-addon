@@ -29,7 +29,7 @@ def trace_blend_file(blend_file_path):
     :param blend_file_path: the .blend file to inspect
     :type blend_file_path: str
     :return: A dictionary of .blend files and their sets of dependencies
-    :rtype: dictionary
+    :rtype: collections.defaultdict(set)
     """
 
     # the dependencies as a mapping from the blend file to its set of dependencies.
