@@ -32,6 +32,7 @@ classes = (
     GRIDMARKETS_OT_Submit,
 )
 
+
 def register():
     from bpy.utils import register_class
 

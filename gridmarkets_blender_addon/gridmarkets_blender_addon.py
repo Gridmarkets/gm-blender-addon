@@ -23,19 +23,6 @@ from gridmarkets.errors import *
 # ------------------------------------------------------------------------
 
 
-class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
-    """Class to represent the 'Open Manager Portal' operation. Opens the portal in the user's browser."""
-
-    bl_idname = constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME
-    bl_label = constants.OPERATOR_OPEN_MANAGER_PORTAL_LABEL
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        # open the render manager url in the users browser
-        bpy.ops.wm.url_open(url=constants.RENDER_MANAGER_URL)
-        return {"FINISHED"}
-
-
 class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
     """Class to represent the 'Cost Calculator' operation. Opens the cost calculator page in the user's browser."""
 
@@ -496,7 +483,6 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
 
 
 classes = (
-    GRIDMARKETS_OT_Open_Manager_Portal,
     GRIDMARKETS_OT_Open_Cost_Calculator,
     GRIDMARKETS_OT_open_help_url,
     GRIDMARKETS_OT_project_actions,
