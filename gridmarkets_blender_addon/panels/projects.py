@@ -28,12 +28,12 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         if project_count < 2:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
-        sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
 
         row = layout.row(align=True)
         sub = row.column()
-        sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='ADD', text="Upload Project").action = 'UPLOAD'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='ADD', text="Upload Project").action = 'UPLOAD'
 
         sub = row.column()
 
@@ -41,7 +41,7 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         if project_count <= 0:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_ACTIONS_ID_NAME, icon='REMOVE', text="Remove Project").action = 'REMOVE'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='REMOVE', text="Remove Project").action = 'REMOVE'
 
         icons = ['NONE', 'QUESTION', 'ERROR', 'CANCEL', 'TRIA_RIGHT', 'TRIA_DOWN', 'TRIA_LEFT', 'TRIA_UP', 'ARROW_LEFTRIGHT',
          'PLUS', 'DISCLOSURE_TRI_RIGHT', 'DISCLOSURE_TRI_DOWN', 'RADIOBUT_OFF', 'RADIOBUT_ON', 'MENU_PANEL', 'BLENDER',
