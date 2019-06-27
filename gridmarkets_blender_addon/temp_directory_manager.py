@@ -74,11 +74,30 @@ class _AssociationTuple:
 
 
 class TempDirectoryManager:
-    """ Manages all temporary directories created by the add-on and makes sure they are deleted when no longer needed"""
+    """ Singleton class used for managing all temporary directories created by the add-on and makes sure they are
+    deleted when no longer needed.
+    """
+
+    _instance = None
 
     def __init__(self):
+        # prevent more than one instance from ever being created
+        if TempDirectoryManager._instance:
+            raise Exception("TempDirectoryManager should never be instantiated twice")
+
         self.associations = []
+
+        # register a clean up function that gets called on exit
         atexit.register(self.clean_up)
+
+        TempDirectoryManager._instance = self
+
+    @staticmethod
+    def get_temp_directory_manager():
+        if TempDirectoryManager._instance:
+            return TempDirectoryManager._instance
+
+        return TempDirectoryManager()
 
     def get_temp_directory(self):
         """ Creates a new temporary directory
