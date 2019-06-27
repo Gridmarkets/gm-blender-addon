@@ -23,11 +23,11 @@ from gridmarkets.errors import *
 # ------------------------------------------------------------------------
 
 
-class GRIDMARKETS_OT_frame_range_actions(bpy.types.Operator):
+class GRIDMARKETS_OT_frame_range_list_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the frame range list menu """
 
-    bl_idname = constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME
-    bl_label = constants.OPERATOR_FRAME_RANGE_ACTIONS_LABEL
+    bl_idname = constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME
+    bl_label = constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_LABEL
 
     action: bpy.props.EnumProperty(
         items=(
@@ -254,7 +254,7 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
 
 
 classes = (
-    GRIDMARKETS_OT_frame_range_actions,
+    GRIDMARKETS_OT_frame_range_list_actions,
     GRIDMARKETS_OT_edit_frame_range,
     GRIDMARKETS_UL_frame_range,
     GRIDMARKETS_UL_project,

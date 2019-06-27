@@ -38,16 +38,16 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         col.active = enabled
 
         sub = col.column(align=True)
-        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='MODIFIER', text="").action = 'EDIT'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='MODIFIER', text="").action = 'EDIT'
 
         sub = col.column(align=True)
-        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='ADD', text="").action = 'ADD'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='ADD', text="").action = 'ADD'
 
         remove = sub.row()
         # prevent the user removing the last frame range for a job
         if frame_range_count < 2:
             remove.enabled = False
-        remove.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
+        remove.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
 
         sub = col.column(align=True)
 
@@ -55,8 +55,8 @@ class GRIDMARKETS_PT_frame_ranges(bpy.types.Panel):
         if frame_range_count < 2:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
-        sub.operator(constants.OPERATOR_FRAME_RANGE_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
+        sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
 
 
 classes = (
