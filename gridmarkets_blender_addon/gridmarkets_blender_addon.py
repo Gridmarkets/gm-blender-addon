@@ -17,37 +17,10 @@ from gridmarkets.job import Job
 from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
-# ------------------------------------------------------------------------
-#    Global Variables
-# ------------------------------------------------------------------------
-
-temp_dir_manager = TempDirectoryManager()
 
 # ------------------------------------------------------------------------
 #    Operators
 # ------------------------------------------------------------------------
-
-
-class GRIDMARKETS_OT_Submit(bpy.types.Operator):
-    """Class to represent the 'Render' operation. Currently only uploads the project file to the servers."""
-
-    bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
-    bl_label = constants.OPERATOR_SUBMIT_LABEL
-
-    def execute(self, context):
-        try:
-            utils_blender.submit_job(context, temp_dir_manager)
-        except InvalidInputError as e:
-            self.report({'ERROR_INVALID_INPUT'}, e.user_message())
-        except AuthenticationError as e:
-            self.report({'ERROR'}, "Authentication Error: " + e.user_message)
-        except InsufficientCreditsError as e:
-            self.report({'ERROR'}, "Insufficient Credits Error: " + e.user_message)
-        except InvalidRequestError as e:
-            self.report({'ERROR'}, "Invalid Request Error: " + e.user_message)
-        except APIError as e:
-            self.report({'ERROR'}, "API Error: " + str(e.user_message))
-        return {'FINISHED'}
 
 
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
@@ -250,7 +223,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         props = scene.props
 
         try:
-            utils_blender.upload_project(self.project_name, temp_dir_manager)
+            utils_blender.upload_project(self.project_name, TempDirectoryManager.get_temp_directory_manager())
             self._add_project_to_list(props)
 
         except InvalidInputError as e:
@@ -523,7 +496,6 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
 
 
 classes = (
-    GRIDMARKETS_OT_Submit,
     GRIDMARKETS_OT_Open_Manager_Portal,
     GRIDMARKETS_OT_Open_Cost_Calculator,
     GRIDMARKETS_OT_open_help_url,
