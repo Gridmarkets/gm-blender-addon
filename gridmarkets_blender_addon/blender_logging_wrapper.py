@@ -3,9 +3,6 @@ import bpy
 from time import gmtime, strftime
 from utils_blender import force_redraw_addon
 
-_MAX_LINE_LENGTH = 80
-
-
 def _log(msg, level):
     """ Helper function which takes log message and adds it to the log_items list.
 
@@ -18,7 +15,7 @@ def _log(msg, level):
 
     props = bpy.context.scene.props
     lines = msg.splitlines()
-    line_count = 0
+    line_count = len(lines)
 
     # report each line individually because blender has problems with multi-line reports (They display backwards in the
     # info panel)
@@ -30,17 +27,9 @@ def _log(msg, level):
         if i == 0:
             line = strftime("%Y-%m-%d %H:%M:%S ", gmtime()) + line
 
-        # split the lines if they are over a certain length
-        while True:
-            log_item = props.log_items.add()
-            log_item.body = line[:_MAX_LINE_LENGTH + 1]
-            log_item.level = level
-            line_count = line_count + 1
-
-            if len(line) > _MAX_LINE_LENGTH:
-                line = line[_MAX_LINE_LENGTH + 1:]
-            else:
-                break
+        log_item = props.log_items.add()
+        log_item.body = line
+        log_item.level = level
 
     # if the last log item was selected then set the selected log item to the new last item
     if props.selected_log_item == len(props.log_items) - (line_count + 1):
