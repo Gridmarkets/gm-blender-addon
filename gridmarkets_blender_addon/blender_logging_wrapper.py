@@ -1,6 +1,29 @@
 import logging
 
 
+def _report(level, msg, operator):
+    """ helper function which takes a messages intended to be logged and converts it into one the blender can display
+        properly using Operator.report().
+
+    :param level: The logging level of the message
+    :type level: enum
+    :param msg: The logging message
+    :type msg: str
+    :param operator: An instance of a Blender Operator which can be used to report the message to the blender ui
+    :type operator: bpy.types.Operator
+    :rtype: void
+    """
+
+    # report each line individually because blender has problems with multi-line reports (They display backwards in the
+    # info panel)
+    for line in msg.splitlines():
+
+        # replace tabs since the blender info console can not display them
+        line = line.replace('\t', '   ')
+
+        operator.report(level, line)
+
+
 class BlenderLoggingWrapper:
     """
     A very simple wrapper class that wrappers a logging.Logger and exposes some basic functions. It is designed to be
@@ -26,7 +49,7 @@ class BlenderLoggingWrapper:
         """
 
         if operator:
-            operator.report({'DEBUG'}, msg)
+            _report({'DEBUG'}, msg, operator)
 
         self._logger.debug(msg, *args, **kwargs)
 
@@ -40,7 +63,7 @@ class BlenderLoggingWrapper:
         """
 
         if operator:
-            operator.report({'INFO'}, msg)
+            _report({'INFO'}, msg, operator)
 
         self._logger.info(msg, *args, **kwargs)
 
@@ -54,7 +77,7 @@ class BlenderLoggingWrapper:
         """
 
         if operator:
-            operator.report({'WARNING'}, msg)
+            _report({'WARNING'}, msg, operator)
 
         self._logger.warning(msg, *args, **kwargs)
 
@@ -68,7 +91,7 @@ class BlenderLoggingWrapper:
         """
 
         if operator:
-            operator.report({'ERROR'}, msg)
+            _report({'ERROR'}, msg, operator)
 
         self._logger.error(msg, args, kwargs)
 
@@ -83,7 +106,7 @@ class BlenderLoggingWrapper:
 
         if operator:
             # blender has no exception enum
-            operator.report({'ERROR'}, msg)
+            _report({'ERROR'}, msg, operator)
 
         self._logger.exception(msg, *args, exc_info, **kwargs)
 
@@ -98,7 +121,7 @@ class BlenderLoggingWrapper:
 
         if operator:
             # blender has no critical enum
-            operator.report({'ERROR'}, msg)
+            _report({'ERROR'}, msg, operator)
 
         self._logger.critical(msg, *args, **kwargs)
 

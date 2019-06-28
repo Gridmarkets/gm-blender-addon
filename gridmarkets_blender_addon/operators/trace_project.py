@@ -4,8 +4,9 @@ import os
 import constants
 import utils_blender
 
-import logging
-log = logging.getLogger(__name__)
+from blender_logging_wrapper import get_wrapped_logger
+log = get_wrapped_logger(__name__)
+
 
 class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
     bl_idname = constants.OPERATOR_TRACE_PROJECT_ID_NAME
@@ -25,20 +26,21 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
         """ Run for every file selected by the user """
         filename, extension = os.path.splitext(self.filepath)
 
-        self.report({"INFO"}, "Tracing %s" % self.filepath)
-        log.info("Tracing %s" % self.filepath)
+        log.info("Tracing %s" % self.filepath, operator=self)
 
         # find all dependencies
         dependencies = utils_blender.trace_blend_file(self.filepath)
 
+        # store the trace output as a single string
+        trace_summary = "Trace summary:"
 
         for key, value in dependencies.items():
-            self.report({"INFO"}, key + " has the following dependencies:")
+            trace_summary = trace_summary + os.linesep + "%s has the following dependencies:" % key
 
             for asset in value:
-                self.report({"INFO"}, '\t' + str(asset))
+                trace_summary = trace_summary + os.linesep + '\t' + str(asset)
 
-        #self.log.warning(trace_report)
+        log.info(trace_summary, operator=self)
 
         return {'FINISHED'}
 
