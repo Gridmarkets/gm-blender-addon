@@ -1,6 +1,9 @@
 import bpy
 import constants
 
+from blender_logging_wrapper import get_wrapped_logger
+log = get_wrapped_logger(__name__)
+
 
 class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
     """Class to represent the 'Cost Calculator' operation. Opens the cost calculator page in the user's browser."""
@@ -10,6 +13,8 @@ class GRIDMARKETS_OT_Open_Cost_Calculator(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        log.info("Opening cost calculator...")
+
         # open the render manager url in the users browser
         bpy.ops.wm.url_open(url=constants.COST_CALCULATOR_URL)
         return {"FINISHED"}
