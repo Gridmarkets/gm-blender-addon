@@ -21,6 +21,24 @@ class LogItemProps(bpy.types.PropertyGroup):
         ]
     )
 
+    name: bpy.props.StringProperty(
+        name="Name",
+        description="Name of the logger which generated this item",
+        default=""
+    )
+
+    date: bpy.props.StringProperty(
+        name="Date",
+        description="The date when this message was generated",
+        default=""
+    )
+
+    time: bpy.props.StringProperty(
+        name="Time",
+        description="The time when this message was generated",
+        default=""
+    )
+
 
 class FrameRangeProps(bpy.types.PropertyGroup):
 
@@ -238,6 +256,24 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     # logging items
     log_items: bpy.props.CollectionProperty(
         type=LogItemProps
+    )
+
+    show_log_dates: bpy.props.BoolProperty(
+        name="Show Logged Dates",
+        description="Toggles the displaying of dates for log items",
+        default=True
+    )
+
+    show_log_times: bpy.props.BoolProperty(
+        name="Show Logged Times",
+        description="Toggles the displaying of times for log items",
+        default=True
+    )
+
+    show_log_modules: bpy.props.BoolProperty(
+        name="Show Logged Modules",
+        description="Toggles the displaying of module names for log items",
+        default=False
     )
 
 

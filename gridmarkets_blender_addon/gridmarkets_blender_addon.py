@@ -58,13 +58,28 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
 class GRIDMARKETS_UL_log(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        props = context.scene.props
 
         row = layout.row(align=True)
         row.alignment = 'LEFT'
 
         # line text
         row.alert = item.level == 'ERROR' # if the message is an error then colour red
-        row.label(text=item.body)
+
+        text = ''
+
+        if item.date and props.show_log_dates:
+            text = text + item.date + ' '
+
+        if item.time and props.show_log_times:
+            text = text + item.time + ' '
+
+        if item.name and props.show_log_modules:
+            text = text + item.name + ' '
+
+        text = text + item.body
+
+        row.label(text=text)
 
 
 # ------------------------------------------------------------------------

@@ -12,13 +12,31 @@ class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_icon = 'BLEND_FILE'
     bl_options = {'UNDO'}
 
+    @staticmethod
+    def _get_log_text(item):
+        text = ''
+
+        if item.date:
+            text = text + item.date + ' '
+
+        if item.time:
+            text = text + item.time + ' '
+
+        if item.name:
+            text = text + item.name + ' ' + item.level + ' '
+
+        text = text + item.body
+
+        return text
+
     def execute(self, context):
         props = context.scene.props
         output = ''
 
         for log_item in props.log_items:
-            output = output + os.linesep + log_item.body
+            output = output + os.linesep + GRIDMARKETS_OT_copy_logs_to_clipboard._get_log_text(log_item)
 
+        log.info("Copying logs to clipboard...")
         bpy.context.window_manager.clipboard = output
 
         return {'FINISHED'}
