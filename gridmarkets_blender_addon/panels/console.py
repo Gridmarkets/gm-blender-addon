@@ -23,7 +23,8 @@ class GRIDMARKETS_PT_console(bpy.types.Panel):
         props = context.scene.props
 
         box = layout.box()
-        box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=6)
+        box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=6,
+                          sort_lock=True)
         box.operator(constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME)
 
 
