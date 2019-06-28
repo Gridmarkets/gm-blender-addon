@@ -93,7 +93,7 @@ class BlenderLoggingWrapper:
         if operator:
             _report({'ERROR'}, msg, operator)
 
-        self._logger.error(msg, args, kwargs)
+        #self._logger.error(msg, *args, **kwargs)
 
     def exception(self, msg, operator=None, *args, exc_info=True, **kwargs):
         """
