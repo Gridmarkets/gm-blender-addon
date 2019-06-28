@@ -86,7 +86,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         frame_range.frame_step = self.frame_step
 
         # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-        utils_blender.force_redraw_panel()
+        utils_blender.force_redraw_addon()
 
         return {'FINISHED'}
 

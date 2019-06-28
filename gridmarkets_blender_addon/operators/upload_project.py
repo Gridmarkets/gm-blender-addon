@@ -77,7 +77,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         props.selected_project = len(props.projects) - 1
 
         # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-        utils_blender.force_redraw_panel()
+        utils_blender.force_redraw_addon()
 
     def draw(self, context):
         layout = self.layout

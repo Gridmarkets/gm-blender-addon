@@ -351,12 +351,16 @@ def add_project_to_options_list(context, project_name):
     props.selected_project = len(props.projects) - 1
 
     # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-    force_redraw_panel()
+    force_redraw_addon()
 
 
-def force_redraw_panel():
+def force_redraw_addon():
+    redraw_region(constants.PANEL_SPACE_TYPE, constants.PANEL_REGION_TYPE)
+
+
+def redraw_region(area_type, region_type):
     for area in bpy.context.screen.areas:
-        if area.type == constants.PANEL_SPACE_TYPE:
+        if area.type == area_type:
             for region in area.regions:
-                if region.type == constants.PANEL_REGION_TYPE:
+                if region.type == region_type:
                     region.tag_redraw()
