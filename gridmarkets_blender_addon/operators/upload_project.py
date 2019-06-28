@@ -56,7 +56,8 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             self._add_project_to_list(props)
 
         except InvalidInputError as e:
-            self.report({'ERROR_INVALID_INPUT'}, e.user_message())
+            log.warning("Invalid Input Error: " + e.user_message)
+            self.report({'ERROR_INVALID_INPUT'}, e.user_message)
         except AuthenticationError as e:
             log.error("Authentication Error: " + e.user_message)
         except InsufficientCreditsError as e:

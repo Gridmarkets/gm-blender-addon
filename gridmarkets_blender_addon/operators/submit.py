@@ -19,7 +19,8 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         try:
             utils_blender.submit_job(context, TempDirectoryManager.get_temp_directory_manager())
         except InvalidInputError as e:
-            self.report({'ERROR_INVALID_INPUT'}, e.user_message())
+            log.warning("Invalid Input Error: " + e.user_message)
+            self.report({'ERROR_INVALID_INPUT'}, e.user_message)
         except AuthenticationError as e:
             log.error("Authentication Error: " + e.user_message)
         except InsufficientCreditsError as e:
