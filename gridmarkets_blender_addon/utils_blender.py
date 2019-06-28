@@ -1,15 +1,14 @@
 import bpy
+import inspect
 import pathlib
 import os
-
+import collections
 
 import constants
 import utils
 
 from invalid_input_error import InvalidInputError
-from property_sanitizer import PropertySanitizer
 from temp_directory_manager import TempDirectoryManager
-from validation_response import ValidationResponse
 
 from gridmarkets.envoy_client import EnvoyClient
 from gridmarkets.project import Project
@@ -20,7 +19,10 @@ from gridmarkets.errors import *
 from blender_asset_tracer import trace, pack
 from blender_asset_tracer.pack.progress import Callback
 
-import collections
+
+def get_wrapped_logger(name):
+    from blender_logging_wrapper import get_wrapped_logger
+    return get_wrapped_logger(name)
 
 
 def trace_blend_file(blend_file_path):
@@ -93,6 +95,9 @@ def validate_credentials(email = None, access_key = None):
     :raises: InvalidInputError, AuthenticationError
     """
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Validating credentials...")
+
     # only read from preferences if a parameter is None
     if email is None or access_key is None:
 
@@ -113,14 +118,14 @@ def validate_credentials(email = None, access_key = None):
 
     # validate
     if not has_email and not has_key:
-        raise InvalidInputError(message="No Gridmarkets email address or access key provided." +
-                                        constants.AUTHENTICATION_HELP_MESSAGE)
+        message = "No Gridmarkets email address or access key provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        raise InvalidInputError(message=message)
     elif not has_email:
-        raise InvalidInputError(message="No Gridmarketes email address provided." +
-                                        constants.AUTHENTICATION_HELP_MESSAGE)
+        message = "No Gridmarketes email address provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        raise InvalidInputError(message=message)
     elif not has_key:
-        raise InvalidInputError(message="No Gridmarketes access key provided." +
-                                        constants.AUTHENTICATION_HELP_MESSAGE)
+        message = "No Gridmarketes access key provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        raise InvalidInputError(message=message)
 
     # if initial checks pass try the Gridmarkets validate_auth function
     # create an instance of Envoy client
