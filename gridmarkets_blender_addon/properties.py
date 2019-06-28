@@ -261,7 +261,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     show_log_dates: bpy.props.BoolProperty(
         name="Show Logged Dates",
         description="Toggles the displaying of dates for log items",
-        default=True
+        default=False
     )
 
     show_log_times: bpy.props.BoolProperty(
