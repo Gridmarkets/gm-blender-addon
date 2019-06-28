@@ -144,7 +144,6 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
 
-
 def _get_project_options(scene, context):
     """ Returns a list of items representing project options """
 
@@ -163,6 +162,7 @@ def _get_project_options(scene, context):
         project_options.append((str(i + 1), project.name, '', '', project.id))
 
     return project_options
+
 
 def _get_job_options(scene, context):
     """ Returns a list of items representing project options """
