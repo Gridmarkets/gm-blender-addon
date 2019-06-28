@@ -1,6 +1,7 @@
 import bpy
 import constants
 import properties
+import utils_blender
 
 
 class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
@@ -85,11 +86,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         frame_range.frame_step = self.frame_step
 
         # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-        for area in bpy.context.screen.areas:
-            if area.type == constants.PANEL_SPACE_TYPE:
-                for region in area.regions:
-                    if region.type == constants.PANEL_REGION_TYPE:
-                        region.tag_redraw()
+        utils_blender.force_redraw_panel()
 
         return {'FINISHED'}
 
