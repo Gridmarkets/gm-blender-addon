@@ -358,6 +358,12 @@ def force_redraw_addon():
     redraw_region(constants.PANEL_SPACE_TYPE, constants.PANEL_REGION_TYPE)
 
 
+def redraw_area(area_type):
+    for area in bpy.context.screen.areas:
+        if area.type == area_type:
+            area.tag_redraw()
+
+
 def redraw_region(area_type, region_type):
     for area in bpy.context.screen.areas:
         if area.type == area_type:

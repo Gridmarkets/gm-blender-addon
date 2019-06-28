@@ -6,6 +6,9 @@ from gridmarkets.errors import *
 from invalid_input_error import InvalidInputError
 from temp_directory_manager import TempDirectoryManager
 
+from blender_logging_wrapper import get_wrapped_logger
+log = get_wrapped_logger(__name__)
+
 
 class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
@@ -55,13 +58,13 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         except InvalidInputError as e:
             self.report({'ERROR_INVALID_INPUT'}, e.user_message())
         except AuthenticationError as e:
-            self.report({'ERROR'}, "Authentication Error: " + e.user_message)
+            log.error("Authentication Error: " + e.user_message)
         except InsufficientCreditsError as e:
-            self.report({'ERROR'}, "Insufficient Credits Error: " + e.user_message)
+            log.error("Insufficient Credits Error: " + e.user_message)
         except InvalidRequestError as e:
-            self.report({'ERROR'}, "Invalid Request Error: " + e.user_message)
+            log.error("Invalid Request Error: " + e.user_message)
         except APIError as e:
-            self.report({'ERROR'}, "API Error: " + str(e.user_message))
+            log.error("API Error: " + str(e.user_message))
 
         return {'FINISHED'}
 

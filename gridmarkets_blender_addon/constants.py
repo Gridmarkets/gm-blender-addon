@@ -63,6 +63,9 @@ PANEL_FRAME_RANGES_LABEL = "Custom Frame Ranges"
 PANEL_OUTPUT_SETTINGS_ID_NAME = "gridmarkets_output_settings_sub_panel"
 PANEL_OUTPUT_SETTINGS_LABEL = "Output Settings"
 
+PANEL_CONSOLE_ID_NAME = "gridmarkets_console_panel"
+PANEL_CONSOLE_LABEL = "Console"
+
 PANEL_SPACE_TYPE = "PROPERTIES"
 PANEL_REGION_TYPE = "WINDOW"
 PANEL_CONTEXT = "render"

@@ -38,7 +38,8 @@ modulesNames = ['constants',
                 'panels.jobs',
                 #'panels.job_info',
                 'panels.frame_ranges',
-                'panels.output_settings']
+                'panels.output_settings',
+                'panels.console']
 
 # append this folder to sys.path so local dependencies can be found
 sys.path.append(os.path.dirname(__file__))

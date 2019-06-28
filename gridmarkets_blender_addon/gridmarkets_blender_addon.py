@@ -55,6 +55,18 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
         layout.prop(item, "name", text="", icon=constants.JOB_ICON, emboss=False)
 
 
+class GRIDMARKETS_UL_log(bpy.types.UIList):
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+
+        row = layout.row(align=True)
+        row.alignment = 'LEFT'
+
+        # line text
+        row.alert = item.level == 'ERROR' # if the message is an error then colour red
+        row.label(text=item.body)
+
+
 # ------------------------------------------------------------------------
 #    Registration
 # ------------------------------------------------------------------------
@@ -63,7 +75,8 @@ class GRIDMARKETS_UL_job(bpy.types.UIList):
 classes = (
     GRIDMARKETS_UL_frame_range,
     GRIDMARKETS_UL_project,
-    GRIDMARKETS_UL_job
+    GRIDMARKETS_UL_job,
+    GRIDMARKETS_UL_log
 )
 
 

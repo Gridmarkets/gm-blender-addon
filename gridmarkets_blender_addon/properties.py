@@ -2,6 +2,26 @@ import bpy
 import constants
 
 
+class LogItemProps(bpy.types.PropertyGroup):
+
+    body: bpy.props.StringProperty(
+        name="Body",
+        description="The body of the log message",
+        default=""
+    )
+
+    level: bpy.props.EnumProperty(
+        name="Level",
+        description="The logging level of the item",
+        items=[
+            ('DEBUG', 'DEBUG', ''),
+            ('INFO', 'INFO', ''),
+            ('WARNING', 'WARNING', ''),
+            ('ERROR', 'ERROR', '')
+        ]
+    )
+
+
 class FrameRangeProps(bpy.types.PropertyGroup):
 
     def get_frame_start(self):
@@ -211,8 +231,18 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         items=_get_job_options
     )
 
+    selected_log_item: bpy.props.IntProperty(
+        default=-1 # must be negative one otherwise the logic that selects new log items wont work
+    )
+
+    # logging items
+    log_items: bpy.props.CollectionProperty(
+        type=LogItemProps
+    )
+
 
 classes = (
+    LogItemProps,
     FrameRangeProps,
     ProjectProps,
     JobProps,

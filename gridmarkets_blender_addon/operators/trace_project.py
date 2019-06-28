@@ -26,7 +26,7 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
         """ Run for every file selected by the user """
         filename, extension = os.path.splitext(self.filepath)
 
-        log.info("Tracing %s" % self.filepath, operator=self)
+        log.info("Tracing %s" % self.filepath)
 
         # find all dependencies
         dependencies = utils_blender.trace_blend_file(self.filepath)
@@ -40,7 +40,7 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
             for asset in value:
                 trace_summary = trace_summary + os.linesep + '\t' + str(asset)
 
-        log.info(trace_summary, operator=self)
+        log.info(trace_summary)
 
         return {'FINISHED'}
 
