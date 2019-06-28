@@ -1,6 +1,7 @@
 import sys
 import traceback
 
+
 class InvalidInputError(Exception):
 
     def __init__(self, message=None):

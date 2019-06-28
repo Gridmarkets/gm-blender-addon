@@ -49,10 +49,10 @@ PANEL_MAIN_ID_NAME = "gridmarkets_main_panel"
 PANEL_MAIN_ID_LABEL = "GridMarkets"
 
 PANEL_PROJECTS_ID_NAME = "gridmarkets_projects_sub_panel"
-PANEL_PROJECTS_LABEL = "Uploaded Projects"
+PANEL_PROJECTS_LABEL = "Projects"
 
 PANEL_JOBS_ID_NAME = "gridmarkets_jobs_sub_panel"
-PANEL_JOBS_LABEL = "Custom Jobs"
+PANEL_JOBS_LABEL = "Jobs"
 
 PANEL_JOBS_INFO_ID_NAME = "gridmarkets_job_info_sub_panel"
 PANEL_JOBS_INFO_LABEL = "Job Info"
