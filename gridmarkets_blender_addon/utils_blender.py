@@ -177,7 +177,9 @@ def _add_project_to_list(project_name, props):
     force_redraw_addon()
 
 
-def upload_project(context, project_name, temp_dir_manager, operator=None,
+def upload_project(context, project_name, temp_dir_manager,
+                   operator=None,
+                   skip_upload=False,
                    min_progress=0,
                    max_progress=100,
                    progress_attribute_name = "uploading_project",
@@ -186,14 +188,15 @@ def upload_project(context, project_name, temp_dir_manager, operator=None,
                    ):
     """Uploads the current scene with the provided project name to Envoy.
 
-    :param operator: The operator that called the function
-    :type operator: bpy.types.Operator
     :param context: The operator's context
     :type context: bpy.types.Context
     :param project_name: The name of the project as it will appear in Envoy
     :type project_name: str
     :param temp_dir_manager: The temporary directory manager used to store packed projects
     :type temp_dir_manager: TempDirectoryManager
+    :param operator: The operator that called the function
+    :type operator: bpy.types.Operator
+    :param skip_upload: Pack files but don't upload project files
     :param operator: An optional instance of an operator so that invalid input can be reported correctly
     :type operator: bpy.types.Operator
     :param min_progress: The min value to set the progress too
@@ -285,15 +288,17 @@ def upload_project(context, project_name, temp_dir_manager, operator=None,
         log.info("Adding '%s' to Gridmarkets project..." % str(packed_dir))
         project.add_folders(str(packed_dir))
 
-        # submit project
-        log.info("Uploading project to Gridmarkets...")
-        _set_progress(progress=80, status="Uploading Project")
-        client.submit_project(project)  # returns project name
+        if skip_upload:
+            log.info("Skipping project upload...")
+        else:
+            log.info("Uploading project to Gridmarkets...")
+            _set_progress(progress=80, status="Uploading Project")
+            client.submit_project(project)  # returns project name
 
-        # add the new project to the projects list
-        _add_project_to_list(project_name, context.scene.props)
+            # add the new project to the projects list
+            _add_project_to_list(project_name, context.scene.props)
 
-        log.info("Successfully uploaded project")
+            log.info("Successfully uploaded project")
 
     except InvalidInputError as e:
         log.warning("Invalid Input Error: " + e.user_message)
@@ -366,6 +371,7 @@ def get_job_output_prefix(job):
 
 
 def submit_job(context, temp_dir_manager,
+               new_project_name=None,
                operator=None,
                min_progress=0,
                max_progress=100,
@@ -379,6 +385,8 @@ def submit_job(context, temp_dir_manager,
     :type context: bpy.context
     :param temp_dir_manager: The temporary directory manager used to store packed projects
     :type temp_dir_manager: TempDirectoryManager
+    :param new_project_name: The name of the project to use if uploading a new project
+    :type new_project_name: str
     :param operator: An optional instance of an operator so that invalid input can be reported correctly
     :type operator: bpy.types.Operator
     :param min_progress: The min value to set the progress too
@@ -426,8 +434,10 @@ def submit_job(context, temp_dir_manager,
             log.info("Uploading project for job submit...")
             _set_progress(progress=10, status="Uploading project")
 
-            # create a name for the project
-            project_name = utils.create_unique_object_name(props.projects, name_prefix='unnamed_project_')
+            if new_project_name is None:
+                raise InvalidInputError("Project name can not be None type")
+
+            project_name = new_project_name
 
             # upload the project
             upload_project(context, project_name, temp_dir_manager,
@@ -436,13 +446,21 @@ def submit_job(context, temp_dir_manager,
                            max_progress=40,
                            progress_attribute_name=progress_attribute_name,
                            progress_percent_attribute_name=progress_percent_attribute_name,
-                           progress_status_attribute_name=progress_status_attribute_name)
+                           progress_status_attribute_name=progress_status_attribute_name,
+                           # skip upload here otherwise when we submit this job the project may not have finished
+                           # uploading. Instead use upload project to pack the files and upload when the job is
+                           # submitted
+                           skip_upload=True)
+
+            skip_upload = False
+
 
         elif props.project_options.isnumeric():
             # get the name of the selected project
             selected_project_option = int(props.project_options)
             selected_project = props.projects[selected_project_option - constants.PROJECT_OPTIONS_STATIC_COUNT]
             project_name = selected_project.name
+            skip_upload = True
         else:
             raise InvalidInputError(message="Invalid project option")
 
@@ -492,7 +510,7 @@ def submit_job(context, temp_dir_manager,
         # submit project
         log.info("Submitting project...")
         _set_progress(progress=50, status="Submitting project")
-        client.submit_project(project, skip_upload=True)
+        client.submit_project(project, skip_upload=skip_upload)
 
         log.info("Project submitted")
 
