@@ -37,7 +37,7 @@ class IconLoader:
         # load a preview thumbnail of the icon and store in the previews collection
         preview_collection.load(constants.GRIDMARKETS_LOGO_ID,
                                 os.path.join(my_icons_dir,
-                                             constants.GM_GREYSCALE_LOGO),
+                                             constants.GM_COLOURED_LOGO),
                                 'IMAGE')
 
         IconLoader._icon_preview_collections[constants.MAIN_COLLECTION_ID] = preview_collection
