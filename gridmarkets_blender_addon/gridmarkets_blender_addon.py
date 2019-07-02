@@ -8,7 +8,6 @@ import utils_blender
 
 from temp_directory_manager import TempDirectoryManager
 from icon_loader import IconLoader
-from property_sanitizer import PropertySanitizer
 from invalid_input_error import InvalidInputError
 
 from gridmarkets.envoy_client import EnvoyClient

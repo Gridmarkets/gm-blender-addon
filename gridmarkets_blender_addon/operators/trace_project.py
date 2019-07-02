@@ -3,6 +3,7 @@ from bpy_extras.io_utils import ImportHelper
 import os
 import constants
 import utils_blender
+from bat_progress_callback import BatProgressCallback
 
 from blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
@@ -28,8 +29,11 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
 
         log.info("Tracing %s" % self.filepath)
 
+        # create the progress callback
+        progress_cb = BatProgressCallback(log)
+
         # find all dependencies
-        dependencies = utils_blender.trace_blend_file(self.filepath)
+        dependencies = utils_blender.trace_blend_file(self.filepath, progress_cb=progress_cb)
 
         # store the trace output as a single string
         trace_summary = "Trace summary:"

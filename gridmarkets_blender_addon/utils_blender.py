@@ -9,6 +9,7 @@ import utils
 
 from invalid_input_error import InvalidInputError
 from temp_directory_manager import TempDirectoryManager
+from bat_progress_callback import BatProgressCallback
 
 from gridmarkets.envoy_client import EnvoyClient
 from gridmarkets.project import Project
@@ -25,11 +26,13 @@ def get_wrapped_logger(name):
     return get_wrapped_logger(name)
 
 
-def trace_blend_file(blend_file_path):
+def trace_blend_file(blend_file_path, progress_cb=None):
     """ Finds all the dependencies for a given .blend file
 
     :param blend_file_path: the .blend file to inspect
     :type blend_file_path: str
+    :param progress_cb: The progress reporting callback instance
+    :type progress_cb: blender_asset_tracer.pack.progress.Callback
     :return: A dictionary of .blend files and their sets of dependencies
     :rtype: collections.defaultdict(set)
     """
@@ -38,7 +41,7 @@ def trace_blend_file(blend_file_path):
     dependencies = collections.defaultdict(set)
 
     # Find the dependencies
-    for usage in trace.deps(pathlib.Path(blend_file_path)):
+    for usage in trace.deps(pathlib.Path(blend_file_path), progress_cb):
         file_path = usage.block.bfile.filepath.absolute()
         for assetPath in usage.files():
             asset_path = assetPath.resolve()
@@ -47,13 +50,15 @@ def trace_blend_file(blend_file_path):
     return dependencies
 
 
-def pack_blend_file(blend_file_path, target_dir_path):
+def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
     """ Packs a Blender .blend file to a target folder using blender_asset_tracer
 
     :param blend_file_path: The .blend file to pack
     :type blend_file_path: str
     :param target_dir_path: The path to the directory which will contain the packed files
     :type target_dir_path: str
+    :param progress_cb: The progress reporting callback instance
+    :type progress_cb: blender_asset_tracer.pack.progress.Callback
     """
 
     blend_file_path = pathlib.Path(blend_file_path)
@@ -68,6 +73,9 @@ def pack_blend_file(blend_file_path, target_dir_path):
                      compress=False,
                      relative_only=False
                      ) as packer:
+
+        if progress_cb:
+            packer._progress_cb = progress_cb
 
         # plan the packing operation (must be called before execute)
         packer.strategise()
@@ -154,67 +162,158 @@ def get_new_envoy_client():
     return EnvoyClient(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
 
 
-def upload_project(project_name, temp_dir_manager):
-    """ Uploads the current scene with the provided project name to Envoy.
+def _add_project_to_list(project_name, props):
 
+    # add a project to the list
+    project = props.projects.add()
+
+    project.id = utils.get_unique_id(props.projects)
+    project.name = project_name
+
+    # select the new project
+    props.selected_project = len(props.projects) - 1
+
+    # force region to redraw otherwise the list wont update until next event (mouse over, etc)
+    force_redraw_addon()
+
+
+def upload_project(context, project_name, temp_dir_manager, operator=None,
+                   min_progress=0,
+                   max_progress=100,
+                   progress_attribute_name = "uploading_project",
+                   progress_percent_attribute_name = "uploading_project_progress",
+                   progress_status_attribute_name = "uploading_project_status"
+                   ):
+    """Uploads the current scene with the provided project name to Envoy.
+
+    :param operator: The operator that called the function
+    :type operator: bpy.types.Operator
+    :param context: The operator's context
+    :type context: bpy.types.Context
     :param project_name: The name of the project as it will appear in Envoy
     :type project_name: str
     :param temp_dir_manager: The temporary directory manager used to store packed projects
     :type temp_dir_manager: TempDirectoryManager
+    :param operator: An optional instance of an operator so that invalid input can be reported correctly
+    :type operator: bpy.types.Operator
+    :param min_progress: The min value to set the progress too
+    :type min_progress: float
+    :param max_progress: The max value to set the progress too
+    :type max_progress: float
+    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
+    :type progress_attribute_name: str
+    :param progress_percent_attribute_name: The name of the property which represents the operations progress
+    :type progress_percent_attribute_name: str
+    :param progress_status_attribute_name: The name of the property which represents the operations status
+    :type progress_status_attribute_name: str
     :rtype: void
     :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
     """
 
-    # create an instance of Envoy client
-    client = get_new_envoy_client()
+    # helper function for setting the progress of the operation
+    def _set_progress(progress=None, status=None):
+        if progress is not None:
+            # re-scale progress so that it is between the min and max values
+            scaled_progress = min_progress + ((max_progress - min_progress) / 100) * progress
+            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
 
-    blend_file_name = None
+        if status is not None:
+            setattr(context.scene.props, progress_status_attribute_name, status)
 
-    # if the file has been saved
-    if bpy.context.blend_data.is_saved:
-        # use the name of the saved .blend file
-        blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-    else:
-        # otherwise create a name for the packed .blend file
-        blend_file_name = 'main_GM_blend_file_packed.blend'
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
 
-    # create a new temp directory
-    temp_dir_path = temp_dir_manager.get_temp_directory()
+    setattr(context.scene.props, progress_attribute_name, True)
+    _set_progress(progress=0, status="Starting project upload")
 
-    blend_file_path = temp_dir_path / blend_file_name
+    try:
+        # create an instance of Envoy client
+        client = get_new_envoy_client()
 
-    # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-    # or if it has been modified since it's last save then the submitted .blend file will represent the
-    # current state of the scene
-    bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                compress=True)
+        # if the file has been saved
+        if bpy.context.blend_data.is_saved:
+            # use the name of the saved .blend file
+            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+            log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
+        else:
+            # otherwise create a name for the packed .blend file
+            blend_file_name = 'main_GM_blend_file_packed.blend'
+            log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
 
-    # create directory to contain packed project
-    packed_dir = temp_dir_path / project_name
-    os.mkdir(str(packed_dir))
+        # create a new temp directory
+        temp_dir_path = temp_dir_manager.get_temp_directory()
 
-    # pack the .blend file to the pack directory
-    pack_blend_file(str(blend_file_path), str(packed_dir))
+        blend_file_path = temp_dir_path / blend_file_name
 
-    # delete pack-info.txt if it exists
-    pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
-    if pack_info_file.is_file():
-        pack_info_file.unlink()
+        # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
+        # or if it has been modified since it's last save then the submitted .blend file will represent the
+        # current state of the scene
+        _set_progress(progress=20, status="Saving scene data")
+        bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
+                                    compress=True)
+        log.info("Saved copy of scene to '%s'" % str(blend_file_path))
 
-    # create the project
-    project = Project(str(packed_dir), project_name)
+        # create directory to contain packed project
+        packed_dir = temp_dir_path / project_name
 
-    # associate this project with the temp directory so the temp directory can be removed once the project is
-    # complete
-    temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, blend_file_name)
+        log.info("Creating packed directory '%s'..." % str(packed_dir))
+        _set_progress(progress=40, status="Creating packed directory")
+        os.mkdir(str(packed_dir))
 
-    # add files to project
-    # only files and folders within the project path can be added, use relative or full path
-    # any other paths passed will be ignored
-    project.add_folders(str(packed_dir))
+        # create the progress callback
+        progress_cb = BatProgressCallback(log)
 
-    # submit project
-    resp = client.submit_project(project)  # returns project name
+        # pack the .blend file to the pack directory
+        _set_progress(progress=60, status="Packing scene data")
+        pack_blend_file(str(blend_file_path), str(packed_dir), progress_cb=progress_cb)
+
+        # delete pack-info.txt if it exists
+        pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
+        if pack_info_file.is_file():
+            log.info("Removing '%s'..." % str(pack_info_file))
+            pack_info_file.unlink()
+
+        # create the project
+        project = Project(str(packed_dir), project_name)
+
+        # associate this project with the temp directory so the temp directory can be removed once the project is
+        # complete
+        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, blend_file_name)
+        # add files to project
+        # only files and folders within the project path can be added, use relative or full path
+        # any other paths passed will be ignored
+        log.info("Adding '%s' to Gridmarkets project..." % str(packed_dir))
+        project.add_folders(str(packed_dir))
+
+        # submit project
+        log.info("Uploading project to Gridmarkets...")
+        _set_progress(progress=80, status="Uploading Project")
+        client.submit_project(project)  # returns project name
+
+        # add the new project to the projects list
+        _add_project_to_list(project_name, context.scene.props)
+
+        log.info("Successfully uploaded project")
+
+    except InvalidInputError as e:
+        log.warning("Invalid Input Error: " + e.user_message)
+        if operator:
+            operator.report({'ERROR_INVALID_INPUT'}, e.user_message)
+        raise e
+    except AuthenticationError as e:
+        log.error("Authentication Error: " + e.user_message)
+        raise e
+    except InsufficientCreditsError as e:
+        log.error("Insufficient Credits Error: " + e.user_message)
+        raise e
+    except InvalidRequestError as e:
+        log.error("Invalid Request Error: " + e.user_message)
+        raise e
+    except APIError as e:
+        log.error("API Error: " + str(e.user_message))
+        raise e
+    finally:
+        setattr(context.scene.props, progress_attribute_name, False)
 
 
 def get_blender_frame_range(context):
@@ -266,13 +365,32 @@ def get_job_output_prefix(job):
     return job.outputPrefix
 
 
-def submit_job(context, temp_dir_manager):
-    """ Submits a job to a existing or new project.
+def submit_job(context, temp_dir_manager,
+               operator=None,
+               min_progress=0,
+               max_progress=100,
+               progress_attribute_name = "submitting_project",
+               progress_percent_attribute_name = "submitting_project_progress",
+               progress_status_attribute_name = "submitting_project_status"
+               ):
+    """Submits a job to a existing or new project.
 
     :param context: Depends on the area of Blender which is currently being accessed
     :type context: bpy.context
     :param temp_dir_manager: The temporary directory manager used to store packed projects
     :type temp_dir_manager: TempDirectoryManager
+    :param operator: An optional instance of an operator so that invalid input can be reported correctly
+    :type operator: bpy.types.Operator
+    :param min_progress: The min value to set the progress too
+    :type min_progress: float
+    :param max_progress: The max value to set the progress too
+    :type max_progress: float
+    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
+    :type progress_attribute_name: str
+    :param progress_percent_attribute_name: The name of the property which represents the operations progress
+    :type progress_percent_attribute_name: str
+    :param progress_status_attribute_name: The name of the property which represents the operations status
+    :type progress_status_attribute_name: str
     :rtype: void
     :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
     """
@@ -280,83 +398,118 @@ def submit_job(context, temp_dir_manager):
     scene = context.scene
     props = scene.props
 
-    # if the user has selected to upload the current scene as a new project then upload current scene as new project
-    if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
-        # create a name for the project
-        project_name = utils.create_unique_object_name(props.projects, name_prefix='unnamed_project_')
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
 
-        # upload the project
-        upload_project(project_name, temp_dir_manager)
+    # define a helper function for setting the progress
+    def _set_progress(progress=None, status=None):
+        if progress is not None:
+            # re-scale progress so that it is between the min and max values
+            scaled_progress = min_progress + ((max_progress - min_progress) / 100) * progress
+            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
 
-        # update the ui options list
-        add_project_to_options_list(context, project_name)
+        if status is not None:
+            setattr(context.scene.props, progress_status_attribute_name, status)
 
-    elif props.project_options.isnumeric():
-        # get the name of the selected project
-        selected_project_option = int(props.project_options)
-        selected_project = props.projects[selected_project_option - constants.PROJECT_OPTIONS_STATIC_COUNT]
-        project_name = selected_project.name
-    else:
-        raise InvalidInputError(message="Invalid project option")
+    # set the submitting flag to true
+    setattr(context.scene.props, progress_attribute_name, True)
 
-    association = temp_dir_manager.get_association_with_project_name(project_name)
-    project = association.get_project()
-    render_file = association.get_relative_render_file()
+    # set the progress to 0 and set a status message
+    _set_progress(progress=0, status="Starting job submission")
 
-    if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
-        job = get_default_blender_job(context, render_file)
+    # log the start of the operation
+    log.info("Starting submit operation...")
 
-    elif props.job_options.isnumeric():
-        selected_job_option = int(props.job_options)
-        selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
+    try:
+        # if the user has selected to upload the current scene as a new project then upload current scene as new project
+        if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            log.info("Uploading project for job submit...")
+            _set_progress(progress=10, status="Uploading project")
 
-        job = Job(
-            selected_job.name,
-            constants.JOB_PRODUCT_TYPE,
-            constants.JOB_PRODUCT_VERSION,
-            constants.JOB_OPERATION,
-            render_file,
-            frames=get_job_frame_ranges(context, selected_job),
-            output_prefix=get_job_output_prefix(selected_job),
-            output_format=scene.render.image_settings.file_format,
-            engine=scene.render.engine
-        )
-    else:
-        raise InvalidInputError(message="Invalid job option")
+            # create a name for the project
+            project_name = utils.create_unique_object_name(props.projects, name_prefix='unnamed_project_')
 
-    # create an instance of Envoy client
-    client = get_new_envoy_client()
+            # upload the project
+            upload_project(context, project_name, temp_dir_manager,
+                           operator=operator,
+                           min_progress=10,
+                           max_progress=40,
+                           progress_attribute_name=progress_attribute_name,
+                           progress_percent_attribute_name=progress_percent_attribute_name,
+                           progress_status_attribute_name=progress_status_attribute_name)
 
-    # add job to project
-    project.add_jobs(job)
+        elif props.project_options.isnumeric():
+            # get the name of the selected project
+            selected_project_option = int(props.project_options)
+            selected_project = props.projects[selected_project_option - constants.PROJECT_OPTIONS_STATIC_COUNT]
+            project_name = selected_project.name
+        else:
+            raise InvalidInputError(message="Invalid project option")
 
+        association = temp_dir_manager.get_association_with_project_name(project_name)
+        project = association.get_project()
+        render_file = association.get_relative_render_file()
 
-    print('project_name:', project_name)
-    print('job.name:', job.name)
-    print('job.app:', job.app)
-    print('job.app_version:', job.app_version)
-    print('job.operation:', job.operation)
-    print('job.path:', job.path)
-    print('job.frames:', get_blender_frame_range(context))
+        # if the job options are set to 'use blender render settings' then set the job options accordingly
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            job = get_default_blender_job(context, render_file)
 
-    # submit project
-    client.submit_project(project, skip_upload=True)
+        # otherwise set the job options based on a user defined job
+        elif props.job_options.isnumeric():
+            selected_job_option = int(props.job_options)
+            selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
 
+            job = Job(
+                selected_job.name,
+                constants.JOB_PRODUCT_TYPE,
+                constants.JOB_PRODUCT_VERSION,
+                constants.JOB_OPERATION,
+                render_file,
+                frames=get_job_frame_ranges(context, selected_job),
+                output_prefix=get_job_output_prefix(selected_job),
+                output_format=scene.render.image_settings.file_format,
+                engine=scene.render.engine
+            )
+        else:
+            raise InvalidInputError(message="Invalid job option")
 
-def add_project_to_options_list(context, project_name):
-    props = context.scene.props
+        # create an instance of Envoy client
+        client = get_new_envoy_client()
 
-    # add a project to the list
-    project = props.projects.add()
+        # add job to project
+        project.add_jobs(job)
 
-    project.id = utils.get_unique_id(props.projects)
-    project.name = project_name
+        log.info("Submitted Job Settings: \n" +
+                 "\tproject_name: %s\n" % project_name +
+                 "\tjob.app: %s\n" % job.app +
+                 "\tjob.name: %s\n" % job.name +
+                 "\tjob.app_version: %s\n" % job.app_version +
+                 "\tjob.operation: %s\n" % job.operation +
+                 "\tjob.path: %s\n" % job.path +
+                 "\tjob.frames: %s\n" % get_blender_frame_range(context)
+                 )
 
-    # select the new project
-    props.selected_project = len(props.projects) - 1
+        # submit project
+        log.info("Submitting project...")
+        _set_progress(progress=50, status="Submitting project")
+        client.submit_project(project, skip_upload=True)
 
-    # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-    force_redraw_addon()
+        log.info("Project submitted")
+
+    except InvalidInputError as e:
+        log.warning("Invalid Input Error: " + e.user_message)
+        if operator:
+            operator.report({'ERROR_INVALID_INPUT'}, e.user_message)
+    except AuthenticationError as e:
+        log.error("Authentication Error: " + e.user_message)
+    except InsufficientCreditsError as e:
+        log.error("Insufficient Credits Error: " + e.user_message)
+    except InvalidRequestError as e:
+        log.error("Invalid Request Error: " + e.user_message)
+    except APIError as e:
+        log.error("API Error: " + str(e.user_message))
+    finally:
+        setattr(context.scene.props, progress_attribute_name, False)
 
 
 def force_redraw_addon():
@@ -364,14 +517,18 @@ def force_redraw_addon():
 
 
 def redraw_area(area_type):
-    for area in bpy.context.screen.areas:
-        if area.type == area_type:
-            area.tag_redraw()
+    # the screen may be None if method is called from a different thread
+    if bpy.context.screen:
+        for area in bpy.context.screen.areas:
+            if area.type == area_type:
+                area.tag_redraw()
 
 
 def redraw_region(area_type, region_type):
-    for area in bpy.context.screen.areas:
-        if area.type == area_type:
-            for region in area.regions:
-                if region.type == region_type:
-                    region.tag_redraw()
+    # the screen may be None if method is called from a different thread
+    if bpy.context.screen:
+        for area in bpy.context.screen.areas:
+            if area.type == area_type:
+                for region in area.regions:
+                    if region.type == region_type:
+                        region.tag_redraw()

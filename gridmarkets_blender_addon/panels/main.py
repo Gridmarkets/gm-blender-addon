@@ -2,6 +2,7 @@ import bpy
 import constants
 from icon_loader import IconLoader
 
+
 class GRIDMARKETS_PT_Main(bpy.types.Panel):
     """Class to represent the plugins main panel. Contains all sub panels as well as 'Render' and 'Open Manager Portal'
     buttons.
@@ -45,6 +46,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
         # submit box
         box = layout.box()
+        box.use_property_split = False
         row = box.row()
 
         # project options
@@ -57,10 +59,13 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         col2.label(text="Job")
         col2.prop(props, "job_options", text="")
 
-        # submit button
+        # submit button / progress indicator
         row = box.row(align=True)
         row.scale_y = 2.5
-        row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
+        if props.submitting_project:
+            row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
+        else:
+            row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
 
         # Portal manager link
         row = layout.row(align=True)

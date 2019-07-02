@@ -19,7 +19,6 @@ import importlib
 modulesNames = ['constants',
                 'icon_loader',
                 'properties',
-                'property_sanitizer',
                 'addon_preferences',
                 'blender_logging_wrapper',
                 'operators.trace_project',

@@ -276,6 +276,52 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
+    # upload project progress props
+    uploading_project: bpy.props.BoolProperty(
+        name="Uploading Project",
+        description="Indicates that a project is being uploaded",
+        default=False
+    )
+
+    uploading_project_progress: bpy.props.IntProperty(
+        name="Uploading Project Progress",
+        description="What percent of the project has been uploaded",
+        default=0,
+        min=0,
+        max=100,
+        step=1,
+        subtype='PERCENTAGE'
+    )
+
+    uploading_project_status: bpy.props.StringProperty(
+        name="Uploading Project Status",
+        description="A brief description of the current status of the uploading operation",
+        default="",
+    )
+
+    # submit operation progress props
+    submitting_project: bpy.props.BoolProperty(
+        name="Submitting Project",
+        description="Indicates that a project is being submitted",
+        default=False
+    )
+
+    submitting_project_progress: bpy.props.IntProperty(
+        name="Submitting Project Progress",
+        description="The progress made towards submitting this job",
+        default=0,
+        min=0,
+        max=100,
+        step=1,
+        subtype='PERCENTAGE'
+    )
+
+    submitting_project_status: bpy.props.StringProperty(
+        name="Submitting Project Status",
+        description="A brief description of the current status of the submit operation",
+        default="",
+    )
+
 
 classes = (
     LogItemProps,

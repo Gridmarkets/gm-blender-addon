@@ -1,9 +1,8 @@
 import bpy
 import constants
+import threading
 import utils
 import utils_blender
-from gridmarkets.errors import *
-from invalid_input_error import InvalidInputError
 from temp_directory_manager import TempDirectoryManager
 
 from blender_logging_wrapper import get_wrapped_logger
@@ -24,6 +23,21 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         maxlen=256
     )
 
+    _timer = None
+    _thread = None
+
+    def modal(self, context, event):
+        if event.type == 'TIMER':
+            # repaint add-on on timer event
+            utils_blender.force_redraw_addon()
+
+            if not self._thread.isAlive():
+                self._thread.join()
+                utils_blender.force_redraw_addon()
+                return {'FINISHED'}
+
+        return {'PASS_THROUGH'}
+
     def invoke(self, context, event):
         props = context.scene.props
 
@@ -31,13 +45,8 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         if bpy.context.blend_data.is_saved:
             blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
 
-            print("blend_file_name", blend_file_name)
-
             if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
-                print("blend_file_name", blend_file_name)
                 blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
-
-            print("blend_file_name", blend_file_name)
 
             self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
         else:
@@ -48,45 +57,21 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
     def execute(self, context):
         """ Called after the user clicks the 'ok' button on the popup """
-        scene = context.scene
-        props = scene.props
+        wm = context.window_manager
 
-        try:
-            utils_blender.upload_project(self.project_name, TempDirectoryManager.get_temp_directory_manager())
-            self._add_project_to_list(props)
-
-        except InvalidInputError as e:
-            log.warning("Invalid Input Error: " + e.user_message)
-            self.report({'ERROR_INVALID_INPUT'}, e.user_message)
-        except AuthenticationError as e:
-            log.error("Authentication Error: " + e.user_message)
-        except InsufficientCreditsError as e:
-            log.error("Insufficient Credits Error: " + e.user_message)
-        except InvalidRequestError as e:
-            log.error("Invalid Request Error: " + e.user_message)
-        except APIError as e:
-            log.error("API Error: " + str(e.user_message))
-
-        return {'FINISHED'}
-
-    def _add_project_to_list(self, props):
-
-        # add a project to the list
-        project = props.projects.add()
-
-        project.id = utils.get_unique_id(props.projects)
-        project.name = self.project_name
-
-        # select the new project
-        props.selected_project = len(props.projects) - 1
-
-        # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-        utils_blender.force_redraw_addon()
+        # run the upload project function in separate thread so that gui is not blocked
+        self._thread = threading.Thread(target=utils_blender.upload_project,
+                                        args=(context, self.project_name, TempDirectoryManager.get_temp_directory_manager()),
+                                        kwargs={'operator': self})
+        self._thread.start()
+        self._timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
     def draw(self, context):
         layout = self.layout
 
-        # project name
+        # project name prop
         layout.prop(self, "project_name")
 
 

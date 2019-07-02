@@ -45,6 +45,10 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='REMOVE',
                      text="Remove Project").action = 'REMOVE'
 
+        # upload status
+        if props.uploading_project:
+            layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
+
 
 classes = (
     GRIDMARKETS_PT_Projects,

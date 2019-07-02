@@ -1,6 +1,7 @@
 import bpy
 import constants
 import utils_blender
+import threading
 from gridmarkets.errors import *
 from invalid_input_error import InvalidInputError
 from temp_directory_manager import TempDirectoryManager
@@ -15,21 +16,32 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
     bl_label = constants.OPERATOR_SUBMIT_LABEL
 
+    _timer = None
+    _thread = None
+
+    def modal(self, context, event):
+        if event.type == 'TIMER':
+            # repaint add-on on timer event
+            utils_blender.force_redraw_addon()
+
+            if not self._thread.isAlive():
+                self._thread.join()
+                utils_blender.force_redraw_addon()
+                return {'FINISHED'}
+
+        return {'PASS_THROUGH'}
+
     def execute(self, context):
-        try:
-            utils_blender.submit_job(context, TempDirectoryManager.get_temp_directory_manager())
-        except InvalidInputError as e:
-            log.warning("Invalid Input Error: " + e.user_message)
-            self.report({'ERROR_INVALID_INPUT'}, e.user_message)
-        except AuthenticationError as e:
-            log.error("Authentication Error: " + e.user_message)
-        except InsufficientCreditsError as e:
-            log.error("Insufficient Credits Error: " + e.user_message)
-        except InvalidRequestError as e:
-            log.error("Invalid Request Error: " + e.user_message)
-        except APIError as e:
-            log.error("API Error: " + str(e.user_message))
-        return {'FINISHED'}
+        wm = context.window_manager
+
+        # run the upload project function in separate thread so that gui is not blocked
+        self._thread = threading.Thread(target=utils_blender.submit_job,
+                                        args=(context, TempDirectoryManager.get_temp_directory_manager()),
+                                        kwargs={'operator': self})
+        self._thread.start()
+        self._timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 
 classes = (
