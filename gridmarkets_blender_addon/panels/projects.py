@@ -33,6 +33,11 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
 
         row = layout.row(align=True)
         sub = row.column()
+
+        # disable upload project button if already submitting or uploading
+        if props.uploading_project or props.submitting_project:
+            sub.enabled = False
+
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='ADD',
                      text="Upload Project").action = 'UPLOAD'
 

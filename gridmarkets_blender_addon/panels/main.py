@@ -65,6 +65,10 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         if props.submitting_project:
             row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
         else:
+            # disable submit button when uploading project
+            if props.uploading_project:
+                row.enabled = False
+
             row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
 
         # Portal manager link
