@@ -322,6 +322,18 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default="",
     )
 
+    tab_options: bpy.props.EnumProperty(
+        name="Tabs",
+        description="The tabs that show at the top of the add-on main window",
+        items=[
+            (constants.TAB_SUBMISSION_SETTINGS, constants.TAB_SUBMISSION_SETTINGS, ''),
+            (constants.TAB_PROJECTS, constants.TAB_PROJECTS, ''),
+            (constants.TAB_JOB_PRESETS, constants.TAB_JOB_PRESETS, ''),
+            (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
+            (constants.TAB_LOGGING, constants.TAB_LOGGING, ''),
+        ]
+    )
+
 
 classes = (
     LogItemProps,

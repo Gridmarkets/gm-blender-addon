@@ -1,6 +1,9 @@
 # the add-ons package name
 ADDON_PACKAGE_NAME = "gridmarkets_blender_addon"
 
+# the name to search for in blenders add-on list
+ADDON_NAME = "Gridmarkets Blender Add-on"
+
 # the icons folder contains custom icons for the UI
 ICONS_FOLDER = "icons"
 
@@ -27,6 +30,9 @@ HELP_URL = "https://www.gridmarkets.com/"
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
 
+DEFAULT_WINDOW_WIDTH = 1200
+DEFAULT_WINDOW_HIEGHT = 600
+
 # plugin versioning
 PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 
@@ -43,6 +49,8 @@ FRAME_RANGE_PREFIX = 'range_'
 DEFAULT_FRAME_RANGE_START_VALUE = 1
 DEFAULT_FRAME_RANGE_END_VALUE = 255
 DEFAULT_FRAME_RANGE_STEP_VALUE = 1
+
+INJECTED_SCREEN_NAME = "GRIDMARKETS_INJECTION_SCREEN"
 
 # panels
 PANEL_MAIN_ID_NAME = "gridmarkets_main_panel"
@@ -65,6 +73,9 @@ PANEL_OUTPUT_SETTINGS_LABEL = "Output Settings"
 
 PANEL_CONSOLE_ID_NAME = "gridmarkets_console_panel"
 PANEL_CONSOLE_LABEL = "Console"
+
+PANEL_PREFERENCES_ID_NAME = "gridmarekts_preferences_panel"
+PANEL_PREFERENCES_LABEL = "Preferences"
 
 PANEL_SPACE_TYPE = "PROPERTIES"
 PANEL_REGION_TYPE = "WINDOW"
@@ -93,22 +104,33 @@ OPERATOR_TRACE_PROJECT_ID_NAME = "gridmarkets.trace_blend_file"
 OPERATOR_TRACE_PROJECT_LABEL = "Trace .blend file"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME = "gridmarkets.copy_logs_to_clipboard"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL = "Copy logs to clipboard"
+OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
+OPERATOR_OPEN_PREFERENCES_LABEL = "Open Gridmarkets add-on preferences"
+OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
+OPERATOR_OPEN_ADDON_LABEL = "Open Gridmarkets add-on"
 
 # enum values
 PROJECT_OPTIONS_STATIC_COUNT = 1
 PROJECT_OPTIONS_NEW_PROJECT_VALUE = 'NEW_PROJECT'
-PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'As New Project'
+PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'Submit Scene as New Project'
 PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project to Gridmarkets'
 
 JOB_OPTIONS_STATIC_COUNT = 1
 JOB_OPTIONS_BLENDERS_SETTINGS_VALUE = "BLENDER_JOB_SETTINGS"
-JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Blender's Render Settings"
+JOB_OPTIONS_BLENDERS_SETTINGS_LABEL = "Use Blender's Render Settings"
 JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when determining the job options."
 
 # API constants
 JOB_PRODUCT_TYPE = "blender"
 JOB_PRODUCT_VERSION = "2.80"
 JOB_OPERATION = "render"
+
+# add-on tabs
+TAB_SUBMISSION_SETTINGS = "Submission Settings"
+TAB_PROJECTS = "Projects"
+TAB_JOB_PRESETS = "Job Presets"
+TAB_CREDENTIALS = "Credentials"
+TAB_LOGGING = "Logging Output"
 
 # register module
 def register():

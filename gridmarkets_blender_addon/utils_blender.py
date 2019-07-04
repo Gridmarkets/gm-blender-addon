@@ -530,6 +530,29 @@ def submit_job(context, temp_dir_manager,
         setattr(context.scene.props, progress_attribute_name, False)
 
 
+def get_addon(module_name):
+    """ Gets a blender add-on
+
+    :param module_name: The name of the add-on
+    :type module_name: str
+    :return: The add-on or None if the add-on could not be found
+    :rtype: (bpy.types.Addon, module_bl_info)
+    """
+
+    # noinspection PyUnresolvedReferences
+    import addon_utils
+
+    for module in addon_utils.modules(refresh=False):
+        info = addon_utils.module_bl_info(module)
+
+        if 'name' in info:
+            name = info['name']
+
+            if name == module_name:
+                return module, info
+
+    return None
+
 def force_redraw_addon():
     redraw_region(constants.PANEL_SPACE_TYPE, constants.PANEL_REGION_TYPE)
 
@@ -550,3 +573,9 @@ def redraw_region(area_type, region_type):
                 for region in area.regions:
                     if region.type == region_type:
                         region.tag_redraw()
+
+def get_addon_window():
+    for window in bpy.context.window_manager.windows:
+        if window.screen.name == constants.INJECTED_SCREEN_NAME:
+            return window
+    return None

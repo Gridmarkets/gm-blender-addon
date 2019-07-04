@@ -32,14 +32,17 @@ modulesNames = ['constants',
                 'operators.frame_range_list_actions',
                 'operators.edit_frame_range',
                 'operators.copy_logs_to_clipboard',
+                'operators.open_preferences',
+                'operators.open_addon',
                 'gridmarkets_blender_addon',
                 'panels.main',
                 'panels.projects',
                 'panels.jobs',
-                #'panels.job_info',
                 'panels.frame_ranges',
                 'panels.output_settings',
-                'panels.console']
+                'panels.console',
+                'panels.preferences',
+                'panel_injections']
 
 # append this folder to sys.path so local dependencies can be found
 sys.path.append(os.path.dirname(__file__))

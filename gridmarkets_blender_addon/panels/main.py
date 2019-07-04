@@ -16,7 +16,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
     @classmethod
     def poll(self, context):
-        return True  # context.object is not None
+        return context.window.screen.name == constants.INJECTED_SCREEN_NAME
 
     def draw_header(self, context):
         layout = self.layout
@@ -26,7 +26,18 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
 
         # display Gridmarkets icon and version
-        layout.label(text="", icon_value=iconGM.icon_id)
+        row = layout.row()
+        row.alignment = "CENTER"
+        row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
+
+        # get the plugin version as a string
+        version_str = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
+            constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
+
+        # version label
+        sub = row.row(align=True)
+        sub.enabled = False
+        sub.label(text=version_str)
 
     def draw(self, context):
         layout = self.layout
@@ -35,29 +46,29 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
         props = context.scene.props
 
-        # get the plugin version as a string
-        version_str = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
-            constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
-
-        # version label
-        row = layout.row(align=True)
-        row.enabled = False
-        row.label(text=version_str)
-
         # submit box
         box = layout.box()
         box.use_property_split = False
         row = box.row()
 
         # project options
-        col1 = row.column(align=True)
-        col1.label(text="Project")
-        col1.prop(props, "project_options", text="")
+        col = row.column(align=True)
+        col.label(text="Project")
+        sub = col.row()
+        sub.enabled = False
+        sub.label(text="The project to run the selected job against.")
+        col.separator(factor=1.0)
+        col.prop(props, "project_options", text="")
+
 
         # job options
-        col2 = row.column(align=True)
-        col2.label(text="Job")
-        col2.prop(props, "job_options", text="")
+        col = row.column(align=True)
+        col.label(text="Job")
+        sub = col.row()
+        sub.enabled = False
+        sub.label(text="The render settings and output settings to use.")
+        col.separator(factor=1.0)
+        col.prop(props, "job_options", text="")
 
         # submit button / progress indicator
         row = box.row(align=True)
@@ -70,15 +81,6 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
                 row.enabled = False
 
             row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
-
-        # Portal manager link
-        row = layout.row(align=True)
-        row.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon='URL')
-
-        # Cost calculator
-        row = layout.row()
-        row.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon='URL')
-        row.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon='HELP')
 
 
 classes = (
