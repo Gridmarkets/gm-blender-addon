@@ -26,6 +26,13 @@ def _draw_submission_summary(self, context):
     box = self.layout.box()
     box.label(text="Submission Summary")
 
+def _draw_compact_console(self, context):
+    props = context.scene.props
+    box = self.layout.box()
+    box.alignment = "RIGHT"
+    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4,
+                      sort_lock=True)
+
 def register():
     _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
@@ -43,8 +50,10 @@ def register():
             if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
                 GRIDMARKETS_PT_Main.draw(self, context)
                 _draw_submission_summary(self, context)
+                _draw_compact_console(self, context)
             elif props.tab_options == constants.TAB_PROJECTS:
                 GRIDMARKETS_PT_Projects.draw(self, context)
+                _draw_compact_console(self, context)
             elif props.tab_options == constants.TAB_JOB_PRESETS:
                 _draw_jobs_panels(self, context)
             elif props.tab_options == constants.TAB_CREDENTIALS:
