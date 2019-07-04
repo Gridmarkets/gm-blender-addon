@@ -334,6 +334,12 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         ]
     )
 
+    submission_summary_open: bpy.props.BoolProperty(
+        name="Submission Summary Open",
+        description="Whether or not the submission summary view is open",
+        default=False
+    )
+
 
 classes = (
     LogItemProps,

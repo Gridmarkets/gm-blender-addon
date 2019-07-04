@@ -342,7 +342,18 @@ def get_default_blender_job(context, render_file):
     )
 
 
-def get_job_frame_ranges(context, job):
+def get_job_frame_ranges(context, job=None):
+    scene = context.scene
+    props = scene.props
+
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return get_blender_frame_range(context)
+        else:
+            # otherwise use the selected job
+            job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
     # use scene frame settings unless the user has overridden them
     if job.use_custom_frame_ranges:
 
@@ -368,6 +379,36 @@ def get_job_output_prefix(job):
         return "0"
 
     return job.outputPrefix
+
+
+def get_job(context, render_file):
+    scene = context.scene
+    props = scene.props
+
+    # if the job options are set to 'use blender render settings' then set the job options accordingly
+    if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+        job = get_default_blender_job(context, render_file)
+
+    # otherwise set the job options based on a user defined job
+    elif props.job_options.isnumeric():
+        selected_job_option = int(props.job_options)
+        selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
+
+        job = Job(
+            selected_job.name,
+            constants.JOB_PRODUCT_TYPE,
+            constants.JOB_PRODUCT_VERSION,
+            constants.JOB_OPERATION,
+            render_file,
+            frames=get_job_frame_ranges(context, job=selected_job),
+            output_prefix=get_job_output_prefix(selected_job),
+            output_format=scene.render.image_settings.file_format,
+            engine=scene.render.engine
+        )
+    else:
+        raise InvalidInputError(message="Invalid job option")
+
+    return job
 
 
 def submit_job(context, temp_dir_manager,
@@ -468,34 +509,16 @@ def submit_job(context, temp_dir_manager,
         project = association.get_project()
         render_file = association.get_relative_render_file()
 
-        # if the job options are set to 'use blender render settings' then set the job options accordingly
-        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
-            job = get_default_blender_job(context, render_file)
-
-        # otherwise set the job options based on a user defined job
-        elif props.job_options.isnumeric():
-            selected_job_option = int(props.job_options)
-            selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
-
-            job = Job(
-                selected_job.name,
-                constants.JOB_PRODUCT_TYPE,
-                constants.JOB_PRODUCT_VERSION,
-                constants.JOB_OPERATION,
-                render_file,
-                frames=get_job_frame_ranges(context, selected_job),
-                output_prefix=get_job_output_prefix(selected_job),
-                output_format=scene.render.image_settings.file_format,
-                engine=scene.render.engine
-            )
-        else:
-            raise InvalidInputError(message="Invalid job option")
+        job = get_job(context, render_file)
 
         # create an instance of Envoy client
         client = get_new_envoy_client()
 
         # add job to project
         project.add_jobs(job)
+
+        # set the output directory
+        # project.add_watch_files()
 
         log.info("Submitted Job Settings: \n" +
                  "\tproject_name: %s\n" % project_name +
@@ -504,7 +527,10 @@ def submit_job(context, temp_dir_manager,
                  "\tjob.app_version: %s\n" % job.app_version +
                  "\tjob.operation: %s\n" % job.operation +
                  "\tjob.path: %s\n" % job.path +
-                 "\tjob.frames: %s\n" % get_blender_frame_range(context)
+                 "\tjob.frames: %s\n" % job.params['frames'] +
+                 "\tjob.output_prefix: %s\n" % job.params['output_prefix'] +
+                 "\tjob.output_format: %s\n" % job.params['output_format'] +
+                 "\tjob.engine: %s\n" % job.params['engine']
                  )
 
         # submit project
