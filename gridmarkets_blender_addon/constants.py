@@ -30,8 +30,8 @@ HELP_URL = "https://www.gridmarkets.com/"
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
 
-DEFAULT_WINDOW_WIDTH = 1200
-DEFAULT_WINDOW_HIEGHT = 600
+DEFAULT_WINDOW_WIDTH = 1000
+DEFAULT_WINDOW_HIEGHT = 550
 
 # plugin versioning
 PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}

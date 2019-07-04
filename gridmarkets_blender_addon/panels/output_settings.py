@@ -17,6 +17,11 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         job_count = len(context.scene.props.jobs)
         return job_count > 0
 
+    def draw_header(self, context):
+        props = bpy.context.scene.props
+        selected_job = props.jobs[props.selected_job]
+        self.layout.prop(selected_job, "use_custom_output_path")
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -24,6 +29,7 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         job = props.jobs[props.selected_job]
 
         col = layout.column()
+        col.label(text="Relative output paths will only work if you have saved your scene", icon="QUESTION")
         col.prop(job, "output_path")
         col.prop(job, "output_prefix")
 

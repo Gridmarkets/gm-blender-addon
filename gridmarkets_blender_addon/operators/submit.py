@@ -59,10 +59,12 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             # create popup
             return context.window_manager.invoke_props_dialog(self, width=400)
         else:
-            return {'FINISHED'}
+            return self.execute(context)
 
     def execute(self, context):
         wm = context.window_manager
+
+        log.info("Creating separate thread for submission process")
 
         # run the upload project function in separate thread so that gui is not blocked
         self._thread = threading.Thread(target=utils_blender.submit_job,

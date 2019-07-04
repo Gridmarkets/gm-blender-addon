@@ -145,6 +145,13 @@ class JobProps(bpy.types.PropertyGroup):
 
     selected_frame_range: bpy.props.IntProperty()
 
+    use_custom_output_path: bpy.props.BoolProperty(
+        name="use custom output path",
+        description="If this is option is selected this job will use the provided output path to output render results "
+                    "to instead of Blender's output path",
+        default=False
+    )
+
     # output path
     output_path: bpy.props.StringProperty(
         name="Output Path",

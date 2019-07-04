@@ -1,5 +1,6 @@
 import bpy
 import constants
+import pathlib
 import utils_blender
 from types import SimpleNamespace
 
@@ -21,6 +22,7 @@ def _draw_jobs_panels(self, context):
     if len(context.scene.props.jobs) > 0:
         GRIDMARKETS_PT_frame_ranges.draw_header(self, context)
         GRIDMARKETS_PT_frame_ranges.draw(self, context)
+        GRIDMARKETS_PT_Output_Settings.draw_header(self, context)
         GRIDMARKETS_PT_Output_Settings.draw(self, context)
 
 
@@ -86,7 +88,7 @@ def _draw_submission_summary(self, context):
         values.label(text=job.params['frames'])
         values.label(text=job.params['output_prefix'])
         values.label(text=job.params['output_format'])
-        values.label(text="todo")
+        values.label(text=utils_blender.get_job_output_path_abs(context))
         values.label(text=job.params['engine'])
         values.label(text=str(scene.render.resolution_x))
         values.label(text=str(scene.render.resolution_y))

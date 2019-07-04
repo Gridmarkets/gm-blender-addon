@@ -341,6 +341,52 @@ def get_default_blender_job(context, render_file):
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
 
+def get_job_output_path(context, job=None):
+    """ Gets the output path for either the provided job or the currently selested job if no job provided
+
+    :param context: The context
+    :type context: bpy.context
+    :param job: The job to get the output path for (optional)
+    :type job: properties.JobProps
+    :return: The output path as it is entered in either the blender ui or custom output field
+    :rtype: str
+    """
+
+    scene = context.scene
+    props = scene.props
+
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return context.scene.render.filepath
+
+        # otherwise use the selected job
+        job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
+    if job.use_custom_output_path:
+        return job.output_path
+
+    return context.scene.render.filepath
+
+
+def get_job_output_path_abs(context, job=None):
+    path = get_job_output_path(context, job)
+
+    # check if the path is relative
+    if path.startswith("//"):
+
+        # remove the relative double slash
+        path = path[2:]
+
+        if bpy.context.blend_data.is_saved:
+            return str(pathlib.Path(bpy.context.blend_data.filepath).parent / pathlib.Path(path))
+        else:
+            # if they are using a relative path with an unsaved project just output to tmp
+            return '/tmp\\'
+
+    return path
+
+
 
 def get_job_frame_ranges(context, job=None):
     scene = context.scene
@@ -378,7 +424,7 @@ def get_job_output_prefix(job):
         # download the results.
         return "0"
 
-    return job.outputPrefix
+    return job.output_prefix
 
 
 def get_job(context, render_file):
@@ -495,7 +541,6 @@ def submit_job(context, temp_dir_manager,
 
             skip_upload = False
 
-
         elif props.project_options.isnumeric():
             # get the name of the selected project
             selected_project_option = int(props.project_options)
@@ -517,8 +562,18 @@ def submit_job(context, temp_dir_manager,
         # add job to project
         project.add_jobs(job)
 
+        # results regex pattern to download
+        # `project.remote_output_folder` provides the remote root folder under which results are available
+        # below is the regex to look for all folders and files under `project.remote_output_folder`
+        output_pattern = '{0}/.+'.format(project.remote_output_folder)
+
+        download_path = get_job_output_path_abs(context)
+
+        # create a watch file
+        watch_file = WatchFile(output_pattern, download_path)
+
         # set the output directory
-        # project.add_watch_files()
+        project.add_watch_files(watch_file)
 
         log.info("Submitted Job Settings: \n" +
                  "\tproject_name: %s\n" % project_name +
@@ -530,7 +585,8 @@ def submit_job(context, temp_dir_manager,
                  "\tjob.frames: %s\n" % job.params['frames'] +
                  "\tjob.output_prefix: %s\n" % job.params['output_prefix'] +
                  "\tjob.output_format: %s\n" % job.params['output_format'] +
-                 "\tjob.engine: %s\n" % job.params['engine']
+                 "\tjob.engine: %s\n" % job.params['engine'] +
+                 "\tdownload_path: %s\n" % download_path
                  )
 
         # submit project
