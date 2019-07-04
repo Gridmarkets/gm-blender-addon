@@ -84,7 +84,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             regions = area.regions
 
             # Change area type to the Preferences editor
-            area.type = "PREFERENCES"
+            area.type = constants.WINDOW_SPACE_TYPE
 
             # switch to the add-ons tab
             context.preferences.active_section = 'ADDONS'

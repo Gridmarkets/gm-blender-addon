@@ -554,7 +554,7 @@ def get_addon(module_name):
     return None
 
 def force_redraw_addon():
-    redraw_region(constants.PANEL_SPACE_TYPE, constants.PANEL_REGION_TYPE)
+    redraw_region(constants.WINDOW_SPACE_TYPE, constants.PANEL_REGION_TYPE)
 
 
 def redraw_area(area_type):
