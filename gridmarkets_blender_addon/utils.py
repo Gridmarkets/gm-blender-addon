@@ -81,4 +81,3 @@ def create_unique_object_name(objects, attribute_name='name', name_prefix = ""):
         i = i+1
 
     return name_prefix + str(i)
-

@@ -3,6 +3,7 @@ import traceback
 
 
 class InvalidInputError(Exception):
+    """ An error to throw after an invalid input. Used alongside the GM client errors. """
 
     def __init__(self, message=None):
         super(InvalidInputError, self).__init__(message)

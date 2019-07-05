@@ -1,5 +1,6 @@
 import bpy
 import constants
+import utils_blender
 from icon_loader import IconLoader
 
 
@@ -31,8 +32,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
 
         # get the plugin version as a string
-        version_str = 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
-            constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
+        version_str = utils_blender.get_version_string()
 
         # version label
         sub = row.row(align=True)

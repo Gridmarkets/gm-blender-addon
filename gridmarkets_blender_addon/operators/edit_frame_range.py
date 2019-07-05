@@ -1,6 +1,6 @@
 import bpy
 import constants
-import properties
+from property_groups.frame_range_props import FrameRangeProps
 import utils_blender
 
 
@@ -28,8 +28,8 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         description="First frame of the rendering range",
         default=1,
         min=0,
-        get=properties.FrameRangeProps.get_frame_start,
-        set=properties.FrameRangeProps.set_frame_start
+        get=FrameRangeProps.get_frame_start,
+        set=FrameRangeProps.set_frame_start
     )
 
     frame_end: bpy.props.IntProperty(
@@ -37,8 +37,8 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         description="Final frame of the rendering range",
         default=255,
         min=0,
-        get=properties.FrameRangeProps.get_frame_end,
-        set=properties.FrameRangeProps.set_frame_end
+        get=FrameRangeProps.get_frame_end,
+        set=FrameRangeProps.set_frame_end
     )
 
     frame_step: bpy.props.IntProperty(

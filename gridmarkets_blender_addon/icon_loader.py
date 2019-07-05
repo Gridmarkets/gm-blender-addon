@@ -4,6 +4,7 @@ import constants
 
 
 class IconLoader:
+    """ Singleton class for loading custom icons """
 
     # Used to store any previews for images (In this case the Gridmarkets custom icon)
     _icon_preview_collections = {}
@@ -11,6 +12,10 @@ class IconLoader:
 
     @staticmethod
     def get_preview_collections():
+        """ Getter
+        :return: Returns the icon preview collections dictionary that stores all loaded icon previews
+        :rtype: Dictionary of previews
+        """
         if not IconLoader._initialised:
             IconLoader._register_icons()
 
@@ -18,8 +23,16 @@ class IconLoader:
 
     @staticmethod
     def initialise():
+        """ Initialise the singleton
+
+        :return: The new instance of an IconLoader
+        :rtype: IconLoader
+        """
+
         if not IconLoader._initialised:
             IconLoader._register_icons()
+        else:
+            raise Exception("Attempted to initialise IconLoader twice.")
 
     @staticmethod
     def _register_icons():
@@ -46,6 +59,7 @@ class IconLoader:
 
     @staticmethod
     def clean_up():
+        """ Removes all the previews from the preview collection and then removes the collection itself """
 
         if IconLoader._initialised:
             # clear the preview collections object of icons

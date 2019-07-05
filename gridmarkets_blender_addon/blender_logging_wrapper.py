@@ -3,6 +3,7 @@ import bpy
 from time import gmtime, strftime
 from utils_blender import force_redraw_addon
 
+
 class BlenderLoggingWrapper:
     """
     A very simple wrapper class that wrappers a logging.Logger and exposes some basic functions. It is designed to be
@@ -50,7 +51,6 @@ class BlenderLoggingWrapper:
             log_item.body = line
             log_item.level = level
 
-
         # if the last log item was selected then set the selected log item to the new last item
         if props.selected_log_item == len(props.log_items) - (line_count + 1):
             props.selected_log_item = props.selected_log_item + line_count
@@ -58,7 +58,7 @@ class BlenderLoggingWrapper:
         force_redraw_addon()
 
     def debug(self, msg, *args, **kwargs):
-        """
+        """ Log debug message
         :param msg: The debug message
         :type msg: str
         :rtype: void
@@ -68,7 +68,7 @@ class BlenderLoggingWrapper:
         self._logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
-        """
+        """ Log info message
         :param msg: The info message
         :type msg: str
         :rtype: void
@@ -78,7 +78,7 @@ class BlenderLoggingWrapper:
         self._logger.info(msg, *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        """
+        """ Log warning message
         :param msg: The warning message
         :type msg: str
         :param operator: An instance of a Blender Operator which can be used to report the message to the blender ui
@@ -90,7 +90,7 @@ class BlenderLoggingWrapper:
         self._logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        """
+        """ Log error message
         :param msg: The error message
         :type msg: str
         :param operator: An instance of a Blender Operator which can be used to report the message to the blender ui
@@ -102,7 +102,7 @@ class BlenderLoggingWrapper:
         self._logger.error(msg, *args, **kwargs)
 
     def exception(self, msg, *args, exc_info=True, **kwargs):
-        """
+        """ Log exception message
         :param msg: The exception message
         :type msg: str
         :param operator: An instance of a Blender Operator which can be used to report the message to the blender ui
@@ -114,7 +114,7 @@ class BlenderLoggingWrapper:
         self._logger.exception(msg, *args, exc_info, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
-        """
+        """ Log critical message
         :param msg: The critical message
         :type msg: str
         :param operator: An instance of a Blender Operator which can be used to report the message to the blender ui

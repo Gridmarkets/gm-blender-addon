@@ -1,3 +1,9 @@
+"""
+Constants used throughout the add-on
+
+Stored in one central file to prevent circular dependencies
+"""
+
 # the add-ons package name
 ADDON_PACKAGE_NAME = "gridmarkets_blender_addon"
 

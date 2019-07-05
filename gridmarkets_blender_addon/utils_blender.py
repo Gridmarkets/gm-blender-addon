@@ -496,6 +496,11 @@ def get_job(context, render_file):
     return job
 
 
+def get_version_string():
+    return 'GM Blender Add-on Beta v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
+        constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
+
+
 def submit_job(context, temp_dir_manager,
                new_project_name=None,
                operator=None,
