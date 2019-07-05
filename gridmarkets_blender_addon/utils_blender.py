@@ -671,6 +671,10 @@ def submit_job(context, temp_dir_manager,
         _set_progress(progress=50, status="Submitting project")
         client.submit_project(project, skip_upload=skip_upload)
 
+        # skip upload is only false if its a new project, in which case it needs adding to the list
+        if not skip_upload:
+            _add_project_to_list(project_name, props)
+
         log.info("Project submitted")
 
     except InvalidInputError as e:
