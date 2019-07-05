@@ -16,7 +16,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
-    project_name: bpy.props.StringProperty(
+    project_name = bpy.props.StringProperty(
         name="Project Name",
         description="The name of your project",
         default="",

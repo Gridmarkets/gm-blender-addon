@@ -12,7 +12,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = constants.ADDON_PACKAGE_NAME
 
     # user's email
-    auth_email: bpy.props.StringProperty(
+    auth_email = bpy.props.StringProperty(
         name="Email",
         description="Your Gridmarkets account email",
         default="",
@@ -20,7 +20,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
         )
     
     # user's gridmarkets access key
-    auth_accessKey: bpy.props.StringProperty(
+    auth_accessKey = bpy.props.StringProperty(
         name="Access Key",
         description="Your Gridmarkets access key. This is different from your "
             "password and can be found by opening the Gridmarkets mangager "

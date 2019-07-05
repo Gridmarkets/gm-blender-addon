@@ -7,7 +7,7 @@ class GRIDMARKETS_OT_project_list_actions(bpy.types.Operator):
     bl_idname = constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME
     bl_label = constants.OPERATOR_PROJECT_LIST_ACTIONS_LABEL
 
-    action: bpy.props.EnumProperty(
+    action = bpy.props.EnumProperty(
         items=(
             ('UP', "Up", ""),
             ('DOWN', "Down", ""),

@@ -21,20 +21,20 @@ class FrameRangeProps(bpy.types.PropertyGroup):
 
         self['frame_end'] = value
 
-    name: bpy.props.StringProperty(
+    name = bpy.props.StringProperty(
         name="Range Name",
         description="Adding a name to your frame ranges makes them searchable",
         default="",
         maxlen=256
     )
 
-    enabled: bpy.props.BoolProperty(
+    enabled = bpy.props.BoolProperty(
         name="Enabled",
         description="If disabled the frame range will be ignored by Gridmarekts",
         default=True
     )
 
-    frame_start: bpy.props.IntProperty(
+    frame_start = bpy.props.IntProperty(
         name="Frame Start",
         description="First frame of the rendering range",
         default=1,
@@ -43,7 +43,7 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         set=set_frame_start
     )
 
-    frame_end: bpy.props.IntProperty(
+    frame_end = bpy.props.IntProperty(
         name="Frame End",
         description="Final frame of the rendering range",
         default=255,
@@ -52,7 +52,7 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         set=set_frame_end
     )
 
-    frame_step: bpy.props.IntProperty(
+    frame_step = bpy.props.IntProperty(
         name="Step Size",
         description="Number of frames to skip forward while rendering back each frame",
         default=1,

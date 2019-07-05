@@ -6,13 +6,13 @@ from property_groups.frame_range_props import FrameRangeProps
 
 class JobProps(bpy.types.PropertyGroup):
 
-    id: bpy.props.IntProperty(
+    id = bpy.props.IntProperty(
         name="ID",
         description="A integer that is unique across all existing jobs",
         min= 0
     )
 
-    name: bpy.props.StringProperty(
+    name = bpy.props.StringProperty(
         name="Name",
         description="The name of the job",
         default="",
@@ -20,7 +20,7 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
     # use project settings or overrided settings
-    use_custom_frame_ranges: bpy.props.BoolProperty(
+    use_custom_frame_ranges = bpy.props.BoolProperty(
         name="Use custom frame range(s)",
         description="Choose between rendering custom frame ranges or using blenders standard animation frame range "
                     "settings",
@@ -28,13 +28,13 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
     # frame range collection
-    frame_ranges: bpy.props.CollectionProperty(
+    frame_ranges = bpy.props.CollectionProperty(
         type=FrameRangeProps
     )
 
-    selected_frame_range: bpy.props.IntProperty()
+    selected_frame_range = bpy.props.IntProperty()
 
-    use_custom_output_path: bpy.props.BoolProperty(
+    use_custom_output_path = bpy.props.BoolProperty(
         name="Use custom output path",
         description="If this is option is selected this job will use the provided output path to output render results "
                     "to instead of Blender's output path",
@@ -42,7 +42,7 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
     # output path
-    output_path: bpy.props.StringProperty(
+    output_path = bpy.props.StringProperty(
         name="Output Path",
         description="",
         default=constants.DEFAULT_OUTPUT_PATH,
@@ -50,20 +50,20 @@ class JobProps(bpy.types.PropertyGroup):
     )
 
     # prefix for output files
-    output_prefix: bpy.props.StringProperty(
+    output_prefix = bpy.props.StringProperty(
         name="Output Prefix",
         description="",
         default="GM_",
         maxlen=200,
     )
 
-    use_custom_output_format: bpy.props.BoolProperty(
+    use_custom_output_format = bpy.props.BoolProperty(
         name="Use custom output format",
         description="If this is option is selected this job will use the provided output format when outputting results",
         default=False
     )
 
-    output_format: bpy.props.EnumProperty(
+    output_format = bpy.props.EnumProperty(
         name="Output Format",
         description="The output format to use when rendering the scene",
         items=[
@@ -77,13 +77,13 @@ class JobProps(bpy.types.PropertyGroup):
         ]
     )
 
-    use_custom_render_engine: bpy.props.BoolProperty(
+    use_custom_render_engine = bpy.props.BoolProperty(
         name="Use custom render engine",
         description="If this is option is selected this job will use the override the scene render engine",
         default=False
     )
 
-    render_engine: bpy.props.EnumProperty(
+    render_engine = bpy.props.EnumProperty(
         name="Render Engine",
         description="The render engine to use when rendering the scene",
         items=[

@@ -21,7 +21,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     _thread = None
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
-    project_name: bpy.props.StringProperty(
+    project_name = bpy.props.StringProperty(
         name="Project Name",
         description="The name of your project",
         default="",

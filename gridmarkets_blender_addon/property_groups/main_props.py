@@ -52,7 +52,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """
     
     # artist name
-    artist_name: bpy.props.StringProperty(
+    artist_name = bpy.props.StringProperty(
         name="Artist",
         description="The name of the Artist is optional",
         default="",
@@ -60,7 +60,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         )
         
     # submission comment
-    submission_comment: bpy.props.StringProperty(
+    submission_comment = bpy.props.StringProperty(
         name="Comment",
         description="",
         default="",
@@ -68,68 +68,68 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         )
 
     # project collection
-    projects: bpy.props.CollectionProperty(
+    projects = bpy.props.CollectionProperty(
         type=ProjectProps
     )
 
-    selected_project: bpy.props.IntProperty()
+    selected_project = bpy.props.IntProperty()
 
     # projects enum
-    project_options: bpy.props.EnumProperty(
+    project_options = bpy.props.EnumProperty(
         name="Project",
         description="The list of possible projects to use on submit",
         items=_get_project_options
     )
 
     # job collection
-    jobs: bpy.props.CollectionProperty(
+    jobs = bpy.props.CollectionProperty(
         type=JobProps
     )
 
-    selected_job: bpy.props.IntProperty()
+    selected_job = bpy.props.IntProperty()
 
     # jobs enum
-    job_options: bpy.props.EnumProperty(
+    job_options = bpy.props.EnumProperty(
         name="Job",
         description="The list of possible jobs to use on submit",
         items=_get_job_options
     )
 
-    selected_log_item: bpy.props.IntProperty(
+    selected_log_item = bpy.props.IntProperty(
         default=-1 # must be negative one otherwise the logic that selects new log items wont work
     )
 
     # logging items
-    log_items: bpy.props.CollectionProperty(
+    log_items = bpy.props.CollectionProperty(
         type=LogItemProps
     )
 
-    show_log_dates: bpy.props.BoolProperty(
+    show_log_dates = bpy.props.BoolProperty(
         name="Show Logged Dates",
         description="Toggles the displaying of dates for log items",
         default=False
     )
 
-    show_log_times: bpy.props.BoolProperty(
+    show_log_times = bpy.props.BoolProperty(
         name="Show Logged Times",
         description="Toggles the displaying of times for log items",
         default=True
     )
 
-    show_log_modules: bpy.props.BoolProperty(
+    show_log_modules = bpy.props.BoolProperty(
         name="Show Logged Modules",
         description="Toggles the displaying of module names for log items",
         default=False
     )
 
     # upload project progress props
-    uploading_project: bpy.props.BoolProperty(
+    uploading_project = bpy.props.BoolProperty(
         name="Uploading Project",
         description="Indicates that a project is being uploaded",
         default=False
     )
 
-    uploading_project_progress: bpy.props.IntProperty(
+    uploading_project_progress = bpy.props.IntProperty(
         name="Uploading Project Progress",
         description="What percent of the project has been uploaded",
         default=0,
@@ -139,20 +139,20 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         subtype='PERCENTAGE'
     )
 
-    uploading_project_status: bpy.props.StringProperty(
+    uploading_project_status = bpy.props.StringProperty(
         name="Uploading Project Status",
         description="A brief description of the current status of the uploading operation",
         default="",
     )
 
     # submit operation progress props
-    submitting_project: bpy.props.BoolProperty(
+    submitting_project = bpy.props.BoolProperty(
         name="Submitting Project",
         description="Indicates that a project is being submitted",
         default=False
     )
 
-    submitting_project_progress: bpy.props.IntProperty(
+    submitting_project_progress = bpy.props.IntProperty(
         name="Submitting Project Progress",
         description="The progress made towards submitting this job",
         default=0,
@@ -162,13 +162,13 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         subtype='PERCENTAGE'
     )
 
-    submitting_project_status: bpy.props.StringProperty(
+    submitting_project_status = bpy.props.StringProperty(
         name="Submitting Project Status",
         description="A brief description of the current status of the submit operation",
         default="",
     )
 
-    tab_options: bpy.props.EnumProperty(
+    tab_options = bpy.props.EnumProperty(
         name="Tabs",
         description="The tabs that show at the top of the add-on main window",
         items=[
@@ -180,13 +180,13 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         ]
     )
 
-    submission_summary_open: bpy.props.BoolProperty(
+    submission_summary_open = bpy.props.BoolProperty(
         name="Submission Summary Open",
         description="Whether or not the submission summary view is open",
         default=False
     )
 
-    custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
+    custom_settings_views = bpy.props.PointerProperty(type=CustomSettingsViews)
 
 
 

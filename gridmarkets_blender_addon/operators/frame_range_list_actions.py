@@ -9,7 +9,7 @@ class GRIDMARKETS_OT_frame_range_list_actions(bpy.types.Operator):
     bl_idname = constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME
     bl_label = constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_LABEL
 
-    action: bpy.props.EnumProperty(
+    action = bpy.props.EnumProperty(
         items=(
             ('UP', "Up", ""),
             ('DOWN', "Down", ""),

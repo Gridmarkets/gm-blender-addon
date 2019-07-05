@@ -18,7 +18,7 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
     _all_blend_file = '*.blend'
 
     # filters the files the user is able to select
-    filter_glob: bpy.props.StringProperty(
+    filter_glob = bpy.props.StringProperty(
         default = _all_blend_file,
         options={'HIDDEN'}
     )
