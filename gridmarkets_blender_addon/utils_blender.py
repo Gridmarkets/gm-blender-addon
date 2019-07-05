@@ -416,6 +416,39 @@ def get_job_frame_ranges(context, job=None):
         return get_blender_frame_range(context)
 
 
+def do_frame_ranges_overlap(job):
+    """ Detects if the job has overlapping frame ranges, returns false if use_custom_frame_ranges is false.
+
+    :param job: The job to check
+    :type job: property_groups.job_props.JobProps
+    :return: True if frame ranges overlap, otherwise false
+    :rtype: bool
+    """
+
+    if not job.use_custom_frame_ranges:
+        return False
+
+    # buffer to store frames already seen
+    frames_buffer = []
+
+    for frame_range in job.frame_ranges:
+        start = frame_range.frame_start
+        end = frame_range.frame_end
+        step = frame_range.frame_step
+
+        # add all frames in range to frames buffer
+        i = start
+        while i <= end:
+
+            if i in frames_buffer:
+                return True
+
+            frames_buffer.append(i)
+            i = i + step
+
+    return False
+
+
 def get_job_render_engine(context, job=None):
     scene = context.scene
     props = scene.props

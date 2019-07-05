@@ -1,5 +1,6 @@
 import bpy
 import constants
+import utils_blender
 from types import SimpleNamespace
 
 
@@ -39,6 +40,13 @@ def _draw_frame_ranges_view(self, context):
 
     sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
     sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+
+    # display warning if overlapping frame ranges
+    if utils_blender.do_frame_ranges_overlap(selected_job):
+        sub = layout.row()
+        sub.enabled=False
+        sub.label(text="Warning: frame ranges overlap. You will still be charged for overlapping frames but will "
+                       "receive only one output frame for each conflict.", icon="ERROR")
 
 
 def _draw_output_format_view(self, context):
