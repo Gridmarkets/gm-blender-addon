@@ -41,12 +41,27 @@ def _draw_frame_ranges_view(self, context):
     sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
 
 
+def _draw_output_format_view(self, context):
+    layout = self.layout
+    job = context.scene.props.jobs[context.scene.props.selected_job]
+    layout.prop(job, "output_format")
+
+
 def _draw_output_path_view(self, context):
     layout = self.layout
     job = context.scene.props.jobs[context.scene.props.selected_job]
 
     # col.label(text="Relative output paths will only work if you have saved your scene", icon="QUESTION")
     layout.prop(job, "output_path")
+    sub = layout.row()
+    sub.enabled=False
+    sub.label(text="Note: Relative paths will not work if the scene has not been saved")
+
+
+def _draw_render_engine_view(self, context):
+    layout = self.layout
+    job = context.scene.props.jobs[context.scene.props.selected_job]
+    layout.prop(job, "render_engine")
 
 
 def _draw_view(self, context, operator_id, view_name, draw_handler):
@@ -54,7 +69,7 @@ def _draw_view(self, context, operator_id, view_name, draw_handler):
     job = context.scene.props.jobs[context.scene.props.selected_job]
 
     box = self.layout.box()
-    col = box.column()
+    col = box.column(align = True)
     row = col.row(align=True)
     row.alignment = 'LEFT'
 
@@ -92,15 +107,42 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         props = scene.props
+        job = context.scene.props.jobs[context.scene.props.selected_job]
 
         custom_settings_box = SimpleNamespace(layout=self.layout.box())
-        custom_settings_box.layout.label(text="Custom Settings")
-
+        custom_settings_box.layout.label(text="Overridable Settings")
 
         _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_FRAME_RANGES_VIEW_ID_NAME, "frame_ranges", _draw_frame_ranges_view)
+
+        # output format
+        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_FORMAT_VIEW_ID_NAME, "output_format",
+                   _draw_output_format_view)
+
+        # output path
         _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
 
-        #col.prop(job, "output_prefix")
+        # output prefix
+        box = custom_settings_box.layout.box()
+        box.prop(job, "output_prefix")
+        sub = box.row()
+        sub.enabled = False
+        sub.label(text="Prefix must not be empty")
+
+        # render engine
+        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME, "render_engine",
+                   _draw_render_engine_view)
+
+        # resolution x
+        # Todo (needs agent update)
+
+        # resolution y
+        # Todo (needs agent update)
+
+        # resolution percentage
+        # Todo (needs agent update)
+
+        # frame rate
+        # Todo (needs agent update)
 
 
 classes = (

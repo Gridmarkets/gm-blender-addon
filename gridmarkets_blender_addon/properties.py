@@ -132,7 +132,7 @@ class JobProps(bpy.types.PropertyGroup):
 
     # use project settings or overrided settings
     use_custom_frame_ranges: bpy.props.BoolProperty(
-        name="Use custom frame ranges",
+        name="Use custom frame range(s)",
         description="Choose between rendering custom frame ranges or using blenders standard animation frame range "
                     "settings",
         default=False,
@@ -164,8 +164,43 @@ class JobProps(bpy.types.PropertyGroup):
     output_prefix: bpy.props.StringProperty(
         name="Output Prefix",
         description="",
-        default="",
+        default="GM_",
         maxlen=200,
+    )
+
+    use_custom_output_format: bpy.props.BoolProperty(
+        name="Use custom output format",
+        description="If this is option is selected this job will use the provided output format when outputting results",
+        default=False
+    )
+
+    output_format: bpy.props.EnumProperty(
+        name="Output Format",
+        description="The output format to use when rendering the scene",
+        items=[
+            ("TGA", "TGA", ''),
+            ("RAWTGA", "RAWTGA", ''),
+            ("JPEG", "JPEG", ''),
+            ("IRIS", "IRIS", ''),
+            ("PNG", "PNG", ''),
+            ("RAWTGA", "RAWTGA", ''),
+            ("BMP", "BMP", '')
+        ]
+    )
+
+    use_custom_render_engine: bpy.props.BoolProperty(
+        name="Use custom render engine",
+        description="If this is option is selected this job will use the override the scene render engine",
+        default=False
+    )
+
+    render_engine: bpy.props.EnumProperty(
+        name="Render Engine",
+        description="The render engine to use when rendering the scene",
+        items=[
+            ("CYCLES", "CYCLES", ''),
+            ("BLENDER_EEVEE", "BLENDER_EEVEE", '')
+        ]
     )
 
 
@@ -174,6 +209,10 @@ class CustomSettingsViews(bpy.types.PropertyGroup):
     frame_ranges_view: bpy.props.BoolProperty(default=False)
 
     output_path_view: bpy.props.BoolProperty(default=False)
+
+    output_format_view: bpy.props.BoolProperty(default=False)
+
+    render_engine_view: bpy.props.BoolProperty(default=False)
 
 
 def _get_project_options(scene, context):

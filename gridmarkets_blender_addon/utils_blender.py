@@ -387,7 +387,6 @@ def get_job_output_path_abs(context, job=None):
     return path
 
 
-
 def get_job_frame_ranges(context, job=None):
     scene = context.scene
     props = scene.props
@@ -415,6 +414,46 @@ def get_job_frame_ranges(context, job=None):
 
     else:
         return get_blender_frame_range(context)
+
+
+def get_job_render_engine(context, job=None):
+    scene = context.scene
+    props = scene.props
+
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return scene.render.engine
+        else:
+            # otherwise use the selected job
+            job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
+    # use scene frame settings unless the user has overridden them
+    if job.use_custom_render_engine:
+        return job.render_engine
+
+    else:
+        return scene.render.engine
+
+
+def get_job_output_format(context, job=None):
+    scene = context.scene
+    props = scene.props
+
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return scene.render.image_settings.file_format
+        else:
+            # otherwise use the selected job
+            job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
+    # use scene frame settings unless the user has overridden them
+    if job.use_custom_output_format:
+        return job.output_format
+
+    else:
+        return scene.render.image_settings.file_format
 
 
 def get_job_output_prefix(job):
@@ -448,8 +487,8 @@ def get_job(context, render_file):
             render_file,
             frames=get_job_frame_ranges(context, job=selected_job),
             output_prefix=get_job_output_prefix(selected_job),
-            output_format=scene.render.image_settings.file_format,
-            engine=scene.render.engine
+            output_format=get_job_output_format(context, job=selected_job),
+            engine=get_job_render_engine(context, job=selected_job)
         )
     else:
         raise InvalidInputError(message="Invalid job option")
