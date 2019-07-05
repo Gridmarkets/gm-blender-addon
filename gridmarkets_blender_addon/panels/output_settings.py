@@ -93,8 +93,12 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         scene = context.scene
         props = scene.props
 
-        _draw_view(self, context, constants.OPERATOR_TOGGLE_FRAME_RANGES_VIEW_ID_NAME, "frame_ranges", _draw_frame_ranges_view)
-        _draw_view(self, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
+        custom_settings_box = SimpleNamespace(layout=self.layout.box())
+        custom_settings_box.layout.label(text="Custom Settings")
+
+
+        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_FRAME_RANGES_VIEW_ID_NAME, "frame_ranges", _draw_frame_ranges_view)
+        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
 
         #col.prop(job, "output_prefix")
 
