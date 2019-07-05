@@ -2,14 +2,12 @@ import bpy
 import constants
 import pathlib
 import utils_blender
-from types import SimpleNamespace
 
 from panels.main import GRIDMARKETS_PT_Main
 from panels.projects import GRIDMARKETS_PT_Projects
 from panels.jobs import GRIDMARKETS_PT_Jobs
 from panels.preferences import GRIDMARKETS_PT_preferences
 from panels.console import GRIDMARKETS_PT_console
-from panels.frame_ranges import GRIDMARKETS_PT_frame_ranges
 from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 
 _old_USERPREF_PT_addons_draw_function = None
@@ -20,9 +18,6 @@ _old_USERPREF_PT_navigation_bar_draw_function = None
 def _draw_jobs_panels(self, context):
     GRIDMARKETS_PT_Jobs.draw(self, context)
     if len(context.scene.props.jobs) > 0:
-        GRIDMARKETS_PT_frame_ranges.draw_header(self, context)
-        GRIDMARKETS_PT_frame_ranges.draw(self, context)
-        GRIDMARKETS_PT_Output_Settings.draw_header(self, context)
         GRIDMARKETS_PT_Output_Settings.draw(self, context)
 
 

@@ -146,7 +146,7 @@ class JobProps(bpy.types.PropertyGroup):
     selected_frame_range: bpy.props.IntProperty()
 
     use_custom_output_path: bpy.props.BoolProperty(
-        name="use custom output path",
+        name="Use custom output path",
         description="If this is option is selected this job will use the provided output path to output render results "
                     "to instead of Blender's output path",
         default=False
@@ -167,6 +167,13 @@ class JobProps(bpy.types.PropertyGroup):
         default="",
         maxlen=200,
     )
+
+
+class CustomSettingsViews(bpy.types.PropertyGroup):
+
+    frame_ranges_view: bpy.props.BoolProperty(default=False)
+
+    output_path_view: bpy.props.BoolProperty(default=False)
 
 
 def _get_project_options(scene, context):
@@ -347,12 +354,15 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
+    custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
+
 
 classes = (
     LogItemProps,
     FrameRangeProps,
     ProjectProps,
     JobProps,
+    CustomSettingsViews,
     GRIDMARKETS_PROPS_Addon_Properties,
 )
 
