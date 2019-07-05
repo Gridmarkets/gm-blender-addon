@@ -203,8 +203,6 @@ classes = (
 def register():
     from bpy.utils import register_class
 
-    print("Registering main props!!!!!!!!!!!")
-
     # register classes
     for cls in classes:
         register_class(cls)

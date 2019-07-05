@@ -123,6 +123,10 @@ OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
 OPERATOR_OPEN_PREFERENCES_LABEL = "Open Gridmarkets add-on preferences"
 OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
 OPERATOR_OPEN_ADDON_LABEL = "Open Gridmarkets add-on"
+OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME = "gridmarkets.delete_temporary_project_files"
+OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_LABEL = "Delete temporary project files"
+OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
+OPERATOR_GET_SELECTED_PROJECT_STATUS_LABEL = "Get selected project status"
 
 # enum values
 PROJECT_OPTIONS_STATIC_COUNT = 1

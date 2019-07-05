@@ -1,5 +1,83 @@
 import bpy
 import constants
+from temp_directory_manager import TempDirectoryManager
+
+def _draw_project_info_view(self, context):
+    layout = self.layout
+    props = bpy.context.scene.props
+    project_count = len(props.projects)
+    selected_project_index = props.selected_project
+
+    if project_count > 0 and selected_project_index >= 0 and selected_project_index < project_count:
+        project = props.projects[selected_project_index]
+        temp_directory_manager = TempDirectoryManager.get_temp_directory_manager()
+        association = temp_directory_manager.get_association_with_project_name(project.name)
+
+        box = layout.box()
+        col = box.column(align=True)
+
+        col.label(text="Project Info", icon=constants.PROJECT_ICON)
+        col.separator()
+
+        col.label(text="Project name: %s" % project.name)
+        sub = col.row(align=True)
+        sub.enabled = False
+        sub.label(text="The name of the project as it will appear in Envoy.")
+
+        col.separator()
+
+        sub = col.row()
+        sub.label(text="Temporary directory path: %s" % association.get_temp_dir_name())
+        op = sub.row()
+        op.alignment = 'RIGHT'
+        op.operator(constants.OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME, text="Delete")
+
+        sub = col.row(align=True)
+        sub.enabled = False
+        sub.label(text="The temporary directory project files are packed to before uploading. They are automatically "
+                       "deleted when blender closes.")
+
+        col.separator()
+
+        sub = col.row()
+        sub.label(text="Project status:")
+        op = sub.row()
+        op.alignment = 'RIGHT'
+        op.operator(constants.OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME, text="Get status")
+
+        if project.status:
+            import json
+            projecs_status = json.loads(project.status)
+
+            split = col.split(factor=0.2)
+
+            keys = split.column()
+            values = split.column()
+
+            keys.label(text="Code: ")
+            values.label(text=str(projecs_status["Code"]))
+
+            keys.label(text="State: ")
+            values.label(text=projecs_status["State"])
+
+            keys.label(text="Message: ")
+            values.label(text=projecs_status["Message"])
+
+            keys.label(text="BytesDone: ")
+            values.label(text=str(projecs_status["BytesDone"]))
+
+            keys.label(text="BytesTotal: ")
+            values.label(text=str(projecs_status["BytesTotal"]))
+
+            keys.label(text="Speed: ")
+            values.label(text=str(projecs_status["Speed"]))
+        else:
+            col.label(text="Status not yet fetched")
+
+        sub = col.row(align=True)
+        sub.enabled = False
+        sub.label(
+            text="Press 'Get status' to re-fetch the status of the project.")
 
 
 class GRIDMARKETS_PT_Projects(bpy.types.Panel):
@@ -53,6 +131,8 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         # upload status
         if props.uploading_project:
             layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
+
+        _draw_project_info_view(self, context)
 
 
 classes = (

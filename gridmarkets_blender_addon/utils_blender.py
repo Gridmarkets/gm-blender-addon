@@ -3,6 +3,7 @@ import inspect
 import pathlib
 import os
 import collections
+import json
 
 import constants
 import utils
@@ -175,6 +176,34 @@ def _add_project_to_list(project_name, props):
 
     # force region to redraw otherwise the list wont update until next event (mouse over, etc)
     force_redraw_addon()
+
+
+def get_project_status(project):
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    try:
+        # create an instance of Envoy client
+        client = get_new_envoy_client()
+        resp = client.get_project_status(project.name)
+
+        log.info("Getting project status for %s..." %project.name)
+
+        # convert to string
+        project.status = json.dumps(resp)
+
+        log.info("Project status response: %s" % project.status)
+
+    except InvalidInputError as e:
+        log.warning("Invalid Input Error: " + e.user_message)
+    except AuthenticationError as e:
+        log.error("Authentication Error: " + e.user_message)
+    except InsufficientCreditsError as e:
+        log.error("Insufficient Credits Error: " + e.user_message)
+    except InvalidRequestError as e:
+        log.error("Invalid Request Error: " + e.user_message)
+    except APIError as e:
+        log.error("API Error: " + str(e.user_message))
 
 
 def upload_project(context, project_name, temp_dir_manager,

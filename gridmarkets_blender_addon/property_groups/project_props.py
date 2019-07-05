@@ -15,3 +15,8 @@ class ProjectProps(bpy.types.PropertyGroup):
         default="",
         maxlen=256
     )
+
+    status: bpy.props.StringProperty(
+        name="Satus",
+        description="The HTTP response of client.get_project_status for this project"
+    )

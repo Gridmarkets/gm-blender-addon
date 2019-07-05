@@ -15,7 +15,7 @@ class _AssociationTuple:
         """ Constructor
 
         :param temp_directory: The path to the temporary directory used to hold the temporary files related to a project
-        :type temp_directory: str
+        :type temp_directory: tempfile.TemporaryDirectory
         :param project: The actual project instance
         :type project: gridmarkets.Project
         :param render_file: The name of there render file
@@ -39,14 +39,17 @@ class _AssociationTuple:
         self._project = project
         self._render_file = render_file
 
-    def get_temp_dir(self):
+    def get_temp_dir_name(self):
         """ Getter
 
         :return: The path to the temporary directory used to hold the temporary files related to a project
         :rtype: str
         """
 
-        return self._temp_directory
+        if self._temp_directory is None:
+            return "TEMPORARY FILES DELETED"
+
+        return self._temp_directory.name
 
     def get_project(self):
         """ Getter
@@ -71,6 +74,11 @@ class _AssociationTuple:
         :rtype: str
         """
         return ("{0}/" + self.get_render_file()).format(self.get_project().name)
+
+    def delete_temporary_directory(self):
+        if self._temp_directory:
+            self._temp_directory.cleanup()
+            self._temp_directory = None
 
 
 class TempDirectoryManager:
@@ -145,7 +153,7 @@ class TempDirectoryManager:
         """
 
         for association_tuple in self.associations:
-            if association_tuple.get_temp_dir().name == temp_dir_name:
+            if association_tuple.get_temp_dir_name() == temp_dir_name:
                 association_tuple.associate(project, render_file)
                 break
 
@@ -154,6 +162,6 @@ class TempDirectoryManager:
 
         i = len(self.associations) - 1
         while i >= 0:
-            self.associations[i].get_temp_dir().cleanup()
+            self.associations[i].delete_temporary_directory()
             del self.associations[i]
             i = i - 1
