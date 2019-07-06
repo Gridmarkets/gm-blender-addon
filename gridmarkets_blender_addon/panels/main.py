@@ -41,14 +41,12 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = True
         layout.use_property_decorate = False  # No animating of properties
 
         props = context.scene.props
 
         # submit box
         box = layout.box()
-        box.use_property_split = False
         row = box.row()
 
         # project options
