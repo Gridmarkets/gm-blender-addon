@@ -4,19 +4,10 @@ import constants
 import utils_blender
 from icon_loader import IconLoader
 
+_old_header_draw = None
 
-def draw_top_bar_menu_options(self, context):
-    """ Draws the top bar button that opens the add-on window
 
-    :param self: The menu instance that's drawing this button
-    :type self: bpy.types.Menu
-    :param context: The blender context
-    :type context: bpy.context
-    :rtype: void
-    """
-
-    self.layout.separator()
-
+def draw_GM_operator(layout, context):
     # get the Gridmarkets icon
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
     iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
@@ -26,15 +17,38 @@ def draw_top_bar_menu_options(self, context):
     else:
         text = 'Open Gridmarkets add-on'
 
-    self.layout.emboss = "PULLDOWN_MENU"
-    self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
+    layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
+
+
+def draw_top_bar_menu_options(layout, context):
+    """ Draws the top bar button that opens the add-on window
+
+    :param self: The menu instance that's drawing this button
+    :type self: bpy.types.Menu
+    :param context: The blender context
+    :type context: bpy.context
+    :rtype: void
+    """
+
+    # call the old dar menu method to draw the normal menu elements
+    _old_header_draw(layout, context)
+
+    layout.separator()
+
+    # then draw a button to open the GM blender add-on main window
+    draw_GM_operator(layout, context)
 
 
 def register():
-    if hasattr(bpy.types, "TOPBAR_MT_render"):
-        bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar_menu_options)
+    if hasattr(bpy.types, "INFO_MT_editor_menus"):
+        print("registering addon")
+
+        global _old_header_draw
+        _old_header_draw = bpy.types.INFO_MT_editor_menus.draw_menus
+
+        bpy.types.INFO_MT_editor_menus.draw_menus = draw_top_bar_menu_options
 
 
 def unregister():
-    if hasattr(bpy.types, "TOPBAR_MT_render"):
-        bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar_menu_options)
+    if hasattr(bpy.types, "INFO_MT_editor_menus"):
+        bpy.types.INFO_MT_editor_menus.draw_menus = _old_header_draw
