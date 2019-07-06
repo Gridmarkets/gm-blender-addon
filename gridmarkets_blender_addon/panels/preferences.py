@@ -17,7 +17,7 @@ class GRIDMARKETS_PT_preferences(bpy.types.Panel):
         col_box = layout.column()
 
         # draw add-on preferences
-        addon_preferences = context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+        addon_preferences = context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
         if addon_preferences is not None:
             draw = getattr(addon_preferences, "draw", None)
             if draw is not None:

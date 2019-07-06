@@ -111,7 +111,7 @@ def validate_credentials(email = None, access_key = None):
     if email is None or access_key is None:
 
         # get the add-on preferences
-        addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+        addon_prefs = bpy.context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         if email is None:
             email = addon_prefs.auth_email
@@ -154,7 +154,7 @@ def get_new_envoy_client():
     """
 
     # get the add-on preferences
-    addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+    addon_prefs = bpy.context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
     # validate the authentication credentials
     validate_credentials(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)

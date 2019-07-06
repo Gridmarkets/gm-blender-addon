@@ -42,7 +42,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
         # try finally block so that old settings are guaranteed to be restored
         try:
-            pixel_size = context.preferences.system.pixel_size
+            pixel_size = context.user_preferences.system.pixel_size
 
             # Size multiplier to use when drawing custom user interface elements, so that they are scaled correctly on
             # screens with different DPI. This value is based on operating system DPI settings and Blender display scale
@@ -51,8 +51,8 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
 
             print("scale_factor", scale_factor)
-            print("dpi", context.preferences.system.dpi)
-            print("pixel_size", context.preferences.system.pixel_size)
+            print("dpi", context.user_preferences.system.dpi)
+            print("pixel_size", context.user_preferences.system.pixel_size)
 
             # set the new window settings
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
@@ -87,7 +87,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             area.type = constants.WINDOW_SPACE_TYPE
 
             # switch to the add-ons tab
-            context.preferences.active_section = 'ADDONS'
+            context.user_preferences.active_section = 'ADDONS'
 
             screen.name = constants.INJECTED_SCREEN_NAME
 

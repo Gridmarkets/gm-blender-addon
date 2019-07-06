@@ -15,7 +15,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
         log.info("Opening Gridmarkets add-on preferences menu...")
 
         bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        context.preferences.active_section = 'ADDONS'
+        context.user_preferences.active_section = 'ADDONS'
         bpy.data.window_managers["WinMan"].addon_search = constants.ADDON_NAME
 
         mod, info = utils_blender.get_addon(constants.ADDON_NAME)
