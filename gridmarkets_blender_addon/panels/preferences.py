@@ -13,7 +13,6 @@ class GRIDMARKETS_PT_preferences(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.use_property_decorate = False  # No animating of properties
 
         col_box = layout.column()
 

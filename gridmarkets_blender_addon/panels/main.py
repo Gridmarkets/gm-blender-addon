@@ -41,7 +41,6 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.use_property_decorate = False  # No animating of properties
 
         props = context.scene.props
 
