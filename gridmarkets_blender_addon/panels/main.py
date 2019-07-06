@@ -57,7 +57,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         sub = col.row()
         sub.enabled = False
         sub.label(text="The project to run the selected job against.")
-        col.separator(factor=1.0)
+        col.separator()
         col.prop(props, "project_options", text="")
 
 
@@ -67,7 +67,7 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         sub = col.row()
         sub.enabled = False
         sub.label(text="The render settings and output settings to use.")
-        col.separator(factor=1.0)
+        col.separator()
         col.prop(props, "job_options", text="")
 
         # submit button / progress indicator
