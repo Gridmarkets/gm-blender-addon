@@ -3,7 +3,7 @@ bl_info = {
     "description": "Allows users to submit Blender jobs to the Gridmarkets render farm from within Blender.",
     "author": "Oliver Dawes",
     "version": (0, 3, 2),
-    "blender": (2, 80, 0),
+    "blender": (2, 79, 0),
     "location": "3D View > Tools",
     "warning": "", # used for warning icon and text in add-ons panel
     "wiki_url": "https://www.gridmarkets.com/",

@@ -138,7 +138,7 @@ JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when 
 
 # API constants
 JOB_PRODUCT_TYPE = "blender"
-JOB_PRODUCT_VERSION = "2.80"
+JOB_PRODUCT_VERSION = "2.79b"
 JOB_OPERATION = "render"
 
 # add-on tabs
