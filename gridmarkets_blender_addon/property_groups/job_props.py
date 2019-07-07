@@ -88,6 +88,6 @@ class JobProps(bpy.types.PropertyGroup):
         description="The render engine to use when rendering the scene",
         items=[
             ("CYCLES", "CYCLES", ''),
-            ("BLENDER_EEVEE", "BLENDER_EEVEE", '')
+            ("BLENDER_RENDER", "BLENDER_RENDER", '')
         ]
     )
