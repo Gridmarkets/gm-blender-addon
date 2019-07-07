@@ -1,4 +1,5 @@
 import bpy
+import constants
 
 class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
 
@@ -9,7 +10,7 @@ class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
         row.active = item.enabled
 
         # users should be familiar with the restrict render icon and understand what it denotes
-        enabled_icon = ("RESTRICT_RENDER_OFF" if item.enabled else "RESTRICT_RENDER_ON")
+        enabled_icon = (constants.ICON_RESTRICT_RENDER_OFF if item.enabled else constants.ICON_RESTRICT_RENDER_ON)
 
         row.prop(item, "enabled", icon=enabled_icon, text="", emboss=item.enabled)
         row.label(text = item.name)

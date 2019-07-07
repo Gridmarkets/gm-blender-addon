@@ -30,7 +30,7 @@ class GRIDMARKETS_PT_preferences(bpy.types.Panel):
                 except:
                     import traceback
                     traceback.print_exc()
-                    box_prefs.label(text="Error (see console)", icon='ERROR')
+                    box_prefs.label(text="Error (see console)", icon=constants.ICON_ERROR)
                 del addon_preferences_class.layout
 
         row = layout.row()

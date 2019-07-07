@@ -16,7 +16,7 @@ class GRIDMARKETS_PT_console(bpy.types.Panel):
         layout = self.layout
 
         # display Gridmarkets icon and version
-        layout.label(text="", icon='CONSOLE')
+        layout.label(text="", icon=constants.ICON_CONSOLE)
 
     def draw(self, context):
         layout = self.layout

@@ -45,9 +45,6 @@ PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
 
-PROJECT_ICON = 'FILE_BLEND'
-JOB_ICON = 'ALEMBIC'
-
 AUTHENTICATION_HELP_MESSAGE = "\nEnter your Gridmarkets credentials by going to: Edit -> Preferences -> Add-ons -> " \
                               "Gridmarkets Blender Add-on -> preferences"
 
@@ -150,6 +147,26 @@ TAB_PROJECTS = "Projects"
 TAB_JOB_PRESETS = "Job Presets"
 TAB_CREDENTIALS = "Credentials"
 TAB_LOGGING = "Logging Output"
+
+# icons
+ICON_ADD = "ADD"
+ICON_REMOVE = "REMOVE"
+ICON_MODIFIER = "MODIFIER"
+ICON_TRIA_UP = "TRIA_UP"
+ICON_TRIA_DOWN = "TRIA_DOWN"
+ICON_RESTRICT_RENDER_OFF = "RESTRICT_RENDER_OFF"
+ICON_RESTRICT_RENDER_ON = "RESTRICT_RENDER_ON"
+ICON_PROJECT = 'FILE_BLEND'
+ICON_JOB = 'ALEMBIC'
+ICON_BLEND_FILE = 'BLEND_FILE'
+ICON_ERROR = 'ERROR'
+ICON_CONSOLE = 'CONSOLE'
+ICON_DISCLOSURE_TRI_DOWN = 'DISCLOSURE_TRI_DOWN'
+ICON_DISCLOSURE_TRI_RIGHT = 'DISCLOSURE_TRI_RIGHT'
+ICON_HELP = 'HELP'
+ICON_PREFERENCES = 'PREFERENCES'
+ICON_URL = 'URL'
+
 
 # register module
 def register():
