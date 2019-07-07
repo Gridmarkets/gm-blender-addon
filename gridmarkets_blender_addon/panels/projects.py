@@ -49,7 +49,7 @@ def _draw_project_info_view(self, context):
             import json
             projecs_status = json.loads(project.status)
 
-            split = col.split(factor=0.2)
+            split = col.split(percentage=0.2)
 
             keys = split.column()
             values = split.column()

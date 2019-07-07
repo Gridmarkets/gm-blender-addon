@@ -41,7 +41,7 @@ def _draw_submission_summary(self, context):
     )
 
     if open:
-        split = col.split(factor=0.2)
+        split = col.split(percentage=0.2)
         labels = split.column()
         labels.label(text="Project: ")
         labels.separator()
