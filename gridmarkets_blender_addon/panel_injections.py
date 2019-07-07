@@ -100,6 +100,11 @@ def _draw_compact_console(self, context):
 
 
 def register():
+    global _old_USERPREF_PT_addons_draw_function
+    global _old_USERPREF_HT_header_draw_function
+    global _old_USERPREF_PT_navigation_bar_draw_function
+    global  _old_USERPREF_PT_save_preferences_draw_function
+    
     _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
     _old_USERPREF_PT_tabs_draw_function = bpy.types.USERPREF_PT_tabs.draw
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
