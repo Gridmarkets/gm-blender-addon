@@ -36,7 +36,7 @@ def _draw_submission_summary(self, context):
     row.operator(
         constants.OPERATOR_TOGGLE_SUBMISSION_SUMMARY_ID_NAME,
         text="Submission Summary",
-        icon='DISCLOSURE_TRI_DOWN' if open else 'DISCLOSURE_TRI_RIGHT',
+        icon=constants.ICON_DISCLOSURE_TRI_DOWN if open else constants.ICON_DISCLOSURE_TRI_RIGHT,
         emboss=False,
     )
 
@@ -143,12 +143,12 @@ def register():
             col.scale_y = 2
 
             # Portal manager link
-            col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon='URL')
+            col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
 
             # Cost calculator
-            col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon='URL')
-            col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon='PREFERENCES', text="Preferences")
-            col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon='HELP')
+            col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
+            col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
+            col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
         else:
             _old_USERPREF_PT_navigation_bar_draw_function(self, context)
 

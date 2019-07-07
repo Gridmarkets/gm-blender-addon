@@ -9,9 +9,10 @@ class GRIDMARKETS_UL_log(bpy.types.UIList):
         row = layout.row(align=True)
         row.alignment = 'LEFT'
 
-        # line text
-        row.alert = item.level == 'ERROR' # if the message is an error then colour red
+        # if the message is an error then colour red
+        row.alert = item.level == 'ERROR'
 
+        # line text
         text = ''
 
         if item.date and props.show_log_dates:

@@ -25,14 +25,14 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
         col = row.column()
 
         sub = col.column(align=True)
-        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon='ADD', text="").action = 'ADD'
+        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD, text="").action = 'ADD'
         sub2 = sub.row()
 
         # disable remove button if there are no projects to remove
         if job_count <= 0:
             sub2.enabled = False
 
-        sub2.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
+        sub2.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
 
         sub = col.column(align=True)
 
@@ -40,8 +40,8 @@ class GRIDMARKETS_PT_Jobs(bpy.types.Panel):
         if job_count < 2:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
-        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
+        sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
 
 classes = (

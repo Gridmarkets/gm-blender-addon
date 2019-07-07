@@ -42,7 +42,7 @@ def _get_job_options(scene, context):
 
     # iterate through uploaded projects and add them as options
     for i, job in enumerate(props.jobs):
-        job_options.append((str(i + 1), job.name, '', constants.JOB_ICON, job.id))
+        job_options.append((str(i + 1), job.name, '', constants.ICON_JOB, job.id))
 
     return job_options
 

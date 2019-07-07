@@ -9,7 +9,7 @@ log = get_wrapped_logger(__name__)
 class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_idname = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME
     bl_label = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL
-    bl_icon = 'BLEND_FILE'
+    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     @staticmethod

@@ -12,7 +12,7 @@ log = get_wrapped_logger(__name__)
 class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
     bl_idname = constants.OPERATOR_TRACE_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_TRACE_PROJECT_LABEL
-    bl_icon = 'BLEND_FILE'
+    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     _all_blend_file = '*.blend'

@@ -5,7 +5,7 @@ import constants
 class GRIDMARKETS_UL_project(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        layout.label(text=item.name, icon=constants.PROJECT_ICON)
+        layout.label(text=item.name, icon=constants.ICON_PROJECT)
 
 
 classes = (

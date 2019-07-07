@@ -21,16 +21,16 @@ def _draw_frame_ranges_view(self, context):
     col.active = enabled
 
     sub = col.column(align=True)
-    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='MODIFIER', text="").action = 'EDIT'
+    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_MODIFIER, text="").action = 'EDIT'
 
     sub = col.column(align=True)
-    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='ADD', text="").action = 'ADD'
+    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD, text="").action = 'ADD'
 
     remove = sub.row()
     # prevent the user removing the last frame range for a job
     if frame_range_count < 2:
         remove.enabled = False
-    remove.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='REMOVE', text="").action = 'REMOVE'
+    remove.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
 
     sub = col.column(align=True)
 
@@ -38,15 +38,15 @@ def _draw_frame_ranges_view(self, context):
     if frame_range_count < 2:
         sub.enabled = False
 
-    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
-    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
+    sub.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
     # display warning if overlapping frame ranges
     if utils_blender.do_frame_ranges_overlap(selected_job):
         sub = layout.row()
         sub.enabled=False
         sub.label(text="Warning: frame ranges overlap. You will still be charged for overlapping frames but will "
-                       "receive only one output frame for each conflict.", icon="ERROR")
+                       "receive only one output frame for each conflict.", icon=constants.ICON_ERROR)
 
 
 def _draw_output_format_view(self, context):
@@ -59,7 +59,6 @@ def _draw_output_path_view(self, context):
     layout = self.layout
     job = context.scene.props.jobs[context.scene.props.selected_job]
 
-    # col.label(text="Relative output paths will only work if you have saved your scene", icon="QUESTION")
     layout.prop(job, "output_path")
     sub = layout.row()
     sub.enabled=False
@@ -86,7 +85,7 @@ def _draw_view(self, context, operator_id, view_name, draw_handler):
     row.operator(
         operator_id,
         text="",
-        icon='DISCLOSURE_TRI_DOWN' if view else 'DISCLOSURE_TRI_RIGHT',
+        icon= constants.ICON_DISCLOSURE_TRI_DOWN if view else constants.ICON_DISCLOSURE_TRI_RIGHT,
         emboss=False,
     )
 

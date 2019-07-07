@@ -16,7 +16,7 @@ def _draw_project_info_view(self, context):
         box = layout.box()
         col = box.column(align=True)
 
-        col.label(text="Project Info", icon=constants.PROJECT_ICON)
+        col.label(text="Project Info", icon=constants.ICON_PROJECT)
         col.separator()
 
         col.label(text="Project name: %s" % project.name)
@@ -106,8 +106,8 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         if project_count < 2:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='TRIA_UP', text="").action = 'UP'
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='TRIA_DOWN', text="").action = 'DOWN'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
         row = layout.row(align=True)
         sub = row.column()
@@ -116,7 +116,7 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         if props.uploading_project or props.submitting_project:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='ADD',
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
                      text="Upload Project").action = 'UPLOAD'
 
         sub = row.column()
@@ -125,7 +125,7 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         if project_count <= 0:
             sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon='REMOVE',
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
                      text="Remove Project").action = 'REMOVE'
 
         # upload status

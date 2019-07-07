@@ -12,7 +12,7 @@ log = get_wrapped_logger(__name__)
 class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
-    bl_icon = 'BLEND_FILE'
+    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
