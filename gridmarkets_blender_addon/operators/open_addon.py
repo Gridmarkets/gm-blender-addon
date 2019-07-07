@@ -1,7 +1,5 @@
 import bpy
 import constants
-import utils_blender
-from panels.main import GRIDMARKETS_PT_Main
 
 from blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
@@ -21,9 +19,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
                 # create a new context for the delete and close operations
                 c = {"screen": screen, "window": window}
-
-                # delete the screen for the existing add-on window
-                # bpy.ops.screen.delete(c, 'INVOKE_DEFAULT')
 
                 # close the existing add-on window so that it can be re-opened with focus
                 # (no way in blender that I know of to change window focus so I delete and re-open)
@@ -48,12 +43,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             # screens with different DPI. This value is based on operating system DPI settings and Blender display scale
             scale_factor = context.preferences.system.ui_scale * pixel_size
 
-
-
-            print("scale_factor", scale_factor)
-            print("dpi", context.preferences.system.dpi)
-            print("pixel_size", context.preferences.system.pixel_size)
-
             # set the new window settings
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
             render.resolution_y = constants.DEFAULT_WINDOW_HIEGHT * scale_factor
@@ -75,13 +64,10 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             # get all other windows
             windows = context.window_manager.windows
 
-            # bpy.ops.screen.screen_set("INVOKE_DEFAULT", delta=2)
-
             # get screen, area, and regions
             window = windows[-1]
-            screen = window.screen #bpy.context.window_manager.windows[-1].screen
+            screen = window.screen
             area = screen.areas[0]
-            regions = area.regions
 
             # Change area type to the Preferences editor
             area.type = constants.WINDOW_SPACE_TYPE
@@ -90,17 +76,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             context.preferences.active_section = 'ADDONS'
 
             screen.name = constants.INJECTED_SCREEN_NAME
-
-            #area.header_text_set(constants.ADDON_NAME)
-
-            print()
-            print("screen")
-            print(dir(screen))
-
-            print()
-            print("area")
-            print(dir(area))
-
 
         finally:
             # reset render settings
