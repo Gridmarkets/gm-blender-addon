@@ -46,13 +46,13 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
             # Size multiplier to use when drawing custom user interface elements, so that they are scaled correctly on
             # screens with different DPI. This value is based on operating system DPI settings and Blender display scale
-            scale_factor = context.preferences.system.ui_scale * pixel_size
 
 
 
             print("scale_factor", scale_factor)
             print("dpi", context.user_preferences.system.dpi)
             print("pixel_size", context.user_preferences.system.pixel_size)
+            scale_factor = pixel_size
 
             # set the new window settings
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
