@@ -2,6 +2,7 @@ import bpy
 import constants
 import pathlib
 import utils_blender
+from types import SimpleNamespace
 
 from panels.main import GRIDMARKETS_PT_Main
 from panels.projects import GRIDMARKETS_PT_Projects
@@ -11,9 +12,8 @@ from panels.console import GRIDMARKETS_PT_console
 from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 
 _old_USERPREF_PT_addons_draw_function = None
+_old_USERPREF_PT_tabs_draw_function = None
 _old_USERPREF_HT_header_draw_function = None
-_old_USERPREF_PT_navigation_bar_draw_function = None
-_old_USERPREF_PT_save_preferences_draw_function = None
 
 
 def _draw_jobs_panels(self, context):
@@ -96,61 +96,65 @@ def _draw_compact_console(self, context):
     props = context.scene.props
     box = self.layout.box()
     box.alignment = "RIGHT"
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4, sort_lock=True)
+    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4)
 
 
 def register():
     _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
+    _old_USERPREF_PT_tabs_draw_function = bpy.types.USERPREF_PT_tabs.draw
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
-    _old_USERPREF_PT_navigation_bar_draw_function = bpy.types.USERPREF_PT_navigation_bar.draw
-    _old_USERPREF_PT_save_preferences_draw_function = bpy.types.USERPREF_PT_save_preferences.draw
 
     def _draw_main_region(self, context):
         if context.screen.name == constants.INJECTED_SCREEN_NAME:
             layout = self.layout
             props = context.scene.props
 
-            box = layout.box()
+            # split to show the side bar
+            split = layout.split(percentage=0.2)
+            col = SimpleNamespace(layout=split.column())
+            _draw_nav_region(col, context)
+
+            col = split.column()
+            box = col.box()
             row = box.row()
-            row.prop_tabs_enum(props, "tab_options", icon_only=True)
+            row.prop(props, "tab_options",  expand=True)
+            col = SimpleNamespace(layout=col)
 
             if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-                GRIDMARKETS_PT_Main.draw(self, context)
-                _draw_submission_summary(self, context)
-                _draw_compact_console(self, context)
+                GRIDMARKETS_PT_Main.draw(col, context)
+                _draw_submission_summary(col, context)
+                _draw_compact_console(col, context)
             elif props.tab_options == constants.TAB_PROJECTS:
-                GRIDMARKETS_PT_Projects.draw(self, context)
-                _draw_compact_console(self, context)
+                GRIDMARKETS_PT_Projects.draw(col, context)
+                _draw_compact_console(col, context)
             elif props.tab_options == constants.TAB_JOB_PRESETS:
-                _draw_jobs_panels(self, context)
+                _draw_jobs_panels(col, context)
             elif props.tab_options == constants.TAB_CREDENTIALS:
-                GRIDMARKETS_PT_preferences.draw(self, context)
+                GRIDMARKETS_PT_preferences.draw(col, context)
             elif props.tab_options == constants.TAB_LOGGING:
-                GRIDMARKETS_PT_console.draw(self, context)
+                GRIDMARKETS_PT_console.draw(col, context)
 
         else:
             _old_USERPREF_PT_addons_draw_function(self, context)
 
     def _draw_nav_region(self, context):
-        if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            layout = self.layout
-            props = context.scene.props
+        layout = self.layout
 
-            layout.label(text="Links")
+        box = layout.box()
+        box.label(text="Links")
 
-            col = layout.column()
-            col.scale_x = 1
-            col.scale_y = 2
+        col = box.column()
+        col.scale_x = 1
+        col.scale_y = 2
 
-            # Portal manager link
-            col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
+        # Portal manager link
+        col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
 
-            # Cost calculator
-            col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
-            col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
-            col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
-        else:
-            _old_USERPREF_PT_navigation_bar_draw_function(self, context)
+        # Cost calculator
+        col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
+        col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
+        col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
+
 
     def _draw_header_region(self, context):
         if context.screen.name == constants.INJECTED_SCREEN_NAME:
@@ -159,20 +163,18 @@ def register():
         else:
             _old_USERPREF_HT_header_draw_function(self, context)
 
-    def _draw_save_preferences_region(self, context):
+    def _draw_tabs_region(self, context):
         if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            pass;
+            pass
         else:
-            _old_USERPREF_PT_save_preferences_draw_function(self, context)
+            _old_USERPREF_PT_tabs_draw_function(self, context)
 
     bpy.types.USERPREF_PT_addons.draw = _draw_main_region
+    bpy.types.USERPREF_PT_tabs.draw = _draw_tabs_region
     bpy.types.USERPREF_HT_header.draw = _draw_header_region
-    bpy.types.USERPREF_PT_navigation_bar.draw = _draw_nav_region
-    bpy.types.USERPREF_PT_save_preferences.draw = _draw_save_preferences_region
 
 
 def unregister():
     bpy.types.USERPREF_PT_addons.draw = _old_USERPREF_PT_addons_draw_function
+    bpy.types.USERPREF_PT_tabs.draw = _old_USERPREF_PT_tabs_draw_function
     bpy.types.USERPREF_HT_header.draw = _old_USERPREF_HT_header_draw_function
-    bpy.types.USERPREF_PT_navigation_bar.draw = nav_bar = _old_USERPREF_PT_navigation_bar_draw_function
-    bpy.types.USERPREF_PT_save_preferences.draw = _old_USERPREF_PT_save_preferences_draw_function
