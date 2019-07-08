@@ -7,9 +7,9 @@ from blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
 
 
-class GRIDMARKETS_OT_delete_temporary_project_files(bpy.types.Operator):
-    bl_idname = constants.OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME
-    bl_label = constants.OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_LABEL
+class GRIDMARKETS_OT_copy_temporary_file_location(bpy.types.Operator):
+    bl_idname = constants.OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME
+    bl_label = constants.OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
@@ -22,13 +22,14 @@ class GRIDMARKETS_OT_delete_temporary_project_files(bpy.types.Operator):
             project = props.projects[selected_project_index]
             temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
             association = temporary_directory_manager.get_association_with_project_name(project.name)
-            association.delete_temporary_directory()
+
+            bpy.context.window_manager.clipboard = association.get_temp_dir_name()
 
         return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_OT_delete_temporary_project_files,
+    GRIDMARKETS_OT_copy_temporary_file_location,
 )
 
 def register():

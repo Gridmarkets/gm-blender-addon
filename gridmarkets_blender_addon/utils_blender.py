@@ -4,6 +4,7 @@ import pathlib
 import os
 import collections
 import json
+import math
 
 import constants
 import utils
@@ -19,7 +20,9 @@ from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
 from blender_asset_tracer import trace, pack
-from blender_asset_tracer.pack.progress import Callback
+
+# global client to reuse
+_envoy_client = None
 
 
 def get_wrapped_logger(name):
@@ -148,7 +151,7 @@ def get_new_envoy_client():
     """ Gets a new EnvoyClient instance using the authentication preferences for credentials
 
     :return: The envoy client
-    :rtype: EnvoyClient
+    :rtype: gridmarkets.envoy_client.EnvoyClient
 
     :raises: InvalidInputError, AuthenticationError
     """
@@ -161,6 +164,32 @@ def get_new_envoy_client():
 
     # return the new client
     return EnvoyClient(email=addon_prefs.auth_email, access_key=addon_prefs.auth_accessKey)
+
+
+def get_envoy_client():
+    """ Gets the existing EnvoyClient instance unless the authentication credentials have changed
+
+    :return: The existing envoy client or a new one if the credentials have changed
+    :rtype: gridmarkets.envoy_client.EnvoyClient
+
+    :raises: InvalidInputError, AuthenticationError
+    """
+    global _envoy_client
+
+    if _envoy_client:
+
+        # get the add-on preferences
+        addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+
+        # check neither the email or access key have changed
+
+        if addon_prefs.auth_email == _envoy_client.email and addon_prefs.auth_accessKey == _envoy_client.access_key:
+            return  _envoy_client
+
+    # update the client
+    _envoy_client = get_new_envoy_client()
+
+    return _envoy_client
 
 
 def _add_project_to_list(project_name, props):
@@ -177,6 +206,8 @@ def _add_project_to_list(project_name, props):
     # force region to redraw otherwise the list wont update until next event (mouse over, etc)
     force_redraw_addon()
 
+    return project
+
 
 def get_project_status(project):
     # get method logger
@@ -184,10 +215,10 @@ def get_project_status(project):
 
     try:
         # create an instance of Envoy client
-        client = get_new_envoy_client()
-        resp = client.get_project_status(project.name)
+        client = get_envoy_client()
 
-        log.info("Getting project status for %s..." %project.name)
+        log.info("Getting project status for %s..." % project.name)
+        resp = client.get_project_status(project.name)
 
         # convert to string
         project.status = json.dumps(resp)
@@ -204,6 +235,89 @@ def get_project_status(project):
         log.error("Invalid Request Error: " + e.user_message)
     except APIError as e:
         log.error("API Error: " + str(e.user_message))
+
+
+def clean_up_temporary_files(project_item, progress_callback):
+    """ Checks the status of the project until it has finished uploading and then deletes the temporary files """
+
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    # number of times to retry if receiving malformed responses
+    bad_response_retires = 10
+
+    log.info("Uploading Project...")
+    progress_callback(0, "Uploading Project")
+
+    while(bad_response_retires > 0):
+        import time
+
+        # sleep for 10 seconds to give time for the project to upload
+        log.info("Checking project upload status in " + str(10) + " seconds")
+        time.sleep(10)
+
+        try:
+            # create an instance of Envoy client
+            client = get_envoy_client()
+
+            log.info("Checking project status for %s..." % project_item.name)
+            resp = client.get_project_status(project_item.name)
+
+            # convert to string
+            project_item.status = json.dumps(resp)
+            log.info("Project status response: %s" % project_item.status)
+
+            # redraw the add-on to show the latest update
+            force_redraw_addon()
+        except Exception as e:
+            log.exception("Exception while fetching project status")
+            bad_response_retires -= 1
+            continue
+
+        # parse the json status response
+        projects_status = json.loads(project_item.status)
+
+        # if the response does not contain a details attribute then something has gone wrong
+        if "Details" not in projects_status:
+            log.warning("Project status does not contain a 'Details' attribute")
+            bad_response_retires -= 1
+            continue
+
+        details = projects_status["Details"]
+
+        # if details is None or an empty list then something has gone wrong
+        if not details:
+            log.warning("Details does not contain a project status")
+            bad_response_retires -= 1
+            continue
+
+        project_key = list(details)[0]
+        project_status = details[project_key]
+        uploading_status = project_status['State']
+
+        if uploading_status == 'Completed':
+            progress_callback(100, "Uploaded Project")
+            log.warning("Uploaded Project")
+            break
+        elif uploading_status == 'Uploading':
+            if "BytesDone" in projects_status and "BytesTotal" in projects_status:
+                bytes_done = projects_status["BytesDone"]
+                bytes_total = projects_status["BytesTotal"]
+
+                if isinstance(bytes_done, int) and  isinstance(bytes_total, int) and bytes_total != 0:
+                    percent = (bytes_done / bytes_total) * 100
+                    progress_callback(percent, "Uploading Project...")
+
+            continue
+        else:
+            log.warning("Uploading status was something other than 'Completed' or 'Uploading'")
+            bad_response_retires -= 1
+            continue
+
+    # delete the temporary files for the project
+    temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
+    association = temporary_directory_manager.get_association_with_project_name(project_item.name)
+    association.delete_temporary_directory()
 
 
 def upload_project(context, project_name, temp_dir_manager,
@@ -260,7 +374,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
     try:
         # create an instance of Envoy client
-        client = get_new_envoy_client()
+        client = get_envoy_client()
 
         # if the file has been saved
         if bpy.context.blend_data.is_saved:
@@ -320,14 +434,17 @@ def upload_project(context, project_name, temp_dir_manager,
         if skip_upload:
             log.info("Skipping project upload...")
         else:
-            log.info("Uploading project to Gridmarkets...")
-            _set_progress(progress=80, status="Uploading Project")
             client.submit_project(project)  # returns project name
 
             # add the new project to the projects list
-            _add_project_to_list(project_name, context.scene.props)
+            project_item = _add_project_to_list(project_name, context.scene.props)
 
-            log.info("Successfully uploaded project")
+            # callback for keeping track of the upload progress
+            def progress_callback(percent, status):
+                scaled_percent = 80 + percent / (100 - 80)
+                _set_progress(progress=scaled_percent, status=status)
+
+            clean_up_temporary_files(project_item, progress_callback)
 
     except InvalidInputError as e:
         log.warning("Invalid Input Error: " + e.user_message)
@@ -568,9 +685,9 @@ def submit_job(context, temp_dir_manager,
                operator=None,
                min_progress=0,
                max_progress=100,
-               progress_attribute_name = "submitting_project",
-               progress_percent_attribute_name = "submitting_project_progress",
-               progress_status_attribute_name = "submitting_project_status"
+               progress_attribute_name="submitting_project",
+               progress_percent_attribute_name="submitting_project_progress",
+               progress_status_attribute_name="submitting_project_status"
                ):
     """Submits a job to a existing or new project.
 
@@ -663,7 +780,7 @@ def submit_job(context, temp_dir_manager,
         job = get_job(context, render_file)
 
         # create an instance of Envoy client
-        client = get_new_envoy_client()
+        client = get_envoy_client()
 
         # add job to project
         project.add_jobs(job)
@@ -696,15 +813,23 @@ def submit_job(context, temp_dir_manager,
                  )
 
         # submit project
-        log.info("Submitting project...")
+        log.info("Submitting job...")
         _set_progress(progress=50, status="Submitting project")
         client.submit_project(project, skip_upload=skip_upload)
 
         # skip upload is only false if its a new project, in which case it needs adding to the list
         if not skip_upload:
-            _add_project_to_list(project_name, props)
+            project_item = _add_project_to_list(project_name, props)
 
-        log.info("Project submitted")
+            # callback for keeping track of the upload progress
+            def progress_callback(percent, status):
+                scaled_percent = 50 + percent / 2
+                _set_progress(progress=scaled_percent, status=status)
+
+            clean_up_temporary_files(project_item, progress_callback)
+
+        log.info("Job submitted")
+
 
     except InvalidInputError as e:
         log.warning("Invalid Input Error: " + e.user_message)

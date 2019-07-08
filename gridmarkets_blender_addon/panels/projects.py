@@ -30,7 +30,9 @@ def _draw_project_info_view(self, context):
         sub.label(text="Temporary directory path: %s" % association.get_temp_dir_name())
         op = sub.row()
         op.alignment = 'RIGHT'
-        op.operator(constants.OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME, text="Delete")
+        op.operator(constants.OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME, text="Copy Location")
+        if association.get_temp_dir_name() == constants.TEMPORARY_FILES_DELETED:
+            op.enabled = False
 
         sub = col.row(align=True)
         sub.enabled = False
@@ -47,37 +49,43 @@ def _draw_project_info_view(self, context):
 
         if project.status:
             import json
-            projecs_status = json.loads(project.status)
+            projects_status = json.loads(project.status)
 
             split = col.split(percentage=0.2)
 
             keys = split.column()
             values = split.column()
 
-            keys.label(text="Code: ")
-            values.label(text=str(projecs_status["Code"]))
+            if "Details"in projects_status:
 
-            keys.label(text="State: ")
-            values.label(text=projecs_status["State"])
+                details = projects_status["Details"]
 
-            keys.label(text="Message: ")
-            values.label(text=projecs_status["Message"])
+                if details:
+                    project_key = list(details)[0]
 
-            keys.label(text="BytesDone: ")
-            values.label(text=str(projecs_status["BytesDone"]))
+                    project_status = details[project_key]
 
-            keys.label(text="BytesTotal: ")
-            values.label(text=str(projecs_status["BytesTotal"]))
+                    keys.label(text="Name: ")
+                    values.label(text=str(project_status["Name"]))
 
-            keys.label(text="Speed: ")
-            values.label(text=str(projecs_status["Speed"]))
+                    keys.label(text="State: ")
+                    values.label(text=project_status["State"])
+
+                    keys.label(text="BytesDone: ")
+                    values.label(text=str(project_status["BytesDone"]))
+
+                    keys.label(text="BytesTotal: ")
+                    values.label(text=str(project_status["BytesTotal"]))
+
+                    keys.label(text="Speed: ")
+                    values.label(text=str(project_status["Speed"]))
+
         else:
             col.label(text="Status not yet fetched")
 
         sub = col.row(align=True)
         sub.enabled = False
-        sub.label(
-            text="Press 'Get status' to re-fetch the status of the project.")
+        sub.label(text="Press 'Get status' to re-fetch the status of the project.")
 
 
 class GRIDMARKETS_PT_Projects(bpy.types.Panel):
