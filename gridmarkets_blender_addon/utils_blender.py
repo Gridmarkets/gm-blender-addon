@@ -182,7 +182,6 @@ def get_envoy_client():
         addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # check neither the email or access key have changed
-
         if addon_prefs.auth_email == _envoy_client.email and addon_prefs.auth_accessKey == _envoy_client.access_key:
             return  _envoy_client
 
@@ -297,7 +296,7 @@ def clean_up_temporary_files(project_item, progress_callback):
 
         if uploading_status == 'Completed':
             progress_callback(100, "Uploaded Project")
-            log.warning("Uploaded Project")
+            log.info("Uploaded Project")
             break
         elif uploading_status == 'Uploading':
             if "BytesDone" in projects_status and "BytesTotal" in projects_status:
