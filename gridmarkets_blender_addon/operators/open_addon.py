@@ -38,10 +38,11 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
         # try finally block so that old settings are guaranteed to be restored
         try:
             pixel_size = context.user_preferences.system.pixel_size
+            ui_scale = pixel_size * (context.user_preferences.system.dpi / 72)
 
             # Size multiplier to use when drawing custom user interface elements, so that they are scaled correctly on
             # screens with different DPI. This value is based on operating system DPI settings and Blender display scale
-            scale_factor = pixel_size
+            scale_factor = pixel_size * ui_scale
 
             # set the new window settings
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
