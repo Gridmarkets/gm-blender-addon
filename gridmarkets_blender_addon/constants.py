@@ -39,8 +39,8 @@ DEFAULT_OUTPUT_PATH = "//gm_results\\"
 DEFAULT_WINDOW_WIDTH = 1000
 DEFAULT_WINDOW_HIEGHT = 550
 
-# plugin versioning
-PLUGIN_VERSION = { "major": 0, "minor": 3, "build" : 2}
+# plugin version
+PLUGIN_VERSION = { "major": 0, "minor": 4, "build" : 0}
 
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
