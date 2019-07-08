@@ -1,7 +1,7 @@
-import os
 import pathlib
 import tempfile
 import atexit
+import constants
 
 
 class _AssociationTuple:
@@ -47,7 +47,7 @@ class _AssociationTuple:
         """
 
         if self._temp_directory is None:
-            return "TEMPORARY FILES DELETED"
+            return constants.TEMPORARY_FILES_DELETED
 
         return self._temp_directory.name
 

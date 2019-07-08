@@ -30,7 +30,9 @@ def _draw_project_info_view(self, context):
         sub.label(text="Temporary directory path: %s" % association.get_temp_dir_name())
         op = sub.row()
         op.alignment = 'RIGHT'
-        op.operator(constants.OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME, text="Delete")
+        op.operator(constants.OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME, text="Copy Location")
+        if association.get_temp_dir_name() == constants.TEMPORARY_FILES_DELETED:
+            op.enabled = False
 
         sub = col.row(align=True)
         sub.enabled = False

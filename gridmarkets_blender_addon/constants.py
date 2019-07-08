@@ -48,6 +48,8 @@ JOB_PREFIX = 'Job_'
 AUTHENTICATION_HELP_MESSAGE = "\nEnter your Gridmarkets credentials by going to: Edit -> Preferences -> Add-ons -> " \
                               "Gridmarkets Blender Add-on -> preferences"
 
+TEMPORARY_FILES_DELETED = "Temporary Files Deleted"
+
 FRAME_RANGE_PREFIX = 'range_'
 DEFAULT_FRAME_RANGE_START_VALUE = 1
 DEFAULT_FRAME_RANGE_END_VALUE = 255
@@ -120,8 +122,8 @@ OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
 OPERATOR_OPEN_PREFERENCES_LABEL = "Open Gridmarkets add-on preferences"
 OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
 OPERATOR_OPEN_ADDON_LABEL = "Open Gridmarkets add-on"
-OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_ID_NAME = "gridmarkets.delete_temporary_project_files"
-OPERATOR_DELETE_TEMPORARY_PROJECT_FILES_LABEL = "Delete temporary project files"
+OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_project_files"
+OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL = "Delete temporary project files"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_LABEL = "Get selected project status"
 
