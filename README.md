@@ -49,7 +49,7 @@ add-on's source code use `F3` (or `Cmd + F` on MacOs) in Blender to open up the 
 ## Using the Add-on
 The add-on window can be opened by pressing the 'Open Gridmarkets add-on' button in the top bar.
 
-![image showing the main panel for the add-on](static/addon_overview.png)
+![image showing how to open the add-on](static/open_button.png)
 
 The add-on depends on Gridmarkets' Envoy being installed and running in order to work.
 
@@ -65,10 +65,18 @@ the above image.
 ### Submitting a Project
 
 Once opened you have the option of submitting your current scene using blender's render settings in an easy one click
-submit process, or you can define custom jobs that override blender's render and output settings to give you more 
-control in the __Job Presets__ tab. You can also upload projects in the __Projects__ tab and run jobs against them 
-later.
+submit process. There is no requirement to save the .blend file before submitting, the add-on will automatically save a 
+copy of the currently open scene to a temporary directory. It will then create a packed version of the same file using 
+BAT and upload via the API. The temporary packed files will be deleted after they are uploaded.
 
-There is no requirement to save the .blend file before submitting, the add-on will automatically save a copy of the
-currently open scene to a temporary directory. It will then create a packed version of the same file using BAT and 
-upload via the API. The temporary packed files will be deleted after they are uploaded.
+![image showing the submission settings tab](static/submission_settings_view.png)
+
+You can also can define custom jobs that override blender's render and output settings to give you more control in the 
+__Job Presets__ tab. 
+
+![image showing the job presets tab](static/job_presets_view.png)
+
+Or you can upload projects in the __Projects__ tab and run jobs against them later.
+
+![image showing the projects tab](static/projects_view.png)
+
