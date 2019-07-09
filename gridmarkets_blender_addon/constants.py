@@ -39,6 +39,8 @@ DEFAULT_OUTPUT_PATH = "//gm_results\\"
 DEFAULT_WINDOW_WIDTH = 1000
 DEFAULT_WINDOW_HIEGHT = 550
 
+BLENDER_TEMP_DIRECTORY = '/tmp\\'
+
 # plugin version
 PLUGIN_VERSION = { "major": 0, "minor": 4, "build" : 0}
 
