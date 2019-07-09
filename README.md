@@ -47,13 +47,15 @@ add-on's source code use `F3` (or `Cmd + F` on MacOs) in Blender to open up the 
 ![image showing how to reload scripts inside Blender](static/reload_scripts.png)
 
 ## Using the Add-on
-The add-on panel can be found under `Render -> Gridmarkets` in the Properties menu.
+The add-on window can be opened by pressing the 'Open Gridmarkets add-on' button in the top bar.
 
-![image showing the main panel for the add-on](static/addon_overview.png)
+![image showing how to open the add-on](static/open_button.png)
+
+The add-on depends on Gridmarkets' Envoy being installed and running in order to work.
 
 ### Authentication
-Once the add-on is installed a user can provide their Gridmarkets email and access key in the preferences section found
-directly under the add-on in the Add-ons panel. 
+You must provide your Gridmarkets email and access key (__not your password__) before you can upload or submit and 
+projects. You can do this under the __Credentials__ tab or under the add-on preferences section for the add-on. 
 
 ![image showing where to insert email and access key](static/add-on_preferences.png)
 
@@ -61,21 +63,20 @@ For Blender to remember a users credentials between sessions they must click the
 the above image.
 
 ### Submitting a Project
-There is no requirement to save the .blend file before submitting, the add-on will automatically save a copy of the
-currently open scene to a temporary directory. It will then create a packed version of the same file using BAT and 
-upload via the API. 
 
-## todo
-- ~~Handle dependencies outside of the project root.~~
-- ~~Handle linked blender files which themselves have their own dependencies.~~
-- support blender 2.79
-- Currently the add-on re-packs and re-uploads the entire project for each render, it should detect which files have
-  been updated and act accordingly.
-- ~~Remove the requirement to save the current .blend file before submitting~~
-- ~~Allow the user to specify multiple frame ranges~~
-- Add job status feedback to the user so they know the add-on is working as intended
-- Clean up temp files generated from packing the project. (partially done, all temp folders will now be deleted once 
-  blender is closed but they could be deleted sooner if we check that the files have finished uploading to envoy)
-- [Extension] it would be possible to render single frames in a distributed way by creating a fake animation where each
-  frame is the same and then re-combining the frames client side. Very usefull for artists who are trying to create 
-  still images.
+Once opened you have the option of submitting your current scene using blender's render settings in an easy one click
+submit process. There is no requirement to save the .blend file before submitting, the add-on will automatically save a 
+copy of the currently open scene to a temporary directory. It will then create a packed version of the same file using 
+BAT and upload via the API. The temporary packed files will be deleted after they are uploaded.
+
+![image showing the submission settings tab](static/submission_settings_view.png)
+
+You can also can define custom jobs that override blender's render and output settings to give you more control in the 
+__Job Presets__ tab. 
+
+![image showing the job presets tab](static/job_presets_view.png)
+
+Or you can upload projects in the __Projects__ tab and run jobs against them later.
+
+![image showing the projects tab](static/projects_view.png)
+

@@ -486,6 +486,7 @@ def get_default_blender_job(context, render_file):
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
 
+
 def get_job_output_path(context, job=None):
     """ Gets the output path for either the provided job or the currently selested job if no job provided
 
@@ -527,7 +528,7 @@ def get_job_output_path_abs(context, job=None):
             return str(pathlib.Path(bpy.context.blend_data.filepath).parent / pathlib.Path(path))
         else:
             # if they are using a relative path with an unsaved project just output to tmp
-            return '/tmp\\'
+            return constants.BLENDER_TEMP_DIRECTORY
 
     return path
 
@@ -889,6 +890,7 @@ def redraw_region(area_type, region_type):
                 for region in area.regions:
                     if region.type == region_type:
                         region.tag_redraw()
+
 
 def get_addon_window():
     for window in bpy.context.window_manager.windows:
