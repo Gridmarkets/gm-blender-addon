@@ -6,7 +6,7 @@ bl_info = {
     "blender": (2, 80, 0),
     "location": "Info > Header",
     "warning": "", # used for warning icon and text in add-ons panel
-    "wiki_url": "https://www.gridmarkets.com/",
+    "wiki_url": "https://www.gridmarkets.com/blender",
     "category": "Render"
 }
 

@@ -30,8 +30,7 @@ RENDER_MANAGER_URL = "https://portal.gridmarkets.com/init/member_plugin/index"
 
 COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
-# TODO need an actual help url
-HELP_URL = "https://www.gridmarkets.com/"
+HELP_URL = "https://www.gridmarkets.com/blender"
 
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
