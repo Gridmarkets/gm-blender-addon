@@ -7,7 +7,6 @@ bl_info = {
     "location": "Info > Header",
     "warning": "", # used for warning icon and text in add-ons panel
     "wiki_url": "https://www.gridmarkets.com/",
-    "tracker_url": "",
     "category": "Render"
 }
 
