@@ -481,7 +481,9 @@ def upload_project(context, project_name, temp_dir_manager,
         log.error("API Error: " + str(e.user_message))
         raise e
     finally:
-        setattr(context.scene.props, progress_attribute_name, False)
+        # hide the progress meter if unless skipping upload
+        if not skip_upload:
+            setattr(context.scene.props, progress_attribute_name, False)
 
 
 def get_blender_frame_range(context):
