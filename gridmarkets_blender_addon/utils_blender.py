@@ -313,10 +313,28 @@ def clean_up_temporary_files(project_item, progress_callback):
             bad_response_retires -= 1
             continue
 
-    # delete the temporary files for the project
+    delete_temp_files_for_project(project_item.name)
+
+
+def delete_temp_files_for_project(project_name):
+    """ Attempts to delete the temporary project files for associated with a given project name
+
+    :param project_name: The name of the project
+    :type project_name: str
+    :rtype: void
+    """
+
+    # get the temporary directory manager
     temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
-    association = temporary_directory_manager.get_association_with_project_name(project_item.name)
-    association.delete_temporary_directory()
+
+    # find the association for this project
+    association = temporary_directory_manager.get_association_with_project_name(project_name)
+
+    # if the association exists
+    if association:
+
+        # delete the temporary files for the project
+        association.delete_temporary_directory()
 
 
 def upload_project(context, project_name, temp_dir_manager,
