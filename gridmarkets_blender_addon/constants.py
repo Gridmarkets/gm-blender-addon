@@ -41,7 +41,7 @@ DEFAULT_WINDOW_HIEGHT = 550
 BLENDER_TEMP_DIRECTORY = '/tmp\\'
 
 # plugin version
-PLUGIN_VERSION = { "major": 0, "minor": 4, "build" : 0}
+PLUGIN_VERSION = { "major": 0, "minor": 4, "build" : 1}
 
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
