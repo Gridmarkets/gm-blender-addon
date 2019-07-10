@@ -179,7 +179,7 @@ def get_envoy_client():
     if _envoy_client:
 
         # get the add-on preferences
-        addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
+        addon_prefs = bpy.context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # check neither the email or access key have changed
         if addon_prefs.auth_email == _envoy_client.email and addon_prefs.auth_accessKey == _envoy_client.access_key:
