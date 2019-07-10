@@ -59,25 +59,22 @@ DEFAULT_FRAME_RANGE_STEP_VALUE = 1
 INJECTED_SCREEN_NAME = "GRIDMARKETS_INJECTION_SCREEN"
 
 # panels
-PANEL_MAIN_ID_NAME = "gridmarkets_main_panel"
+PANEL_MAIN_ID_NAME = "GRIDMARKETS_PT_Main"
 PANEL_MAIN_ID_LABEL = "GridMarkets"
 
-PANEL_PROJECTS_ID_NAME = "gridmarkets_projects_sub_panel"
+PANEL_PROJECTS_ID_NAME = "GRIDMARKETS_PT_Projects"
 PANEL_PROJECTS_LABEL = "Projects"
 
-PANEL_JOBS_ID_NAME = "gridmarkets_jobs_sub_panel"
+PANEL_JOBS_ID_NAME = "GRIDMARKETS_PT_Jobs"
 PANEL_JOBS_LABEL = "Jobs"
 
-PANEL_JOBS_INFO_ID_NAME = "gridmarkets_job_info_sub_panel"
-PANEL_JOBS_INFO_LABEL = "Job Info"
-
-PANEL_OUTPUT_SETTINGS_ID_NAME = "gridmarkets_output_settings_sub_panel"
+PANEL_OUTPUT_SETTINGS_ID_NAME = "GRIDMARKETS_PT_Output_Settings"
 PANEL_OUTPUT_SETTINGS_LABEL = "Output Settings"
 
-PANEL_CONSOLE_ID_NAME = "gridmarkets_console_panel"
+PANEL_CONSOLE_ID_NAME = "GRIDMARKETS_PT_console"
 PANEL_CONSOLE_LABEL = "Console"
 
-PANEL_PREFERENCES_ID_NAME = "gridmarekts_preferences_panel"
+PANEL_PREFERENCES_ID_NAME = "GRIDMARKETS_PT_preferences"
 PANEL_PREFERENCES_LABEL = "Preferences"
 
 PANEL_SPACE_TYPE = "PROPERTIES"
