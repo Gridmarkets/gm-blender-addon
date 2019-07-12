@@ -2,6 +2,90 @@ import bpy
 import constants
 from temp_directory_manager import TempDirectoryManager
 
+
+def _get_value(project_status, key):
+    return str(project_status[key]) if key in project_status else 'Value not found'
+
+
+def _draw_project_detail(keys, values, detail_status):
+    keys.label(text="Name: ")
+    values.label(text=_get_value(detail_status, "Name"))
+
+    keys.label(text="State: ")
+    values.label(text=_get_value(detail_status, "State"))
+
+    keys.label(text="BytesDone: ")
+    values.label(text=_get_value(detail_status, "BytesDone"))
+
+    keys.label(text="BytesTotal: ")
+    values.label(text=_get_value(detail_status, "BytesTotal"))
+
+    keys.label(text="Speed: ")
+    values.label(text=_get_value(detail_status, "Speed"))
+
+
+def _draw_project_status(col, project):
+    # draw label
+    sub = col.row()
+    sub.label(text="Project status:")
+
+    # draw the get status operator
+    op = sub.row()
+    op.alignment = 'RIGHT'
+    op.operator(constants.OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME, text="Get status")
+
+    if project.status:
+        import json
+        projects_status = json.loads(project.status)
+
+        split = col.split(percentage=0.2)
+
+        keys = split.column()
+        values = split.column()
+
+        # draw over all project status information
+        keys.label(text="Name: ")
+        values.label(text=project.name if project.name else "Name not provided")
+
+        keys.label(text="Code: ")
+        values.label(text=_get_value(projects_status, "Code"))
+
+        keys.label(text="State: ")
+        values.label(text=_get_value(projects_status, "State"))
+
+        keys.label(text="BytesDone: ")
+        values.label(text=_get_value(projects_status, "BytesDone"))
+
+        keys.label(text="BytesTotal: ")
+        values.label(text=_get_value(projects_status, "BytesTotal"))
+
+        keys.label(text="Speed: ")
+        values.label(text=_get_value(projects_status, "Speed"))
+
+        col.setarator()
+
+        col.label(text="Details")
+
+        # check the details object exists
+        if "Details" in projects_status:
+            details = projects_status["Details"]
+
+            if details:
+
+                # iterate through each file that needs uploading and display its status
+                for detail_name, detail_status in details.items():
+                    _draw_project_detail(keys, values, detail_status)
+
+        else:
+            values.label(text="No project details found")
+    else:
+        col.label(text="Status not yet fetched")
+
+    sub = col.row(align=True)
+    sub.enabled = False
+    sub.label(text="Press 'Get status' to re-fetch the status of the project.")
+
+
 def _draw_project_info_view(self, context):
     layout = self.layout
     props = bpy.context.scene.props
@@ -41,51 +125,7 @@ def _draw_project_info_view(self, context):
 
         col.separator()
 
-        sub = col.row()
-        sub.label(text="Project status:")
-        op = sub.row()
-        op.alignment = 'RIGHT'
-        op.operator(constants.OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME, text="Get status")
-
-        if project.status:
-            import json
-            projects_status = json.loads(project.status)
-
-            split = col.split(factor=0.2)
-
-            keys = split.column()
-            values = split.column()
-
-            if "Details"in projects_status:
-
-                details = projects_status["Details"]
-
-                if details:
-                    project_key = list(details)[0]
-
-                    project_status = details[project_key]
-
-                    keys.label(text="Name: ")
-                    values.label(text=str(project_status["Name"]))
-
-                    keys.label(text="State: ")
-                    values.label(text=project_status["State"])
-
-                    keys.label(text="BytesDone: ")
-                    values.label(text=str(project_status["BytesDone"]))
-
-                    keys.label(text="BytesTotal: ")
-                    values.label(text=str(project_status["BytesTotal"]))
-
-                    keys.label(text="Speed: ")
-                    values.label(text=str(project_status["Speed"]))
-
-        else:
-            col.label(text="Status not yet fetched")
-
-        sub = col.row(align=True)
-        sub.enabled = False
-        sub.label(text="Press 'Get status' to re-fetch the status of the project.")
+        _draw_project_status(col, project)
 
 
 class GRIDMARKETS_PT_Projects(bpy.types.Panel):
