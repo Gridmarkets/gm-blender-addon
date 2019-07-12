@@ -3,6 +3,9 @@ import tempfile
 import atexit
 import constants
 
+def get_wrapped_logger():
+    from blender_logging_wrapper import get_wrapped_logger
+    return get_wrapped_logger(__name__)
 
 class _AssociationTuple:
     """ A container class representing the relationship between a temporary directory, a preject and the preject's
@@ -77,8 +80,16 @@ class _AssociationTuple:
 
     def delete_temporary_directory(self):
         if self._temp_directory:
-            self._temp_directory.cleanup()
-            self._temp_directory = None
+            try:
+                self._temp_directory.cleanup()
+                self._temp_directory = None
+
+            # If the file cannot be cleaned up because it is being used by another process (it shouldn't be!)
+            except OSError as e:
+                # then log the problem and fail
+                log = get_wrapped_logger()
+                log.exception("OSError when attempting to clean up temporary files.")
+                raise e
 
 
 class TempDirectoryManager:
