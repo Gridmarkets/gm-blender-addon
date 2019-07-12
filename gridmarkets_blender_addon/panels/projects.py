@@ -62,7 +62,7 @@ def _draw_project_status(col, project):
         keys.label(text="Speed: ")
         values.label(text=_get_value(projects_status, "Speed"))
 
-        col.setarator()
+        col.separator()
 
         col.label(text="Details")
 
