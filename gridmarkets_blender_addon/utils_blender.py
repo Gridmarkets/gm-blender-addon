@@ -272,26 +272,11 @@ def clean_up_temporary_files(project_item, progress_callback):
             log.exception("Exception while fetching project status")
             bad_response_retires -= 1
             continue
+            continue
+            continue
 
         # parse the json status response
-        projects_status = json.loads(project_item.status)
-
-        # if the response does not contain a details attribute then something has gone wrong
-        if "Details" not in projects_status:
-            log.warning("Project status does not contain a 'Details' attribute")
-            bad_response_retires -= 1
-            continue
-
-        details = projects_status["Details"]
-
-        # if details is None or an empty list then something has gone wrong
-        if not details:
-            log.warning("Details does not contain a project status")
-            bad_response_retires -= 1
-            continue
-
-        project_key = list(details)[0]
-        project_status = details[project_key]
+        project_status = json.loads(project_item.status)
         uploading_status = project_status['State']
 
         if uploading_status == 'Completed':
@@ -299,14 +284,22 @@ def clean_up_temporary_files(project_item, progress_callback):
             log.info("Uploaded Project")
             break
         elif uploading_status == 'Uploading':
-            if "BytesDone" in projects_status and "BytesTotal" in projects_status:
-                bytes_done = projects_status["BytesDone"]
-                bytes_total = projects_status["BytesTotal"]
+            if "BytesDone" in project_status and "BytesTotal" in project_status:
+                bytes_done = project_status["BytesDone"]
+                bytes_total = project_status["BytesTotal"]
 
-                if isinstance(bytes_done, int) and  isinstance(bytes_total, int) and bytes_total != 0:
-                    percent = (bytes_done / bytes_total) * 100
-                    progress_callback(percent, "Uploading Project...")
+                try:
+                    # try converting to floats
+                    bytes_done_f = float(bytes_done)
+                    bytes_total_f = float(bytes_total)
 
+                    # avoid dividing by zero errors
+                    if bytes_total_f > 0:
+                        percent = (bytes_done_f / bytes_total_f) * 100
+                        progress_callback(percent, "Uploading Project...")
+
+                except ValueError:
+                    log.warning("bytes_done or bytes_total was not a float")
             continue
         else:
             log.warning("Uploading status was something other than 'Completed' or 'Uploading'")
