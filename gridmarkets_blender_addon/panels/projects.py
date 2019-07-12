@@ -38,7 +38,7 @@ def _draw_project_status(col, project):
         import json
         projects_status = json.loads(project.status)
 
-        split = col.split(percentage=0.2)
+        split = col.split(factor=0.2)
 
         keys = split.column()
         values = split.column()
