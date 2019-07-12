@@ -111,7 +111,7 @@ class BlenderLoggingWrapper:
         """
 
         self._log(msg, "ERROR")
-        self._logger.exception(msg, *args, exc_info, **kwargs)
+        self._logger.exception(msg, *args, exc_info=exc_info, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
         """ Log critical message
