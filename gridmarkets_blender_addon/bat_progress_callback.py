@@ -37,7 +37,7 @@ class BatProgressCallback(Callback):
         self.log.info('Found asset %s' % filename.name)
 
     def rewrite_blendfile(self, orig_filename: pathlib.Path) -> None:
-        self.log.info('Rewriting %s' % orig_filename.name)
+        self.log.info('Rewriting cloned %s (This will not modify your original file / scene)' % orig_filename.name)
 
     def transfer_file(self, src: pathlib.Path, dst: pathlib.Path) -> None:
         self.log.info('Transferring %s' % src.name)
