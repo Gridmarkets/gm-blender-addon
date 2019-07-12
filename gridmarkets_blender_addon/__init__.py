@@ -53,15 +53,16 @@ modulesNames = ['constants',
                 'panels.preferences',
                 'panel_injections']
 
-# append this folder to sys.path so local dependencies can be found
-sys.path.append(os.path.dirname(__file__))
+# We pre-append so that these paths take precedence over blenders packed modules which can be different versions
+# pre-append this folder to sys.path so local dependencies can be found
+sys.path.insert(0, os.path.dirname(__file__))
 
-# append the lib folder to sys.path so local dependencies can be found
-sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
+# pre-append the lib folder to sys.path so local dependencies can be found
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
 
 for path in sys.path:
-	print(path)
- 
+    print(path)
+
 # create a dictionary to hold the full names of modules
 modulesFullNames = {}
 
