@@ -268,11 +268,21 @@ def clean_up_temporary_files(project_item, progress_callback):
 
             # redraw the add-on to show the latest update
             force_redraw_addon()
-        except Exception as e:
-            log.exception("Exception while fetching project status")
+        except AuthenticationError as e:
+            log.error("Authentication Error: " + e.user_message)
             bad_response_retires -= 1
             continue
+        except InsufficientCreditsError as e:
+            log.error("Insufficient Credits Error: " + e.user_message)
+            bad_response_retires -= 1
             continue
+        except InvalidRequestError as e:
+            log.error("Invalid Request Error: " + e.user_message)
+            bad_response_retires -= 1
+            continue
+        except APIError as e:
+            log.error("API Error: " + str(e.user_message))
+            bad_response_retires -= 1
             continue
 
         # parse the json status response
