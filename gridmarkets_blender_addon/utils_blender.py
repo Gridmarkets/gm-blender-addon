@@ -458,7 +458,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
             # callback for keeping track of the upload progress
             def progress_callback(percent, status):
-                scaled_percent = 80 + percent / (100 - 80)
+                scaled_percent = 80 + percent / (100 / (100 - 80))
                 _set_progress(progress=scaled_percent, status=status)
 
             clean_up_temporary_files(project_item, progress_callback)
