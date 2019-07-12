@@ -248,7 +248,7 @@ def clean_up_temporary_files(project_item, progress_callback):
     log.info("Uploading Project...")
     progress_callback(0, "Uploading Project")
 
-    while(bad_response_retires > 0):
+    while bad_response_retires > 0:
         import time
 
         # sleep for 10 seconds to give time for the project to upload
