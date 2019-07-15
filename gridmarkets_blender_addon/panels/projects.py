@@ -23,6 +23,9 @@ def _draw_project_detail(keys, values, detail_status):
     keys.label(text="Speed: ")
     values.label(text=_get_value(detail_status, "Speed"))
 
+    keys.separator()
+    values.separator()
+
 
 def _draw_project_status(col, project):
     # draw label
@@ -62,9 +65,11 @@ def _draw_project_status(col, project):
         keys.label(text="Speed: ")
         values.label(text=_get_value(projects_status, "Speed"))
 
-        col.separator()
+        keys.separator()
+        values.separator()
 
-        col.label(text="Details")
+        keys.label(text="Project Assets:")
+        values.label(text="")
 
         # check the details object exists
         if "Details" in projects_status:
