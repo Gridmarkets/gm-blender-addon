@@ -50,22 +50,6 @@ def _get_job_options(scene, context):
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessible via the interface.
     """
-    
-    # artist name
-    artist_name: bpy.props.StringProperty(
-        name="Artist",
-        description="The name of the Artist is optional",
-        default="",
-        maxlen=1024,
-        )
-        
-    # submission comment
-    submission_comment: bpy.props.StringProperty(
-        name="Comment",
-        description="",
-        default="",
-        maxlen=1024,
-        )
 
     # project collection
     projects: bpy.props.CollectionProperty(
