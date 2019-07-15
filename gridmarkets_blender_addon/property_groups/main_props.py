@@ -1,4 +1,5 @@
 import bpy
+from bpy.app.handlers import persistent
 import constants
 
 from property_groups.frame_range_props import FrameRangeProps
@@ -53,7 +54,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     # project collection
     projects: bpy.props.CollectionProperty(
-        type=ProjectProps
+        type=ProjectProps,
     )
 
     selected_project: bpy.props.IntProperty()
@@ -62,7 +63,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     project_options: bpy.props.EnumProperty(
         name="Project",
         description="The list of possible projects to use on submit",
-        items=_get_project_options
+        items=_get_project_options,
     )
 
     # job collection
@@ -110,7 +111,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     uploading_project: bpy.props.BoolProperty(
         name="Uploading Project",
         description="Indicates that a project is being uploaded",
-        default=False
+        default=False,
+        options={'SKIP_SAVE'}
     )
 
     uploading_project_progress: bpy.props.IntProperty(
@@ -120,7 +122,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         min=0,
         max=100,
         step=1,
-        subtype='PERCENTAGE'
+        subtype='PERCENTAGE',
+        options={'SKIP_SAVE'}
     )
 
     uploading_project_status: bpy.props.StringProperty(
@@ -133,7 +136,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     submitting_project: bpy.props.BoolProperty(
         name="Submitting Project",
         description="Indicates that a project is being submitted",
-        default=False
+        default=False,
+        options={'SKIP_SAVE'}
     )
 
     submitting_project_progress: bpy.props.IntProperty(
@@ -143,13 +147,15 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         min=0,
         max=100,
         step=1,
-        subtype='PERCENTAGE'
+        subtype='PERCENTAGE',
+        options={'SKIP_SAVE'}
     )
 
     submitting_project_status: bpy.props.StringProperty(
         name="Submitting Project Status",
         description="A brief description of the current status of the submit operation",
         default="",
+        options={'SKIP_SAVE'}
     )
 
     tab_options: bpy.props.EnumProperty(
@@ -184,6 +190,16 @@ classes = (
 )
 
 
+@persistent
+def reset_to_defaults(pos):
+    # options={'SKIP_SAVE'} doesnt work for global properties so we must reset manually
+    bpy.context.scene.props.uploading_project = False
+    bpy.context.scene.props.uploading_project_progress = 0
+    bpy.context.scene.props.submitting_project = False
+    bpy.context.scene.props.submitting_project_progress = 0
+    bpy.context.scene.props.submitting_project_status = ""
+
+
 def register():
     from bpy.utils import register_class
 
@@ -193,6 +209,9 @@ def register():
 
     # register add-on properties
     bpy.types.Scene.props = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_Addon_Properties)
+
+    # add event handler
+    bpy.app.handlers.load_post.append(reset_to_defaults)
 
 
 def unregister():
@@ -204,4 +223,7 @@ def unregister():
 
     # delete add-on properties
     del bpy.types.Scene.props
+
+    # remove event handler
+    bpy.app.handlers.load_post.remove(reset_to_defaults)
 
