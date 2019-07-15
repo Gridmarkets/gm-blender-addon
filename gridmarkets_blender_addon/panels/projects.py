@@ -80,7 +80,7 @@ def _draw_project_status(col, project):
                 for detail_name, detail_status in details.items():
 
                     # don't show the detail object
-                    if detail_name == 'detail':
+                    if detail_name == 'details':
                         continue
 
                     _draw_project_detail(keys, values, detail_status)
