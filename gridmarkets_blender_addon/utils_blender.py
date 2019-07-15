@@ -193,6 +193,12 @@ def get_envoy_client():
 
 def _add_project_to_list(project_name, props):
 
+    # if props already contains a project with the given name
+    existing_projects_with_name = list(filter(lambda x: x.name == project_name, props.projects))
+    if existing_projects_with_name:
+        # don't add it to the list and return the existing project
+        return existing_projects_with_name[0]
+
     # add a project to the list
     project = props.projects.add()
 
@@ -283,13 +289,14 @@ def clean_up_temporary_files(project_item, progress_callback):
         except APIError as e:
             log.error("API Error: " + str(e.user_message))
             bad_response_retires -= 1
+            raise e
             continue
 
         # parse the json status response
         project_status = json.loads(project_item.status)
         uploading_status = project_status['State']
 
-        if uploading_status == 'Completed':
+        if uploading_status == 'Completed' or uploading_status == 'Submitted':
             progress_callback(100, "Uploaded Project")
             log.info("Uploaded Project")
             break
@@ -311,8 +318,67 @@ def clean_up_temporary_files(project_item, progress_callback):
                 except ValueError:
                     log.warning("bytes_done or bytes_total was not a float")
             continue
+        elif uploading_status == 'Error':
+
+            if 'Message' not in project_status:
+                log.warning("Upload Error: No Error message")
+                bad_response_retires -= 1
+                continue
+
+            error_message = project_status['Message']
+
+            # the api returns an error status even if the project has uploaded correctly but it was uploaded without a
+            # job, we need to check to make sure that this 'Error' isn't just a uploaded project without a job
+            if error_message == "Job validation failed.":
+
+                # check that all the details have finished uploading
+                if 'Details' not in project_status:
+                    log.warning("Project status does not contain 'Details' attribute")
+                else:
+                    details = project_status['Details']
+
+                    details_uploaded = True
+
+                    for key, value in details.items():
+
+                        # the Details attribute can contain it's own details attribute which we should ignore
+                        if key == 'details':
+                            continue
+
+                        if 'BytesDone' not in value:
+                            log.warning("project status detail does not contain 'BytesDone' attribute")
+                            details_uploaded = False
+                            break
+
+                        if 'BytesTotal' not in value:
+                            log.warning("project status detail does not contain 'Bytestotal' attribute")
+                            details_uploaded = False
+                            break
+
+                        bytes_done = value['BytesDone']
+                        bytes_total = value['BytesTotal']
+
+                        # if the detail is not finished uploading then break
+                        if bytes_done != bytes_total:
+                            log.warning("project status detail %s does has not finished uploading" % key)
+                            details_uploaded = False
+                            break
+
+                    if details_uploaded:
+                        progress_callback(100, "Uploaded Project")
+                        log.info("Uploaded Project")
+                        break
+                    else:
+                        log.warning("Not all details have been uploaded")
+
+            else:
+                log.warning("Upload Error: %s" % error_message)
+                bad_response_retires -= 1
+                continue
+
+
         else:
-            log.warning("Uploading status was something other than 'Completed' or 'Uploading'")
+            log.warning("Unrecognised status")
             bad_response_retires -= 1
             continue
 
@@ -805,6 +871,9 @@ def submit_job(context, temp_dir_manager,
         # create an instance of Envoy client
         client = get_envoy_client()
 
+        # remove all previously run jobs
+        project.jobs = list()
+
         # add job to project
         project.add_jobs(job)
 
@@ -836,7 +905,7 @@ def submit_job(context, temp_dir_manager,
                  )
 
         # submit project
-        log.info("Submitting job...")
+        log.info("Submitting job (skip_upload=" + str(skip_upload) + ")...")
         _set_progress(progress=50, status="Submitting project")
         client.submit_project(project, skip_upload=skip_upload)
 
