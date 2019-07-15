@@ -865,6 +865,9 @@ def submit_job(context, temp_dir_manager,
         # create an instance of Envoy client
         client = get_envoy_client()
 
+        # remove all previously run jobs
+        project.jobs = list()
+
         # add job to project
         project.add_jobs(job)
 
