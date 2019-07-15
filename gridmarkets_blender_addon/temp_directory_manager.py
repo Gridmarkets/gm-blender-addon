@@ -145,7 +145,7 @@ class TempDirectoryManager:
         for association_tuple in self.associations:
             project = association_tuple.get_project()
 
-            if project.name == project_name:
+            if project and type(project) is not str and project.name == project_name:
                 return association_tuple
 
         return None
@@ -162,6 +162,20 @@ class TempDirectoryManager:
         :type render_file: str
         :rtype: void
         """
+
+        existing_tuple = None
+        for association_tuple in self.associations:
+            existing_project = association_tuple.get_project()
+            if existing_project and type(existing_project) is not str and existing_project.name == project.name:
+                existing_tuple = association_tuple
+
+        # if an association already exists with this project name
+        if existing_tuple:
+            # delete it's temporary directory
+            existing_tuple.delete_temporary_directory()
+
+            # remove it from the list
+            self.associations.remove(existing_tuple)
 
         for association_tuple in self.associations:
             if association_tuple.get_temp_dir_name() == temp_dir_name:
