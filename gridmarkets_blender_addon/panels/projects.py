@@ -71,9 +71,13 @@ def _draw_project_status(col, project):
             details = projects_status["Details"]
 
             if details:
-
                 # iterate through each file that needs uploading and display its status
                 for detail_name, detail_status in details.items():
+
+                    # don't show the detail object
+                    if detail_name == 'detail':
+                        continue
+
                     _draw_project_detail(keys, values, detail_status)
 
         else:
