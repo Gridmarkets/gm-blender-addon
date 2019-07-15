@@ -899,7 +899,7 @@ def submit_job(context, temp_dir_manager,
                  )
 
         # submit project
-        log.info("Submitting job...")
+        log.info("Submitting job (skip_upload=" + str(skip_upload) + ")...")
         _set_progress(progress=50, status="Submitting project")
         client.submit_project(project, skip_upload=skip_upload)
 
