@@ -193,6 +193,12 @@ def get_envoy_client():
 
 def _add_project_to_list(project_name, props):
 
+    # if props already contains a project with the given name
+    existing_projects_with_name = list(filter(lambda x: x.name == project_name, props.projects))
+    if existing_projects_with_name:
+        # don't add it to the list and return the existing project
+        return existing_projects_with_name[0]
+
     # add a project to the list
     project = props.projects.add()
 
