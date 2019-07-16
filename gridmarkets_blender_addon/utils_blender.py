@@ -376,9 +376,8 @@ def clean_up_temporary_files(project_item, progress_callback):
                 bad_response_retires -= 1
                 continue
 
-
         else:
-            log.warning("Unrecognised status")
+            log.warning("Unrecognised status: %s" % uploading_status)
             bad_response_retires -= 1
             continue
 
