@@ -65,6 +65,15 @@ def _draw_output_path_view(self, context):
     sub.label(text="Note: Relative paths will not work if the scene has not been saved")
 
 
+def _draw_output_prefix_view(self, context):
+    layout = self.layout
+    job = context.scene.props.jobs[context.scene.props.selected_job]
+
+    layout.prop(job, "output_prefix")
+    sub = layout.row()
+    sub.enabled=False
+
+
 def _draw_render_engine_view(self, context):
     layout = self.layout
     job = context.scene.props.jobs[context.scene.props.selected_job]
@@ -129,11 +138,8 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
 
         # output prefix
-        box = custom_settings_box.layout.box()
-        box.prop(job, "output_prefix")
-        sub = box.row()
-        sub.enabled = False
-        sub.label(text="Prefix must not be empty")
+        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PREFIX_VIEW_ID_NAME, "output_prefix",
+                   _draw_output_prefix_view)
 
         # render engine
         _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME, "render_engine",

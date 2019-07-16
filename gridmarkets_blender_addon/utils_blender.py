@@ -570,7 +570,7 @@ def get_default_blender_job(context, render_file):
         constants.JOB_OPERATION,                                    # OPERATION
         render_file,                                                # RENDER_FILE
         frames = get_blender_frame_range(context),                  # FRAMES
-        output_prefix = "0",                                        # OUTPUT_PREFIX
+        output_prefix = None,                                       # OUTPUT_PREFIX
         output_format = scene.render.image_settings.file_format,    # OUTPUT_FORMAT
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
@@ -724,14 +724,28 @@ def get_job_output_format(context, job=None):
         return scene.render.image_settings.file_format
 
 
-def get_job_output_prefix(job):
-    # check if the output prefix has been entered
-    if not isinstance(job.output_prefix, str) or len(job.output_prefix) <= 0:
-        # the Blender job submission API requires an output prefix but an if it's an empty string envoy wont auto
-        # download the results.
-        return "0"
+def get_job_output_prefix(context, job=None):
+    scene = context.scene
+    props = scene.props
 
-    return job.output_prefix
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return None
+        else:
+            # otherwise use the selected job
+            job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
+    # use scene frame settings unless the user has overridden them
+    if job.use_custom_output_prefix:
+
+        # check if the output prefix has been entered
+        if not isinstance(job.output_prefix, str):
+            return None
+
+        return job.output_prefix
+
+    return None
 
 
 def get_job(context, render_file):
@@ -754,7 +768,7 @@ def get_job(context, render_file):
             constants.JOB_OPERATION,
             render_file,
             frames=get_job_frame_ranges(context, job=selected_job),
-            output_prefix=get_job_output_prefix(selected_job),
+            output_prefix=get_job_output_prefix(context, job=selected_job),
             output_format=get_job_output_format(context, job=selected_job),
             engine=get_job_render_engine(context, job=selected_job)
         )
