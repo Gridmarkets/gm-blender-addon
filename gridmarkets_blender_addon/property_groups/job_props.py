@@ -70,10 +70,18 @@ class JobProps(bpy.types.PropertyGroup):
             ("TGA", "TGA", ''),
             ("RAWTGA", "RAWTGA", ''),
             ("JPEG", "JPEG", ''),
+            ("JPEG2000", "JPEG 2000", ''),
             ("IRIS", "IRIS", ''),
             ("PNG", "PNG", ''),
-            ("RAWTGA", "RAWTGA", ''),
-            ("BMP", "BMP", '')
+            ("TARGA", "Targa", ''),
+            ("TARGA_RAW", "Targa Raw", ''),
+            ("BMP", "BMP", ''),
+            ("CINEON", "Cineon", ''),
+            ("DPX", "DPX", ''),
+            ("OPEN_EXR_MULTILAYER", "OpenEXR Multilayer", ''),
+            ("EXR", "OpenEXR", ''),
+            ("HDR", "Radiance HDR", ''),
+            ("TIFF", "TIFF", '')
         ]
     )
 
