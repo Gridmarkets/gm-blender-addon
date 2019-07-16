@@ -57,7 +57,9 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         type=ProjectProps,
     )
 
-    selected_project: bpy.props.IntProperty()
+    selected_project: bpy.props.IntProperty(
+        options=set()
+    )
 
     # projects enum
     project_options: bpy.props.EnumProperty(
@@ -71,7 +73,9 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         type=JobProps
     )
 
-    selected_job: bpy.props.IntProperty()
+    selected_job: bpy.props.IntProperty(
+        options=set()
+    )
 
     # jobs enum
     job_options: bpy.props.EnumProperty(
@@ -81,7 +85,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     )
 
     selected_log_item: bpy.props.IntProperty(
-        default=-1 # must be negative one otherwise the logic that selects new log items wont work
+        default=-1, # must be negative one otherwise the logic that selects new log items wont work
+        options = set()
     )
 
     # logging items
