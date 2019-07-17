@@ -1,6 +1,5 @@
 import bpy
 import constants
-import pathlib
 import utils_blender
 
 from panels.main import GRIDMARKETS_PT_Main

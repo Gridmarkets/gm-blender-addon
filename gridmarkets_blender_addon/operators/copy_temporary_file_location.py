@@ -1,5 +1,4 @@
 import bpy
-import os
 import constants
 from temp_directory_manager import TempDirectoryManager
 
