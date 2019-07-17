@@ -447,7 +447,11 @@ def delete_temp_files_for_project(project_name):
         log.info("Project association does not exist")
 
 
-def upload_project(context, project_name, temp_dir_manager,
+def _scale_percentage(min_percentage, max_percentage, percentage):
+    return min_percentage + ((max_percentage - min_percentage) / 100) * percentage
+
+
+def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
                    operator=None,
                    skip_upload=False,
                    min_progress=0,
@@ -456,10 +460,12 @@ def upload_project(context, project_name, temp_dir_manager,
                    progress_percent_attribute_name = "uploading_project_progress",
                    progress_status_attribute_name = "uploading_project_status"
                    ):
-    """Uploads the current scene with the provided project name to Envoy.
+    """Uploads the provided .blend file to Envoy as a new project, using the provided project name.
 
     :param context: The operator's context
     :type context: bpy.types.Context
+    :param file_path: The path to the blend file that needs uploading
+    :type file_path: str
     :param project_name: The name of the project as it will appear in Envoy
     :type project_name: str
     :param temp_dir_manager: The temporary directory manager used to store packed projects
@@ -487,7 +493,7 @@ def upload_project(context, project_name, temp_dir_manager,
     def _set_progress(progress=None, status=None):
         if progress is not None:
             # re-scale progress so that it is between the min and max values
-            scaled_progress = min_progress + ((max_progress - min_progress) / 100) * progress
+            scaled_progress =_scale_percentage(min_progress, max_progress, progress)
             setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
 
         if status is not None:
@@ -503,28 +509,8 @@ def upload_project(context, project_name, temp_dir_manager,
         # create an instance of Envoy client
         client = get_envoy_client()
 
-        # if the file has been saved
-        if bpy.context.blend_data.is_saved:
-            # use the name of the saved .blend file
-            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-            log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
-        else:
-            # otherwise create a name for the packed .blend file
-            blend_file_name = 'main_GM_blend_file_packed.blend'
-            log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
-
         # create a new temp directory
         temp_dir_path = temp_dir_manager.get_temp_directory()
-
-        blend_file_path = temp_dir_path / blend_file_name
-
-        # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-        # or if it has been modified since it's last save then the submitted .blend file will represent the
-        # current state of the scene
-        _set_progress(progress=20, status="Saving scene data")
-        bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                    compress=True)
-        log.info("Saved copy of scene to '%s'" % str(blend_file_path))
 
         # create directory to contain packed project
         packed_dir = temp_dir_path / project_name
@@ -538,7 +524,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
         # pack the .blend file to the pack directory
         _set_progress(progress=60, status="Packing scene data")
-        pack_blend_file(str(blend_file_path), str(packed_dir), progress_cb=progress_cb)
+        pack_blend_file(file_path, str(packed_dir), progress_cb=progress_cb)
 
         # delete pack-info.txt if it exists
         pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
@@ -551,7 +537,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
         # associate this project with the temp directory so the temp directory can be removed once the project is
         # complete
-        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, blend_file_name)
+        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, pathlib.Path(file_path).name)
         # add files to project
         # only files and folders within the project path can be added, use relative or full path
         # any other paths passed will be ignored
@@ -594,6 +580,91 @@ def upload_project(context, project_name, temp_dir_manager,
         # hide the progress meter if unless skipping upload
         if not skip_upload:
             setattr(context.scene.props, progress_attribute_name, False)
+
+
+def upload_project(context, project_name, temp_dir_manager,
+                   operator=None,
+                   skip_upload=False,
+                   min_progress=0,
+                   max_progress=100,
+                   progress_attribute_name = "uploading_project",
+                   progress_percent_attribute_name = "uploading_project_progress",
+                   progress_status_attribute_name = "uploading_project_status"
+                   ):
+    """Uploads the current scene with the provided project name to Envoy.
+
+    :param context: The operator's context
+    :type context: bpy.types.Context
+    :param project_name: The name of the project as it will appear in Envoy
+    :type project_name: str
+    :param temp_dir_manager: The temporary directory manager used to store packed projects
+    :type temp_dir_manager: TempDirectoryManager
+    :param operator: The operator that called the function
+    :type operator: bpy.types.Operator
+    :param skip_upload: Pack files but don't upload project files
+    :param operator: An optional instance of an operator so that invalid input can be reported correctly
+    :type operator: bpy.types.Operator
+    :param min_progress: The min value to set the progress too
+    :type min_progress: float
+    :param max_progress: The max value to set the progress too
+    :type max_progress: float
+    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
+    :type progress_attribute_name: str
+    :param progress_percent_attribute_name: The name of the property which represents the operations progress
+    :type progress_percent_attribute_name: str
+    :param progress_status_attribute_name: The name of the property which represents the operations status
+    :type progress_status_attribute_name: str
+    :rtype: void
+    :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
+    """
+
+    # helper function for setting the progress of the operation
+    def _set_progress(progress=None, status=None):
+        if progress is not None:
+            # re-scale progress so that it is between the min and max values
+            scaled_progress = _scale_percentage(min_progress, max_progress, progress)
+            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
+
+        if status is not None:
+            setattr(context.scene.props, progress_status_attribute_name, status)
+
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    setattr(context.scene.props, progress_attribute_name, True)
+    _set_progress(progress=0, status="Starting project upload")
+
+    # if the file has been saved
+    if bpy.context.blend_data.is_saved:
+        # use the name of the saved .blend file
+        blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
+    else:
+        # otherwise create a name for the packed .blend file
+        blend_file_name = 'main_GM_blend_file_packed.blend'
+        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
+
+    # create a new temp directory
+    temp_dir_path = temp_dir_manager.get_temp_directory()
+
+    blend_file_path = temp_dir_path / blend_file_name
+
+    # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
+    # or if it has been modified since it's last save then the submitted .blend file will represent the
+    # current state of the scene
+    _set_progress(progress=20, status="Saving scene data")
+    bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
+                                compress=True)
+    log.info("Saved copy of scene to '%s'" % str(blend_file_path))
+
+    upload_file_as_project(context,str(blend_file_path), project_name, temp_dir_manager,
+                           operator,
+                           skip_upload,
+                           _scale_percentage(min_progress, max_progress, 20),
+                           max_progress,
+                           progress_attribute_name,
+                           progress_percent_attribute_name,
+                           progress_status_attribute_name)
 
 
 def get_blender_frame_range(context):
