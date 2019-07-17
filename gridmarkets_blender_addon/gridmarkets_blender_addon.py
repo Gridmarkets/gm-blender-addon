@@ -27,7 +27,10 @@ def draw_top_bar_menu_options(self, context):
         text = 'Open Gridmarkets add-on'
 
     self.layout.emboss = "PULLDOWN_MENU"
-    self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
+
+    # todo work out why reloading the script does not work
+    if hasattr(bpy.types, 'GRIDMARKETS_OT_open_addon'):
+        self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
 
 
 def register():
