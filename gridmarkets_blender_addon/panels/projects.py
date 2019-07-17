@@ -176,16 +176,11 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
             sub.enabled = False
 
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
-                     text="Upload Project").action = 'UPLOAD'
+                     text="Upload current scene as new Project").action = 'UPLOAD'
 
         sub = row.column()
-
-        # disable remove button if there are no projects to remove
-        if project_count <= 0:
-            sub.enabled = False
-
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
-                     text="Remove Project").action = 'REMOVE'
+                     text="Upload file as new Project").action = 'UPLOAD_FILE'
 
         # upload status
         if props.uploading_project:
