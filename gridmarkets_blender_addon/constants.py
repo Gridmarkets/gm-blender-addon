@@ -26,7 +26,7 @@ TEMP_FILES_FOLDER = ".gm_temp_files"
 BLEND_FILE_EXTENSION = ".blend"
 
 # the url of the render manager
-RENDER_MANAGER_URL = "https://portal.gridmarkets.com/init/member_plugin/index"
+RENDER_MANAGER_URL = "https://portal.gridmarkets.com"
 
 COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
@@ -98,6 +98,8 @@ OPERATOR_JOB_LIST_ACTIONS_ID_NAME= "gridmarkets.job_list_actions"
 OPERATOR_JOB_LIST_ACTIONS_LABEL = "Job List Actions"
 OPERATOR_UPLOAD_PROJECT_ID_NAME = "gridmarkets.upload_project"
 OPERATOR_UPLOAD_PROJECT_LABEL = "Upload Project"
+OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME = "gridmarkets.upload_file_as_project"
+OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL = "Upload File as Project"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.frame_range_list_actions"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_LABEL = "Frame Range List Actions"
 OPERATOR_EDIT_FRAME_RANGE_ID_NAME = "gridmarkets.edit_frame_range"
@@ -112,6 +114,8 @@ OPERATOR_TOGGLE_OUTPUT_FORMAT_VIEW_ID_NAME = "gridmarkets.toggle_output_format_v
 OPERATOR_TOGGLE_OUTPUT_FORMAT_VIEW_LABEL = "Toggle output format view"
 OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME = "gridmarkets.toggle_output_path_view"
 OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_LABEL = "Toggle output path view"
+OPERATOR_TOGGLE_OUTPUT_PREFIX_VIEW_ID_NAME = "gridmarkets.toggle_output_prefix_view"
+OPERATOR_TOGGLE_OUTPUT_PREFIX_VIEW_LABEL = "Toggle output prefix view"
 OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME = "gridmarkets.toggle_render_engine_view"
 OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_LABEL = "Toggle render engine view"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME = "gridmarkets.copy_logs_to_clipboard"
@@ -167,6 +171,7 @@ ICON_HELP = 'HELP'
 ICON_PREFERENCES = 'PREFERENCES'
 ICON_URL = 'URL'
 
+PROJECT_STATUS_POLLING_ENABLED = False
 
 # register module
 def register():

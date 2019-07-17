@@ -34,11 +34,12 @@ class AddonPreferences(bpy.types.AddonPreferences):
         layout = self.layout
         layout.prop(self, "auth_email")
         layout.prop(self, "auth_accessKey")
-        
+
+
 def register():
-    # register addon preferences
+    # register add-on preferences
     bpy.utils.register_class(AddonPreferences)
 
 def unregister():
-    # unregister addon preferences
+    # unregister add-on preferences
     bpy.utils.unregister_class(AddonPreferences)

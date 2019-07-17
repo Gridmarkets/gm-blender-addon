@@ -4,7 +4,6 @@ import pathlib
 import os
 import collections
 import json
-import math
 
 import constants
 import utils
@@ -65,9 +64,16 @@ def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
     :type progress_cb: blender_asset_tracer.pack.progress.Callback
     """
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting pack operation....")
+
     blend_file_path = pathlib.Path(blend_file_path)
     project_root_path = blend_file_path.parent
     target_dir_path = pathlib.Path(target_dir_path)
+
+    log.info("blend_file_path: %s" % str(blend_file_path))
+    log.info("project_root_path: %s" % str(project_root_path))
+    log.info("target_dir_path: %s" % str(target_dir_path))
 
     # create packer
     with pack.Packer(blend_file_path,
@@ -78,19 +84,26 @@ def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
                      relative_only=False
                      ) as packer:
 
+        log.info("Created packer")
+
         if progress_cb:
+            log.info("Setting packer progress callback...")
             packer._progress_cb = progress_cb
 
         # plan the packing operation (must be called before execute)
+        log.info("Plan packing operation...")
         packer.strategise()
 
         # attempt to pack the project
         try:
+            log.info("Plan packing operation...")
             packer.execute()
         except pack.transfer.FileTransferError as ex:
-            print("%d files couldn't be copied, starting with %s",
-                  len(ex.files_remaining), ex.files_remaining[0])
+            log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
+                        str(ex.files_remaining[0]))
             raise SystemExit(1)
+        finally:
+            log.info("Exiting packing operation...")
 
 
 def validate_credentials(email = None, access_key = None):
@@ -156,6 +169,9 @@ def get_new_envoy_client():
     :raises: InvalidInputError, AuthenticationError
     """
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting new Envoy client....")
+
     # get the add-on preferences
     addon_prefs = bpy.context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
@@ -176,13 +192,19 @@ def get_envoy_client():
     """
     global _envoy_client
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting Envoy client....")
+
     if _envoy_client:
+
+        log.info("Found existing Envoy client, comparing credentials...")
 
         # get the add-on preferences
         addon_prefs = bpy.context.user_preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # check neither the email or access key have changed
         if addon_prefs.auth_email == _envoy_client.email and addon_prefs.auth_accessKey == _envoy_client.access_key:
+            log.info("Returning existing Envoy client...")
             return  _envoy_client
 
     # update the client
@@ -193,19 +215,27 @@ def get_envoy_client():
 
 def _add_project_to_list(project_name, props):
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting add_project_to_list operation...")
+
     # if props already contains a project with the given name
     existing_projects_with_name = list(filter(lambda x: x.name == project_name, props.projects))
+
     if existing_projects_with_name:
         # don't add it to the list and return the existing project
+        log.info("A project with the name %s already exists, returning existing project..." % project_name)
         return existing_projects_with_name[0]
 
     # add a project to the list
+    log.info("Adding project to list...")
+
     project = props.projects.add()
 
     project.id = utils.get_unique_id(props.projects)
     project.name = project_name
 
     # select the new project
+    log.info("Selecting new project...")
     props.selected_project = len(props.projects) - 1
 
     # force region to redraw otherwise the list wont update until next event (mouse over, etc)
@@ -247,6 +277,10 @@ def clean_up_temporary_files(project_item, progress_callback):
 
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    if not constants.PROJECT_STATUS_POLLING_ENABLED:
+        log.info("Uploading Project...")
+        return
 
     # number of times to retry if receiving malformed responses
     bad_response_retires = 10
@@ -376,9 +410,8 @@ def clean_up_temporary_files(project_item, progress_callback):
                 bad_response_retires -= 1
                 continue
 
-
         else:
-            log.warning("Unrecognised status")
+            log.warning("Unrecognised status: %s" % uploading_status)
             bad_response_retires -= 1
             continue
 
@@ -393,6 +426,10 @@ def delete_temp_files_for_project(project_name):
     :rtype: void
     """
 
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting delete_temp_files_for_project operation")
+
     # get the temporary directory manager
     temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
 
@@ -401,12 +438,19 @@ def delete_temp_files_for_project(project_name):
 
     # if the association exists
     if association:
+        log.info("Found association")
 
         # delete the temporary files for the project
         association.delete_temporary_directory()
+    else:
+        log.info("Project association does not exist")
 
 
-def upload_project(context, project_name, temp_dir_manager,
+def _scale_percentage(min_percentage, max_percentage, percentage):
+    return min_percentage + ((max_percentage - min_percentage) / 100) * percentage
+
+
+def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
                    operator=None,
                    skip_upload=False,
                    min_progress=0,
@@ -415,10 +459,12 @@ def upload_project(context, project_name, temp_dir_manager,
                    progress_percent_attribute_name = "uploading_project_progress",
                    progress_status_attribute_name = "uploading_project_status"
                    ):
-    """Uploads the current scene with the provided project name to Envoy.
+    """Uploads the provided .blend file to Envoy as a new project, using the provided project name.
 
     :param context: The operator's context
     :type context: bpy.types.Context
+    :param file_path: The path to the blend file that needs uploading
+    :type file_path: str
     :param project_name: The name of the project as it will appear in Envoy
     :type project_name: str
     :param temp_dir_manager: The temporary directory manager used to store packed projects
@@ -446,7 +492,7 @@ def upload_project(context, project_name, temp_dir_manager,
     def _set_progress(progress=None, status=None):
         if progress is not None:
             # re-scale progress so that it is between the min and max values
-            scaled_progress = min_progress + ((max_progress - min_progress) / 100) * progress
+            scaled_progress =_scale_percentage(min_progress, max_progress, progress)
             setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
 
         if status is not None:
@@ -462,28 +508,8 @@ def upload_project(context, project_name, temp_dir_manager,
         # create an instance of Envoy client
         client = get_envoy_client()
 
-        # if the file has been saved
-        if bpy.context.blend_data.is_saved:
-            # use the name of the saved .blend file
-            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-            log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
-        else:
-            # otherwise create a name for the packed .blend file
-            blend_file_name = 'main_GM_blend_file_packed.blend'
-            log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
-
         # create a new temp directory
         temp_dir_path = temp_dir_manager.get_temp_directory()
-
-        blend_file_path = temp_dir_path / blend_file_name
-
-        # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-        # or if it has been modified since it's last save then the submitted .blend file will represent the
-        # current state of the scene
-        _set_progress(progress=20, status="Saving scene data")
-        bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                    compress=True)
-        log.info("Saved copy of scene to '%s'" % str(blend_file_path))
 
         # create directory to contain packed project
         packed_dir = temp_dir_path / project_name
@@ -497,7 +523,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
         # pack the .blend file to the pack directory
         _set_progress(progress=60, status="Packing scene data")
-        pack_blend_file(str(blend_file_path), str(packed_dir), progress_cb=progress_cb)
+        pack_blend_file(file_path, str(packed_dir), progress_cb=progress_cb)
 
         # delete pack-info.txt if it exists
         pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
@@ -510,7 +536,7 @@ def upload_project(context, project_name, temp_dir_manager,
 
         # associate this project with the temp directory so the temp directory can be removed once the project is
         # complete
-        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, blend_file_name)
+        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, pathlib.Path(file_path).name)
         # add files to project
         # only files and folders within the project path can be added, use relative or full path
         # any other paths passed will be ignored
@@ -555,6 +581,91 @@ def upload_project(context, project_name, temp_dir_manager,
             setattr(context.scene.props, progress_attribute_name, False)
 
 
+def upload_project(context, project_name, temp_dir_manager,
+                   operator=None,
+                   skip_upload=False,
+                   min_progress=0,
+                   max_progress=100,
+                   progress_attribute_name = "uploading_project",
+                   progress_percent_attribute_name = "uploading_project_progress",
+                   progress_status_attribute_name = "uploading_project_status"
+                   ):
+    """Uploads the current scene with the provided project name to Envoy.
+
+    :param context: The operator's context
+    :type context: bpy.types.Context
+    :param project_name: The name of the project as it will appear in Envoy
+    :type project_name: str
+    :param temp_dir_manager: The temporary directory manager used to store packed projects
+    :type temp_dir_manager: TempDirectoryManager
+    :param operator: The operator that called the function
+    :type operator: bpy.types.Operator
+    :param skip_upload: Pack files but don't upload project files
+    :param operator: An optional instance of an operator so that invalid input can be reported correctly
+    :type operator: bpy.types.Operator
+    :param min_progress: The min value to set the progress too
+    :type min_progress: float
+    :param max_progress: The max value to set the progress too
+    :type max_progress: float
+    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
+    :type progress_attribute_name: str
+    :param progress_percent_attribute_name: The name of the property which represents the operations progress
+    :type progress_percent_attribute_name: str
+    :param progress_status_attribute_name: The name of the property which represents the operations status
+    :type progress_status_attribute_name: str
+    :rtype: void
+    :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
+    """
+
+    # helper function for setting the progress of the operation
+    def _set_progress(progress=None, status=None):
+        if progress is not None:
+            # re-scale progress so that it is between the min and max values
+            scaled_progress = _scale_percentage(min_progress, max_progress, progress)
+            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
+
+        if status is not None:
+            setattr(context.scene.props, progress_status_attribute_name, status)
+
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    setattr(context.scene.props, progress_attribute_name, True)
+    _set_progress(progress=0, status="Starting project upload")
+
+    # if the file has been saved
+    if bpy.context.blend_data.is_saved:
+        # use the name of the saved .blend file
+        blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
+    else:
+        # otherwise create a name for the packed .blend file
+        blend_file_name = 'main_GM_blend_file_packed.blend'
+        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
+
+    # create a new temp directory
+    temp_dir_path = temp_dir_manager.get_temp_directory()
+
+    blend_file_path = temp_dir_path / blend_file_name
+
+    # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
+    # or if it has been modified since it's last save then the submitted .blend file will represent the
+    # current state of the scene
+    _set_progress(progress=20, status="Saving scene data")
+    bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
+                                compress=True)
+    log.info("Saved copy of scene to '%s'" % str(blend_file_path))
+
+    upload_file_as_project(context,str(blend_file_path), project_name, temp_dir_manager,
+                           operator,
+                           skip_upload,
+                           _scale_percentage(min_progress, max_progress, 20),
+                           max_progress,
+                           progress_attribute_name,
+                           progress_percent_attribute_name,
+                           progress_status_attribute_name)
+
+
 def get_blender_frame_range(context):
     scene = context.scene
     return str(scene.frame_start) + ' ' + str(scene.frame_end) + ' ' + str(scene.frame_step)
@@ -570,7 +681,7 @@ def get_default_blender_job(context, render_file):
         constants.JOB_OPERATION,                                    # OPERATION
         render_file,                                                # RENDER_FILE
         frames = get_blender_frame_range(context),                  # FRAMES
-        output_prefix = "0",                                        # OUTPUT_PREFIX
+        output_prefix = None,                                       # OUTPUT_PREFIX
         output_format = scene.render.image_settings.file_format,    # OUTPUT_FORMAT
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
@@ -724,14 +835,28 @@ def get_job_output_format(context, job=None):
         return scene.render.image_settings.file_format
 
 
-def get_job_output_prefix(job):
-    # check if the output prefix has been entered
-    if not isinstance(job.output_prefix, str) or len(job.output_prefix) <= 0:
-        # the Blender job submission API requires an output prefix but an if it's an empty string envoy wont auto
-        # download the results.
-        return "0"
+def get_job_output_prefix(context, job=None):
+    scene = context.scene
+    props = scene.props
 
-    return job.output_prefix
+    if job is None:
+        # if no job is selected return the blender frame range
+        if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+            return None
+        else:
+            # otherwise use the selected job
+            job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
+
+    # use scene frame settings unless the user has overridden them
+    if job.use_custom_output_prefix:
+
+        # check if the output prefix has been entered
+        if not isinstance(job.output_prefix, str):
+            return None
+
+        return job.output_prefix
+
+    return None
 
 
 def get_job(context, render_file):
@@ -754,7 +879,7 @@ def get_job(context, render_file):
             constants.JOB_OPERATION,
             render_file,
             frames=get_job_frame_ranges(context, job=selected_job),
-            output_prefix=get_job_output_prefix(selected_job),
+            output_prefix=get_job_output_prefix(context, job=selected_job),
             output_format=get_job_output_format(context, job=selected_job),
             engine=get_job_render_engine(context, job=selected_job)
         )

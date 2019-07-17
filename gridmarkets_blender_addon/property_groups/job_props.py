@@ -49,6 +49,14 @@ class JobProps(bpy.types.PropertyGroup):
         subtype='DIR_PATH'
     )
 
+    use_custom_output_prefix = bpy.props.BoolProperty(
+        name="Use custom output prefix",
+        description="If this is option is selected this job will use the provided output prefix when naming ouput "
+                    "files. The # characters are replaced by the frame number, and used to define zero padding."
+                    "When the filename does not contain #, The suffix #### is added to the filename.",
+        default=False
+    )
+
     # prefix for output files
     output_prefix = bpy.props.StringProperty(
         name="Output Prefix",
@@ -70,10 +78,18 @@ class JobProps(bpy.types.PropertyGroup):
             ("TGA", "TGA", ''),
             ("RAWTGA", "RAWTGA", ''),
             ("JPEG", "JPEG", ''),
+            ("JPEG2000", "JPEG 2000", ''),
             ("IRIS", "IRIS", ''),
             ("PNG", "PNG", ''),
-            ("RAWTGA", "RAWTGA", ''),
-            ("BMP", "BMP", '')
+            ("TARGA", "Targa", ''),
+            ("TARGA_RAW", "Targa Raw", ''),
+            ("BMP", "BMP", ''),
+            ("CINEON", "Cineon", ''),
+            ("DPX", "DPX", ''),
+            ("OPEN_EXR_MULTILAYER", "OpenEXR Multilayer", ''),
+            ("EXR", "OpenEXR", ''),
+            ("HDR", "Radiance HDR", ''),
+            ("TIFF", "TIFF", '')
         ]
     )
 

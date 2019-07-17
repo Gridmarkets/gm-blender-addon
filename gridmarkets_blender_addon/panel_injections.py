@@ -1,6 +1,5 @@
 import bpy
 import constants
-import pathlib
 import utils_blender
 from types import SimpleNamespace
 

@@ -132,9 +132,11 @@ def _draw_project_info_view(self, context):
         sub.label(text="The temporary directory project files are packed to before uploading. They are automatically "
                        "deleted when blender closes.")
 
-        col.separator()
+        # don't show the project status view until gs-utils errors with envoy have been fixed
+        if constants.PROJECT_STATUS_POLLING_ENABLED:
+            col.separator()
+            _draw_project_status(col, project)
 
-        _draw_project_status(col, project)
 
 
 
@@ -167,6 +169,14 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
+        sub = col.column(align=True)
+
+        # disable remove button if there are no projects to remove
+        if project_count <= 0:
+            sub.enabled = False
+
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
+
         row = layout.row(align=True)
         sub = row.column()
 
@@ -175,16 +185,11 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
             sub.enabled = False
 
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
-                     text="Upload Project").action = 'UPLOAD'
+                     text="Upload current scene as new Project").action = 'UPLOAD'
 
         sub = row.column()
-
-        # disable remove button if there are no projects to remove
-        if project_count <= 0:
-            sub.enabled = False
-
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
-                     text="Remove Project").action = 'REMOVE'
+                     text="Upload file as new Project").action = 'UPLOAD_FILE'
 
         # upload status
         if props.uploading_project:

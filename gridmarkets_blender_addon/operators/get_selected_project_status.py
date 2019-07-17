@@ -1,5 +1,4 @@
 import bpy
-import os
 import constants
 import utils_blender
 
