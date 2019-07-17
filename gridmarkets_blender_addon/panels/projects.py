@@ -168,6 +168,14 @@ class GRIDMARKETS_PT_Projects(bpy.types.Panel):
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
         sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
+        sub = col.column(align=True)
+
+        # disable remove button if there are no projects to remove
+        if project_count <= 0:
+            sub.enabled = False
+
+        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
+
         row = layout.row(align=True)
         sub = row.column()
 
