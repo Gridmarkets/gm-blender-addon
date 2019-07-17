@@ -65,9 +65,16 @@ def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
     :type progress_cb: blender_asset_tracer.pack.progress.Callback
     """
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting pack operation....")
+
     blend_file_path = pathlib.Path(blend_file_path)
     project_root_path = blend_file_path.parent
     target_dir_path = pathlib.Path(target_dir_path)
+
+    log.info("blend_file_path: %s" % str(blend_file_path))
+    log.info("project_root_path: %s" % str(project_root_path))
+    log.info("target_dir_path: %s" % str(target_dir_path))
 
     # create packer
     with pack.Packer(blend_file_path,
@@ -78,19 +85,26 @@ def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
                      relative_only=False
                      ) as packer:
 
+        log.info("Created packer")
+
         if progress_cb:
+            log.info("Setting packer progress callback...")
             packer._progress_cb = progress_cb
 
         # plan the packing operation (must be called before execute)
+        log.info("Plan packing operation...")
         packer.strategise()
 
         # attempt to pack the project
         try:
+            log.info("Plan packing operation...")
             packer.execute()
         except pack.transfer.FileTransferError as ex:
-            print("%d files couldn't be copied, starting with %s",
-                  len(ex.files_remaining), ex.files_remaining[0])
+            log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
+                        str(ex.files_remaining[0]))
             raise SystemExit(1)
+        finally:
+            log.info("Exiting packing operation...")
 
 
 def validate_credentials(email = None, access_key = None):
@@ -156,6 +170,9 @@ def get_new_envoy_client():
     :raises: InvalidInputError, AuthenticationError
     """
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting new Envoy client....")
+
     # get the add-on preferences
     addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
@@ -176,13 +193,19 @@ def get_envoy_client():
     """
     global _envoy_client
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting Envoy client....")
+
     if _envoy_client:
+
+        log.info("Found existing Envoy client, comparing credentials...")
 
         # get the add-on preferences
         addon_prefs = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # check neither the email or access key have changed
         if addon_prefs.auth_email == _envoy_client.email and addon_prefs.auth_accessKey == _envoy_client.access_key:
+            log.info("Returning existing Envoy client...")
             return  _envoy_client
 
     # update the client
@@ -193,19 +216,27 @@ def get_envoy_client():
 
 def _add_project_to_list(project_name, props):
 
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting add_project_to_list operation...")
+
     # if props already contains a project with the given name
     existing_projects_with_name = list(filter(lambda x: x.name == project_name, props.projects))
+
     if existing_projects_with_name:
         # don't add it to the list and return the existing project
+        log.info("A project with the name %s already exists, returning existing project..." % project_name)
         return existing_projects_with_name[0]
 
     # add a project to the list
+    log.info("Adding project to list...")
+
     project = props.projects.add()
 
     project.id = utils.get_unique_id(props.projects)
     project.name = project_name
 
     # select the new project
+    log.info("Selecting new project...")
     props.selected_project = len(props.projects) - 1
 
     # force region to redraw otherwise the list wont update until next event (mouse over, etc)
@@ -392,6 +423,10 @@ def delete_temp_files_for_project(project_name):
     :rtype: void
     """
 
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Starting delete_temp_files_for_project operation")
+
     # get the temporary directory manager
     temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
 
@@ -400,9 +435,12 @@ def delete_temp_files_for_project(project_name):
 
     # if the association exists
     if association:
+        log.info("Found association")
 
         # delete the temporary files for the project
         association.delete_temporary_directory()
+    else:
+        log.info("Project association does not exist")
 
 
 def upload_project(context, project_name, temp_dir_manager,

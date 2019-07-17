@@ -79,15 +79,18 @@ class _AssociationTuple:
         return ("{0}/" + self.get_render_file()).format(self.get_project().name)
 
     def delete_temporary_directory(self):
+        # then log the problem and fail
+        log = get_wrapped_logger()
+        log.info("Starting delete_temporary_directory operation")
+
         if self._temp_directory:
             try:
+                log.info("Attempting to delete temporary directory")
                 self._temp_directory.cleanup()
                 self._temp_directory = None
 
             # If the file cannot be cleaned up because it is being used by another process (it shouldn't be!)
             except OSError as e:
-                # then log the problem and fail
-                log = get_wrapped_logger()
                 log.exception("OSError when attempting to clean up temporary files.")
                 raise e
 
