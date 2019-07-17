@@ -132,9 +132,11 @@ def _draw_project_info_view(self, context):
         sub.label(text="The temporary directory project files are packed to before uploading. They are automatically "
                        "deleted when blender closes.")
 
-        col.separator()
+        # don't show the project status view until gs-utils errors with envoy have been fixed
+        if constants.PROJECT_STATUS_POLLING_ENABLED:
+            col.separator()
+            _draw_project_status(col, project)
 
-        _draw_project_status(col, project)
 
 
 class GRIDMARKETS_PT_Projects(bpy.types.Panel):

@@ -169,6 +169,7 @@ ICON_HELP = 'HELP'
 ICON_PREFERENCES = 'PREFERENCES'
 ICON_URL = 'URL'
 
+PROJECT_STATUS_POLLING_ENABLED = False
 
 # register module
 def register():

@@ -279,6 +279,10 @@ def clean_up_temporary_files(project_item, progress_callback):
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
 
+    if not constants.PROJECT_STATUS_POLLING_ENABLED:
+        log.info("Uploading Project...")
+        return
+
     # number of times to retry if receiving malformed responses
     bad_response_retires = 10
 
