@@ -815,6 +815,24 @@ def get_job_render_engine(context, job=None):
         return scene.render.engine
 
 
+def get_supported_render_engines():
+    return {"CYCLES"}
+
+
+def get_user_friendly_name_for_engine(engine: str):
+    if engine == "CYCLES":
+        return "Cycles"
+    elif engine == "BLENDER_EEVEE":
+        return "Eevee"
+    elif engine == "BLENDER_RENDER":
+        return "Blender Internal"
+    elif engine == "BLENDER_WORKBENCH":
+        return "Blender Workbench"
+    else:
+        # if not know just return the enum name for it
+        return engine
+
+
 def get_job_output_format(context, job=None):
     scene = context.scene
     props = scene.props
