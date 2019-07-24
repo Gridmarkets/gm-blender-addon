@@ -67,6 +67,9 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
         col.separator()
         col.prop(props, "job_options", text="")
 
+        submit_text = "Submit"
+        submit_icon = "NONE"
+
         # submit button / progress indicator
         row = box.row(align=True)
         row.scale_y = 2.5
@@ -77,7 +80,14 @@ class GRIDMARKETS_PT_Main(bpy.types.Panel):
             if props.uploading_project:
                 row.enabled = False
 
-            row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text='Submit')
+            # if the engine is not in the supported engines list disable and show a help message
+            render_engine = utils_blender.get_job_render_engine(context)
+            if render_engine not in utils_blender.get_supported_render_engines():
+                row.enabled = False
+                submit_text="Render engine '%s' is not currently supported" % utils_blender.get_user_friendly_name_for_engine(render_engine)
+                submit_icon=constants.ICON_ERROR
+
+            row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
 
 
 classes = (
