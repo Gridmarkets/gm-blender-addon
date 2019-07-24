@@ -81,7 +81,7 @@ def _draw_submission_summary(self, context):
         values.label(text=job.operation)
         values.label(text=job.path)
         values.label(text=job.params['frames'])
-        values.label(text=job.params['output_prefix'])
+        values.label(text='' if job.params['output_prefix'] is None else job.params['output_prefix'] )
         values.label(text=job.params['output_format'])
         values.label(text=utils_blender.get_job_output_path_abs(context))
         values.label(text=job.params['engine'])
