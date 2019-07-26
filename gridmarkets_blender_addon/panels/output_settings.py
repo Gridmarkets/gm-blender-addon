@@ -145,6 +145,12 @@ class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
         _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME, "render_engine",
                    _draw_render_engine_view)
 
+        gm_settings = layout.box()
+        gm_settings.label(text="GridMarkets Job Settings")
+
+        # render device
+        gm_settings.prop(job, "render_device")
+
         # resolution x
         # Todo (needs agent update)
 
