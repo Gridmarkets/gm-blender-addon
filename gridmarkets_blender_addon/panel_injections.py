@@ -98,7 +98,74 @@ def _draw_compact_console(self, context):
     box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4, sort_lock=True)
 
 
+def _draw_main_region(self, context):
+    if context.screen.name == constants.INJECTED_SCREEN_NAME:
+        layout = self.layout
+        props = context.scene.props
+
+        box = layout.box()
+        row = box.row()
+        row.prop_tabs_enum(props, "tab_options", icon_only=True)
+
+        if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
+            GRIDMARKETS_PT_Main.draw(self, context)
+            _draw_submission_summary(self, context)
+            _draw_compact_console(self, context)
+        elif props.tab_options == constants.TAB_PROJECTS:
+            GRIDMARKETS_PT_Projects.draw(self, context)
+            _draw_compact_console(self, context)
+        elif props.tab_options == constants.TAB_JOB_PRESETS:
+            _draw_jobs_panels(self, context)
+        elif props.tab_options == constants.TAB_CREDENTIALS:
+            GRIDMARKETS_PT_preferences.draw(self, context)
+        elif props.tab_options == constants.TAB_LOGGING:
+            GRIDMARKETS_PT_console.draw(self, context)
+
+    else:
+        _old_USERPREF_PT_addons_draw_function(self, context)
+
+
+def _draw_nav_region(self, context):
+    if context.screen.name == constants.INJECTED_SCREEN_NAME:
+        layout = self.layout
+        props = context.scene.props
+
+        layout.label(text="Links")
+
+        col = layout.column()
+        col.scale_x = 1
+        col.scale_y = 2
+
+        # Portal manager link
+        col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
+
+        # Cost calculator
+        col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
+        col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
+        col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
+    else:
+        _old_USERPREF_PT_navigation_bar_draw_function(self, context)
+
+
+def _draw_header_region(self, context):
+    if context.screen.name == constants.INJECTED_SCREEN_NAME:
+        from panels.main import GRIDMARKETS_PT_Main
+        GRIDMARKETS_PT_Main.draw_header(self, context)
+    else:
+        _old_USERPREF_HT_header_draw_function(self, context)
+
+
+def _draw_save_preferences_region(self, context):
+    if context.screen.name == constants.INJECTED_SCREEN_NAME:
+        pass;
+    else:
+        _old_USERPREF_PT_save_preferences_draw_function(self, context)
+
+
 def register():
+
+    print("register injections")
+
     global _old_USERPREF_PT_addons_draw_function
     global _old_USERPREF_HT_header_draw_function
     global _old_USERPREF_PT_navigation_bar_draw_function
@@ -108,66 +175,6 @@ def register():
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
     _old_USERPREF_PT_navigation_bar_draw_function = bpy.types.USERPREF_PT_navigation_bar.draw
     _old_USERPREF_PT_save_preferences_draw_function = bpy.types.USERPREF_PT_save_preferences.draw
-
-    def _draw_main_region(self, context):
-        if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            layout = self.layout
-            props = context.scene.props
-
-            box = layout.box()
-            row = box.row()
-            row.prop_tabs_enum(props, "tab_options", icon_only=True)
-
-            if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-                GRIDMARKETS_PT_Main.draw(self, context)
-                _draw_submission_summary(self, context)
-                _draw_compact_console(self, context)
-            elif props.tab_options == constants.TAB_PROJECTS:
-                GRIDMARKETS_PT_Projects.draw(self, context)
-                _draw_compact_console(self, context)
-            elif props.tab_options == constants.TAB_JOB_PRESETS:
-                _draw_jobs_panels(self, context)
-            elif props.tab_options == constants.TAB_CREDENTIALS:
-                GRIDMARKETS_PT_preferences.draw(self, context)
-            elif props.tab_options == constants.TAB_LOGGING:
-                GRIDMARKETS_PT_console.draw(self, context)
-
-        else:
-            _old_USERPREF_PT_addons_draw_function(self, context)
-
-    def _draw_nav_region(self, context):
-        if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            layout = self.layout
-            props = context.scene.props
-
-            layout.label(text="Links")
-
-            col = layout.column()
-            col.scale_x = 1
-            col.scale_y = 2
-
-            # Portal manager link
-            col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
-
-            # Cost calculator
-            col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
-            col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
-            col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
-        else:
-            _old_USERPREF_PT_navigation_bar_draw_function(self, context)
-
-    def _draw_header_region(self, context):
-        if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            from panels.main import GRIDMARKETS_PT_Main
-            GRIDMARKETS_PT_Main.draw_header(self, context)
-        else:
-            _old_USERPREF_HT_header_draw_function(self, context)
-
-    def _draw_save_preferences_region(self, context):
-        if context.screen.name == constants.INJECTED_SCREEN_NAME:
-            pass;
-        else:
-            _old_USERPREF_PT_save_preferences_draw_function(self, context)
 
     bpy.types.USERPREF_PT_addons.draw = _draw_main_region
     bpy.types.USERPREF_HT_header.draw = _draw_header_region
