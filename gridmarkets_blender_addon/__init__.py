@@ -16,6 +16,7 @@ import importlib
 
 # list of modules to import
 modulesNames = ['constants',
+                'utils_blender',
                 'icon_loader',
                 'property_groups.main_props',
                 'addon_preferences',
@@ -42,7 +43,7 @@ modulesNames = ['constants',
                 'operators.toggle_render_engine_view',
                 'operators.copy_temporary_file_location',
                 'operators.get_selected_project_status',
-                'gridmarkets_blender_addon',
+                'blender_plugin',
                 'list_items.frame_range',
                 'list_items.job',
                 'list_items.log',
@@ -83,19 +84,34 @@ for currentModuleFullName in modulesFullNames.values():
         globals()[currentModuleFullName] = importlib.import_module(currentModuleFullName)
         setattr(globals()[currentModuleFullName], 'modulesNames', modulesFullNames)
 
+
 # register modules
 def register():
+
+    def reload_mod(name):
+        modname = '%s.%s' % (__name__, name)
+        module = importlib.reload(sys.modules[modname])
+        sys.modules[modname] = module
+        return module
+
     for currentModuleName in modulesFullNames.values():
         if currentModuleName in sys.modules:
+
+            # if the modle has already been loaded
+            if '%s.blender' % __name__ in sys.modules:
+                reload_mod(currentModuleName)
+
             if hasattr(sys.modules[currentModuleName], 'register'):
                 sys.modules[currentModuleName].register()
- 
+
+
 # unregister modules
 def unregister():
     for currentModuleName in modulesFullNames.values():
         if currentModuleName in sys.modules:
             if hasattr(sys.modules[currentModuleName], 'unregister'):
                 sys.modules[currentModuleName].unregister()
- 
+
+
 if __name__ == "__main__":
     register()

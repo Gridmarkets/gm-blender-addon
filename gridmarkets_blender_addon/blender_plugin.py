@@ -29,15 +29,15 @@ def draw_top_bar_menu_options(self, context):
     self.layout.emboss = "PULLDOWN_MENU"
 
     # todo work out why reloading the script does not work
-    if hasattr(bpy.types, 'GRIDMARKETS_OT_open_addon'):
-        self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
+    #if hasattr(bpy.types, 'GRIDMARKETS_OT_open_addon'):
+    self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
 
 
 def register():
-    if hasattr(bpy.types, "TOPBAR_MT_render"):
-        bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar_menu_options)
+    print("register gm")
+    bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar_menu_options)
 
 
 def unregister():
-    if hasattr(bpy.types, "TOPBAR_MT_render"):
-        bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar_menu_options)
+    print("unregister gm")
+    bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar_menu_options)
