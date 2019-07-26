@@ -95,7 +95,7 @@ class JobProps(bpy.types.PropertyGroup):
 
     use_custom_render_engine = bpy.props.BoolProperty(
         name="Use custom render engine",
-        description="If this is option is selected this job will use the override the scene render engine",
+        description="If this is option is selected this job will override the scene render engine",
         default=False
     )
 
@@ -105,5 +105,14 @@ class JobProps(bpy.types.PropertyGroup):
         items=[
             ("CYCLES", "Cycles", ''),
             ("BLENDER_RENDER", "Blender Internal", '')
+        ]
+    )
+
+    render_device = bpy.props.EnumProperty(
+        name="Render Device",
+        description="The render device to use when rendering the scene",
+        items=[
+            (constants.RENDER_DEVICE_CPU, constants.RENDER_DEVICE_CPU, ''),
+            (constants.RENDER_DEVICE_GPU, constants.RENDER_DEVICE_GPU, ''),
         ]
     )

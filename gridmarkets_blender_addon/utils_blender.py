@@ -899,7 +899,8 @@ def get_job(context, render_file):
             frames=get_job_frame_ranges(context, job=selected_job),
             output_prefix=get_job_output_prefix(context, job=selected_job),
             output_format=get_job_output_format(context, job=selected_job),
-            engine=get_job_render_engine(context, job=selected_job)
+            engine=get_job_render_engine(context, job=selected_job),
+            gpu=selected_job.render_device == constants.RENDER_DEVICE_GPU
         )
     else:
         raise InvalidInputError(message="Invalid job option")

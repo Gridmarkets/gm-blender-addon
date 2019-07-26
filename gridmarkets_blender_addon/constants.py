@@ -41,7 +41,7 @@ DEFAULT_WINDOW_HIEGHT = 550
 BLENDER_TEMP_DIRECTORY = '/tmp\\'
 
 # plugin version
-PLUGIN_VERSION = { "major": 0, "minor": 6, "build" : 0}
+PLUGIN_VERSION = { "major": 1, "minor": 0, "build" : 0}
 
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
@@ -128,6 +128,9 @@ OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_pr
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL = "Delete temporary project files"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_LABEL = "Get selected project status"
+
+RENDER_DEVICE_GPU = "GPU"
+RENDER_DEVICE_CPU = "CPU"
 
 # enum values
 PROJECT_OPTIONS_STATIC_COUNT = 1
