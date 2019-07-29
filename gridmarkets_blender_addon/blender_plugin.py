@@ -34,10 +34,8 @@ def draw_top_bar_menu_options(self, context):
 
 
 def register():
-    print("register gm")
     bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar_menu_options)
 
 
 def unregister():
-    print("unregister gm")
     bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar_menu_options)

@@ -164,8 +164,6 @@ def _draw_save_preferences_region(self, context):
 
 def register():
 
-    print("register injections")
-
     global _old_USERPREF_PT_addons_draw_function
     global _old_USERPREF_HT_header_draw_function
     global _old_USERPREF_PT_navigation_bar_draw_function
