@@ -60,8 +60,8 @@ def set_cycles_compute_device(value: str):
     bpy.context.scene.cycles.device = value
 
     if value == "GPU":
-        bpy.context.preferences.addons['cycles'].preferences.compute_device_type = "CUDA"
-        bpy.context.preferences.addons['cycles'].preferences.devices[0].use = True
+        bpy.context.user_preferences.addons['cycles'].preferences.compute_device_type = "CUDA"
+        bpy.context.user_preferences.addons['cycles'].preferences.devices[0].use = True
 
         # set performance settings for GPU rendering
         bpy.context.scene.render.tile_x = 256
@@ -89,11 +89,11 @@ def set_cycles_square_samples(value: bool):
 
 
 def set_cycles_min_light_bounces(value: int):
-    bpy.context.scene.cycles.min_light_bounces = value
+    bpy.context.scene.cycles.min_bounces = value
 
 
 def set_cycles_min_transparent_bounces(value: int):
-    bpy.context.scene.cycles.min_transparent_bounces = value
+    bpy.context.scene.cycles.transparent_min_bounces = value
 
 
 def set_cycles_light_sampling_threshold(value: float):
@@ -113,7 +113,7 @@ def set_cycles_glossy_bounces(value: int):
 
 
 def set_cycles_transparent_max_bounces(value: int):
-    bpy.context.scene.cycles.transparent_max_bounces = value
+    bpy.context.scene.cycles.transmission_bounces = value
 
 
 def set_cycles_volume_bounces(value: int):
@@ -181,15 +181,17 @@ def set_cycles_pixel_filter_width(value: int):
 
 
 def set_cycles_film_transparent(value: bool):
-    bpy.context.scene.render.film_transparent = value
+    bpy.context.scene.cycles.film_transparent = value
 
 
 def set_cycles_film_transparent_glass(value: bool):
-    bpy.context.scene.cycles.film_transparent_glass = value
+    # added in 2.80
+    pass
 
 
 def set_cycles_film_transparent_roughness(value: float):
-    bpy.context.scene.cycles.film_transparent_roughness = value
+    # added in 2.80
+    pass
 
 
 def set_output_resolution_x(value: int):
