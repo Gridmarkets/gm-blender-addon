@@ -41,15 +41,12 @@ def draw_top_bar_menu_options(layout, context):
 
 
 def register():
-    if hasattr(bpy.types, "INFO_MT_editor_menus"):
-        print("registering addon")
+    global _old_header_draw
+    _old_header_draw = bpy.types.INFO_MT_editor_menus.draw_menus
 
-        global _old_header_draw
-        _old_header_draw = bpy.types.INFO_MT_editor_menus.draw_menus
-
-        bpy.types.INFO_MT_editor_menus.draw_menus = draw_top_bar_menu_options
+    bpy.types.INFO_MT_editor_menus.draw_menus = draw_top_bar_menu_options
 
 
 def unregister():
-    if hasattr(bpy.types, "INFO_MT_editor_menus"):
-        bpy.types.INFO_MT_editor_menus.draw_menus = _old_header_draw
+    bpy.types.INFO_MT_editor_menus.draw_menus = _old_header_draw
+
