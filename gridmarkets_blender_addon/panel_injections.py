@@ -12,7 +12,6 @@ from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 _old_USERPREF_PT_addons_draw_function = None
 _old_USERPREF_HT_header_draw_function = None
 _old_USERPREF_PT_navigation_bar_draw_function = None
-_old_USERPREF_PT_save_preferences_draw_function = None
 
 
 def _draw_jobs_panels(self, context):
@@ -155,33 +154,22 @@ def _draw_header_region(self, context):
         _old_USERPREF_HT_header_draw_function(self, context)
 
 
-def _draw_save_preferences_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        pass;
-    else:
-        _old_USERPREF_PT_save_preferences_draw_function(self, context)
-
-
 def register():
 
     global _old_USERPREF_PT_addons_draw_function
     global _old_USERPREF_HT_header_draw_function
     global _old_USERPREF_PT_navigation_bar_draw_function
-    global  _old_USERPREF_PT_save_preferences_draw_function
     
     _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
     _old_USERPREF_PT_navigation_bar_draw_function = bpy.types.USERPREF_PT_navigation_bar.draw
-    _old_USERPREF_PT_save_preferences_draw_function = bpy.types.USERPREF_PT_save_preferences.draw
 
     bpy.types.USERPREF_PT_addons.draw = _draw_main_region
     bpy.types.USERPREF_HT_header.draw = _draw_header_region
     bpy.types.USERPREF_PT_navigation_bar.draw = _draw_nav_region
-    bpy.types.USERPREF_PT_save_preferences.draw = _draw_save_preferences_region
 
 
 def unregister():
     bpy.types.USERPREF_PT_addons.draw = _old_USERPREF_PT_addons_draw_function
     bpy.types.USERPREF_HT_header.draw = _old_USERPREF_HT_header_draw_function
     bpy.types.USERPREF_PT_navigation_bar.draw = nav_bar = _old_USERPREF_PT_navigation_bar_draw_function
-    bpy.types.USERPREF_PT_save_preferences.draw = _old_USERPREF_PT_save_preferences_draw_function
