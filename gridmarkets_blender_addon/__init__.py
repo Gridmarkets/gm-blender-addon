@@ -54,6 +54,7 @@ modulesNames = ['constants',
                 'panels.console',
                 'panels.preferences',
                 'panel_injections',
+                'panel_overloaders.navigation_bar',
                 'panel_overloaders.save_preferences',
                 'blender_plugin']
 

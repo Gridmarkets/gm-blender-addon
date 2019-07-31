@@ -11,7 +11,6 @@ from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 
 _old_USERPREF_PT_addons_draw_function = None
 _old_USERPREF_HT_header_draw_function = None
-_old_USERPREF_PT_navigation_bar_draw_function = None
 
 
 def _draw_jobs_panels(self, context):
@@ -124,28 +123,6 @@ def _draw_main_region(self, context):
         _old_USERPREF_PT_addons_draw_function(self, context)
 
 
-def _draw_nav_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        layout = self.layout
-        props = context.scene.props
-
-        layout.label(text="Links")
-
-        col = layout.column()
-        col.scale_x = 1
-        col.scale_y = 2
-
-        # Portal manager link
-        col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
-
-        # Cost calculator
-        col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
-        col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
-        col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
-    else:
-        _old_USERPREF_PT_navigation_bar_draw_function(self, context)
-
-
 def _draw_header_region(self, context):
     if context.screen.name == constants.INJECTED_SCREEN_NAME:
         from panels.main import GRIDMARKETS_PT_Main
@@ -158,18 +135,15 @@ def register():
 
     global _old_USERPREF_PT_addons_draw_function
     global _old_USERPREF_HT_header_draw_function
-    global _old_USERPREF_PT_navigation_bar_draw_function
     
     _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
     _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
-    _old_USERPREF_PT_navigation_bar_draw_function = bpy.types.USERPREF_PT_navigation_bar.draw
 
     bpy.types.USERPREF_PT_addons.draw = _draw_main_region
     bpy.types.USERPREF_HT_header.draw = _draw_header_region
-    bpy.types.USERPREF_PT_navigation_bar.draw = _draw_nav_region
 
 
 def unregister():
     bpy.types.USERPREF_PT_addons.draw = _old_USERPREF_PT_addons_draw_function
     bpy.types.USERPREF_HT_header.draw = _old_USERPREF_HT_header_draw_function
-    bpy.types.USERPREF_PT_navigation_bar.draw = nav_bar = _old_USERPREF_PT_navigation_bar_draw_function
+    

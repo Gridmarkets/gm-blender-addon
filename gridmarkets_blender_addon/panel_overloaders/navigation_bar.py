@@ -1,27 +1,24 @@
 import bpy
 from utils_blender import addon_draw_condition
+from layouts.sidebar import draw_sidebar
 from .panel_overloader import PanelOverloader
 
 _instance = None
 
 
-class SavePreferencesOverloader(PanelOverloader):
+class NavigationBarOverloader(PanelOverloader):
 
     def __init__(self):
-        super().__init__(bpy.types.USERPREF_PT_save_preferences,
-                         SavePreferencesOverloader._draw_method,
+        super().__init__(bpy.types.USERPREF_PT_navigation_bar,
+                         draw_sidebar,
                          overload_condition=addon_draw_condition)
-
-    @staticmethod
-    def _draw_method(self, context):
-        pass;
 
 
 def register():
     global _instance
 
     if _instance is None:
-        _instance = SavePreferencesOverloader()
+        _instance = NavigationBarOverloader()
 
 
 def unregister():
