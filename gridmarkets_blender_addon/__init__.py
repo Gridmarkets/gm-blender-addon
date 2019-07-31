@@ -53,7 +53,9 @@ modulesNames = ['constants',
                 'panels.output_settings',
                 'panels.console',
                 'panels.preferences',
-                'panel_injections',
+                'panel_overloaders.addons',
+                'panel_overloaders.header',
+                'panel_overloaders.tabs',
                 'blender_plugin']
 
 # We pre-append so that these paths take precedence over blenders packed modules which can be different versions

@@ -1,19 +1,15 @@
-import bpy
 import constants
-import utils_blender
 from layouts import sidebar
 from types import SimpleNamespace
 
-from panels.main import GRIDMARKETS_PT_Main
-from panels.projects import GRIDMARKETS_PT_Projects
-from panels.jobs import GRIDMARKETS_PT_Jobs
 from panels.preferences import GRIDMARKETS_PT_preferences
 from panels.console import GRIDMARKETS_PT_console
-from panels.output_settings import GRIDMARKETS_PT_Output_Settings
+from panels.main import GRIDMARKETS_PT_Main
+from panels.projects import GRIDMARKETS_PT_Projects
+import utils_blender
 
-_old_USERPREF_PT_addons_draw_function = None
-_old_USERPREF_PT_tabs_draw_function = None
-_old_USERPREF_HT_header_draw_function = None
+from panels.jobs import GRIDMARKETS_PT_Jobs
+from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 
 
 def _draw_jobs_panels(self, context):
@@ -99,71 +95,35 @@ def _draw_compact_console(self, context):
     box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4)
 
 
-def _draw_main_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        layout = self.layout
-        props = context.scene.props
+def draw_body(self, context):
+    layout = self.layout
+    props = context.scene.props
 
-        # split to show the side bar
-        split = layout.split(percentage=0.2)
-        col = SimpleNamespace(layout=split.column())
-        sidebar.draw_sidebar(col, context)
+    # split to show the side bar
+    split = layout.split(percentage=0.2)
+    col = SimpleNamespace(layout=split.column())
 
-        col = split.column()
-        box = col.box()
-        row = box.row()
-        row.prop(props, "tab_options", expand=True)
-        col = SimpleNamespace(layout=col)
+    # draw the sidebar
+    sidebar.draw_sidebar(col, context)
 
-        if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-            GRIDMARKETS_PT_Main.draw(col, context)
-            _draw_submission_summary(col, context)
-            _draw_compact_console(col, context)
-        elif props.tab_options == constants.TAB_PROJECTS:
-            GRIDMARKETS_PT_Projects.draw(col, context)
-            _draw_compact_console(col, context)
-        elif props.tab_options == constants.TAB_JOB_PRESETS:
-            _draw_jobs_panels(col, context)
-        elif props.tab_options == constants.TAB_CREDENTIALS:
-            GRIDMARKETS_PT_preferences.draw(col, context)
-        elif props.tab_options == constants.TAB_LOGGING:
-            GRIDMARKETS_PT_console.draw(col, context)
+    # draw the main body
+    col = split.column()
+    box = col.box()
+    row = box.row()
+    row.prop(props, "tab_options", expand=True)
+    col = SimpleNamespace(layout=col)
 
-    else:
-        _old_USERPREF_PT_addons_draw_function(self, context)
+    if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
+        GRIDMARKETS_PT_Main.draw(col, context)
+        _draw_submission_summary(col, context)
+        _draw_compact_console(col, context)
+    elif props.tab_options == constants.TAB_PROJECTS:
+        GRIDMARKETS_PT_Projects.draw(col, context)
+        _draw_compact_console(col, context)
+    elif props.tab_options == constants.TAB_JOB_PRESETS:
+        _draw_jobs_panels(col, context)
+    elif props.tab_options == constants.TAB_CREDENTIALS:
+        GRIDMARKETS_PT_preferences.draw(col, context)
+    elif props.tab_options == constants.TAB_LOGGING:
+        GRIDMARKETS_PT_console.draw(col, context)
 
-
-def _draw_header_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        from panels.main import GRIDMARKETS_PT_Main
-        GRIDMARKETS_PT_Main.draw_header(self, context)
-    else:
-        _old_USERPREF_HT_header_draw_function(self, context)
-
-
-def _draw_tabs_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        pass
-    else:
-        _old_USERPREF_PT_tabs_draw_function(self, context)
-
-
-def register():
-
-    global _old_USERPREF_PT_addons_draw_function
-    global _old_USERPREF_PT_tabs_draw_function
-    global _old_USERPREF_HT_header_draw_function
-    
-    _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
-    _old_USERPREF_PT_tabs_draw_function = bpy.types.USERPREF_PT_tabs.draw
-    _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
-
-    bpy.types.USERPREF_PT_addons.draw = _draw_main_region
-    bpy.types.USERPREF_PT_tabs.draw = _draw_tabs_region
-    bpy.types.USERPREF_HT_header.draw = _draw_header_region
-
-
-def unregister():
-    bpy.types.USERPREF_PT_addons.draw = _old_USERPREF_PT_addons_draw_function
-    bpy.types.USERPREF_PT_tabs.draw = _old_USERPREF_PT_tabs_draw_function
-    bpy.types.USERPREF_HT_header.draw = _old_USERPREF_HT_header_draw_function
