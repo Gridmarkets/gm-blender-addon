@@ -3,9 +3,11 @@ import constants
 from layouts import sidebar
 from layouts.preferences import draw_preferences
 from layouts.jobs import draw_jobs
+from layouts.console import draw_console, draw_compact_console
+
 
 from types import SimpleNamespace
-from panels.console import GRIDMARKETS_PT_console
+
 from panels.main import GRIDMARKETS_PT_Main
 from panels.projects import GRIDMARKETS_PT_Projects
 import utils_blender
@@ -81,13 +83,6 @@ def _draw_submission_summary(self, context):
         values.label(text=str(scene.render.fps))
 
 
-def _draw_compact_console(self, context):
-    props = context.scene.props
-    box = self.layout.box()
-    box.alignment = "RIGHT"
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4)
-
-
 def draw_body(self, context):
     layout = self.layout
     props = context.scene.props
@@ -109,14 +104,13 @@ def draw_body(self, context):
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         GRIDMARKETS_PT_Main.draw(col, context)
         _draw_submission_summary(col, context)
-        _draw_compact_console(col, context)
+        draw_compact_console(col, context)
     elif props.tab_options == constants.TAB_PROJECTS:
         GRIDMARKETS_PT_Projects.draw(col, context)
-        _draw_compact_console(col, context)
+        draw_compact_console(col, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         draw_jobs(col, context)
     elif props.tab_options == constants.TAB_CREDENTIALS:
         draw_preferences(col, context)
     elif props.tab_options == constants.TAB_LOGGING:
-        GRIDMARKETS_PT_console.draw(col, context)
-
+        draw_console(col, context)
