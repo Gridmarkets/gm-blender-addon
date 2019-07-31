@@ -1,16 +1,12 @@
-import bpy
 import constants
-import utils_blender
-
-from panels.main import GRIDMARKETS_PT_Main
-from panels.projects import GRIDMARKETS_PT_Projects
-from panels.jobs import GRIDMARKETS_PT_Jobs
 from panels.preferences import GRIDMARKETS_PT_preferences
 from panels.console import GRIDMARKETS_PT_console
-from panels.output_settings import GRIDMARKETS_PT_Output_Settings
+from panels.main import GRIDMARKETS_PT_Main
+from panels.projects import GRIDMARKETS_PT_Projects
+import utils_blender
 
-_old_USERPREF_PT_addons_draw_function = None
-_old_USERPREF_HT_header_draw_function = None
+from panels.jobs import GRIDMARKETS_PT_Jobs
+from panels.output_settings import GRIDMARKETS_PT_Output_Settings
 
 
 def _draw_jobs_panels(self, context):
@@ -96,54 +92,24 @@ def _draw_compact_console(self, context):
     box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4, sort_lock=True)
 
 
-def _draw_main_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        layout = self.layout
-        props = context.scene.props
+def draw_body(self, context):
+    layout = self.layout
+    props = context.scene.props
 
-        box = layout.box()
-        row = box.row()
-        row.prop_tabs_enum(props, "tab_options", icon_only=True)
+    box = layout.box()
+    row = box.row()
+    row.prop_tabs_enum(props, "tab_options", icon_only=True)
 
-        if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-            GRIDMARKETS_PT_Main.draw(self, context)
-            _draw_submission_summary(self, context)
-            _draw_compact_console(self, context)
-        elif props.tab_options == constants.TAB_PROJECTS:
-            GRIDMARKETS_PT_Projects.draw(self, context)
-            _draw_compact_console(self, context)
-        elif props.tab_options == constants.TAB_JOB_PRESETS:
-            _draw_jobs_panels(self, context)
-        elif props.tab_options == constants.TAB_CREDENTIALS:
-            GRIDMARKETS_PT_preferences.draw(self, context)
-        elif props.tab_options == constants.TAB_LOGGING:
-            GRIDMARKETS_PT_console.draw(self, context)
-
-    else:
-        _old_USERPREF_PT_addons_draw_function(self, context)
-
-
-def _draw_header_region(self, context):
-    if context.screen.name == constants.INJECTED_SCREEN_NAME:
-        from panels.main import GRIDMARKETS_PT_Main
-        GRIDMARKETS_PT_Main.draw_header(self, context)
-    else:
-        _old_USERPREF_HT_header_draw_function(self, context)
-
-
-def register():
-
-    global _old_USERPREF_PT_addons_draw_function
-    global _old_USERPREF_HT_header_draw_function
-    
-    _old_USERPREF_PT_addons_draw_function = bpy.types.USERPREF_PT_addons.draw
-    _old_USERPREF_HT_header_draw_function = bpy.types.USERPREF_HT_header.draw
-
-    bpy.types.USERPREF_PT_addons.draw = _draw_main_region
-    bpy.types.USERPREF_HT_header.draw = _draw_header_region
-
-
-def unregister():
-    bpy.types.USERPREF_PT_addons.draw = _old_USERPREF_PT_addons_draw_function
-    bpy.types.USERPREF_HT_header.draw = _old_USERPREF_HT_header_draw_function
-    
+    if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
+        GRIDMARKETS_PT_Main.draw(self, context)
+        _draw_submission_summary(self, context)
+        _draw_compact_console(self, context)
+    elif props.tab_options == constants.TAB_PROJECTS:
+        GRIDMARKETS_PT_Projects.draw(self, context)
+        _draw_compact_console(self, context)
+    elif props.tab_options == constants.TAB_JOB_PRESETS:
+        _draw_jobs_panels(self, context)
+    elif props.tab_options == constants.TAB_CREDENTIALS:
+        GRIDMARKETS_PT_preferences.draw(self, context)
+    elif props.tab_options == constants.TAB_LOGGING:
+        GRIDMARKETS_PT_console.draw(self, context)
