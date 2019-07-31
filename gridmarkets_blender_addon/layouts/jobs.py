@@ -136,7 +136,7 @@ def draw_jobs(self, context):
     sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
     if len(context.scene.props.jobs) > 0:
-        _draw_job_settings.draw(self, context)
+        _draw_job_settings(self, context)
 
 
 def _draw_job_settings(self, context):
