@@ -1,8 +1,8 @@
 import bpy
-import constants
-from temp_directory_manager import TempDirectoryManager
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
-from blender_logging_wrapper import get_wrapped_logger
+from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
 
 

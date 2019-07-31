@@ -1,7 +1,7 @@
 import bpy
-from utils_blender import addon_draw_condition
-from layouts.sidebar import draw_sidebar
-from .panel_overloader import PanelOverloader
+from gridmarkets_blender_addon.utils_blender import addon_draw_condition
+from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
+from gridmarkets_blender_addon.panel_overloaders.panel_overloader import PanelOverloader
 
 _instance = None
 

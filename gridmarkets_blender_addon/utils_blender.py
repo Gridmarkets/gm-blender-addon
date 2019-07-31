@@ -5,12 +5,11 @@ import os
 import collections
 import json
 
-import constants
-import utils
-
-from invalid_input_error import InvalidInputError
-from temp_directory_manager import TempDirectoryManager
-from bat_progress_callback import BatProgressCallback
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon import utils
+from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
+from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
+from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
 
 from gridmarkets.envoy_client import EnvoyClient
 from gridmarkets.project import Project
@@ -25,7 +24,7 @@ _envoy_client = None
 
 
 def get_wrapped_logger(name):
-    from blender_logging_wrapper import get_wrapped_logger
+    from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
     return get_wrapped_logger(name)
 
 

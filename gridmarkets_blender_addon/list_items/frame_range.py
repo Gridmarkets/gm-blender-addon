@@ -1,5 +1,5 @@
 import bpy
-import constants
+from gridmarkets_blender_addon import constants
 
 class GRIDMARKETS_UL_frame_range(bpy.types.UIList):
 

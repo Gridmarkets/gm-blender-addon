@@ -1,6 +1,6 @@
-from icon_loader import IconLoader
-import constants
-import utils_blender
+from gridmarkets_blender_addon.icon_loader import IconLoader
+from gridmarkets_blender_addon import constants, utils_blender
+
 
 def draw_header(self, context):
     layout = self.layout

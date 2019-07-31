@@ -1,7 +1,6 @@
 import bpy
-import constants
-import utils_blender
 from types import SimpleNamespace
+from gridmarkets_blender_addon import constants, utils_blender
 
 
 def _draw_frame_ranges_view(self, context):

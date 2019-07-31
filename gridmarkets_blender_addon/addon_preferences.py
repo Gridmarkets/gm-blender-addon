@@ -1,5 +1,5 @@
 import bpy
-import constants
+from gridmarkets_blender_addon import constants
 
 
 class AddonPreferences(bpy.types.AddonPreferences):

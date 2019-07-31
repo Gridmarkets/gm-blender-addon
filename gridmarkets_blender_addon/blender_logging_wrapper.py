@@ -1,7 +1,7 @@
 import logging
 import bpy
 from time import gmtime, strftime
-from utils_blender import force_redraw_addon
+from gridmarkets_blender_addon.utils_blender import force_redraw_addon
 
 
 class BlenderLoggingWrapper:

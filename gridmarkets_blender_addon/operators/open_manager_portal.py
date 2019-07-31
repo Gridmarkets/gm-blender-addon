@@ -1,7 +1,7 @@
 import bpy
-import constants
+from gridmarkets_blender_addon import constants
 
-from blender_logging_wrapper import get_wrapped_logger
+from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
 
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):

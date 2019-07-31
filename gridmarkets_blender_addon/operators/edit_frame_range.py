@@ -1,7 +1,6 @@
 import bpy
-import constants
-from property_groups.frame_range_props import FrameRangeProps
-import utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
 
 class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
