@@ -7,6 +7,7 @@ def draw_console(self, context):
     box = layout.box()
     box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=6, sort_lock=True)
     box.operator(constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME)
+    box.operator(constants.OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME)
 
 
 def draw_compact_console(self, context):

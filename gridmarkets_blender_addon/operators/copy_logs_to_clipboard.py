@@ -1,6 +1,5 @@
 import bpy
-import os
-from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon import constants, utils_blender
 
 from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
@@ -12,33 +11,10 @@ class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
-    @staticmethod
-    def _get_log_text(item):
-        text = ''
-
-        if item.date:
-            text = text + item.date + ' '
-
-        if item.time:
-            text = text + item.time + ' '
-
-        if item.name:
-            text = text + item.name + ' ' + item.level + ' '
-
-        text = text + item.body
-
-        return text
 
     def execute(self, context):
-        props = context.scene.props
-        output = ''
-
-        for log_item in props.log_items:
-            output = output + os.linesep + GRIDMARKETS_OT_copy_logs_to_clipboard._get_log_text(log_item)
-
         log.info("Copying logs to clipboard...")
-        bpy.context.window_manager.clipboard = output
-
+        bpy.context.window_manager.clipboard = utils_blender.get_logs(self, context)
         return {'FINISHED'}
 
 

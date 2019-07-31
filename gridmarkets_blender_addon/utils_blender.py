@@ -1136,3 +1136,30 @@ def get_addon_window():
 
 def addon_draw_condition(self, context):
     return context.screen.name == constants.INJECTED_SCREEN_NAME
+
+
+def get_logs(self, context):
+    props = context.scene.props
+    output = ''
+
+    def _get_log_text(item):
+        """ Converts a log item into a textual representation """
+        text = ''
+
+        if item.date:
+            text = text + item.date + ' '
+
+        if item.time:
+            text = text + item.time + ' '
+
+        if item.name:
+            text = text + item.name + ' ' + item.level + ' '
+
+        text = text + item.body
+
+        return text
+
+    for log_item in props.log_items:
+        output = output + os.linesep + _get_log_text(log_item)
+
+    return output
