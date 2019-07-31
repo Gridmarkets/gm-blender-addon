@@ -104,82 +104,81 @@ def _draw_view(self, context, operator_id, view_name, draw_handler):
         draw_handler(SimpleNamespace(layout=col), context)
 
 
-class GRIDMARKETS_PT_Output_Settings(bpy.types.Panel):
-    """The plugin's output settings sub panel."""
+def draw_jobs(self, context):
+    layout = self.layout
+    props = context.scene.props
+    job_count = len(props.jobs)
 
-    bl_idname = constants.PANEL_OUTPUT_SETTINGS_ID_NAME
-    bl_label = constants.PANEL_OUTPUT_SETTINGS_LABEL
-    bl_space_type = constants.PANEL_SPACE_TYPE
-    bl_region_type = constants.PANEL_REGION_TYPE
-    bl_context = constants.PANEL_CONTEXT
-    bl_parent_id = constants.PANEL_JOBS_ID_NAME
+    layout.label(text='Preset Jobs')
 
-    @classmethod
-    def poll(self, context):
-        job_count = len(context.scene.props.jobs)
-        return job_count > 0
+    row = layout.row()
+    row.template_list("GRIDMARKETS_UL_job", "", props, "jobs", props, "selected_job", rows=3)
 
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        props = scene.props
-        job = context.scene.props.jobs[context.scene.props.selected_job]
+    col = row.column()
 
-        custom_settings_box = SimpleNamespace(layout=self.layout.box())
-        custom_settings_box.layout.label(text="Overridable Settings")
+    sub = col.column(align=True)
+    sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD, text="").action = 'ADD'
+    sub2 = sub.row()
 
-        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_FRAME_RANGES_VIEW_ID_NAME, "frame_ranges", _draw_frame_ranges_view)
+    # disable remove button if there are no projects to remove
+    if job_count <= 0:
+        sub2.enabled = False
 
-        # output format
-        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_FORMAT_VIEW_ID_NAME, "output_format",
-                   _draw_output_format_view)
+    sub2.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
 
-        # output path
-        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
+    sub = col.column(align=True)
 
-        # output prefix
-        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PREFIX_VIEW_ID_NAME, "output_prefix",
-                   _draw_output_prefix_view)
+    # disable up and down buttons if there are less than 2 projects
+    if job_count < 2:
+        sub.enabled = False
 
-        # render engine
-        _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME, "render_engine",
-                   _draw_render_engine_view)
+    sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
+    sub.operator(constants.OPERATOR_JOB_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
-        gm_settings = layout.box()
-        gm_settings.label(text="GridMarkets Job Settings")
-
-        # render device
-        gm_settings.prop(job, "render_device")
-
-        # resolution x
-        # Todo (needs agent update)
-
-        # resolution y
-        # Todo (needs agent update)
-
-        # resolution percentage
-        # Todo (needs agent update)
-
-        # frame rate
-        # Todo (needs agent update)
+    if len(context.scene.props.jobs) > 0:
+        _draw_job_settings(self, context)
 
 
-classes = (
-    GRIDMARKETS_PT_Output_Settings,
-)
+def _draw_job_settings(self, context):
+    layout = self.layout
+    scene = context.scene
+    props = scene.props
+    job = context.scene.props.jobs[context.scene.props.selected_job]
 
+    custom_settings_box = SimpleNamespace(layout=self.layout.box())
+    custom_settings_box.layout.label(text="Overridable Settings")
 
-def register():
-    from bpy.utils import register_class
+    _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_FRAME_RANGES_VIEW_ID_NAME, "frame_ranges", _draw_frame_ranges_view)
 
-    # register classes
-    for cls in classes:
-        register_class(cls)
+    # output format
+    _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_FORMAT_VIEW_ID_NAME, "output_format",
+               _draw_output_format_view)
 
+    # output path
+    _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PATH_VIEW_ID_NAME, "output_path", _draw_output_path_view)
 
-def unregister():
-    from bpy.utils import unregister_class
+    # output prefix
+    _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_OUTPUT_PREFIX_VIEW_ID_NAME, "output_prefix",
+               _draw_output_prefix_view)
 
-    # unregister classes
-    for cls in reversed(classes):
-        unregister_class(cls)
+    # render engine
+    _draw_view(custom_settings_box, context, constants.OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_ID_NAME, "render_engine",
+               _draw_render_engine_view)
+
+    gm_settings = layout.box()
+    gm_settings.label(text="GridMarkets Job Settings")
+
+    # render device
+    gm_settings.prop(job, "render_device")
+
+    # resolution x
+    # Todo (needs agent update)
+
+    # resolution y
+    # Todo (needs agent update)
+
+    # resolution percentage
+    # Todo (needs agent update)
+
+    # frame rate
+    # Todo (needs agent update)

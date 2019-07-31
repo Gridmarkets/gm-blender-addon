@@ -2,21 +2,13 @@ import constants
 
 from layouts import sidebar
 from layouts.preferences import draw_preferences
+from layouts.jobs import draw_jobs
 
 from types import SimpleNamespace
 from panels.console import GRIDMARKETS_PT_console
 from panels.main import GRIDMARKETS_PT_Main
 from panels.projects import GRIDMARKETS_PT_Projects
 import utils_blender
-
-from panels.jobs import GRIDMARKETS_PT_Jobs
-from panels.output_settings import GRIDMARKETS_PT_Output_Settings
-
-
-def _draw_jobs_panels(self, context):
-    GRIDMARKETS_PT_Jobs.draw(self, context)
-    if len(context.scene.props.jobs) > 0:
-        GRIDMARKETS_PT_Output_Settings.draw(self, context)
 
 
 def _draw_submission_summary(self, context):
@@ -122,7 +114,7 @@ def draw_body(self, context):
         GRIDMARKETS_PT_Projects.draw(col, context)
         _draw_compact_console(col, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
-        _draw_jobs_panels(col, context)
+        draw_jobs(col, context)
     elif props.tab_options == constants.TAB_CREDENTIALS:
         draw_preferences(col, context)
     elif props.tab_options == constants.TAB_LOGGING:
