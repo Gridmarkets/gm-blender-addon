@@ -15,13 +15,13 @@ class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
     DEFAULT_FILTER = "*.txt"
     DEFAULT_NAME = "GM_blender_logs"
 
-    filter_glob: bpy.props.StringProperty(
+    filter_glob = bpy.props.StringProperty(
         default= DEFAULT_FILTER,
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    filepath: bpy.props.StringProperty(
+    filepath = bpy.props.StringProperty(
         default= DEFAULT_NAME,
         options={'HIDDEN'},
         maxlen=255,
