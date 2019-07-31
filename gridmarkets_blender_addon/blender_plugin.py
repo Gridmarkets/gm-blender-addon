@@ -36,8 +36,7 @@ def draw_top_bar_menu_options(layout, context):
     layout.separator()
 
     # then draw a button to open the GM blender add-on main window
-    if hasattr(bpy.types, 'GRIDMARKETS_OT_open_addon'):
-        draw_GM_operator(layout, context)
+    draw_GM_operator(layout, context)
 
 
 def register():
