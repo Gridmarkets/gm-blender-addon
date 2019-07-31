@@ -1,8 +1,7 @@
 import bpy
 
-import constants
-import utils_blender
-from icon_loader import IconLoader
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.icon_loader import IconLoader
 
 _old_header_draw = None
 

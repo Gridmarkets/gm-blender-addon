@@ -1,6 +1,6 @@
 import bpy
 import os
-import constants
+from gridmarkets_blender_addon import constants
 
 
 class IconLoader:

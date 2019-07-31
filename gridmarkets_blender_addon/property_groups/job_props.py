@@ -1,7 +1,6 @@
 import bpy
-import constants
-
-from property_groups.frame_range_props import FrameRangeProps
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
 
 class JobProps(bpy.types.PropertyGroup):

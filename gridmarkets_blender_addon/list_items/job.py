@@ -1,5 +1,5 @@
 import bpy
-import constants
+from gridmarkets_blender_addon import constants
 
 
 class GRIDMARKETS_UL_job(bpy.types.UIList):

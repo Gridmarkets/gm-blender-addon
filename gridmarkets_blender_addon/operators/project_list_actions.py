@@ -1,5 +1,5 @@
 import bpy
-import constants
+from gridmarkets_blender_addon import constants
 
 class GRIDMARKETS_OT_project_list_actions(bpy.types.Operator):
     """ Contains actions that can be performed on the project list menu """

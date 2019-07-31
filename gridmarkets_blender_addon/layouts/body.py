@@ -1,12 +1,12 @@
 from types import SimpleNamespace
-import constants
+from gridmarkets_blender_addon import constants
 
-from layouts.submission_settings import draw_submission_settings, draw_submission_summary
-from layouts.preferences import draw_preferences
-from layouts.projects import draw_projects
-from layouts.jobs import draw_jobs
-from layouts.console import draw_console, draw_compact_console
-from layouts.sidebar import draw_sidebar
+from gridmarkets_blender_addon.layouts.submission_settings import draw_submission_settings, draw_submission_summary
+from gridmarkets_blender_addon.layouts.preferences import draw_preferences
+from gridmarkets_blender_addon.layouts.projects import draw_projects
+from gridmarkets_blender_addon.layouts.jobs import draw_jobs
+from gridmarkets_blender_addon.layouts.console import draw_console, draw_compact_console
+from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
 
 
 def draw_body(self, context):

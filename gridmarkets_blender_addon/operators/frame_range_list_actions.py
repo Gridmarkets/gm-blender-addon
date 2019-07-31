@@ -1,6 +1,5 @@
 import bpy
-import constants
-import utils
+from gridmarkets_blender_addon import constants, utils
 
 
 class GRIDMARKETS_OT_frame_range_list_actions(bpy.types.Operator):

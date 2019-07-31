@@ -1,4 +1,5 @@
-import constants
+from gridmarkets_blender_addon import constants
+
 
 def draw_preferences(self, context):
     layout = self.layout

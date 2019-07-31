@@ -1,5 +1,5 @@
-import constants
-import utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
+
 
 def draw_submission_summary(self, context):
     scene = context.scene

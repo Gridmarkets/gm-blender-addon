@@ -1,4 +1,4 @@
-import constants
+from gridmarkets_blender_addon import constants
 
 
 def draw_sidebar(self, context):

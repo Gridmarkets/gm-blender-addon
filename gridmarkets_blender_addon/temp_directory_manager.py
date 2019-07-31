@@ -1,10 +1,10 @@
 import pathlib
 import tempfile
 import atexit
-import constants
+from gridmarkets_blender_addon import constants
 
 def get_wrapped_logger():
-    from blender_logging_wrapper import get_wrapped_logger
+    from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
     return get_wrapped_logger(__name__)
 
 class _AssociationTuple:

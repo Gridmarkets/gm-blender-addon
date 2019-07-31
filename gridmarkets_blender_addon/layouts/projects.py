@@ -1,5 +1,5 @@
-import constants
-from temp_directory_manager import TempDirectoryManager
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
 
 def _get_value(project_status, key):
