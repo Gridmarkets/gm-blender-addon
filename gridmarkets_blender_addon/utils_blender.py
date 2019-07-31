@@ -1133,3 +1133,7 @@ def get_addon_window():
         if window.screen.name == constants.INJECTED_SCREEN_NAME:
             return window
     return None
+
+
+def addon_draw_condition(self, context):
+    return context.screen.name == constants.INJECTED_SCREEN_NAME

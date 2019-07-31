@@ -1,6 +1,7 @@
 import bpy
 import constants
 import utils_blender
+from layouts import sidebar
 from types import SimpleNamespace
 
 from panels.main import GRIDMARKETS_PT_Main
@@ -106,7 +107,7 @@ def _draw_main_region(self, context):
         # split to show the side bar
         split = layout.split(percentage=0.2)
         col = SimpleNamespace(layout=split.column())
-        _draw_nav_region(col, context)
+        sidebar.draw_sidebar(col, context)
 
         col = split.column()
         box = col.box()
@@ -130,25 +131,6 @@ def _draw_main_region(self, context):
 
     else:
         _old_USERPREF_PT_addons_draw_function(self, context)
-
-
-def _draw_nav_region(self, context):
-    layout = self.layout
-
-    box = layout.box()
-    box.label(text="Links")
-
-    col = box.column()
-    col.scale_x = 1
-    col.scale_y = 2
-
-    # Portal manager link
-    col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
-
-    # Cost calculator
-    col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
-    col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
-    col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
 
 
 def _draw_header_region(self, context):
