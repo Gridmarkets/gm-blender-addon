@@ -43,7 +43,6 @@ modulesNames = ['constants',
                 'operators.toggle_render_engine_view',
                 'operators.copy_temporary_file_location',
                 'operators.get_selected_project_status',
-                'blender_plugin',
                 'list_items.frame_range',
                 'list_items.job',
                 'list_items.log',
@@ -54,7 +53,8 @@ modulesNames = ['constants',
                 'panels.output_settings',
                 'panels.console',
                 'panels.preferences',
-                'panel_injections']
+                'panel_injections',
+                'blender_plugin']
 
 # We pre-append so that these paths take precedence over blenders packed modules which can be different versions
 # pre-append this folder to sys.path so local dependencies can be found
