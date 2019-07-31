@@ -1,11 +1,11 @@
 import constants
 
 from layouts.preferences import draw_preferences
+from layouts.projects import draw_projects
 from layouts.jobs import draw_jobs
 from layouts.console import draw_console, draw_compact_console
 
 from panels.main import GRIDMARKETS_PT_Main
-from panels.projects import GRIDMARKETS_PT_Projects
 import utils_blender
 
 
@@ -92,7 +92,7 @@ def draw_body(self, context):
         _draw_submission_summary(self, context)
         draw_compact_console(self, context)
     elif props.tab_options == constants.TAB_PROJECTS:
-        GRIDMARKETS_PT_Projects.draw(self, context)
+        draw_projects(self, context)
         draw_compact_console(self, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         draw_jobs(self, context)

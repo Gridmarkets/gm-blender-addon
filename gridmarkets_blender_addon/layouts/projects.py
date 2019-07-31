@@ -1,4 +1,3 @@
-import bpy
 import constants
 from temp_directory_manager import TempDirectoryManager
 
@@ -97,7 +96,7 @@ def _draw_project_status(col, project):
 
 def _draw_project_info_view(self, context):
     layout = self.layout
-    props = bpy.context.scene.props
+    props = context.scene.props
     project_count = len(props.projects)
     selected_project_index = props.selected_project
 
@@ -138,81 +137,50 @@ def _draw_project_info_view(self, context):
             _draw_project_status(col, project)
 
 
+def draw_projects(self, context):
+    layout = self.layout
+    props = context.scene.props
+    project_count = len(props.projects)
 
-class GRIDMARKETS_PT_Projects(bpy.types.Panel):
-    """ Create a Panel which lists all uploaded projects """
+    row = layout.row()
+    row.template_list("GRIDMARKETS_UL_project", "", props, "projects", props, "selected_project", rows=2)
 
-    bl_idname = constants.PANEL_PROJECTS_ID_NAME
-    bl_label = constants.PANEL_PROJECTS_LABEL
-    bl_space_type = constants.PANEL_SPACE_TYPE
-    bl_region_type = constants.PANEL_REGION_TYPE
-    bl_context = constants.PANEL_CONTEXT
-    bl_parent_id = constants.PANEL_MAIN_ID_NAME
+    col = row.column()
 
-    def draw(self, context):
-        layout = self.layout
-        props = bpy.context.scene.props
-        project_count = len(props.projects)
+    sub = col.column(align=True)
 
-        row = layout.row()
-        row.template_list("GRIDMARKETS_UL_project", "", props, "projects", props, "selected_project", rows=2)
+    # disable up and down buttons if there are less than 2 projects
+    if project_count < 2:
+        sub.enabled = False
 
-        col = row.column()
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN,
+                 text="").action = 'DOWN'
 
-        sub = col.column(align=True)
+    sub = col.column(align=True)
 
-        # disable up and down buttons if there are less than 2 projects
-        if project_count < 2:
-            sub.enabled = False
+    # disable remove button if there are no projects to remove
+    if project_count <= 0:
+        sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
 
-        sub = col.column(align=True)
+    row = layout.row(align=True)
+    sub = row.column()
 
-        # disable remove button if there are no projects to remove
-        if project_count <= 0:
-            sub.enabled = False
+    # disable upload project button if already submitting or uploading
+    if props.uploading_project or props.submitting_project:
+        sub.enabled = False
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
+                 text="Upload current scene as new Project").action = 'UPLOAD'
 
-        row = layout.row(align=True)
-        sub = row.column()
+    sub = row.column()
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
+                 text="Upload file as new Project").action = 'UPLOAD_FILE'
 
-        # disable upload project button if already submitting or uploading
-        if props.uploading_project or props.submitting_project:
-            sub.enabled = False
+    # upload status
+    if props.uploading_project:
+        layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
 
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
-                     text="Upload current scene as new Project").action = 'UPLOAD'
-
-        sub = row.column()
-        sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
-                     text="Upload file as new Project").action = 'UPLOAD_FILE'
-
-        # upload status
-        if props.uploading_project:
-            layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
-
-        _draw_project_info_view(self, context)
-
-
-classes = (
-    GRIDMARKETS_PT_Projects,
-)
-
-
-def register():
-    from bpy.utils import register_class
-
-    # register classes
-    for cls in classes:
-        register_class(cls)
-
-
-def unregister():
-    from bpy.utils import unregister_class
-
-    # unregister classes
-    for cls in reversed(classes):
-        unregister_class(cls)
+    _draw_project_info_view(self, context)
