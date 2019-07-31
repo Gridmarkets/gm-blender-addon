@@ -1,8 +1,9 @@
 import constants
-from layouts import sidebar
-from types import SimpleNamespace
 
-from panels.preferences import GRIDMARKETS_PT_preferences
+from layouts import sidebar
+from layouts.preferences import draw_preferences
+
+from types import SimpleNamespace
 from panels.console import GRIDMARKETS_PT_console
 from panels.main import GRIDMARKETS_PT_Main
 from panels.projects import GRIDMARKETS_PT_Projects
@@ -123,7 +124,7 @@ def draw_body(self, context):
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         _draw_jobs_panels(col, context)
     elif props.tab_options == constants.TAB_CREDENTIALS:
-        GRIDMARKETS_PT_preferences.draw(col, context)
+        draw_preferences(col, context)
     elif props.tab_options == constants.TAB_LOGGING:
         GRIDMARKETS_PT_console.draw(col, context)
 
