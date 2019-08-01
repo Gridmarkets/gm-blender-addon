@@ -908,7 +908,7 @@ def get_job(context, render_file):
 
 
 def get_version_string():
-    return 'GM Blender Add-on Beta v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
+    return 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
         constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
 
 
