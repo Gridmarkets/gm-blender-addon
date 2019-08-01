@@ -14,7 +14,7 @@ output to the `./dist` directory by default or you can use the `-d` argument to 
 `python .\setup.py bzip -d ./custom_path/zip_name`.
 
 ### Installing the Zipped Add-on
-You can then import the buildt .zip file into Blender by going `edit -> preferences -> Add-ons -> install`. Activate the 
+You can then import the built .zip file into Blender by going to `edit -> preferences -> Add-ons -> install`. Activate the 
 add-on by searching `gridmarkets blender addon` and ticking it's checkbox.
 
 ![gif showing how to install add-ons inside Blender](static/blender_addon_install_walkthrough.gif)
