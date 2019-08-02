@@ -38,3 +38,5 @@ def draw_sidebar(self, context):
     col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
     col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
     col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
+    col.separator()
+    col.operator(constants.OPERATOR_OPEN_REPOSITORY_ID_NAME, icon=constants.ICON_URL, text="View on GitHub")

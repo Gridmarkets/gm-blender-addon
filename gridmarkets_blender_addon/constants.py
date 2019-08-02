@@ -52,6 +52,8 @@ COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
 HELP_URL = "https://www.gridmarkets.com/blender"
 
+GITHUB_REPO = "https://github.com/Gridmarkets/gm-blender-addon"
+
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
 
@@ -121,6 +123,8 @@ OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME = "gridmarkets.copy_logs_to_clipboard"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL = "Copy logs to clipboard"
 OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
 OPERATOR_OPEN_PREFERENCES_LABEL = "Open Gridmarkets add-on preferences"
+OPERATOR_OPEN_REPOSITORY_ID_NAME = "gridmarkets.open_github_repo"
+OPERATOR_OPEN_REPOSITORY_LABEL = "Open GitHub repository"
 OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
 OPERATOR_OPEN_ADDON_LABEL = "Open Gridmarkets add-on"
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_project_files"
