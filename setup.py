@@ -191,8 +191,8 @@ setup(
     author_email=EMAIL,
     url=URL,
     packages=find_packages('.'),
-    data_files=[('gridmarkets_blender_plugin', ['README.md']),
-                ('gridmarkets_blender_plugin/icons', glob.glob('gridmarkets_blender_plugin/icons/*'))],
+    data_files=[('gridmarkets_blender_addon', ['README.md']),
+                ('gridmarkets_blender_addon/icons', glob.glob('gridmarkets_blender_addon/icons/*'))],
     classifiers=[
         'Intended Audience :: End Users/Desktop',
         'Operating System :: OS Independent',
