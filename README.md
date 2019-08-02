@@ -29,14 +29,14 @@ the source files.
 Setting up a custom scripts path is done by editing `edit -> prefereces -> File Paths -> Scripts` to point to a custom 
 directory. This directory must be setup to mirror the structure of Blender's default scripts folder. This means it must 
 contain an `addons` sub-directory which blender will use when searching for custom add-ons. You can then create a 
-symlink to the location of the `gm-blender-plugin\gridmarkets_blender_addon` folder. See 
+symlink to the location of the `gm-blender-addon\gridmarkets_blender_addon` folder. See 
 https://docs.blender.org/manual/en/dev/preferences/file_paths.html#scripts-path for more information about using a 
 custom scripts path.
 
 For an example setup, in Windows create a folder called `C:\blender-addons` and set Blender's `Scripts` path to it (as 
 described above). Then create a sub-directory called `addons` under the first folder. Create a symbolic link to the 
 add-on using `mklink /D C:\blender-addons\addons\gridmarkets_blender_addon 
-C:\<path to repo>\gm-blender-plugin\gridmarkets_blender_addon` (using cmd not PowerShell). Now you should be able to 
+C:\<path to repo>\gm-blender-addon\gridmarkets_blender_addon` (using cmd not PowerShell). Now you should be able to 
 activate the add-on within Blender, and reload any changes to the source without packing as a zip and re-installing.
 
 #### Reloading Add-ons
