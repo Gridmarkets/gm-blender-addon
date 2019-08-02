@@ -102,6 +102,28 @@ class BuildDependencies(Command):
                          package])
 
 
+class CleanCache(Command):
+    """ Recursively deletes the __pycache__ directories """
+
+    description = "Recursively deletes the __pycache__ directories."
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        log.info('Cleaning __pycache__ directories')
+
+        path = pathlib.Path(ADDON_FOLDER)
+        for p in path.rglob("*"):
+            if p.name == '__pycache__':
+                shutil.rmtree(p)
+
+
 class Bzip(Command):
     """ Zips the add-on folder for distribution so that it can be installed by Blender. Overwrites any existing zip file
     of the same name in the output folder.
@@ -126,6 +148,8 @@ class Bzip(Command):
     def run(self):
         # create the dist folder if it does not exist yet
         DIST_FOLDER.mkdir(parents=True, exist_ok=True)
+
+        self.run_command('clean_cache')
 
         shutil.make_archive(
             self.path, # zip file name
@@ -181,7 +205,8 @@ class AvoidEggInfo(install_egg_info):
 setup(
     cmdclass={'bzip': Bzip,
               'fdist': Fdist,
-              'wheels': BuildDependencies},
+              'wheels': BuildDependencies,
+              'clean_cache': CleanCache},
     name=NAME,
     version=VERSION,
     description=DESCRIPTION,
