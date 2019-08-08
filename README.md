@@ -1,6 +1,20 @@
 # GridMarkets Blender Add-on
 A Blender add-on for uploading Blender Projects to GridMarkets and for specifying render jobs.
 
+- [Installing the Add-on](#installing-the-add-on)
+  - [Pre-built Files](#pre-built-files)
+  - [Building from Sources](#building-from-sources)
+    - [Installing Dependencies](#installing-dependencies)
+    - [Building .Zip File](#building-zip-file)
+  - [Installing the Zipped Add-on](#installing-the-zipped-add-on)
+  - [Implicit Installation for Development](#implicit-installation-for-development)
+    - [Custom Scripts Path](#custom-scripts-path)
+  - [Reloading Add-ons](#reloading-add-ons)
+- [Using the Add-on](#using-the-add-on)
+  - [Authentication](#authentication)
+  - [Submitting a Project](#submitting-a-project)
+
+
 ## Installing the Add-on
 
 To install the add-on you must first either download one of the pre-built zip files or follow the below instructions for
