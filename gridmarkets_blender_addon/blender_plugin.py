@@ -27,14 +27,14 @@ _old_header_draw = None
 
 
 def draw_GM_operator(layout, context):
-    # get the Gridmarkets icon
+    # get the GridMarkets icon
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
     iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
 
     if utils_blender.get_addon_window():
-        text = 'Close Gridmarkets add-on'
+        text = 'Close ' + constants.COMPANY_NAME + ' add-on'
     else:
-        text = 'Open Gridmarkets add-on'
+        text = 'Open ' + constants.COMPANY_NAME + ' add-on'
 
     layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
 
@@ -49,7 +49,7 @@ def draw_top_bar_menu_options(layout, context):
     :rtype: void
     """
 
-    # call the old dar menu method to draw the normal menu elements
+    # call the old draw menu method to draw the normal menu elements
     _old_header_draw(layout, context)
 
     layout.separator()

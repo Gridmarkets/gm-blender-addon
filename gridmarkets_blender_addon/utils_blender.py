@@ -129,9 +129,9 @@ def validate_credentials(email = None, access_key = None):
     """Blender specific authentication validator, uses the gridmarkets validate_auth() function internally but adds
         additional checks and blender specific error messages.
 
-    :param email: The user's Gridmarkets account email, if None or not given then it will be read from the preferences
+    :param email: The user's GridMarkets account email, if None or not given then it will be read from the preferences
     :type email: str
-    :param access_key: The user's Gridmarkets access key, if None or not given then it will be read from the preferences
+    :param access_key: The user's GridMarkets access key, if None or not given then it will be read from the preferences
     :type access_key: str
     :return: true if credentials are valid
     :rtype: bool
@@ -162,16 +162,17 @@ def validate_credentials(email = None, access_key = None):
 
     # validate
     if not has_email and not has_key:
-        message = "No Gridmarkets email address or access key provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        message = "No " + constants.COMPANY_NAME + " email address or access key provided." + \
+                  constants.AUTHENTICATION_HELP_MESSAGE
         raise InvalidInputError(message=message)
     elif not has_email:
-        message = "No Gridmarketes email address provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        message = "No " + constants.COMPANY_NAME + " email address provided." + constants.AUTHENTICATION_HELP_MESSAGE
         raise InvalidInputError(message=message)
     elif not has_key:
-        message = "No Gridmarketes access key provided." + constants.AUTHENTICATION_HELP_MESSAGE
+        message = "No " + constants.COMPANY_NAME + " access key provided." + constants.AUTHENTICATION_HELP_MESSAGE
         raise InvalidInputError(message=message)
 
-    # if initial checks pass try the Gridmarkets validate_auth function
+    # if initial checks pass try the client api validate_auth function
     # create an instance of Envoy client
     client = EnvoyClient(email=email, access_key=access_key)
     client.validate_auth()
@@ -559,7 +560,7 @@ def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
         # add files to project
         # only files and folders within the project path can be added, use relative or full path
         # any other paths passed will be ignored
-        log.info("Adding '%s' to Gridmarkets project..." % str(packed_dir))
+        log.info("Adding '%s' to " + constants.COMPANY_NAME + " project..." % str(packed_dir))
         project.add_folders(str(packed_dir))
 
         if skip_upload:

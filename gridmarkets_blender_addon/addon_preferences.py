@@ -31,10 +31,15 @@ class AddonPreferences(bpy.types.AddonPreferences):
     # the bl_idname must match the addon's package name
     bl_idname = constants.ADDON_PACKAGE_NAME
 
+    _auth_email_description = "Your " + constants.COMPANY_NAME + " account email"
+    _auth_accessKey_description = "Your " + constants.COMPANY_NAME + " access key. This is different from your "\
+                                  "password and can be found by opening the " + constants.COMPANY_NAME + " mangager " \
+                                  "portal and viewing your profile details"
+
     # user's email
     auth_email = bpy.props.StringProperty(
         name="Email",
-        description="Your Gridmarkets account email",
+        description=_auth_email_description,
         default="",
         maxlen=1024,
         )
@@ -42,9 +47,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
     # user's gridmarkets access key
     auth_accessKey = bpy.props.StringProperty(
         name="Access Key",
-        description="Your Gridmarkets access key. This is different from your "
-            "password and can be found by opening the Gridmarkets mangager "
-            "portal and viewing your profile details",
+        description=_auth_accessKey_description,
         default="",
         maxlen=1024,
         subtype='PASSWORD'

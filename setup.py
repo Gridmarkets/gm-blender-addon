@@ -43,7 +43,7 @@ readme.close()
 
 # Package meta-data.
 NAME = 'gridmarkets_blender_addon'
-DESCRIPTION = 'Allows users to submit Blender jobs to the Gridmarkets render farm from within Blender.'
+DESCRIPTION = 'Allows users to submit Blender jobs to the GridMarkets render farm from within Blender.'
 LONG_DESCRIPTION = README_TEXT
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 URL = 'https://www.gridmarkets.com/'

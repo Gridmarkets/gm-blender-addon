@@ -1,14 +1,40 @@
 # GridMarkets Blender Add-on
 A Blender add-on for uploading Blender Projects to GridMarkets and for specifying render jobs.
 
+- [Installing the Add-on](#installing-the-add-on)
+  - [Pre-built Files](#pre-built-files)
+  - [Building from Sources](#building-from-sources)
+    - [Installing Dependencies](#installing-dependencies)
+    - [Building .Zip File](#building-zip-file)
+  - [Installing the Zipped Add-on](#installing-the-zipped-add-on)
+  - [Implicit Installation for Development](#implicit-installation-for-development)
+    - [Custom Scripts Path](#custom-scripts-path)
+  - [Reloading Add-ons](#reloading-add-ons)
+- [Using the Add-on](#using-the-add-on)
+  - [Authentication](#authentication)
+  - [Submitting a Project](#submitting-a-project)
+
+
 ## Installing the Add-on
 
-### Installing Dependencies
+To install the add-on you must first either download one of the pre-built zip files or follow the below instructions for
+how to build the add-on from source.
+
+### Pre-built Files
+
+| Blender Version   | Add-on Download Link|
+|-------------------|--------|
+| 2.80  | [gridmarkets_blender_addon_2_80_v1_0_0.zip](https://gridmarkets-misc.s3-ap-southeast-1.amazonaws.com/gridmarkets_blender_addon_v2_80_1_0_0.zip)  |
+| 2.79  | [gridmarkets_blender_addon_2_79_v1_0_0.zip](https://gridmarkets-misc.s3-ap-southeast-1.amazonaws.com/gridmarkets_blender_addon_v2_79_1_0_0.zip)  |
+
+### Building from Sources
+
+#### Installing Dependencies
 The add-on depends on the GridMarkets api library and blender-asset-tracer (BAT). Use `python setup.py wheels` to 
 install the wheel dependencies to the `gridmarkets_blender_addon/lib` directory. Dependencies **must** be installed 
 before using `bzip` or `fdist` as these will not currently check to make sure libraries are downloaded.
 
-### Building .Zip File
+#### Building .Zip File
 To build the add-on as a .zip file that can be imported into blender run `python ./setup.py bzip`. The .zip will be 
 output to the `./dist` directory by default or you can use the `-d` argument to pass a custom path. For example
 `python .\setup.py bzip -d ./custom_path/zip_name`.
@@ -79,4 +105,5 @@ __Job Presets__ tab.
 Or you can upload projects in the __Projects__ tab and run jobs against them later.
 
 ![image showing the projects tab](static/projects_view.png)
+
 
