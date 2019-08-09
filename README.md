@@ -14,6 +14,7 @@ A Blender add-on for uploading Blender Projects to GridMarkets and for specifyin
   - [Authentication](#authentication)
   - [Submitting a Project](#submitting-a-project)
 
+![image showing a preview of the add-on](static/floating_window.png)
 
 ## Installing the Add-on
 
@@ -95,7 +96,7 @@ submit process. There is no requirement to save the .blend file before submittin
 copy of the currently open scene to a temporary directory. It will then create a packed version of the same file using 
 BAT and upload via the API. The temporary packed files will be deleted after they are uploaded.
 
-![image showing the submission settings tab](static/submission_settings_view.png)
+![GIF showing the submission settings tab](static/submission_settings_view.gif)
 
 You can also can define custom jobs that override blender's render and output settings to give you more control in the 
 __Job Presets__ tab. 
