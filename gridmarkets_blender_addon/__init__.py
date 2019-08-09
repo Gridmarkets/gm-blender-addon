@@ -19,8 +19,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 bl_info = {
-    "name": "Gridmarkets Blender Add-on",
-    "description": "Allows users to submit Blender jobs to the Gridmarkets render farm from within Blender.",
+    "name": "GridMarkets Blender Add-on",
+    "description": "Allows users to submit Blender jobs to the GridMarkets render farm from within Blender.",
     "author": "GridMarkets",
     "version": (1, 0, 0),
     "blender": (2, 80, 0),

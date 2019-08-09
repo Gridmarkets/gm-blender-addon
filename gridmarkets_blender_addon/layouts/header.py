@@ -25,11 +25,11 @@ from gridmarkets_blender_addon import constants, utils_blender
 def draw_header(self, context):
     layout = self.layout
 
-    # get the Gridmarkets icon
+    # get the company icon
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
     iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
 
-    # display Gridmarkets icon and version
+    # display company icon and version
     row = layout.row()
     row.alignment = "CENTER"
     row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)

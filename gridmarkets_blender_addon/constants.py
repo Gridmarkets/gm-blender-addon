@@ -27,8 +27,11 @@ Stored in one central file to prevent circular dependencies
 # the add-ons package name
 ADDON_PACKAGE_NAME = "gridmarkets_blender_addon"
 
+# The name of the company
+COMPANY_NAME = "GridMarkets"
+
 # the name to search for in blenders add-on list
-ADDON_NAME = "Gridmarkets Blender Add-on"
+ADDON_NAME = COMPANY_NAME + " Blender Add-on"
 
 # the icons folder contains custom icons for the UI
 ICONS_FOLDER = "icons"
@@ -68,8 +71,8 @@ PLUGIN_VERSION = { "major": 1, "minor": 0, "build" : 0}
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
 
-AUTHENTICATION_HELP_MESSAGE = "\nEnter your Gridmarkets credentials by going to: Edit -> Preferences -> Add-ons -> " \
-                              "Gridmarkets Blender Add-on -> preferences"
+AUTHENTICATION_HELP_MESSAGE = "\nEnter your " + COMPANY_NAME + " credentials by going to: Edit -> Preferences -> " \
+                              "Add-ons -> " + ADDON_NAME + " -> preferences"
 
 TEMPORARY_FILES_DELETED = "Temporary Files Deleted"
 
@@ -122,11 +125,11 @@ OPERATOR_TOGGLE_RENDER_ENGINE_VIEW_LABEL = "Toggle render engine view"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME = "gridmarkets.copy_logs_to_clipboard"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL = "Copy logs to clipboard"
 OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
-OPERATOR_OPEN_PREFERENCES_LABEL = "Open Gridmarkets add-on preferences"
+OPERATOR_OPEN_PREFERENCES_LABEL = "Open " + COMPANY_NAME + " add-on preferences"
 OPERATOR_OPEN_REPOSITORY_ID_NAME = "gridmarkets.open_github_repo"
 OPERATOR_OPEN_REPOSITORY_LABEL = "Open GitHub repository"
 OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
-OPERATOR_OPEN_ADDON_LABEL = "Open Gridmarkets add-on"
+OPERATOR_OPEN_ADDON_LABEL = "Open " + COMPANY_NAME + " add-on"
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_project_files"
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL = "Delete temporary project files"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
@@ -139,7 +142,7 @@ RENDER_DEVICE_CPU = "CPU"
 PROJECT_OPTIONS_STATIC_COUNT = 1
 PROJECT_OPTIONS_NEW_PROJECT_VALUE = 'NEW_PROJECT'
 PROJECT_OPTIONS_NEW_PROJECT_LABEL = 'Submit Scene as New Project'
-PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project to Gridmarkets'
+PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION = 'Upload the current scene as a new project to ' + COMPANY_NAME
 
 JOB_OPTIONS_STATIC_COUNT = 1
 JOB_OPTIONS_BLENDERS_SETTINGS_VALUE = "BLENDER_JOB_SETTINGS"

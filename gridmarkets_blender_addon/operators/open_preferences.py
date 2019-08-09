@@ -31,7 +31,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        log.info("Opening Gridmarkets add-on preferences menu...")
+        log.info("Opening GridMarkets add-on preferences menu...")
 
         bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
         context.preferences.active_section = 'ADDONS'

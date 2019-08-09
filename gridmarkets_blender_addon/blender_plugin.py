@@ -36,14 +36,14 @@ def draw_top_bar_menu_options(self, context):
 
     self.layout.separator()
 
-    # get the Gridmarkets icon
+    # get the GridMarkets icon
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
     iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
 
     if utils_blender.get_addon_window():
-        text = 'Close Gridmarkets add-on'
+        text = 'Close GridMarkets add-on'
     else:
-        text = 'Open Gridmarkets add-on'
+        text = 'Open GridMarkets add-on'
 
     self.layout.emboss = "PULLDOWN_MENU"
     self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)

@@ -26,7 +26,7 @@ from gridmarkets_blender_addon import constants
 class IconLoader:
     """ Singleton class for loading custom icons """
 
-    # Used to store any previews for images (In this case the Gridmarkets custom icon)
+    # Used to store any previews for images
     _icon_preview_collections = {}
     _initialised = False
 
