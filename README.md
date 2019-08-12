@@ -25,8 +25,8 @@ how to build the add-on from source.
 
 | Blender Version   | Add-on Download Link|
 |-------------------|--------|
-| 2.80  | [gridmarkets_blender_addon_2_80_v1_0_0.zip](https://gridmarkets-misc.s3-ap-southeast-1.amazonaws.com/gridmarkets_blender_addon_v2_80_1_0_0.zip)  |
-| 2.79  | [gridmarkets_blender_addon_2_79_v1_0_0.zip](https://gridmarkets-misc.s3-ap-southeast-1.amazonaws.com/gridmarkets_blender_addon_v2_79_1_0_0.zip)  |
+| 2.80  | [gridmarkets_blender_addon_v2_80.zip](https://gridmarkets-misc.s3.amazonaws.com/Blender/gridmarkets_blender_addon_v2_80_LATEST.zip)  |
+| 2.79  | [gridmarkets_blender_addon_v2_79.zip](https://gridmarkets-misc.s3.amazonaws.com/Blender/gridmarkets_blender_addon_v2_79_LATEST.zip)  |
 
 ### Building from Sources
 
