@@ -560,7 +560,7 @@ def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
         # add files to project
         # only files and folders within the project path can be added, use relative or full path
         # any other paths passed will be ignored
-        log.info("Adding '%s' to " + constants.COMPANY_NAME + " project..." % str(packed_dir))
+        log.info("Adding '" + str(packed_dir) + "' to " + constants.COMPANY_NAME + " project...")
         project.add_folders(str(packed_dir))
 
         if skip_upload:
