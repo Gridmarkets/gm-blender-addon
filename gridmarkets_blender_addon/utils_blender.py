@@ -901,12 +901,20 @@ def get_job(context, render_file):
     scene = context.scene
     props = scene.props
 
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    log.info("Getting job settings...")
+
     # if the job options are set to 'use blender render settings' then set the job options accordingly
     if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
+        log.info("Using default blender render settings")
         job = get_default_blender_job(context, render_file)
 
     # otherwise set the job options based on a user defined job
     elif props.job_options.isnumeric():
+        log.info("Using custom job")
+
         selected_job_option = int(props.job_options)
         selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
 
@@ -1018,6 +1026,7 @@ def submit_job(context, temp_dir_manager,
             skip_upload = False
 
         elif props.project_options.isnumeric():
+            log.info("Project already uploaded, submitting job...")
             # get the name of the selected project
             selected_project_option = int(props.project_options)
             selected_project = props.projects[selected_project_option - constants.PROJECT_OPTIONS_STATIC_COUNT]
@@ -1100,6 +1109,7 @@ def submit_job(context, temp_dir_manager,
     except APIError as e:
         log.error("API Error: " + str(e.user_message))
     finally:
+        log.info("Finished submit operation")
         setattr(context.scene.props, progress_attribute_name, False)
 
 
