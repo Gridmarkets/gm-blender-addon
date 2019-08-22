@@ -75,7 +75,7 @@ def draw_submission_summary(self, context):
             values.label(text=selected_job.name)
 
         # get a gridmarkets job. The render file doesnt matter for now
-        job = utils_blender.get_job(context, "RENDER FILE")
+        job = utils_blender.get_job(context, "RENDER FILE", enable_logging=False)
         values.label(text=job.app)
         values.label(text=job.app_version)
         values.label(text=job.operation)

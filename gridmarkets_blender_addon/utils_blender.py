@@ -897,23 +897,26 @@ def get_job_output_prefix(context, job=None):
     return None
 
 
-def get_job(context, render_file):
+def get_job(context, render_file, enable_logging=True):
     scene = context.scene
     props = scene.props
 
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
 
-    log.info("Getting job settings...")
+    if enable_logging:
+        log.info("Getting job settings...")
 
     # if the job options are set to 'use blender render settings' then set the job options accordingly
     if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
-        log.info("Using default blender render settings")
+        if enable_logging:
+            log.info("Using default blender render settings")
         job = get_default_blender_job(context, render_file)
 
     # otherwise set the job options based on a user defined job
     elif props.job_options.isnumeric():
-        log.info("Using custom job")
+        if enable_logging:
+            log.info("Using custom job")
 
         selected_job_option = int(props.job_options)
         selected_job = props.jobs[selected_job_option - constants.JOB_OPTIONS_STATIC_COUNT]
