@@ -36,9 +36,6 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
     bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
-
-    # ImportHelper mixin class uses this
-    filename_ext = constants.BLEND_FILE_EXTENSION
     _filter_glob = '*' + constants.BLEND_FILE_EXTENSION
 
     filter_glob: bpy.props.StringProperty(
@@ -77,18 +74,7 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
 
     def invoke(self, context, event):
         props = context.scene.props
-
-        # if the file has been saved use the name of the file as the prefix
-        if bpy.context.blend_data.is_saved:
-            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-
-            if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
-                blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
-
-            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
-        else:
-            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
-
+        self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
