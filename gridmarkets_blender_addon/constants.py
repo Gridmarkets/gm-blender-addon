@@ -86,6 +86,8 @@ PANEL_REGION_TYPE = "WINDOW"
 WINDOW_SPACE_TYPE = "PREFERENCES"
 
 # operators
+OPERATOR_CLEAR_LOGS_ID_NAME = "gridmarkets.clear_logs"
+OPERATOR_CLEAR_LOGS_LABEL = "Clear logs"
 OPERATOR_SUBMIT_ID_NAME = "gridmarkets.render"
 OPERATOR_SUBMIT_LABEL = "Submit"
 OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME = "gridmarkets.open_portal"

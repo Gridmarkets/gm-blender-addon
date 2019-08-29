@@ -20,7 +20,9 @@
 
 import logging
 import bpy
+import os
 from time import gmtime, strftime
+from gridmarkets_blender_addon.constants import PLUGIN_VERSION
 from gridmarkets_blender_addon.utils_blender import force_redraw_addon
 
 
@@ -38,18 +40,10 @@ class BlenderLoggingWrapper:
         """
 
         self._logger = logger
+        self._buffer = []
 
-    def _log(self, msg, level):
-        """ Helper function which takes log message and adds it to the log_items list.
+    def _handel_logging_message(self, props, msg, level):
 
-        :param level: The logging level of the message
-        :type level: enum
-        :param msg: The logging message
-        :type msg: str
-        :rtype: void
-        """
-
-        props = bpy.context.scene.props
         lines = msg.splitlines()
         line_count = len(lines)
         time = gmtime()
@@ -76,6 +70,30 @@ class BlenderLoggingWrapper:
             props.selected_log_item = props.selected_log_item + line_count
 
         force_redraw_addon()
+
+    def _log(self, msg, level):
+        """ Helper function which takes log message and adds it to the log_items list.
+
+        :param level: The logging level of the message
+        :type level: enum
+        :param msg: The logging message
+        :type msg: str
+        :rtype: void
+        """
+
+        # add the message to the logging buffer
+        self._buffer.append((msg, level))
+
+        try:
+            props = bpy.context.scene.props
+        except AttributeError:
+            return
+
+        # handel all messages in the buffer
+        while len(self._buffer) > 0:
+            log_args = self._buffer.pop(0)
+            self._handel_logging_message(props, log_args[0], log_args[1])
+
 
     def debug(self, msg, *args, **kwargs):
         """ Log debug message
@@ -144,6 +162,11 @@ class BlenderLoggingWrapper:
 
         self._log(msg, "ERROR")
         self._logger.critical(msg, *args, **kwargs)
+
+    def clear_logs(self):
+        props = bpy.context.scene.props
+        props.log_items.clear()
+        props.selected_log_item = -1
 
 
 def get_wrapped_logger(name):
