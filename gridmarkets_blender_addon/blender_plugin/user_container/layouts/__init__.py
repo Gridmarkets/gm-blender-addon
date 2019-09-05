@@ -197,10 +197,10 @@ def draw_user_container(self, context):
 
         row = sign_out_box.row()
         row.alignment = "CENTER"
-        row.scale_x = 0.5
 
         # use an operator so that it is actually centered
-        row.operator(constants.OPERATOR_NULL_ID_NAME, text="Signed in as: " + api_client.get_signed_in_user().get_auth_email())
+        row.operator(constants.OPERATOR_NULL_ID_NAME, text="Signed in as: " + api_client.get_signed_in_user().get_auth_email(),
+                     emboss=False)
 
         row = sign_out_box.row()
         row.operator(GRIDMARKETS_OT_sign_out.bl_idname)
