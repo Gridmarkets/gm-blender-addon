@@ -131,8 +131,12 @@ OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME = "gridmarkets.upload_file_as_project"
 OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL = "Upload File as Project"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.frame_range_list_actions"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_LABEL = "Frame Range List Actions"
+OPERATOR_VRAY_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.vray_frame_range_list_actions"
+OPERATOR_VRAY_FRAME_RANGE_LIST_ACTIONS_LABEL = "Frame Range List Actions"
 OPERATOR_EDIT_FRAME_RANGE_ID_NAME = "gridmarkets.edit_frame_range"
 OPERATOR_EDIT_FRAME_RANGE_LABEL = "Edit Frame Range"
+OPERATOR_EDIT_VRAY_FRAME_RANGE_ID_NAME = "gridmarkets.edit_vray_frame_range"
+OPERATOR_EDIT_VRAY_FRAME_RANGE_LABEL = "Edit Frame Range"
 OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME = "gridmarkets.save_logs_to_file"
 OPERATOR_SAVE_LOGS_TO_FILE_LABEL = "Save logs to file"
 OPERATOR_TRACE_PROJECT_ID_NAME = "gridmarkets.trace_blend_file"
@@ -214,6 +218,9 @@ ICON_DEFAULT_USER = 'SOLO_ON'
 ICON_NON_DEFAULT_USER = 'SOLO_OFF'
 
 PROJECT_STATUS_POLLING_ENABLED = False
+
+VRAY_RENDER_RT = "VRAY_RENDER_RT"
+
 
 # register module
 def register():

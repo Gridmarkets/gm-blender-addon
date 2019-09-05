@@ -120,7 +120,12 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             self.project_type = api_constants.PRODUCTS.VRAY
         else:
             self.project_type = api_constants.PRODUCTS.BLENDER
-            self.blender_280_engine = scene.render.engine
+
+            try:
+                self.blender_280_engine = scene.render.engine
+            except TypeError:
+                self.report({"WARNING"}, scene.render.engine + " is not supported with this product type")
+                return {"FINISHED"}
             self.blender_version = api_constants.BLENDER_VERSIONS.V_2_80
 
         # create popup
@@ -136,7 +141,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             packed_project.set_name(self.project_name)
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:
-            packed_project = VRaySceneExporter.export(temp_dir)
+            packed_project = VRaySceneExporter().export(temp_dir)
             packed_project.set_name(self.project_name)
         else:
             raise RuntimeError("Unknown project type")

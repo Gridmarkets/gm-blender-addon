@@ -77,13 +77,7 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
             id = int(id)
 
         for i, remote_project in enumerate(remote_projects):
-            print("remote project.id", remote_project.id)
-            print("remote project.id", type(remote_project.id))
-            print("remote searching for", id)
-            print("remote searching for", type(id))
-            print("equality", remote_project.id == id)
             if remote_project.id == id:
-                print("index:", i)
                 return self.get_at(i)
 
         raise ValueError("no remote project with id: " + str(id))

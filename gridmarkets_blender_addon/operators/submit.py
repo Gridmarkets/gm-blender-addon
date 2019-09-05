@@ -58,6 +58,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
     def invoke(self, context, event):
         props = context.scene.props
+        remote_projects = props.remote_project_container.remote_projects
 
         # only show project name pop up dialog if submitting a new project
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
@@ -68,9 +69,9 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
                     blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
 
-                self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
+                self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=blend_file_name)
             else:
-                self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
+                self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=constants.PROJECT_PREFIX)
 
             # create popup
             return context.window_manager.invoke_props_dialog(self, width=400)

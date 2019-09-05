@@ -64,8 +64,8 @@ def draw_submission_summary(self, context):
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             values.label(text=constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION)
         else:
-            project = props.projects[int(props.project_options) - constants.PROJECT_OPTIONS_STATIC_COUNT]
-            values.label(text=project.name)
+            project = utils_blender.get_selected_project_options(scene, context, props.project_options)#props.projects[int(props.project_options) - constants.PROJECT_OPTIONS_STATIC_COUNT]
+            values.label(text=project.get_name())
         values.separator()
 
         if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:

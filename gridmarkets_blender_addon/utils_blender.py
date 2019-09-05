@@ -782,7 +782,7 @@ def get_job_frame_ranges(context, job=None):
             job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
 
     # use scene frame settings unless the user has overridden them
-    if job.use_custom_frame_ranges:
+    if (not hasattr(job, "use_custom_frame_ranges")) or job.use_custom_frame_ranges:
 
         # filter disabled frame ranges
         frame_ranges = filter(lambda frame_range: frame_range.enabled, job.frame_ranges)
@@ -807,13 +807,17 @@ def do_frame_ranges_overlap(job):
     :rtype: bool
     """
 
-    if not job.use_custom_frame_ranges:
+    if hasattr(job, "use_custom_frame_ranges") and not job.use_custom_frame_ranges:
         return False
 
     # buffer to store frames already seen
     frames_buffer = []
 
     for frame_range in job.frame_ranges:
+
+        if not frame_range.enabled:
+            continue
+
         start = frame_range.frame_start
         end = frame_range.frame_end
         step = frame_range.frame_step
@@ -1301,3 +1305,58 @@ def get_sys_info():
 
     return sys_info
 
+def get_selected_project_options(scene, context, id):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon.icon_loader import IconLoader
+    from gridmarkets_blender_addon import api_constants
+    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
+
+    props = context.scene.props
+
+    project_options = [
+        # it is always an option to upload as a new project
+        (constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_LABEL,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION,
+         'FILE_NEW', 0)
+    ]
+
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+        remote_project_container = plugin.get_remote_project_container()
+        remote_projects = remote_project_container.get_all()
+
+        a = 0
+
+        # iterate through uploaded projects and add them as options
+        for i, project in enumerate(remote_projects):
+            project_product = project.get_attribute("PRODUCT")
+
+            # get the correct icon
+            if project_product == "vray":
+                icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
+            elif project_product == "blender":
+                icon = constants.ICON_BLENDER
+            else:
+                icon = constants.ICON_PROJECT
+
+            # if render engine set to V-Ray only return VRay projects
+            if context.scene.render.engine == constants.VRAY_RENDER_RT and project_product == api_constants.PRODUCTS.VRAY:
+                append = True
+            elif context.scene.render.engine != constants.VRAY_RENDER_RT and project_product != api_constants.PRODUCTS.VRAY:
+                # otherwise only return blender projects
+                append = True
+            else:
+                append = False
+
+            if append:
+                a += 1
+
+                if a == int(id):
+                    return project
+
+                project_options.append(
+                    (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
+
+    return project_options

@@ -26,6 +26,9 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts i
 from gridmarkets_blender_addon.layouts.jobs import draw_jobs
 from gridmarkets_blender_addon.layouts.console import draw_console, draw_compact_console
 
+from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
+from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
+
 
 def draw_body(self, context):
     layout = self.layout
@@ -37,6 +40,7 @@ def draw_body(self, context):
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         if context.scene.render.engine == "VRAY_RENDER_RT":
+
             from gridmarkets_blender_addon import utils_blender
 
             # submit box

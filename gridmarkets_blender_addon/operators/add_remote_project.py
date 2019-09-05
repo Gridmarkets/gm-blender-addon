@@ -123,17 +123,20 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width=400)
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         dir = pathlib.Path(self.project_name)
         main_file = dir / pathlib.Path(self.project_file)
 
         if self.project_type == api_constants.PRODUCTS.BLENDER:
             remote_project = RemoteBlenderProject(dir, main_file)
 
+
         elif self.project_type == api_constants.PRODUCTS.VRAY:
             remap_file = dir / pathlib.Path(self.remap_file)
             remote_project = RemoteVRayProject(dir, main_file, remap_file)
 
-        #utils_blender._add_project_to_list(remote_project.get_name(), context.scene.props)
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_remote_project_container().append(remote_project)
 
         # reset string inputs, enum inputs don't really need to reset to default values
         self.project_name = ""
