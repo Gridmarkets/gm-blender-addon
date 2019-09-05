@@ -80,7 +80,6 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-        from gridmarkets_blender_addon import api_constants
         from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 
         props = context.scene.props

@@ -36,9 +36,43 @@ def draw_body(self, context):
     row.prop_tabs_enum(props, "tab_options", icon_only=True)
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-        draw_submission_settings(self, context)
-        draw_submission_summary(self, context)
-        draw_compact_console(self, context)
+        if context.scene.render.engine == "VRAY_RENDER_RT":
+            from gridmarkets_blender_addon import utils_blender
+
+            # submit box
+            box = self.layout.box()
+            row = box.column(align=True)
+
+            # project options
+            row.label(text="Project")
+            sub = row.row()
+            sub.enabled = False
+            sub.label(text="The project to run the selected job against.")
+            row.separator()
+            row.prop(props, "project_options", text="")
+
+            submit_text = "Submit V-Ray Project"
+            submit_icon = "NONE"
+
+            # submit button / progress indicator
+            row = box.row(align=True)
+            row.scale_y = 2.5
+            if props.submitting_project:
+                row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
+            else:
+                # disable submit button when uploading project
+                if props.uploading_project:
+                    row.enabled = False
+
+                if not utils_blender.is_addon_enabled("vb30"):
+                    row.enabled = False
+
+                row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
+        else:
+            draw_submission_settings(self, context)
+            draw_submission_summary(self, context)
+            draw_compact_console(self, context)
+
     elif props.tab_options == constants.TAB_PROJECTS:
         draw_remote_project_container(self, context)
         draw_compact_console(self, context)
