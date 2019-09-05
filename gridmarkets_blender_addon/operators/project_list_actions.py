@@ -31,9 +31,7 @@ class GRIDMARKETS_OT_project_list_actions(bpy.types.Operator):
         items=(
             ('UP', "Up", ""),
             ('DOWN', "Down", ""),
-            ('REMOVE', "Remove", ""),
-            ('UPLOAD', "Upload", ""),
-            ('UPLOAD_FILE', "Upload File", "")
+            ('REMOVE', "Remove", "")
         )
     )
 
@@ -67,12 +65,6 @@ class GRIDMARKETS_OT_project_list_actions(bpy.types.Operator):
                 # select the previous project if the selected project isn't already the first in the list
                 if props.selected_project > 0:
                     props.selected_project -= 1
-
-        if self.action == 'UPLOAD':
-            bpy.ops.gridmarkets.upload_project('INVOKE_DEFAULT')
-
-        if self.action == 'UPLOAD_FILE':
-            bpy.ops.gridmarkets.upload_file_as_project('INVOKE_DEFAULT')
 
         return {"FINISHED"}
 

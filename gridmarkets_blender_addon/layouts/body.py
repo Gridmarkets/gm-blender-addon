@@ -23,7 +23,7 @@ from gridmarkets_blender_addon import constants
 
 from gridmarkets_blender_addon.layouts.submission_settings import draw_submission_settings, draw_submission_summary
 from gridmarkets_blender_addon.layouts.preferences import draw_preferences
-from gridmarkets_blender_addon.layouts.projects import draw_projects
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts import draw_remote_project_container
 from gridmarkets_blender_addon.layouts.jobs import draw_jobs
 from gridmarkets_blender_addon.layouts.console import draw_console, draw_compact_console
 from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
@@ -52,7 +52,7 @@ def draw_body(self, context):
         draw_submission_summary(col, context)
         draw_compact_console(col, context)
     elif props.tab_options == constants.TAB_PROJECTS:
-        draw_projects(col, context)
+        draw_remote_project_container(col, context)
         draw_compact_console(col, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         draw_jobs(col, context)

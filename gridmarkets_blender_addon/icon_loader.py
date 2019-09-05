@@ -69,8 +69,44 @@ class IconLoader:
 
         # load a preview thumbnail of the icon and store in the previews collection
         preview_collection.load(constants.GRIDMARKETS_LOGO_ID,
-                                os.path.join(my_icons_dir,
-                                             constants.GM_GREYSCALE_LOGO),
+                                os.path.join(my_icons_dir, constants.GM_GREYSCALE_LOGO),
+                                'IMAGE')
+
+        # load a preview thumbnail of the icon and store in the previews collection
+        preview_collection.load(constants.VRAY_LOGO_ID,
+                                os.path.join(my_icons_dir, constants.VRAY_LOGO),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_0_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_0),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_1_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_1),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_2_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_2),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_3_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_3),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_4_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_4),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_5_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_5),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_6_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_6),
+                                'IMAGE')
+
+        preview_collection.load(constants.CUSTOM_SPINNER_ICON_7_ID,
+                                os.path.join(my_icons_dir, constants.CUSTOM_SPINNER_ICON_7),
                                 'IMAGE')
 
         IconLoader._icon_preview_collections[constants.MAIN_COLLECTION_ID] = preview_collection

@@ -26,11 +26,21 @@ from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRan
 from gridmarkets_blender_addon.property_groups.job_props import JobProps
 from gridmarkets_blender_addon.property_groups.project_props import ProjectProps
 from gridmarkets_blender_addon.property_groups.log_item_props import LogItemProps
+from gridmarkets_blender_addon.blender_plugin.user_interface.property_groups.user_interface_props import \
+    UserInterfaceProps
+from gridmarkets_blender_addon.blender_plugin.remote_project.property_groups.remote_project_props import \
+    RemoteProjectProps
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.property_groups.remote_project_container_props import \
+    RemoteProjectContainerProps
 from gridmarkets_blender_addon.property_groups.custom_settings_views import CustomSettingsViews
 
 
 def _get_project_options(scene, context):
     """ Returns a list of items representing project options """
+
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon.icon_loader import IconLoader
+    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
 
     props = context.scene.props
 
@@ -42,9 +52,25 @@ def _get_project_options(scene, context):
          'FILE_NEW', 0)
     ]
 
-    # iterate through uploaded projects and add them as options
-    for i, project in enumerate(props.projects):
-        project_options.append((str(i + 1), project.name, '', '', project.id))
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+
+        remote_project_container = plugin.get_remote_project_container()
+
+        # iterate through uploaded projects and add them as options
+        for i, project in enumerate(remote_project_container.get_all()):
+
+            product = project.get_attribute("PRODUCT")
+            if product == "vray":
+                icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
+            elif product == "blender":
+                icon = constants.ICON_BLENDER
+            else:
+                icon = constants.ICON_PROJECT
+
+            project_options.append(
+                (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
 
     return project_options
 
@@ -72,21 +98,13 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessible via the interface.
     """
 
-    # artist name
-    artist_name = bpy.props.StringProperty(
-        name="Artist",
-        description="The name of the Artist is optional",
-        default="",
-        maxlen=1024,
-        )
-        
-    # submission comment
-    submission_comment = bpy.props.StringProperty(
-        name="Comment",
-        description="",
-        default="",
-        maxlen=1024,
-        )
+    user_interface = bpy.props.PointerProperty(
+        type=UserInterfaceProps
+    )
+
+    remote_project_container = bpy.props.PointerProperty(
+        type=RemoteProjectContainerProps,
+    )
 
     # project collection
     projects = bpy.props.CollectionProperty(
@@ -122,8 +140,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     )
 
     selected_log_item = bpy.props.IntProperty(
-        default=-1, # must be negative one otherwise the logic that selects new log items wont work
-        options = set()
+        default=-1,  # must be negative one otherwise the logic that selects new log items wont work
+        options=set()
     )
 
     # logging items
@@ -221,13 +239,15 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     custom_settings_views = bpy.props.PointerProperty(type=CustomSettingsViews)
 
 
-
 classes = (
     CustomSettingsViews,
     FrameRangeProps,
     JobProps,
     ProjectProps,
     LogItemProps,
+    UserInterfaceProps,
+    RemoteProjectProps,
+    RemoteProjectContainerProps,
     GRIDMARKETS_PROPS_Addon_Properties,
 )
 
@@ -268,4 +288,3 @@ def unregister():
 
     # remove event handler
     bpy.app.handlers.load_post.remove(reset_to_defaults)
-

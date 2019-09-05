@@ -105,6 +105,20 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             render.resolution_percentage = old_settings['res_percent']
             render.display_mode = old_settings['display_mode']
 
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        api_client = plugin.get_api_client()
+
+        if not api_client.is_user_signed_in():
+            user_container = plugin.get_preferences_container().get_user_container()
+            default_user = user_container.get_default_user()
+
+            if default_user:
+                user_container.focus_item(default_user)
+                user_container.load_focused_profile()
+                bpy.ops.gridmarkets.sign_in_new_user({"screen": screen, "window": window}, "INVOKE_DEFAULT")
+
         return {"FINISHED"}
 
 

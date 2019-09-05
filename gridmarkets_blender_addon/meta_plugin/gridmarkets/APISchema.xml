@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<APISchema>
+
+    <JobDefinitions>
+        <JobDefinition id="BLENDER_CYCLES">
+
+            <DisplayName>Blender Cycles</DisplayName>
+
+            <Attribute key="name">
+                <DisplayName>Name</DisplayName>
+                <Description>The name of the job.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+            </Attribute>
+
+            <Attribute key="frame_ranges">
+                <DisplayName>Frame ranges</DisplayName>
+                <Description>The frame ranges to render.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+            </Attribute>
+
+            <Attribute key="output_path">
+                <DisplayName>Output Path</DisplayName>
+                <Description>The path to output the render results to.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+            </Attribute>
+
+            <Attribute key="output_prefix">
+                <DisplayName>Output Prefix</DisplayName>
+                <Description>The prefix to add to render results.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+            </Attribute>
+
+            <Attribute key="output_format">
+                <DisplayName>Output Format</DisplayName>
+                <Description>The output format to use when rendering the scene.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>TGA</Key>
+                        <DisplayName>TGA</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>RAWTGA</Key>
+                        <DisplayName>RAWTGA</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>JPEG</Key>
+                        <DisplayName>JPEG</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>JPEG2000</Key>
+                        <DisplayName>JPEG 2000</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>IRIS</Key>
+                        <DisplayName>IRIS</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>PNG</Key>
+                        <DisplayName>PNG</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>TARGA</Key>
+                        <DisplayName>Targa</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>TARGA_RAW</Key>
+                        <DisplayName>Targa Raw</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>BMP</Key>
+                        <DisplayName>BMP</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>CINEON</Key>
+                        <DisplayName>Cineon</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>DPX</Key>
+                        <DisplayName>DPX</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>OPEN_EXR_MULTILAYER</Key>
+                        <DisplayName>OpenEXR Multilayer</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>EXR</Key>
+                        <DisplayName>OpenEXR</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>HDR</Key>
+                        <DisplayName>Radiance HDR</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>TIFF</Key>
+                        <DisplayName>TIFF</DisplayName>
+                        <Description></Description>
+                    </Item>
+                </Items>
+            </Attribute>
+
+            <Attribute key="render_engine">
+                <DisplayName>Render Engine</DisplayName>
+                <Description>The render engine to use when rendering the scene.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>CYCLES</Key>
+                        <DisplayName>Cycles</DisplayName>
+                        <Description></Description>
+                    </Item>
+                </Items>
+            </Attribute>
+
+            <Attribute key="render_device">
+                <DisplayName>Render Device</DisplayName>
+                <Description>The render device to use when rendering the scene.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>CPU</Key>
+                        <DisplayName>CPU</DisplayName>
+                        <Description></Description>
+                    </Item>
+                    <Item>
+                        <Key>GPU</Key>
+                        <DisplayName>GPU</DisplayName>
+                        <Description></Description>
+                    </Item>
+                </Items>
+            </Attribute>
+
+        </JobDefinition>
+    </JobDefinitions>
+
+    <ProjectAttributes>
+
+        <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
+            <DisplayName>Render Engine</DisplayName>
+            <Description>The render engine the project is set to use.</Description>
+            <ValidProject>True</ValidProject>
+            <Type>ENUM</Type>
+            <Items>
+                <Item>
+                    <Key>INTERNAL</Key>
+                    <DisplayName>Blender Internal</DisplayName>
+                    <Description>The internal blender engine.</Description>
+                </Item>
+                <Item>
+                    <Key>CYCLES</Key>
+                    <DisplayName>Cycles</DisplayName>
+                    <Description>Blender Cycles</Description>
+                </Item>
+            </Items>
+            <Transitions></Transitions>
+            <CompatibleJobTypes>
+                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
+            </CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
+            <DisplayName>Render Engine</DisplayName>
+            <Description>The render engine the project is set to use.</Description>
+            <ValidProject>True</ValidProject>
+            <Type>ENUM</Type>
+            <Items>
+                <Item>
+                    <Key>CYCLES</Key>
+                    <DisplayName>Cycles</DisplayName>
+                    <Description>Blender Cycles</Description>
+                </Item>
+                <Item>
+                    <Key>EEVEE</Key>
+                    <DisplayName>Eevee</DisplayName>
+                    <Description>Blender Eevee</Description>
+                </Item>
+            </Items>
+            <Transitions></Transitions>
+            <CompatibleJobTypes>
+                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
+            </CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_79_MAIN_PROJECT_FILE">
+            <Key>MAIN_FILE</Key>
+            <DisplayName>Main project file</DisplayName>
+            <Description>The main .blend file for your project.</Description>
+            <ValidProject>False</ValidProject>
+            <Type>STRING</Type>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_80_MAIN_PROJECT_FILE">
+            <Key>MAIN_FILE</Key>
+            <DisplayName>Main project file</DisplayName>
+            <Description>The main .blend file for your project.</Description>
+            <ValidProject>False</ValidProject>
+            <Type>STRING</Type>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_VERSION">
+            <Key>VERSION</Key>
+            <DisplayName>Version</DisplayName>
+            <Description>The version of Blender</Description>
+            <ValidProject>False</ValidProject>
+            <Type>ENUM</Type>
+            <Items>
+                <Item>
+                    <Key>2.79</Key>
+                    <DisplayName>2.79</DisplayName>
+                    <Description>Blender 2.79</Description>
+                </Item>
+                <Item>
+                    <Key>2.80</Key>
+                    <DisplayName>2.80</DisplayName>
+                    <Description>Blender 2.80</Description>
+                </Item>
+            </Items>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
+                    <TransitionFormula>2.79</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
+                    <TransitionFormula>2.80</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="VRAY_REMAP_FILE">
+            <DisplayName>V-Ray re-map file</DisplayName>
+            <Description>The V-Ray re-map file for the project.</Description>
+            <ValidProject>True</ValidProject>
+            <Type>STRING</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="VRAY_SCENE_FILE">
+            <Key>MAIN_FILE</Key>
+            <DisplayName>V-Ray scene file</DisplayName>
+            <Description>The main .vrscene file for the project.</Description>
+            <ValidProject>False</ValidProject>
+            <Type>STRING</Type>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>VRAY_REMAP_FILE</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="VRAY_VERSION">
+            <Key>VERSION</Key>
+            <DisplayName>Version</DisplayName>
+            <Description>The version of V-Ray</Description>
+            <ValidProject>False</ValidProject>
+            <Type>ENUM</Type>
+            <Items>
+                <Item>
+                    <Key>3.60.03</Key>
+                    <DisplayName>3.60.03</DisplayName>
+                    <Description>V-Ray 3.60.03</Description>
+                </Item>
+                <Item>
+                    <Key>3.60.04</Key>
+                    <DisplayName>3.60.04</DisplayName>
+                    <Description>V-Ray 3.60.04</Description>
+                </Item>
+                <Item>
+                    <Key>3.60.05</Key>
+                    <DisplayName>3.60.05</DisplayName>
+                    <Description>V-Ray 3.60.05</Description>
+                </Item>
+                <Item>
+                    <Key>4.02.05</Key>
+                    <DisplayName>4.02.05</DisplayName>
+                    <Description>V-Ray 4.02.05</Description>
+                </Item>
+                <Item>
+                    <Key>4.10.01</Key>
+                    <DisplayName>4.10.01</DisplayName>
+                    <Description>V-Ray 4.10.01</Description>
+                </Item>
+                <Item>
+                    <Key>4.10.02</Key>
+                    <DisplayName>4.10.02</DisplayName>
+                    <Description>V-Ray 4.10.02</Description>
+                </Item>
+            </Items>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>VRAY_SCENE_FILE</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="PRODUCT">
+            <Key>PRODUCT</Key>
+            <DisplayName>Product</DisplayName>
+            <Description>A GridMarkets product.</Description>
+            <ValidProject>False</ValidProject>
+            <Type>ENUM</Type>
+            <Items>
+                <Item>
+                    <Key>blender</Key>
+                    <DisplayName>Blender</DisplayName>
+                    <Description>Blender is a professional, free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D printed models, interactive 3D applications and video games</Description>
+                </Item>
+                <Item>
+                    <Key>vray</Key>
+                    <DisplayName>V-Ray</DisplayName>
+                    <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997</Description>
+                </Item>
+            </Items>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_VERSION</ProjectAttributeId>
+                    <TransitionFormula>blender</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>VRAY_VERSION</ProjectAttributeId>
+                    <TransitionFormula>vray</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+
+        </ProjectAttribute>
+
+        <ProjectAttribute id="GM_PROJECT_NAME">
+            <Key>PROJECT_NAME</Key>
+            <DisplayName>Project name</DisplayName>
+            <Description>The name of the project as specified in Envoy.</Description>
+            <ValidProject>False</ValidProject>
+            <Type>STRING</Type>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>PRODUCT</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+    </ProjectAttributes>
+</APISchema>

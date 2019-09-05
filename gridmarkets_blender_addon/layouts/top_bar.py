@@ -19,12 +19,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.icon_loader import IconLoader
 
 _old_header_draw = None
-
 
 def draw_GM_operator(layout, context):
     # get the GridMarkets icon
@@ -67,4 +65,3 @@ def register():
 
 def unregister():
     bpy.types.INFO_MT_editor_menus.draw_menus = _old_header_draw
-

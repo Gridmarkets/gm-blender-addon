@@ -17,52 +17,49 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
 import bpy
+
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.blender_plugin.user.property_groups.user_props import UserProps
+from gridmarkets_blender_addon.blender_plugin.user_container.property_groups.user_container_props import UserContainerProps
 
 
 class AddonPreferences(bpy.types.AddonPreferences):
     """ 
-    This class holds the user's preferences for the addon. They are set in the 
+    This class holds the user's preferences for the add-on. They are set in the
     user preferences window in the Add-ons tab.
     """
 
-    # the bl_idname must match the addon's package name
+    # the bl_idname must match the add-on's package name
     bl_idname = constants.ADDON_PACKAGE_NAME
 
-    _auth_email_description = "Your " + constants.COMPANY_NAME + " account email"
-    _auth_accessKey_description = "Your " + constants.COMPANY_NAME + " access key. This is different from your "\
-                                  "password and can be found by opening the " + constants.COMPANY_NAME + " mangager " \
-                                  "portal and viewing your profile details"
-
-    # user's email
-    auth_email = bpy.props.StringProperty(
-        name="Email",
-        description=_auth_email_description,
-        default="",
-        maxlen=1024,
-        )
-    
-    # user's gridmarkets access key
-    auth_accessKey = bpy.props.StringProperty(
-        name="Access Key",
-        description=_auth_accessKey_description,
-        default="",
-        maxlen=1024,
-        subtype='PASSWORD'
-        )
+    saved_profiles = bpy.props.PointerProperty(
+        type=UserContainerProps
+    )
 
     def draw(self, context):
-        layout = self.layout
-        layout.prop(self, "auth_email")
-        layout.prop(self, "auth_accessKey")
+        from gridmarkets_blender_addon.blender_plugin.user_container.layouts import draw_user_container
+        draw_user_container(self, context)
+
+
+classes = (
+    UserProps,
+    UserContainerProps,
+    AddonPreferences,
+)
 
 
 def register():
-    # register add-on preferences
-    bpy.utils.register_class(AddonPreferences)
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
 
 def unregister():
-    # unregister add-on preferences
-    bpy.utils.unregister_class(AddonPreferences)
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)

@@ -19,6 +19,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+# noinspection PyUnresolvedReferences
+import addon_utils
 import inspect
 import pathlib
 import os
@@ -29,7 +31,7 @@ from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon import utils
 from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
 from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
+from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
 from gridmarkets.envoy_client import EnvoyClient
 from gridmarkets.project import Project
@@ -466,6 +468,119 @@ def delete_temp_files_for_project(project_name):
         log.info("Project association does not exist")
 
 
+def submit_new_vray_project(packed_project: PackedProject, job_name: str, frame_ranges: str, output_height, output_width,
+                            output_prefix, output_format, output_path: pathlib.Path):
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    packed_dir = str(packed_project.get_root_dir())
+
+    try:
+        # create an instance of Envoy client
+        client = get_envoy_client()
+
+        # create the project
+        project = Project(packed_dir, packed_project.get_name())
+
+        # add files to project
+        # only files and folders within the project path can be added, use relative or full path
+        # any other paths passed will be ignored
+        log.info("Adding '" + packed_dir + "' to " + constants.COMPANY_NAME + " project...")
+        project.add_folders(packed_dir)
+
+        # get product resolver
+        resolver = client.get_product_resolver()
+
+        # get products for Houdini product type
+        qry = 'vray'
+        products = resolver.get_versions_by_type(qry)
+
+        JOB_NAME = job_name
+        PRODUCT_TYPE = "vray"
+        PRODUCT_VERSION = products[-1]
+        OPERATION = "render"
+        PATH = '/' + packed_project.get_name() + '/' + str(packed_project.get_relative_main_file())
+        FRAMES = frame_ranges
+        OUTPUT_HEIGHT = output_height
+        OUTPUT_WIDTH = output_width
+        OUTPUT_PREFIX = output_prefix
+        OUTPUT_FORMAT = output_format
+        REMAP_FILE = packed_project.get_remap_file_name()
+
+        print("JOB_NAME", JOB_NAME)
+        print("PRODUCT_TYPE", PRODUCT_TYPE)
+        print("PRODUCT_VERSION", PRODUCT_VERSION)
+        print("OPERATION", OPERATION)
+        print("PATH", PATH)
+        print("FRAMES", FRAMES)
+        print("OUTPUT_HEIGHT", OUTPUT_HEIGHT)
+        print("OUTPUT_WIDTH", OUTPUT_WIDTH)
+        print("OUTPUT_PREFIX", OUTPUT_PREFIX)
+        print("OUTPUT_FORMAT", OUTPUT_FORMAT)
+        print("REMAP_FILE", REMAP_FILE)
+
+        job = Job(
+          JOB_NAME, # job name
+          PRODUCT_TYPE, # product type
+          PRODUCT_VERSION, # product version
+          OPERATION, # operation
+          PATH, # job file to be run, note that the path is relative to the project name which is also the remote folder name
+          frames=FRAMES, # rest are all job specific params
+          output_height=OUTPUT_HEIGHT,
+          output_width=OUTPUT_WIDTH,
+          output_prefix=OUTPUT_PREFIX,
+          output_format=OUTPUT_FORMAT,
+          remap_file=REMAP_FILE,
+        )
+
+        # results regex pattern to download
+        # `project.remote_output_folder` provides the remote root folder under which results are available
+        # below is the regex to look for all folders and files under `project.remote_output_folder`
+        output_pattern = '{0}/.+'.format(project.remote_output_folder)
+
+        # create a watch file
+        watch_file = WatchFile(output_pattern, str(output_path))
+
+        # set the output directory
+        project.add_watch_files(watch_file)
+
+        log.info("Submitted V-Ray Job Settings: \n" +
+                 "\tproject_name: %s\n" % project.name +
+                 "\tjob.app: %s\n" % job.app +
+                 "\tjob.name: %s\n" % job.name +
+                 "\tjob.app_version: %s\n" % job.app_version +
+                 "\tjob.operation: %s\n" % job.operation +
+                 "\tjob.path: %s\n" % job.path +
+                 "\tjob.frames: %s\n" % job.params['frames'] +
+                 "\tjob.output_prefix: %s\n" % job.params['output_prefix'] +
+                 "\tjob.output_format: %s\n" % job.params['output_format'] +
+                 "\tjob.engine: %s\n" % job.params['engine'] +
+                 "\tdownload_path: %s\n" % str(output_path)
+                 )
+
+        project.add_jobs(job)
+
+        client.submit_project(project)
+
+        log.info("Submitted V-Ray job")
+
+    except InvalidInputError as e:
+        log.warning("Invalid Input Error: " + e.user_message)
+        raise e
+    except AuthenticationError as e:
+        log.error("Authentication Error: " + e.user_message)
+        raise e
+    except InsufficientCreditsError as e:
+        log.error("Insufficient Credits Error: " + e.user_message)
+        raise e
+    except InvalidRequestError as e:
+        log.error("Invalid Request Error: " + e.user_message)
+        raise e
+    except APIError as e:
+        log.error("API Error: " + str(e.user_message))
+        raise e
+
+
 def _scale_percentage(min_percentage, max_percentage, percentage):
     return min_percentage + ((max_percentage - min_percentage) / 100) * percentage
 
@@ -538,6 +653,11 @@ def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
         _set_progress(progress=40, status="Creating packed directory")
         os.mkdir(str(packed_dir))
 
+        from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
+        blender_scene_exporter = BlenderSceneExporter()
+        blender_scene_exporter.export(packed_dir)
+
+        """
         # create the progress callback
         progress_cb = BatProgressCallback(log)
 
@@ -550,6 +670,7 @@ def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
         if pack_info_file.is_file():
             log.info("Removing '%s'..." % str(pack_info_file))
             pack_info_file.unlink()
+        """
 
         # create the project
         project = Project(str(packed_dir), project_name)
@@ -599,6 +720,23 @@ def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
         # hide the progress meter if unless skipping upload
         if not skip_upload:
             setattr(context.scene.props, progress_attribute_name, False)
+
+
+def get_blend_file_name():
+    # get method logger
+    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+
+    # if the file has been saved
+    if bpy.context.blend_data.is_saved:
+        # use the name of the saved .blend file
+        blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
+        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
+    else:
+        # otherwise create a name for the packed .blend file
+        blend_file_name = 'main_GM_blend_file_packed.blend'
+        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
+
+    return blend_file_name
 
 
 def upload_project(context, project_name, temp_dir_manager,
@@ -653,15 +791,7 @@ def upload_project(context, project_name, temp_dir_manager,
     setattr(context.scene.props, progress_attribute_name, True)
     _set_progress(progress=0, status="Starting project upload")
 
-    # if the file has been saved
-    if bpy.context.blend_data.is_saved:
-        # use the name of the saved .blend file
-        blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
-    else:
-        # otherwise create a name for the packed .blend file
-        blend_file_name = 'main_GM_blend_file_packed.blend'
-        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
+    blend_file_name = get_blend_file_name()
 
     # create a new temp directory
     temp_dir_path = temp_dir_manager.get_temp_directory()
@@ -836,7 +966,7 @@ def get_job_render_engine(context, job=None):
 
 
 def get_supported_render_engines():
-    return {"CYCLES"}
+    return {"CYCLES", "VRAY_RENDER_RT"}
 
 
 def get_user_friendly_name_for_engine(engine: str):
@@ -848,9 +978,59 @@ def get_user_friendly_name_for_engine(engine: str):
         return "Blender Internal"
     elif engine == "BLENDER_WORKBENCH":
         return "Blender Workbench"
+    elif engine == "VRAY_RENDER_RT":
+        return "V-Ray"
     else:
         # if not know just return the enum name for it
         return engine
+
+
+def get_supported_products(scene, context):
+    from gridmarkets_blender_addon.api_constants import PRODUCTS
+
+    return [
+        (PRODUCTS.BLENDER, "Blender", ""),
+        (PRODUCTS.VRAY, "V-Ray", ""),
+    ]
+
+
+def get_supported_blender_versions(scene, context):
+    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+
+    return [
+        (BLENDER_VERSIONS.V_2_80, "2.80", ""),
+        (BLENDER_VERSIONS.V_2_79, "2.79", ""),
+    ]
+
+
+def get_supported_blender_279_engines(scene, context):
+    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+
+    return [
+        (BLENDER_ENGINES.CYCLES, "Cycles", ""),
+        (BLENDER_ENGINES.INTERNAL, "Internal", ""),
+    ]
+
+
+def get_supported_blender_280_engines(scene, context):
+    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+
+    return [
+        (BLENDER_ENGINES.CYCLES, "Cycles", ""),
+        (BLENDER_ENGINES.EEVEE, "Eevee", ""),
+    ]
+
+def get_supported_vray_versions(scene, context):
+    from gridmarkets_blender_addon.api_constants import VRAY_VERSIONS
+
+    return [
+        (VRAY_VERSIONS.V_3_60_03, "3.60.03", ""),
+        (VRAY_VERSIONS.V_3_60_04, "3.60.04", ""),
+        (VRAY_VERSIONS.V_3_60_05, "3.60.05", ""),
+        (VRAY_VERSIONS.V_4_02_05, "4.02.05", ""),
+        (VRAY_VERSIONS.V_4_10_01, "4.10.01", ""),
+        (VRAY_VERSIONS.V_4_10_02, "4.10.02", ""),
+    ]
 
 
 def get_job_output_format(context, job=None):
@@ -1125,9 +1305,6 @@ def get_addon(module_name):
     :rtype: (bpy.types.Addon, module_bl_info)
     """
 
-    # noinspection PyUnresolvedReferences
-    import addon_utils
-
     for module in addon_utils.modules(refresh=False):
         info = addon_utils.module_bl_info(module)
 
@@ -1140,8 +1317,8 @@ def get_addon(module_name):
     return None
 
 def force_redraw_addon():
-    redraw_region(constants.WINDOW_SPACE_TYPE, constants.PANEL_REGION_TYPE)
-
+    #redraw_region(constants.WINDOW_SPACE_TYPE, constants.PANEL_REGION_TYPE)
+    redraw_area(constants.WINDOW_SPACE_TYPE)
 
 def redraw_area(area_type):
     # the screen may be None if method is called from a different thread
@@ -1171,6 +1348,26 @@ def get_addon_window():
 def addon_draw_condition(self, context):
     return context.screen.name == constants.INJECTED_SCREEN_NAME
 
+def get_spinner(index: int):
+    from gridmarkets_blender_addon.icon_loader import IconLoader
+    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
+
+    if index == 0:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_0_ID]
+    elif index == 1:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_1_ID]
+    elif index == 2:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_2_ID]
+    elif index == 3:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_3_ID]
+    elif index == 4:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_4_ID]
+    elif index == 5:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_5_ID]
+    elif index == 6:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_6_ID]
+    else:
+        return preview_collection[constants.CUSTOM_SPINNER_ICON_7_ID]
 
 def get_logs(self, context):
     props = context.scene.props
@@ -1196,4 +1393,25 @@ def get_logs(self, context):
     for log_item in props.log_items:
         output = output + os.linesep + _get_log_text(log_item)
 
-    return output
+    return get_sys_info() + os.linesep + output
+
+
+def is_addon_enabled(addon_name: str):
+    is_enabled, is_loaded = addon_utils.check(addon_name)
+    return is_enabled and is_loaded
+
+
+def get_sys_info():
+    import platform
+
+    blender_version = bpy.app.version
+    addon_version = constants.PLUGIN_VERSION
+
+    sys_info = "Operating System: " + platform.platform() + os.linesep
+    sys_info = sys_info + "Blender Version: " + str(blender_version[0]) + '.' + str(blender_version[1]) + '.' + \
+               str(blender_version[2]) + os.linesep
+    sys_info = sys_info + "Add-on Version: " + str(addon_version["major"]) + '.' + str(addon_version["minor"]) + \
+               '.' + str(addon_version["build"]) + os.linesep
+
+    return sys_info
+

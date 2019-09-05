@@ -19,9 +19,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
+import pathlib
 import threading
-from gridmarkets_blender_addon import constants, utils, utils_blender
+
+from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
 from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
+from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
+from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 
 from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
 log = get_wrapped_logger(__name__)
@@ -31,6 +37,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
     bl_icon = constants.ICON_BLEND_FILE
+    bl_description = "Upload the current scene as a new project."
     bl_options = {'UNDO'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
@@ -39,6 +46,44 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         description="The name of your project",
         default="",
         maxlen=256
+    )
+
+    project_type = bpy.props.EnumProperty(
+        name="Project Type",
+        items=utils_blender.get_supported_products
+    )
+
+    blender_280_engine = bpy.props.EnumProperty(
+        name="Blender engine",
+        items=utils_blender.get_supported_blender_280_engines
+    )
+
+    blender_279_engine = bpy.props.EnumProperty(
+        name="Blender engine",
+        items=utils_blender.get_supported_blender_279_engines
+    )
+
+    blender_version = bpy.props.EnumProperty(
+        name="Blender version",
+        items=utils_blender.get_supported_blender_versions
+    )
+
+    vray_version = bpy.props.EnumProperty(
+        name="V-Ray version",
+        items=utils_blender.get_supported_vray_versions
+    )
+
+    project_file = bpy.props.StringProperty(
+        name="Project file",
+        subtype="FILE_PATH",
+        default="<Generated during upload>",
+    )
+
+    remap_file = bpy.props.StringProperty(
+        name="Re-map file",
+        subtype="FILE_PATH",
+        default="<Generated during upload>",
+        description="The name of the remap file",
     )
 
     _timer = None
@@ -57,7 +102,8 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         return {'PASS_THROUGH'}
 
     def invoke(self, context, event):
-        props = context.scene.props
+        scene = context.scene
+        props = scene.props
 
         # if the file has been saved use the name of the file as the prefix
         if bpy.context.blend_data.is_saved:
@@ -70,27 +116,81 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         else:
             self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
 
+        if scene.render.engine == "VRAY_RENDER_RT":
+            self.project_type = api_constants.PRODUCTS.VRAY
+        else:
+            self.project_type = api_constants.PRODUCTS.BLENDER
+            self.blender_280_engine = scene.render.engine
+            self.blender_version = api_constants.BLENDER_VERSIONS.V_2_80
+
         # create popup
         return context.window_manager.invoke_props_dialog(self, width=400)
 
     def execute(self, context):
-        """ Called after the user clicks the 'ok' button on the popup """
-        wm = context.window_manager
+        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
-        # run the upload project function in separate thread so that gui is not blocked
-        self._thread = threading.Thread(target=utils_blender.upload_project,
-                                        args=(context, self.project_name, TempDirectoryManager.get_temp_directory_manager()),
-                                        kwargs={'operator': self})
-        self._thread.start()
-        self._timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+
+        if self.project_type == api_constants.PRODUCTS.BLENDER:
+            packed_project = BlenderSceneExporter().export(temp_dir)
+            packed_project.set_name(self.project_name)
+
+        elif self.project_type == api_constants.PRODUCTS.VRAY:
+            packed_project = VRaySceneExporter.export(temp_dir)
+            packed_project.set_name(self.project_name)
+        else:
+            raise RuntimeError("Unknown project type")
+
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_client = plugin.get_api_client()
+        api_client.upload_project(packed_project)
+
+        return {'FINISHED'}
 
     def draw(self, context):
         layout = self.layout
+        layout.separator()
 
-        # project name prop
         layout.prop(self, "project_name")
+
+        sub = layout.row()
+        sub.enabled = False
+        sub.prop(self, "project_type")
+
+        if self.project_type == api_constants.PRODUCTS.BLENDER:
+            sub = layout.row()
+            sub.enabled = False
+            sub.prop(self, "blender_version")
+
+            sub = layout.row()
+            sub.enabled = False
+            sub.prop(self, "project_file")
+
+            sub1 = layout.row()
+            sub1.enabled = False
+
+            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
+                sub1.prop(self, "blender_280_engine")
+            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
+                sub1.prop(self, "blender_279_engine")
+
+        elif self.project_type == api_constants.PRODUCTS.VRAY:
+            layout.prop(self, "vray_version")
+
+            sub = layout.row()
+            sub.enabled = False
+            sub.prop(self, "project_file")
+
+            sub = layout.row()
+            sub.enabled = False
+            sub.prop(self, "remap_file")
+
+        layout.separator()
+
+        draw_summary(layout, self.project_name, self.project_type,
+                     self.blender_version, self.project_file, self.blender_280_engine, self.blender_279_engine,
+                     self.vray_version, self.remap_file)
 
 
 classes = (
