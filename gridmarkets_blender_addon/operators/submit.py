@@ -58,6 +58,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
     def invoke(self, context, event):
         props = context.scene.props
+        remote_projects = props.remote_project_container.remote_projects
 
         # only show project name pop up dialog if submitting a new project
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
@@ -68,9 +69,9 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                 if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
                     blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
 
-                self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
+                self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=blend_file_name)
             else:
-                self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
+                self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=constants.PROJECT_PREFIX)
 
             # create popup
             return context.window_manager.invoke_props_dialog(self, width=400)
@@ -80,18 +81,26 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-        from gridmarkets_blender_addon import api_constants
         from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 
+        props = context.scene.props
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
 
-        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+        selected_project = props.project_options
 
-        packed_project = BlenderSceneExporter().export(temp_dir)
-        packed_project.set_name(self.project_name)
+        if selected_project == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
-        api_client.submit_new_blender_project(packed_project)
+            packed_project = BlenderSceneExporter().export(temp_dir)
+            packed_project.set_name(self.project_name)
+
+            api_client.submit_new_blender_project(packed_project)
+        else:
+            remote_project_container = plugin.get_remote_project_container()
+            remote_project = remote_project_container.get_project_with_id(selected_project)
+            api_client.submit_existing_blender_project(remote_project)
+
 
         return {"FINISHED"}
         """

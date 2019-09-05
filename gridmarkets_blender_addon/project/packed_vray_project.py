@@ -106,11 +106,7 @@ class PackedVRayProject(PackedProject):
     def __init__(self, packed_dir: pathlib.Path, main_file: pathlib.Path):
         from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
 
-        self._file_last_updated = str(os.path.getmtime(main_file)).replace('.', '-')
-        remap_file_path = self.create_remap_file()
-
         attributes = {
-            RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY: remap_file_path,
             "PRODUCT": "vray"
         }
 
@@ -120,6 +116,10 @@ class PackedVRayProject(PackedProject):
                                main_file,
                                set(),  # empty set for now since they are not used
                                attributes)
+
+        self._file_last_updated = str(os.path.getmtime(main_file)).replace('.', '-')
+        remap_file_path = self.create_remap_file()
+        self.set_attribute(RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY, remap_file_path)
 
     def get_remap_file(self) -> pathlib.Path:
         from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
@@ -136,7 +136,7 @@ class PackedVRayProject(PackedProject):
         return pathlib.Path(remap_file_path)
 
     def parse_scene_file(self):
-        print("Parsing scene file...")
+        #print("Parsing scene file...")
 
         scene_file = str(self.get_main_file())
 
@@ -152,14 +152,14 @@ class PackedVRayProject(PackedProject):
             src_path, '.parsed-info' + '-' + self._file_last_updated)
 
         if os.path.exists(parsed_info_file):
-            print("Cache found, loading scene file info from cache...")
+            #print("Cache found, loading scene file info from cache...")
             with open(parsed_info_file) as file_:
                 parsed_info = json.load(file_)
                 return parsed_info
 
         scene_parser = VRaySceneParser(scene_file)
         parsed_info = scene_parser.parse()
-        print("Parsing scene file completed.")
+        #print("Parsing scene file completed.")
 
         with open(parsed_info_file, 'w') as file_:
             json.dump(parsed_info, file_)

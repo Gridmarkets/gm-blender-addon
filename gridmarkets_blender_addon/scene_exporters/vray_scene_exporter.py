@@ -21,10 +21,6 @@ def export_vray_scene(engine, scene):
 
     _un_modified_render_method(engine, scene)
 
-    for root, dirs, files in os.walk("C:\\Users\\01\\Desktop\\vray-tests\\2\\"):
-        for filename in files:
-            print(filename)
-
 
 class VRaySceneExporter(SceneExporter):
 
@@ -42,6 +38,9 @@ class VRaySceneExporter(SceneExporter):
         # remember user settings
         autorun = VRayExporter.autorun
         useSeparateFiles = VRayExporter.useSeparateFiles
+        app_output_dir = VRayExporter.output_dir
+        auto_save_render = VRayExporter.auto_save_render
+        img_file_needFrameNumber = scene.vray.SettingsOutput.img_file_needFrameNumber
 
         # store the un modified render method (overridden later)
         global _un_modified_render_method
@@ -51,6 +50,9 @@ class VRaySceneExporter(SceneExporter):
             # change the exporter settings for our purposes
             VRayExporter.autorun = False            # don't render the scene
             VRayExporter.useSeparateFiles = True    # export as separate files in case of differential file uploading
+            VRayExporter.output_dir = str(output_dir)
+            VRayExporter.auto_save_render = True
+            scene.vray.SettingsOutput.img_file_needFrameNumber = True
 
             # override the default VRay render eninge render method
             vb30.export.RenderScene = export_vray_scene
@@ -62,6 +64,10 @@ class VRaySceneExporter(SceneExporter):
             # reset all settings to what they were before exporting
             VRayExporter.autorun = autorun
             VRayExporter.useSeparateFiles = useSeparateFiles
+            VRayExporter.output_dir = app_output_dir
+            VRayExporter.auto_save_render = auto_save_render
+            scene.vray.SettingsOutput.img_file_needFrameNumber = img_file_needFrameNumber
             vb30.export.RenderScene = _un_modified_render_method
+
 
         return PackedVRayProject(output_dir, output_dir / "scene_scene.vrscene")

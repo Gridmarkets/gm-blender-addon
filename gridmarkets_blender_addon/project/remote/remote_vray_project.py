@@ -8,8 +8,10 @@ class RemoteVRayProject(RemoteProject):
     ATTRIBUTE_REMAP_FILE_KEY = "REMAP_FILE"
 
     def __init__(self, root_dir: pathlib.Path, main_file: pathlib.Path, remap_file: pathlib.Path):
+        from gridmarkets_blender_addon import api_constants
 
         attributes = {
+            "PRODUCT": api_constants.PRODUCTS.VRAY,
             self.ATTRIBUTE_REMAP_FILE_KEY : remap_file
         }
 

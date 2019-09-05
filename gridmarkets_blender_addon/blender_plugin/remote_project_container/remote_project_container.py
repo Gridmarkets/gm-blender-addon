@@ -69,3 +69,15 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
     def get_project_id(self, remote_project: RemoteProject):
         index = self.get_index(remote_project)
         return bpy.context.scene.props.remote_project_container.remote_projects[index].id
+
+    def get_project_with_id(self, id: int):
+        remote_projects = bpy.context.scene.props.remote_project_container.remote_projects
+
+        if type(id) == str:
+            id = int(id)
+
+        for i, remote_project in enumerate(remote_projects):
+            if remote_project.id == id:
+                return self.get_at(i)
+
+        raise ValueError("no remote project with id: " + str(id))

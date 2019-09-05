@@ -467,120 +467,6 @@ def delete_temp_files_for_project(project_name):
     else:
         log.info("Project association does not exist")
 
-
-def submit_new_vray_project(packed_project: PackedProject, job_name: str, frame_ranges: str, output_height, output_width,
-                            output_prefix, output_format, output_path: pathlib.Path):
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-
-    packed_dir = str(packed_project.get_root_dir())
-
-    try:
-        # create an instance of Envoy client
-        client = get_envoy_client()
-
-        # create the project
-        project = Project(packed_dir, packed_project.get_name())
-
-        # add files to project
-        # only files and folders within the project path can be added, use relative or full path
-        # any other paths passed will be ignored
-        log.info("Adding '" + packed_dir + "' to " + constants.COMPANY_NAME + " project...")
-        project.add_folders(packed_dir)
-
-        # get product resolver
-        resolver = client.get_product_resolver()
-
-        # get products for Houdini product type
-        qry = 'vray'
-        products = resolver.get_versions_by_type(qry)
-
-        JOB_NAME = job_name
-        PRODUCT_TYPE = "vray"
-        PRODUCT_VERSION = products[-1]
-        OPERATION = "render"
-        PATH = '/' + packed_project.get_name() + '/' + str(packed_project.get_relative_main_file())
-        FRAMES = frame_ranges
-        OUTPUT_HEIGHT = output_height
-        OUTPUT_WIDTH = output_width
-        OUTPUT_PREFIX = output_prefix
-        OUTPUT_FORMAT = output_format
-        REMAP_FILE = packed_project.get_remap_file_name()
-
-        print("JOB_NAME", JOB_NAME)
-        print("PRODUCT_TYPE", PRODUCT_TYPE)
-        print("PRODUCT_VERSION", PRODUCT_VERSION)
-        print("OPERATION", OPERATION)
-        print("PATH", PATH)
-        print("FRAMES", FRAMES)
-        print("OUTPUT_HEIGHT", OUTPUT_HEIGHT)
-        print("OUTPUT_WIDTH", OUTPUT_WIDTH)
-        print("OUTPUT_PREFIX", OUTPUT_PREFIX)
-        print("OUTPUT_FORMAT", OUTPUT_FORMAT)
-        print("REMAP_FILE", REMAP_FILE)
-
-        job = Job(
-          JOB_NAME, # job name
-          PRODUCT_TYPE, # product type
-          PRODUCT_VERSION, # product version
-          OPERATION, # operation
-          PATH, # job file to be run, note that the path is relative to the project name which is also the remote folder name
-          frames=FRAMES, # rest are all job specific params
-          output_height=OUTPUT_HEIGHT,
-          output_width=OUTPUT_WIDTH,
-          output_prefix=OUTPUT_PREFIX,
-          output_format=OUTPUT_FORMAT,
-          remap_file=REMAP_FILE,
-        )
-
-        # results regex pattern to download
-        # `project.remote_output_folder` provides the remote root folder under which results are available
-        # below is the regex to look for all folders and files under `project.remote_output_folder`
-        output_pattern = '{0}/.+'.format(project.remote_output_folder)
-
-        # create a watch file
-        watch_file = WatchFile(output_pattern, str(output_path))
-
-        # set the output directory
-        project.add_watch_files(watch_file)
-
-        log.info("Submitted V-Ray Job Settings: \n" +
-                 "\tproject_name: %s\n" % project.name +
-                 "\tjob.app: %s\n" % job.app +
-                 "\tjob.name: %s\n" % job.name +
-                 "\tjob.app_version: %s\n" % job.app_version +
-                 "\tjob.operation: %s\n" % job.operation +
-                 "\tjob.path: %s\n" % job.path +
-                 "\tjob.frames: %s\n" % job.params['frames'] +
-                 "\tjob.output_prefix: %s\n" % job.params['output_prefix'] +
-                 "\tjob.output_format: %s\n" % job.params['output_format'] +
-                 "\tjob.engine: %s\n" % job.params['engine'] +
-                 "\tdownload_path: %s\n" % str(output_path)
-                 )
-
-        project.add_jobs(job)
-
-        client.submit_project(project)
-
-        log.info("Submitted V-Ray job")
-
-    except InvalidInputError as e:
-        log.warning("Invalid Input Error: " + e.user_message)
-        raise e
-    except AuthenticationError as e:
-        log.error("Authentication Error: " + e.user_message)
-        raise e
-    except InsufficientCreditsError as e:
-        log.error("Insufficient Credits Error: " + e.user_message)
-        raise e
-    except InvalidRequestError as e:
-        log.error("Invalid Request Error: " + e.user_message)
-        raise e
-    except APIError as e:
-        log.error("API Error: " + str(e.user_message))
-        raise e
-
-
 def _scale_percentage(min_percentage, max_percentage, percentage):
     return min_percentage + ((max_percentage - min_percentage) / 100) * percentage
 
@@ -896,7 +782,7 @@ def get_job_frame_ranges(context, job=None):
             job = props.jobs[int(props.job_options) - constants.JOB_OPTIONS_STATIC_COUNT]
 
     # use scene frame settings unless the user has overridden them
-    if job.use_custom_frame_ranges:
+    if (not hasattr(job, "use_custom_frame_ranges")) or job.use_custom_frame_ranges:
 
         # filter disabled frame ranges
         frame_ranges = filter(lambda frame_range: frame_range.enabled, job.frame_ranges)
@@ -921,13 +807,17 @@ def do_frame_ranges_overlap(job):
     :rtype: bool
     """
 
-    if not job.use_custom_frame_ranges:
+    if hasattr(job, "use_custom_frame_ranges") and not job.use_custom_frame_ranges:
         return False
 
     # buffer to store frames already seen
     frames_buffer = []
 
     for frame_range in job.frame_ranges:
+
+        if not frame_range.enabled:
+            continue
+
         start = frame_range.frame_start
         end = frame_range.frame_end
         step = frame_range.frame_step
@@ -1415,3 +1305,58 @@ def get_sys_info():
 
     return sys_info
 
+def get_selected_project_options(scene, context, id):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon.icon_loader import IconLoader
+    from gridmarkets_blender_addon import api_constants
+    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
+
+    props = context.scene.props
+
+    project_options = [
+        # it is always an option to upload as a new project
+        (constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_LABEL,
+         constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION,
+         'FILE_NEW', 0)
+    ]
+
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+        remote_project_container = plugin.get_remote_project_container()
+        remote_projects = remote_project_container.get_all()
+
+        a = 0
+
+        # iterate through uploaded projects and add them as options
+        for i, project in enumerate(remote_projects):
+            project_product = project.get_attribute("PRODUCT")
+
+            # get the correct icon
+            if project_product == "vray":
+                icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
+            elif project_product == "blender":
+                icon = constants.ICON_BLENDER
+            else:
+                icon = constants.ICON_PROJECT
+
+            # if render engine set to V-Ray only return VRay projects
+            if context.scene.render.engine == constants.VRAY_RENDER_RT and project_product == api_constants.PRODUCTS.VRAY:
+                append = True
+            elif context.scene.render.engine != constants.VRAY_RENDER_RT and project_product != api_constants.PRODUCTS.VRAY:
+                # otherwise only return blender projects
+                append = True
+            else:
+                append = False
+
+            if append:
+                a += 1
+
+                if a == int(id):
+                    return project
+
+                project_options.append(
+                    (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
+
+    return project_options

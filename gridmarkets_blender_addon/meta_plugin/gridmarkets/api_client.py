@@ -130,6 +130,12 @@ class GridMarketsAPIClient(MetaAPIClient):
                              packed_project.get_relative_files(),
                              packed_project.get_attributes())
 
+        attributes = packed_project.get_attributes()
+        if "REMAP_FILE" in attributes:
+            remap_file = packed_project.get_relative_file_path(attributes["REMAP_FILE"])
+            remote_project.set_attribute("REMAP_FILE", remap_file)
+
+
         remote_project_container = self.get_plugin().get_remote_project_container()
         remote_project_container.append(remote_project)
 

@@ -28,6 +28,9 @@ from gridmarkets_blender_addon.layouts.jobs import draw_jobs
 from gridmarkets_blender_addon.layouts.console import draw_console, draw_compact_console
 from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
 
+from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
+from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
+
 
 def draw_body(self, context):
     layout = self.layout
@@ -48,9 +51,14 @@ def draw_body(self, context):
     col = SimpleNamespace(layout=col)
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
-        draw_submission_settings(col, context)
-        draw_submission_summary(col, context)
-        draw_compact_console(col, context)
+        if context.scene.render.engine == "VRAY_RENDER_RT":
+            draw_v_ray_submission_form(col, context)
+            draw_compact_console(col, context)
+        else:
+            draw_submission_settings(col, context)
+            draw_submission_summary(col, context)
+            draw_compact_console(col, context)
+
     elif props.tab_options == constants.TAB_PROJECTS:
         draw_remote_project_container(col, context)
         draw_compact_console(col, context)

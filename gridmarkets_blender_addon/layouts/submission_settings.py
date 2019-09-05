@@ -63,8 +63,8 @@ def draw_submission_summary(self, context):
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             values.label(text=constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION)
         else:
-            project = props.projects[int(props.project_options) - constants.PROJECT_OPTIONS_STATIC_COUNT]
-            values.label(text=project.name)
+            project = utils_blender.get_selected_project_options(scene, context, props.project_options)#props.projects[int(props.project_options) - constants.PROJECT_OPTIONS_STATIC_COUNT]
+            values.label(text=project.get_name())
         values.separator()
 
         if props.job_options == constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE:
@@ -139,7 +139,3 @@ def draw_submission_settings(self, context):
             submit_icon = constants.ICON_ERROR
 
         row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
-
-        sub = row.row()
-        sub.enabled = utils_blender.is_addon_enabled("vb30")
-        sub.operator("gridmarkets.submit_new_vray_project", text="Submit V-Ray Project", icon=submit_icon)

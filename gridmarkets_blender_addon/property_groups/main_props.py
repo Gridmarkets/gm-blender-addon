@@ -20,7 +20,7 @@
 
 import bpy
 from bpy.app.handlers import persistent
-from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon import constants, api_constants
 
 from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 from gridmarkets_blender_addon.property_groups.job_props import JobProps
@@ -33,6 +33,7 @@ from gridmarkets_blender_addon.blender_plugin.remote_project.property_groups.rem
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.property_groups.remote_project_container_props import \
     RemoteProjectContainerProps
 from gridmarkets_blender_addon.property_groups.custom_settings_views import CustomSettingsViews
+from gridmarkets_blender_addon.property_groups.vray_props import VRayProps
 
 
 def _get_project_options(scene, context):
@@ -55,22 +56,33 @@ def _get_project_options(scene, context):
     plugin = PluginFetcher.get_plugin_if_initialised()
 
     if plugin:
-
         remote_project_container = plugin.get_remote_project_container()
+        remote_projects = remote_project_container.get_all()
 
         # iterate through uploaded projects and add them as options
-        for i, project in enumerate(remote_project_container.get_all()):
+        for i, project in enumerate(remote_projects):
+            project_product = project.get_attribute("PRODUCT")
 
-            product = project.get_attribute("PRODUCT")
-            if product == "vray":
+            # get the correct icon
+            if project_product == "vray":
                 icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            elif product == "blender":
+            elif project_product == "blender":
                 icon = constants.ICON_BLENDER
             else:
                 icon = constants.ICON_PROJECT
 
-            project_options.append(
-                (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
+            # if render engine set to V-Ray only return VRay projects
+            if context.scene.render.engine == constants.VRAY_RENDER_RT and project_product == api_constants.PRODUCTS.VRAY:
+                append = True
+            elif context.scene.render.engine != constants.VRAY_RENDER_RT and project_product != api_constants.PRODUCTS.VRAY:
+                # otherwise only return blender projects
+                append = True
+            else:
+                append = False
+
+            if append:
+                project_options.append(
+                    (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
 
     return project_options
 
@@ -94,6 +106,25 @@ def _get_job_options(scene, context):
     return job_options
 
 
+def _get_tab_items(scene, context):
+
+    if bpy.context.scene.render.engine == constants.VRAY_RENDER_RT:
+        return [
+            (constants.TAB_SUBMISSION_SETTINGS, constants.TAB_SUBMISSION_SETTINGS, ''),
+            (constants.TAB_PROJECTS, constants.TAB_PROJECTS, ''),
+            (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
+            (constants.TAB_LOGGING, constants.TAB_LOGGING, ''),
+        ]
+
+    return [
+        (constants.TAB_SUBMISSION_SETTINGS, constants.TAB_SUBMISSION_SETTINGS, ''),
+        (constants.TAB_PROJECTS, constants.TAB_PROJECTS, ''),
+        (constants.TAB_JOB_PRESETS, constants.TAB_JOB_PRESETS, ''),
+        (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
+        (constants.TAB_LOGGING, constants.TAB_LOGGING, ''),
+    ]
+
+
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessible via the interface.
     """
@@ -104,6 +135,10 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     remote_project_container = bpy.props.PointerProperty(
         type=RemoteProjectContainerProps,
+    )
+
+    vray = bpy.props.PointerProperty(
+        type=VRayProps
     )
 
     # project collection
@@ -120,7 +155,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     project_options = bpy.props.EnumProperty(
         name="Project",
         description="The list of possible projects to use on submit",
-        items=_get_project_options,
+        items=_get_project_options
     )
 
     # job collection
@@ -221,13 +256,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     tab_options = bpy.props.EnumProperty(
         name="Tabs",
         description="The tabs that show at the top of the add-on main window",
-        items=[
-            (constants.TAB_SUBMISSION_SETTINGS, constants.TAB_SUBMISSION_SETTINGS, ''),
-            (constants.TAB_PROJECTS, constants.TAB_PROJECTS, ''),
-            (constants.TAB_JOB_PRESETS, constants.TAB_JOB_PRESETS, ''),
-            (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
-            (constants.TAB_LOGGING, constants.TAB_LOGGING, ''),
-        ]
+        items = _get_tab_items
     )
 
     submission_summary_open = bpy.props.BoolProperty(
@@ -242,6 +271,7 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 classes = (
     CustomSettingsViews,
     FrameRangeProps,
+    VRayProps,
     JobProps,
     ProjectProps,
     LogItemProps,
@@ -260,6 +290,18 @@ def reset_to_defaults(pos):
     bpy.context.scene.props.submitting_project = False
     bpy.context.scene.props.submitting_project_progress = 0
     bpy.context.scene.props.submitting_project_status = ""
+
+    while len(bpy.context.scene.props.vray.frame_ranges) > 0:
+        bpy.context.scene.props.vray.frame_ranges.pop()
+
+    bpy.context.scene.props.vray.selected_frame_range = 0
+
+    frame_range = bpy.context.scene.props.vray.frame_ranges.add()
+    frame_range.name = "Default frame range"
+    frame_range.enabled = True
+    frame_range.frame_start = 1
+    frame_range.frame_end = 256
+    frame_range.frame_step = 1
 
 
 def register():
