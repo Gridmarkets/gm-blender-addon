@@ -78,6 +78,23 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             return self.execute(context)
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
+        from gridmarkets_blender_addon import api_constants
+        from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
+
+        plugin = PluginFetcher.get_plugin()
+        api_client = plugin.get_api_client()
+
+        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+
+        packed_project = BlenderSceneExporter().export(temp_dir)
+        packed_project.set_name(self.project_name)
+
+        api_client.submit_new_blender_project(packed_project)
+
+        return {"FINISHED"}
+        """
         wm = context.window_manager
 
         log.info("Creating separate thread for submission process")
@@ -90,6 +107,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         self._timer = wm.event_timer_add(0.1, window=context.window)
         wm.modal_handler_add(self)
         return {'RUNNING_MODAL'}
+        """
 
 
 classes = (

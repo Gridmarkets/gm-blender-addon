@@ -23,7 +23,11 @@ from gridmarkets_blender_addon import constants, utils_blender
 
 
 def draw_header(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
     layout = self.layout
+    user_interface = plugin.get_user_interface()
+    signed_in_user = plugin.get_api_client().get_signed_in_user()
 
     # get the company icon
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
@@ -37,7 +41,21 @@ def draw_header(self, context):
     # get the plugin version as a string
     version_str = utils_blender.get_version_string()
 
+    # signed in indicator
+    sub = row.row(align=True)
+
+    if user_interface.get_signing_in_flag():
+        sub.label( text = "Signing in...",
+                   icon_value = utils_blender.get_spinner(user_interface.get_signing_in_spinner()).icon_id)
+    else:
+        if signed_in_user:
+            sub.label(text="Signed in as: " + signed_in_user.get_auth_email())
+        else:
+            sub.label(text="Not signed in", icon=constants.ICON_ERROR)
+
     # version label
     sub = row.row(align=True)
     sub.enabled = False
     sub.label(text=version_str)
+
+

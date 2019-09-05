@@ -18,8 +18,34 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
+
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
+
+
+class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
+    bl_idname = "GRIDMARKETS_MT_add_new_project"
+    bl_label = "Add new project"
+
+    def draw(self, context):
+        props = context.scene.props
+        layout = self.layout
+        layout.operator_context = 'INVOKE_AREA'
+
+        sub = layout.row()
+        if props.uploading_project or props.submitting_project:
+            # disable upload project button if already submitting or uploading
+            sub.enabled = False
+        sub.operator(constants.OPERATOR_UPLOAD_PROJECT_ID_NAME, text="Upload current scene as new Project")
+
+        sub = layout.row()
+        sub.operator(constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME, text="Upload file as new Project")
+
+        #layout.separator()
+
+        sub = layout.row()
+        sub.operator(constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME, text="Manually enter details for existing Project")
 
 
 def _get_value(project_status, key):
@@ -177,30 +203,38 @@ def draw_projects(self, context):
     sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN,
                  text="").action = 'DOWN'
 
-    sub = col.column(align=True)
-
-    # disable remove button if there are no projects to remove
-    if project_count <= 0:
-        sub.enabled = False
-
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="").action = 'REMOVE'
-
     row = layout.row(align=True)
-    sub = row.column()
+    row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)
 
-    # disable upload project button if already submitting or uploading
-    if props.uploading_project or props.submitting_project:
+    sub = row.column()
+    if project_count <= 0:
+        # disable remove button if there are no projects to remove
         sub.enabled = False
-
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_ADD,
-                 text="Upload current scene as new Project").action = 'UPLOAD'
-
-    sub = row.column()
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE,
-                 text="Upload file as new Project").action = 'UPLOAD_FILE'
+    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="Remove Project").action = 'REMOVE'
 
     # upload status
     if props.uploading_project:
         layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
 
     _draw_project_info_view(self, context)
+
+
+classes = (
+    GRIDMARKETS_MT_add_new_project,
+)
+
+
+def register():
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)

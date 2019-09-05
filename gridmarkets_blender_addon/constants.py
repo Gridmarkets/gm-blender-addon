@@ -43,12 +43,35 @@ GM_GREYSCALE_LOGO = "logo_greyscale.png"
 GRIDMARKETS_LOGO_ID = "gridmarkets_logo"
 MAIN_COLLECTION_ID = "main"
 
+VRAY_LOGO_ID = "vray_logo"
+VRAY_LOGO = "vray_logo.png"
+
+CUSTOM_SPINNER_ICON_0 = "spinner_0.png"
+CUSTOM_SPINNER_ICON_1 = "spinner_1.png"
+CUSTOM_SPINNER_ICON_2 = "spinner_2.png"
+CUSTOM_SPINNER_ICON_3 = "spinner_3.png"
+CUSTOM_SPINNER_ICON_4 = "spinner_4.png"
+CUSTOM_SPINNER_ICON_5 = "spinner_5.png"
+CUSTOM_SPINNER_ICON_6 = "spinner_6.png"
+CUSTOM_SPINNER_ICON_7 = "spinner_7.png"
+CUSTOM_SPINNER_ICON_0_ID = "SPINNER_0"
+CUSTOM_SPINNER_ICON_1_ID = "SPINNER_1"
+CUSTOM_SPINNER_ICON_2_ID = "SPINNER_2"
+CUSTOM_SPINNER_ICON_3_ID = "SPINNER_3"
+CUSTOM_SPINNER_ICON_4_ID = "SPINNER_4"
+CUSTOM_SPINNER_ICON_5_ID = "SPINNER_5"
+CUSTOM_SPINNER_ICON_6_ID = "SPINNER_6"
+CUSTOM_SPINNER_ICON_7_ID = "SPINNER_7"
+
 # directory for the add-on to output temporary files
 TEMP_FILES_FOLDER = ".gm_temp_files"
 
 BLEND_FILE_EXTENSION = ".blend"
+VRAY_SCENE_FILE_EXTENSION = '.vrscene'
 
 # the url of the render manager
+REGISTER_ACCOUNT_LINK = "https://www.gridmarkets.com/sign-up"
+
 RENDER_MANAGER_URL = "https://portal.gridmarkets.com"
 
 COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
@@ -86,6 +109,8 @@ PANEL_REGION_TYPE = "WINDOW"
 WINDOW_SPACE_TYPE = "PREFERENCES"
 
 # operators
+OPERATOR_ADD_REMOTE_PROJECT_ID_NAME = "gridmarkets.add_remote_project"
+OPERATOR_ADD_REMOTE_PROJECT_LABEL = "Manually specify details for existing Remote Project"
 OPERATOR_CLEAR_LOGS_ID_NAME = "gridmarkets.clear_logs"
 OPERATOR_CLEAR_LOGS_LABEL = "Clear logs"
 OPERATOR_SUBMIT_ID_NAME = "gridmarkets.render"
@@ -101,7 +126,7 @@ OPERATOR_PROJECT_LIST_ACTIONS_LABEL = "Project List Actions"
 OPERATOR_JOB_LIST_ACTIONS_ID_NAME= "gridmarkets.job_list_actions"
 OPERATOR_JOB_LIST_ACTIONS_LABEL = "Job List Actions"
 OPERATOR_UPLOAD_PROJECT_ID_NAME = "gridmarkets.upload_project"
-OPERATOR_UPLOAD_PROJECT_LABEL = "Upload Project"
+OPERATOR_UPLOAD_PROJECT_LABEL = "Upload the current scene as a new Project"
 OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME = "gridmarkets.upload_file_as_project"
 OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL = "Upload File as Project"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.frame_range_list_actions"
@@ -128,6 +153,8 @@ OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME = "gridmarkets.copy_logs_to_clipboard"
 OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL = "Copy logs to clipboard"
 OPERATOR_OPEN_PREFERENCES_ID_NAME = "gridmarkets.open_preferences"
 OPERATOR_OPEN_PREFERENCES_LABEL = "Open " + COMPANY_NAME + " add-on preferences"
+OPERATOR_OPEN_REGISTER_ACCOUNT_LINK_ID_NAME = "gridmarkets.open_register_account_link"
+OPERATOR_OPEN_REGISTER_ACCOUNT_LINK_LABEL = "Register"
 OPERATOR_OPEN_REPOSITORY_ID_NAME = "gridmarkets.open_github_repo"
 OPERATOR_OPEN_REPOSITORY_LABEL = "Open GitHub repository"
 OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
@@ -174,6 +201,7 @@ ICON_RESTRICT_RENDER_ON = "RESTRICT_RENDER_ON"
 ICON_PROJECT = 'FILE_BLEND'
 ICON_JOB = 'FILE_VOLUME'
 ICON_BLEND_FILE = 'BLEND_FILE'
+ICON_BLENDER = 'BLENDER'
 ICON_ERROR = 'ERROR'
 ICON_CONSOLE = 'CONSOLE'
 ICON_DISCLOSURE_TRI_DOWN = 'DISCLOSURE_TRI_DOWN'
@@ -181,6 +209,9 @@ ICON_DISCLOSURE_TRI_RIGHT = 'DISCLOSURE_TRI_RIGHT'
 ICON_HELP = 'HELP'
 ICON_PREFERENCES = 'PREFERENCES'
 ICON_URL = 'URL'
+ICON_INFO = 'QUESTION'
+ICON_DEFAULT_USER = 'SOLO_ON'
+ICON_NON_DEFAULT_USER = 'SOLO_OFF'
 
 PROJECT_STATUS_POLLING_ENABLED = False
 
