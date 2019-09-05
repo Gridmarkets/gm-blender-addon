@@ -83,15 +83,24 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         from gridmarkets_blender_addon import api_constants
         from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 
+        props = context.scene.props
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
 
-        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+        selected_project = props.project_options
 
-        packed_project = BlenderSceneExporter().export(temp_dir)
-        packed_project.set_name(self.project_name)
+        if selected_project == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
-        api_client.submit_new_blender_project(packed_project)
+            packed_project = BlenderSceneExporter().export(temp_dir)
+            packed_project.set_name(self.project_name)
+
+            api_client.submit_new_blender_project(packed_project)
+        else:
+            remote_project_container = plugin.get_remote_project_container()
+            remote_project = remote_project_container.get_project_with_id(selected_project)
+            api_client.submit_existing_blender_project(remote_project)
+
 
         return {"FINISHED"}
         """
