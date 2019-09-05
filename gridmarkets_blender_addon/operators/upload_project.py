@@ -122,11 +122,11 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             self.project_type = api_constants.PRODUCTS.BLENDER
 
             try:
-                self.blender_280_engine = scene.render.engine
+                self.blender_279_engine = scene.render.engine
             except TypeError:
                 self.report({"WARNING"}, scene.render.engine + " is not supported with this product type")
                 return {"FINISHED"}
-            self.blender_version = api_constants.BLENDER_VERSIONS.V_2_80
+            self.blender_version = api_constants.BLENDER_VERSIONS.V_2_79
 
         # create popup
         return context.window_manager.invoke_props_dialog(self, width=400)
