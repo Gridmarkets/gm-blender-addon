@@ -167,6 +167,8 @@ OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_pr
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL = "Delete temporary project files"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_LABEL = "Get selected project status"
+OPERATOR_NULL_ID_NAME = "gridmarkets.null_operator"
+OPERATOR_NULL_LABEL = "Button which does nothing."
 
 RENDER_DEVICE_GPU = "GPU"
 RENDER_DEVICE_CPU = "CPU"
