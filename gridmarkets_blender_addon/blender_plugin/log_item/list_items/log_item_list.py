@@ -30,11 +30,33 @@ class GRIDMARKETS_UL_log_item(bpy.types.UIList):
                   flt_flag=0):
 
         plugin = PluginFetcher.get_plugin()
+        user_interface = plugin.get_user_interface()
         log_item = plugin.get_logging_coordinator().get_log_history_container().get_at(index)
 
-        row = layout.row()
-        row.alignment = "LEFT"
-        row.label(text=log_item.get_message())
+        show_date = user_interface.show_log_dates()
+        show_time = user_interface.show_log_times()
+        show_name = user_interface.show_logger_names()
+
+        split = layout.split()
+
+        if show_date:
+            col = split.column()
+            col.alignment = "LEFT"
+            col.label(log_item.get_date())
+
+        if show_time:
+            col = split.column()
+            col.alignment = "LEFT"
+            col.label(log_item.get_time())
+
+        if show_name:
+            col = split.column()
+            col.alignment = "LEFT"
+            col.label(log_item.get_logger_name())
+
+        col = split.column()
+        col.alignment = "LEFT"
+        col.label(log_item.get_message())
 
 
 classes = (
