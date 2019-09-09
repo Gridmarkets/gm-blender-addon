@@ -23,6 +23,8 @@ from gridmarkets_blender_addon import bl_info
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient
 from gridmarkets_blender_addon.meta_plugin.plugin import Plugin as MetaPlugin
 from gridmarkets_blender_addon.meta_plugin.plugin_version import PluginVersion
+from gridmarkets_blender_addon.meta_plugin.log_history_container import LogHistoryContainer
+from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 
 from gridmarkets_blender_addon.blender_plugin.preferences_container.preferences_container import PreferencesContainer
 from gridmarkets_blender_addon.blender_plugin.user_container.user_container import UserContainer
@@ -36,6 +38,7 @@ class Plugin(MetaPlugin):
     def __init__(self):
         version = bl_info['version']
         self._version = PluginVersion(version[0], version[1], version[2])
+        self._logging_coordinator = LoggingCoordinator(LogHistoryContainer())
         self._preferences_container = PreferencesContainer(UserContainer())
         self._api_client = APIClient()
         self._user_interface = UserInterface()
@@ -46,6 +49,9 @@ class Plugin(MetaPlugin):
 
     def get_version(self) -> PluginVersion:
         return self._version
+
+    def get_logging_coordinator(self) -> LoggingCoordinator:
+        return self._logging_coordinator
 
     def get_preferences_container(self) -> PreferencesContainer:
         return self._preferences_container
