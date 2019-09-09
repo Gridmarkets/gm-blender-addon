@@ -44,6 +44,9 @@ class LoggingCoordinator:
     def get_logger(self, name: str = None) -> Logger:
         return Logger(name, self)
 
+    def get_log_history_container(self) -> LogHistoryContainer:
+        return self._log_history_container
+
     def queue(self, log_item: LogItem) -> None:
         """
         Add the log_item to the queue if operating in multi-threaded mode, otherwise append straight to the log history
