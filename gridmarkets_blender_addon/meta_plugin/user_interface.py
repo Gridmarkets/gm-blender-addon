@@ -81,3 +81,22 @@ class UserInterface(ABC, PluginAccessor):
     # load profile
     def load_profile(self, user_profile: User):
         raise NotImplementedError
+
+    # logging
+    def show_log_dates(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_log_dates(self, enabled: bool) -> None:
+        raise NotImplementedError
+
+    def show_log_times(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_log_times(self, enabled: bool) -> None:
+        raise NotImplementedError
+
+    def show_logger_names(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_logger_names(self, enabled: bool) -> None:
+        raise NotImplementedError

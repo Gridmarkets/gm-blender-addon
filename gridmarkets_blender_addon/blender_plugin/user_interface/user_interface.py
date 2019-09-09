@@ -91,3 +91,22 @@ class UserInterface(MetaUserInterface):
 
         if bpy.context.scene.props.user_interface.signing_in_spinner > 7:
             bpy.context.scene.props.user_interface.signing_in_spinner = 0
+
+    # logger
+    def show_log_dates(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_log_dates
+
+    def set_show_log_dates(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_log_dates = enabled
+
+    def show_log_times(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_log_times
+
+    def set_show_log_times(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_log_times = enabled
+
+    def show_logger_names(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_logger_names
+
+    def set_show_logger_names(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_logger_names = enabled

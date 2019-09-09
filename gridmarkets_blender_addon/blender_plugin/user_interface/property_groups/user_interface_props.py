@@ -120,3 +120,22 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
+    # logger
+    show_log_dates: bpy.props.BoolProperty(
+        name="Show Logged Dates",
+        description="Toggles the displaying of dates for log items",
+        default=False
+    )
+
+    show_log_times: bpy.props.BoolProperty(
+        name="Show Logged Times",
+        description="Toggles the displaying of times for log items",
+        default=True
+    )
+
+    show_logger_names: bpy.props.BoolProperty(
+        name="Show Logger Names",
+        description="Toggles the displaying of logger names for log items",
+        default=False
+    )
+
