@@ -18,27 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon import constants
 
+def draw_log_history_with_controls(self, context):
+    from types import SimpleNamespace
+    from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
+        draw_logging_console
+    from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_controls import \
+        draw_logging_controls
 
-def draw_console(self, context):
-    layout = self.layout
-    props = context.scene.props
-    box = layout.box()
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=6, sort_lock=True)
+    box = self.layout.box()
+    simple_layout = SimpleNamespace(layout=box)
 
-    split = box.split()
-    col1 = split.column()
-    col2 = split.column()
+    draw_logging_console(simple_layout, context)
+    draw_logging_controls(simple_layout, context)
 
-    col1.operator(constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME)
-    col2.operator(constants.OPERATOR_CLEAR_LOGS_ID_NAME)
-    box.operator(constants.OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME)
-
-
-def draw_compact_console(self, context):
-    layout = self.layout
-    props = context.scene.props
-    box = layout.box()
-    box.alignment = "RIGHT"
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4, sort_lock=True)
