@@ -107,6 +107,7 @@ modulesNames = ['meta_plugin.scene_exporter',
                 'blender_plugin.user_container.operators.sign_in',
                 'blender_plugin.user_container.operators.sign_out',
                 'blender_plugin.user_interface.operators.toggle_show_log_dates',
+                'blender_plugin.user_interface.operators.toggle_show_log_times',
                 'blender_plugin.user_interface.operators.toggle_show_logger_names',
                 'gui_entry_point']
 
