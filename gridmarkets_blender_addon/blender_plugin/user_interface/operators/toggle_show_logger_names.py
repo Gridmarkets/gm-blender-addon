@@ -21,8 +21,8 @@
 import bpy
 
 
-class GRIDMARKETS_OT_toggle_show_logger_name(bpy.types.Operator):
-    bl_idname = "gridmarkets.toggle_show_logger_name"
+class GRIDMARKETS_OT_toggle_show_logger_names(bpy.types.Operator):
+    bl_idname = "gridmarkets.toggle_show_logger_names"
     bl_label = "Toggle logger names"
     bl_description = "Toggles the displaying of logger names in the logging console"
     bl_options = {"REGISTER"}
@@ -39,7 +39,7 @@ class GRIDMARKETS_OT_toggle_show_logger_name(bpy.types.Operator):
 
 
 classes = (
-    GRIDMARKETS_OT_toggle_show_logger_name,
+    GRIDMARKETS_OT_toggle_show_logger_names,
 )
 
 
