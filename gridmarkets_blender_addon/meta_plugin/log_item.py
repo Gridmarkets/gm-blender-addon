@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import datetime
+import time
 
 
 class LogItem:
@@ -40,6 +41,12 @@ class LogItem:
 
     def get_date_time(self) -> datetime.datetime:
         return self._date_time
+
+    def get_date(self) -> str:
+        return time.strftime("%Y-%m-%d", self._date_time.date())
+
+    def get_time(self) -> str:
+        return time.strftime("%H:%M:%S", self._date_time.date())
 
     def get_message(self) -> str:
         return self._message
