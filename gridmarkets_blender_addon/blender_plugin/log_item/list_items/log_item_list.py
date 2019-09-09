@@ -37,26 +37,27 @@ class GRIDMARKETS_UL_log_item(bpy.types.UIList):
         show_time = user_interface.show_log_times()
         show_name = user_interface.show_logger_names()
 
-        split = layout.split()
+        row = layout.row(align=True)
+        row.alignment = 'LEFT'
+
+        # if the message is an error then colour red
+        row.alert = log_item.get_level() == 'ERROR'
+
+        # line text
+        text = ''
 
         if show_date:
-            col = split.column()
-            col.alignment = "LEFT"
-            col.label(log_item.get_date())
+            text += log_item.get_date()
 
         if show_time:
-            col = split.column()
-            col.alignment = "LEFT"
-            col.label(log_item.get_time())
+            text += log_item.get_time()
 
         if show_name:
-            col = split.column()
-            col.alignment = "LEFT"
-            col.label(log_item.get_logger_name())
+            text += log_item.get_logger_name()
 
-        col = split.column()
-        col.alignment = "LEFT"
-        col.label(log_item.get_message())
+        text += log_item.get_message()
+
+        row.label(text=text)
 
 
 classes = (
