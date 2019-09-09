@@ -106,6 +106,7 @@ modulesNames = ['meta_plugin.scene_exporter',
                 'blender_plugin.user_container.operators.set_focused_profile_as_default',
                 'blender_plugin.user_container.operators.sign_in',
                 'blender_plugin.user_container.operators.sign_out',
+                'blender_plugin.user_interface.operators.toggle_show_logger_names',
                 'gui_entry_point']
 
 # pre-append the lib folder to sys.path so local dependencies can be found. Pre-append so that these paths take
