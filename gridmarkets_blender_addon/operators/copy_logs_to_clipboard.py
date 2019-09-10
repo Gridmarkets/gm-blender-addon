@@ -30,10 +30,8 @@ class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
-
-        log.info("Copying logs to clipboard...")
-        bpy.context.window_manager.clipboard = utils_blender.get_logs(self, context)
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_logging_coordinator().copy_logs_to_clipboard()
         return {'FINISHED'}
 
 
