@@ -21,7 +21,8 @@
 import bpy
 
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
+    draw_remote_project_summary
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 
@@ -186,9 +187,10 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
         layout.separator()
 
-        draw_summary(layout, self.project_name, self.project_type,
-                     self.blender_version, self.project_file, self.blender_280_engine, self.blender_279_engine,
-                     self.vray_version, self.remap_file)
+        draw_remote_project_summary(layout, self.project_name, self.project_type,
+                                    self.blender_version, self.project_file, self.blender_280_engine,
+                                    self.blender_279_engine,
+                                    self.vray_version, self.remap_file)
 
 
 classes = (

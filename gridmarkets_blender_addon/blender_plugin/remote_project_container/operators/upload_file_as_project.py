@@ -24,7 +24,8 @@ from bpy_extras.io_utils import ImportHelper
 import pathlib
 
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
+    draw_remote_project_summary
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker
 from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProject
 
@@ -113,7 +114,8 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
 
         if self.project_type == api_constants.PRODUCTS.BLENDER:
             from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-            packed_project = BlenderFilePacker().pack(main_file, TempDirectoryManager.get_temp_directory_manager().get_temp_directory())
+            packed_project = BlenderFilePacker().pack(main_file,
+                                                      TempDirectoryManager.get_temp_directory_manager().get_temp_directory())
             packed_project.set_name(self.project_name)
         elif self.project_type == api_constants.PRODUCTS.VRAY:
             remap_file = pathlib.Path(self.remap_file)
@@ -177,9 +179,10 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         if self.use_file_name:
             self.project_name = project_name
 
-        draw_summary(layout, self.project_name, self.project_type,
-                     self.blender_version, project_file_name, self.blender_280_engine, self.blender_279_engine,
-                     self.vray_version, self.remap_file)
+        draw_remote_project_summary(layout, self.project_name, self.project_type,
+                                    self.blender_version, project_file_name, self.blender_280_engine,
+                                    self.blender_279_engine,
+                                    self.vray_version, self.remap_file)
 
 
 classes = (

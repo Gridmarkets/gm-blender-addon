@@ -23,49 +23,8 @@ import pathlib
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
 from gridmarkets_blender_addon.project.remote.remote_blender_project import RemoteBlenderProject
 from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
-
-
-def draw_summary(layout, project_name, project_type,
-                 blender_version, project_file, blender_280_engine, blender_279_engine,
-                 vray_version, remap_file):
-
-    box = layout.box()
-    split = box.split(factor=0.25)
-
-    col1 = split.column()
-    col2 = split.column()
-
-    col1.label(text="Project Name:")
-    col2.label(text=project_name)
-
-    col1.label(text="Project Type:")
-    col2.label(text=project_type)
-
-    if project_type == api_constants.PRODUCTS.BLENDER:
-
-        col1.label(text="Version")
-        col2.label(text=blender_version)
-
-        col1.label(text="Project File:")
-        col2.label(text=project_name + '/' + project_file)
-
-        if blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
-            col1.label(text="Engine")
-            col2.label(text=blender_280_engine)
-        elif blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
-            col1.label(text="Engine")
-            col2.label(text=blender_279_engine)
-
-    elif project_type == api_constants.PRODUCTS.VRAY:
-
-        col1.label(text="Version")
-        col2.label(text=vray_version)
-
-        col1.label(text="Project File:")
-        col2.label(text=project_name + '/' + project_file)
-
-        col1.label(text="Re-map file")
-        col2.label(text=project_name + '/' + remap_file)
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
+    draw_remote_project_summary
 
 
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
@@ -167,9 +126,10 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         layout.separator()
 
-        draw_summary(layout, self.project_name, self.project_type,
-                 self.blender_version, project_file, self.blender_280_engine, self.blender_279_engine,
-                 self.vray_version, self.remap_file)
+        draw_remote_project_summary(layout, self.project_name, self.project_type,
+                                    self.blender_version, project_file, self.blender_280_engine,
+                                    self.blender_279_engine,
+                                    self.vray_version, self.remap_file)
 
 
 classes = (
