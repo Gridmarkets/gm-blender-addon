@@ -20,6 +20,7 @@
 
 
 def draw_logging_controls(self, context):
+    from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.clear_logs import \
         GRIDMARKETS_OT_clear_logs
     from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.copy_logs_to_clipboard import \
@@ -32,10 +33,10 @@ def draw_logging_controls(self, context):
     split = layout.split()
 
     col1 = split.column()
-    col1.operator(GRIDMARKETS_OT_clear_logs.bl_idname)
+    col1.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_REMOVE)
 
     col2 = split.column()
-    col2.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname)
+    col2.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD)
 
     row = layout.row()
-    row.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname)
+    row.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE)
