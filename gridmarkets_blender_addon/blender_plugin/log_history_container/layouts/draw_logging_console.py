@@ -35,7 +35,7 @@ def draw_logging_console(self, context):
     props = context.scene.props
     log_history_container_props = props.log_history_container
 
-    row = layout.row()
+    row = layout.box().row()
 
     row.template_list(GRIDMARKETS_UL_log_item.bl_idname, "",
                       log_history_container_props, "log_history_items",
@@ -45,7 +45,7 @@ def draw_logging_console(self, context):
     col = row.column()
     col.alignment="RIGHT"
     col.scale_y = 1.4
-    col.ui_units_x = 5
+    col.ui_units_x = 4.5
     col.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Options")
 
     col.separator()
