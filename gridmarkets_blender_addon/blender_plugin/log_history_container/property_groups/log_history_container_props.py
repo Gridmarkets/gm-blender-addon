@@ -46,7 +46,7 @@ class LogHistoryContainerProps(bpy.types.PropertyGroup):
         if plugin:
             log_history_container = plugin.get_logging_coordinator().get_log_history_container()
             item = log_history_container.get_at(value)
-            log_history_container.focus_item(item, update_prop=False)
+            log_history_container.focus_item(item, update_props=False)
 
     focused_log_item: bpy.props.IntProperty(
         options={'SKIP_SAVE', 'HIDDEN'},
