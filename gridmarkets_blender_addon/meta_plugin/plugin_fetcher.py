@@ -35,3 +35,8 @@ class PluginFetcher(ABC):
     @abstractmethod
     def get_plugin_if_initialised() -> Optional['Plugin']:
         raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def delete_cached_plugin() -> None:
+        raise NotImplementedError

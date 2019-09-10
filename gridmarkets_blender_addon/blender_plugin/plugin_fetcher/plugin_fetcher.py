@@ -42,3 +42,7 @@ class PluginFetcher(MetaPluginFetcher):
             return None
 
         return PluginFetcher._plugin
+
+    @staticmethod
+    def delete_cached_plugin() -> None:
+        PluginFetcher._plugin = None

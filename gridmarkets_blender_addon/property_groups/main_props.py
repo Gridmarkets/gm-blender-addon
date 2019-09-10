@@ -266,6 +266,9 @@ classes = (
 
 @persistent
 def reset_to_defaults(pos):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    PluginFetcher.delete_cached_plugin()
+
     # options={'SKIP_SAVE'} doesnt work for global properties so we must reset manually
     bpy.context.scene.props.uploading_project = False
     bpy.context.scene.props.uploading_project_progress = 0
