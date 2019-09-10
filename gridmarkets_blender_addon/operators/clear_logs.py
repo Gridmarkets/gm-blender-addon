@@ -30,9 +30,9 @@ class GRIDMARKETS_OT_clear_logs(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
-
-        log.clear_logs()
+        plugin = PluginFetcher.get_plugin()
+        log_history_container = plugin.get_logging_coordinator().get_log_history_container()
+        log_history_container.reset()
         return {'FINISHED'}
 
 
