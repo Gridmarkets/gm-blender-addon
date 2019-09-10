@@ -46,16 +46,29 @@ class LogHistoryContainer(MetaLogHistoryContainer):
 
     def append(self, log_item: LogItem, focus_new_item: bool = True, update_props: bool = True) -> None:
 
-        if update_props:
-            from gridmarkets_blender_addon import utils
+        message_lines = log_item.get_message().splitlines()
 
-            log_history_items = bpy.context.scene.props.log_history_container.log_history_items
-            log_history_item_props = log_history_items.add()
-            log_history_item_props.id = utils.get_unique_id(log_history_items)
+        # report each line individually because blender has problems with multi-line reports (They display backwards in
+        # the info panel)
+        for message_line in message_lines:
+            # replace tabs since the blender info console can not display them
+            message_line = message_line.replace('\t', ' ' * 4)
 
-            utils_blender.force_redraw_addon()
+            sub_item = LogItem(log_item.get_logger_name(),
+                               log_item.get_level(),
+                               log_item.get_date_time(),
+                               message_line)
 
-        MetaLogHistoryContainer.append(self, log_item, focus_new_item=focus_new_item)
+            if update_props:
+                from gridmarkets_blender_addon import utils
+
+                log_history_items = bpy.context.scene.props.log_history_container.log_history_items
+                log_history_item_props = log_history_items.add()
+                log_history_item_props.id = utils.get_unique_id(log_history_items)
+
+                utils_blender.force_redraw_addon()
+
+            MetaLogHistoryContainer.append(self, sub_item, focus_new_item=focus_new_item)
 
     def remove(self, log_item: LogItem, update_props: bool = True) -> None:
 
