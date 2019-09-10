@@ -25,7 +25,7 @@ from gridmarkets_blender_addon import constants, utils_blender
 class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_idname = "gridmarkets.copy_logs_to_clipboard"
     bl_label = "Copy logs to clipboard"
-    bl_description = "Copy logs to clipboard"
+    bl_description = "Save all the logs to the user's clipboard (Including system information logs)"
     bl_options = {"REGISTER"}
 
     def execute(self, context):

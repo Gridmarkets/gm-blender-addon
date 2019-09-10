@@ -26,7 +26,7 @@ from gridmarkets_blender_addon import constants, utils_blender
 class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
     bl_idname = "gridmarkets.save_logs_to_file"
     bl_label = "Save logs to file"
-    bl_description = "Save logs to a user specified file"
+    bl_description = "Copy all the logs (Including system information logs) to a user specified file"
     bl_options = {"REGISTER"}
 
     filename_ext = ".txt"
