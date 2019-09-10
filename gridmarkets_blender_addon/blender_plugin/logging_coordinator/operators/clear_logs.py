@@ -25,7 +25,6 @@ from gridmarkets_blender_addon import constants
 class GRIDMARKETS_OT_clear_logs(bpy.types.Operator):
     bl_idname = constants.OPERATOR_CLEAR_LOGS_ID_NAME
     bl_label = constants.OPERATOR_CLEAR_LOGS_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     def execute(self, context):

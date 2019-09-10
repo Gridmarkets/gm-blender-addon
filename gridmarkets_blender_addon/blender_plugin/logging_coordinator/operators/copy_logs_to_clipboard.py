@@ -25,7 +25,6 @@ from gridmarkets_blender_addon import constants, utils_blender
 class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_idname = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME
     bl_label = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     def execute(self, context):
