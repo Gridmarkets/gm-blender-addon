@@ -129,8 +129,7 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         api_client.upload_project(packed_project)
 
         return {'FINISHED'}
-
-
+        """
         project_name = pathlib.Path(self.filepath).stem if self.use_file_name else self.project_name
 
         # run the upload project function in separate thread so that gui is not blocked
@@ -141,6 +140,7 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         self._timer = wm.event_timer_add(0.1, window=context.window)
         wm.modal_handler_add(self)
         return {'RUNNING_MODAL'}
+        """
 
     def draw(self, context):
         layout = self.layout

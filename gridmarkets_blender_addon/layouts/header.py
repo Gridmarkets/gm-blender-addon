@@ -38,9 +38,6 @@ def draw_header(self, context):
     row.alignment = "CENTER"
     row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
 
-    # get the plugin version as a string
-    version_str = utils_blender.get_version_string()
-
     # signed in indicator
     sub = row.row(align=True)
 
@@ -56,6 +53,6 @@ def draw_header(self, context):
     # version label
     sub = row.row(align=True)
     sub.enabled = False
-    sub.label(text=version_str)
+    sub.label(text=plugin.get_version().to_string())
 
 
