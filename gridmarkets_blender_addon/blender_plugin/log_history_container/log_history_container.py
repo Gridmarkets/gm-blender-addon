@@ -23,6 +23,7 @@ import bpy
 from gridmarkets_blender_addon.meta_plugin.log_history_container import LogHistoryContainer as MetaLogHistoryContainer
 from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
 from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
+from gridmarkets_blender_addon import utils_blender
 
 
 @attach_blender_plugin
@@ -39,6 +40,8 @@ class LogHistoryContainer(MetaLogHistoryContainer):
             if index:
                 bpy.context.scene.props.log_history_container.focused_log_item = index
 
+            utils_blender.force_redraw_addon()
+
         MetaLogHistoryContainer.focus_item(self, log_item, clear_selection)
 
     def append(self, log_item: LogItem, focus_new_item: bool = True, update_props: bool = True) -> None:
@@ -50,6 +53,8 @@ class LogHistoryContainer(MetaLogHistoryContainer):
             log_history_item_props = log_history_items.add()
             log_history_item_props.id = utils.get_unique_id(log_history_items)
 
+            utils_blender.force_redraw_addon()
+
         MetaLogHistoryContainer.append(self, log_item, focus_new_item=focus_new_item)
 
     def remove(self, log_item: LogItem, update_props: bool = True) -> None:
@@ -58,5 +63,7 @@ class LogHistoryContainer(MetaLogHistoryContainer):
             index = self._items.index(log_item)
             log_history_items = bpy.context.scene.props.log_history_container.log_history_items
             log_history_items.remove(index)
+
+            utils_blender.force_redraw_addon()
 
         MetaLogHistoryContainer.remove(self, log_item)
