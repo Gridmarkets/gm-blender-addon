@@ -39,7 +39,7 @@ from gridmarkets.job import Job
 from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
-from blender_asset_tracer import trace, pack
+from blender_asset_tracer import trace
 
 # global client to reuse
 _envoy_client = None
@@ -72,59 +72,6 @@ def trace_blend_file(blend_file_path, progress_cb=None):
             dependencies[str(file_path)].add(assetPath)
 
     return dependencies
-
-
-def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
-    """ Packs a Blender .blend file to a target folder using blender_asset_tracer
-
-    :param blend_file_path: The .blend file to pack
-    :type blend_file_path: str
-    :param target_dir_path: The path to the directory which will contain the packed files
-    :type target_dir_path: str
-    :param progress_cb: The progress reporting callback instance
-    :type progress_cb: blender_asset_tracer.pack.progress.Callback
-    """
-
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-    log.info("Starting pack operation....")
-
-    blend_file_path = pathlib.Path(blend_file_path)
-    project_root_path = blend_file_path.parent
-    target_dir_path = pathlib.Path(target_dir_path)
-
-    log.info("blend_file_path: %s" % str(blend_file_path))
-    log.info("project_root_path: %s" % str(project_root_path))
-    log.info("target_dir_path: %s" % str(target_dir_path))
-
-    # create packer
-    with pack.Packer(blend_file_path,
-                     project_root_path,
-                     target_dir_path,
-                     noop=False,            # no-op mode, only shows what will be done
-                     compress=False,
-                     relative_only=False
-                     ) as packer:
-
-        log.info("Created packer")
-
-        if progress_cb:
-            log.info("Setting packer progress callback...")
-            packer._progress_cb = progress_cb
-
-        # plan the packing operation (must be called before execute)
-        log.info("Plan packing operation...")
-        packer.strategise()
-
-        # attempt to pack the project
-        try:
-            log.info("Plan packing operation...")
-            packer.execute()
-        except pack.transfer.FileTransferError as ex:
-            log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
-                        str(ex.files_remaining[0]))
-            raise SystemExit(1)
-        finally:
-            log.info("Exiting packing operation...")
 
 
 def validate_credentials(email = None, access_key = None):
