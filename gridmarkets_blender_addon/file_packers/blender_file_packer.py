@@ -25,12 +25,11 @@ import pathlib
 
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class BlenderFilePacker(FilePacker):
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(__name__)
 
         # pack the .blend file to the pack directory
         # _set_progress(progress=60, status="Packing scene data")

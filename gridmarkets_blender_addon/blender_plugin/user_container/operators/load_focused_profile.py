@@ -20,6 +20,7 @@
 
 import bpy
 
+
 class GRIDMARKETS_OT_load_focused_profile(bpy.types.Operator):
     bl_idname = "gridmarkets.load_focused_profile"
     bl_label = "Load profile"

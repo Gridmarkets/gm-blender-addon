@@ -24,10 +24,6 @@ from gridmarkets_blender_addon import api_constants, constants, utils, utils_ble
 from gridmarkets_blender_addon.project.remote.remote_blender_project import RemoteBlenderProject
 from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-
-log = get_wrapped_logger(__name__)
-
 
 def draw_summary(layout, project_name, project_type,
                  blender_version, project_file, blender_280_engine, blender_279_engine,

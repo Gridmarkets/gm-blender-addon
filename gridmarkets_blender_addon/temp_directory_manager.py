@@ -23,9 +23,11 @@ import tempfile
 import atexit
 from gridmarkets_blender_addon import constants
 
+
 def get_wrapped_logger():
-    from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-    return get_wrapped_logger(__name__)
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    return PluginFetcher.get_plugin().get_logging_coordinator().get_logger(__name__)
+
 
 class _AssociationTuple:
     """ A container class representing the relationship between a temporary directory, a preject and the preject's

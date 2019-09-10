@@ -21,9 +21,6 @@
 import bpy
 from gridmarkets_blender_addon import constants, utils_blender
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_idname = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME
@@ -31,8 +28,10 @@ class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
     bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
-
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         log.info("Copying logs to clipboard...")
         bpy.context.window_manager.clipboard = utils_blender.get_logs(self, context)
         return {'FINISHED'}

@@ -25,7 +25,7 @@ def draw_logging_controls(self, context):
     from gridmarkets_blender_addon.blender_plugin.user_interface.operators.toggle_show_log_times import \
         GRIDMARKETS_OT_toggle_show_log_times
     from gridmarkets_blender_addon.blender_plugin.user_interface.operators.toggle_show_logger_names import \
-        GRIDMARKETS_OT_toggle_show_logger_name
+        GRIDMARKETS_OT_toggle_show_logger_names
 
     layout = self.layout
     split = layout.split()
@@ -34,4 +34,4 @@ def draw_logging_controls(self, context):
 
     col1.operator(GRIDMARKETS_OT_toggle_show_log_dates.bl_idname)
     col2.operator(GRIDMARKETS_OT_toggle_show_log_times.bl_idname)
-    layout.operator(GRIDMARKETS_OT_toggle_show_logger_name.bl_idname)
+    layout.operator(GRIDMARKETS_OT_toggle_show_logger_names.bl_idname)

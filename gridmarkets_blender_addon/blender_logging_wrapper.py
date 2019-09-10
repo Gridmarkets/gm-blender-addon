@@ -167,16 +167,3 @@ class BlenderLoggingWrapper:
         props = bpy.context.scene.props
         props.log_items.clear()
         props.selected_log_item = -1
-
-
-def get_wrapped_logger(name):
-    """ Alternate definition of logging.getLogger() only it returns a wrapped Logger instead. Useful for cutting down on
-        the number of imports necessary when creating a wrapped logger.
-
-    :param name: The name of the logger
-    :type name: str
-    :return: The wrapped Logger
-    :rtype: BlenderLoggingWrapper
-    """
-
-    return BlenderLoggingWrapper(logging.getLogger(name))

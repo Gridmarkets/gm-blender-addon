@@ -24,13 +24,9 @@ import pathlib
 import threading
 
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 
 class GRIDMARKETS_OT_upload_project(bpy.types.Operator):

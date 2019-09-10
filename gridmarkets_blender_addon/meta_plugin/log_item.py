@@ -43,10 +43,10 @@ class LogItem:
         return self._date_time
 
     def get_date(self) -> str:
-        return time.strftime("%Y-%m-%d", self._date_time.date())
+        return self._date_time.strftime("%Y-%m-%d")
 
     def get_time(self) -> str:
-        return time.strftime("%H:%M:%S", self._date_time.date())
+        return self._date_time.strftime("%H:%M:%S")
 
     def get_message(self) -> str:
         return self._message

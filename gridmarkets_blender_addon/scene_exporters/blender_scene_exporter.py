@@ -28,14 +28,14 @@ import pathlib
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class BlenderSceneExporter(SceneExporter):
 
     @staticmethod
     def _save_scene_to_file(target: str):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(__name__)
+
         log.info("Saving scene to temporary file: " + target)
         bpy.ops.wm.save_as_mainfile(copy=True, filepath=target, relative_remap=True,
                                     compress=True)

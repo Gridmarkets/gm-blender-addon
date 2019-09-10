@@ -46,8 +46,8 @@ _envoy_client = None
 
 
 def get_wrapped_logger(name):
-    from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-    return get_wrapped_logger(name)
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    return PluginFetcher.get_plugin().get_logging_coordinator().get_logger(name)
 
 
 def trace_blend_file(blend_file_path, progress_cb=None):

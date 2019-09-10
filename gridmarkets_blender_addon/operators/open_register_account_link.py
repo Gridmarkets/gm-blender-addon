@@ -19,10 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants, utils_blender
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
+from gridmarkets_blender_addon import constants
 
 
 class GRIDMARKETS_OT_open_register_account_link(bpy.types.Operator):
@@ -32,6 +29,9 @@ class GRIDMARKETS_OT_open_register_account_link(bpy.types.Operator):
     bl_description = "Open the sign-up page in the users browser for " + constants.COMPANY_NAME
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         log.info("Opening register account link...")
 
         # open the render manager url in the users browser

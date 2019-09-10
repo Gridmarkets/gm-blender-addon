@@ -20,9 +20,10 @@
 
 import bpy
 import pathlib
-from gridmarkets_blender_addon import constants, utils_blender, utils
+from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProject
+
 
 class GRIDMARKETS_OT_submit_vray_project(bpy.types.Operator):
     bl_idname = "gridmarkets.submit_new_vray_project"

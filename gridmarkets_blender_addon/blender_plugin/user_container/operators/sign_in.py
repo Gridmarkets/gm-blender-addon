@@ -46,6 +46,7 @@ class ExcThread(threading.Thread):
         except Exception as e:
             self.bucket.put(e)
 
+
 class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
     bl_idname = "gridmarkets.sign_in_new_user"
     bl_label = "Sign-in new user"

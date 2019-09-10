@@ -28,6 +28,6 @@ def draw_logging_console(self, context):
     log_history_container_props = props.log_history_container
 
     layout.template_list(GRIDMARKETS_UL_log_item.bl_idname, "",
-                      log_history_container_props, "log_items",
-                      log_history_container_props, "selected_log_item",
+                      log_history_container_props, "log_history_items",
+                      log_history_container_props, "focused_log_item",
                       rows=6, sort_lock=True)

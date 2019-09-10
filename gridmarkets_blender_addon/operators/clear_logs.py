@@ -19,10 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants, utils_blender
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
+from gridmarkets_blender_addon import constants
 
 
 class GRIDMARKETS_OT_clear_logs(bpy.types.Operator):
@@ -31,8 +28,10 @@ class GRIDMARKETS_OT_clear_logs(bpy.types.Operator):
     bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
-
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         log.clear_logs()
         return {'FINISHED'}
 

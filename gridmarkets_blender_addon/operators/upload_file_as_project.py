@@ -29,9 +29,6 @@ from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker
 from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProject
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
     bl_idname = constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME
