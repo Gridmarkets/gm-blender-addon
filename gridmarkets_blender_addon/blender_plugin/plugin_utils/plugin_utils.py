@@ -42,3 +42,6 @@ class PluginUtils(MetaPluginUtils):
         sys_info += "Add-on Version: " + plugin_version.to_string()
 
         return sys_info
+
+    def copy_to_clipboard(self, value: str) -> None:
+        bpy.context.window_manager.clipboard = value

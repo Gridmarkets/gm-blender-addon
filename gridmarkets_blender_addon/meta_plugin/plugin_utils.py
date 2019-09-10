@@ -30,3 +30,7 @@ class PluginUtils(ABC):
     @abstractmethod
     def get_sys_info(self) -> str:
         raise NotImplementedError
+
+    @abstractmethod
+    def copy_to_clipboard(self, value: str) -> None:
+        raise NotImplementedError
