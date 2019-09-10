@@ -25,24 +25,30 @@ from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
 
 class BlenderFilePacker(FilePacker):
+    BAT_PACK_INFO_FILE_NAME = "pack-info.txt"
+
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
+        from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(__name__)
+
+        plugin = PluginFetcher.get_plugin()
+        logging_coordinator = plugin.get_logging_coordinator()
+        log = logging_coordinator.get_logger(__name__)
 
         # pack the .blend file to the pack directory
-        self.pack_blend_file(str(target_file), str(output_dir))
+        self.pack_blend_file(str(target_file), str(output_dir), BatProgressCallback(log))
 
         # delete pack-info.txt if it exists
-        pack_info_file = output_dir / 'pack-info.txt'
+        pack_info_file = output_dir / self.BAT_PACK_INFO_FILE_NAME
         if pack_info_file.is_file():
             log.info("Removing '%s'..." % str(pack_info_file))
             pack_info_file.unlink()
 
         return PackedProject(output_dir.stem,
-                                       output_dir,
-                                       output_dir / target_file.name,
-                                       set(),
-                                       {"PRODUCT": "blender"})
+                             output_dir,
+                             output_dir / target_file.name,
+                             set(),
+                             {"PRODUCT": "blender"})
 
     @staticmethod
     def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
