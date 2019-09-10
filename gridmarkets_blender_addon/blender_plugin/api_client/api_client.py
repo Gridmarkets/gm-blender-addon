@@ -26,6 +26,7 @@ from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 import pathlib
 
+
 @attach_blender_plugin
 class APIClient(GridMarketsAPIClient):
 

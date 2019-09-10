@@ -17,3 +17,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+
+
+def draw_remote_project_container(self, context):
+    from gridmarkets_blender_addon import constants
+    from gridmarkets_blender_addon.layouts.projects import _draw_project_info_view, GRIDMARKETS_MT_add_new_project
+
+    from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import GRIDMARKETS_UL_remote_project
+
+    layout = self.layout
+    props = context.scene.props
+    remote_project_container_props = props.remote_project_container
+
+    row = layout.row()
+    row.template_list(GRIDMARKETS_UL_remote_project.bl_idname, "",
+                      remote_project_container_props, "remote_projects",
+                      remote_project_container_props, "focused_remote_project",
+                      rows=2)
+
+    row = layout.row(align=True)
+    row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)

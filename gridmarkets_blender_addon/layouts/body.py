@@ -22,15 +22,18 @@ from gridmarkets_blender_addon import constants
 
 from gridmarkets_blender_addon.layouts.submission_settings import draw_submission_settings, draw_submission_summary
 from gridmarkets_blender_addon.layouts.preferences import draw_preferences
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts import draw_remote_project_container
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_container import \
+    draw_remote_project_container
 from gridmarkets_blender_addon.layouts.jobs import draw_jobs
 
-from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import draw_logging_console
+from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
+    draw_logging_console
 
 from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
 from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
 
 _CONSOLE_SEPARATOR_SPACING = 2
+
 
 def draw_body(self, context):
     layout = self.layout
