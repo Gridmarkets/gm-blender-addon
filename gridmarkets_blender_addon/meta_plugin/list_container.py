@@ -80,6 +80,11 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
         if focus_new_item:
             self.focus_item(item)
 
+    def reset(self) -> None:
+        self.deselect_all()
+        while self._items:
+            self.remove(self._items[0])
+
     def remove(self, item: T) -> None:
         self._selected.remove(item)
         self._items.remove(item)
