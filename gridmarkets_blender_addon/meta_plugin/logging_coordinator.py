@@ -36,7 +36,7 @@ class LoggingCoordinator:
         self._queue: queue.Queue = queue.Queue()
 
     def is_thread_safe_mode_enabled(self) -> bool:
-        return self._multi_thread_counter == 0
+        return self._multi_thread_counter > 0
 
     def set_thread_safe_mode(self, enabled: bool) -> None:
         if enabled:
