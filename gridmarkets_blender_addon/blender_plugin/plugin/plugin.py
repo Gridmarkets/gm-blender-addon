@@ -31,6 +31,7 @@ from gridmarkets_blender_addon.blender_plugin.user_container.user_container impo
 from gridmarkets_blender_addon.blender_plugin.api_client.api_client import APIClient
 from gridmarkets_blender_addon.blender_plugin.user_interface.user_interface import UserInterface
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_project_container import RemoteProjectContainer
+from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 
 
 class Plugin(MetaPlugin):
@@ -43,6 +44,7 @@ class Plugin(MetaPlugin):
         self._api_client = APIClient()
         self._user_interface = UserInterface()
         self._remote_project_container = RemoteProjectContainer()
+        self._plugin_utils = PluginUtils()
 
     def get_name(self) -> str:
         return bl_info['name']
@@ -64,3 +66,6 @@ class Plugin(MetaPlugin):
 
     def get_remote_project_container(self) -> RemoteProjectContainer:
         return self._remote_project_container
+
+    def get_plugin_utils(self) -> PluginUtils:
+        return self._plugin_utils

@@ -25,6 +25,7 @@ from gridmarkets_blender_addon.meta_plugin.preferences_container import Preferen
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient
 from gridmarkets_blender_addon.meta_plugin.user_interface import UserInterface
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer
+from gridmarkets_blender_addon.meta_plugin.plugin_utils import PluginUtils
 
 
 class Plugin(ABC):
@@ -55,4 +56,7 @@ class Plugin(ABC):
 
     @abstractmethod
     def get_remote_project_container(self) -> RemoteProjectContainer:
+        raise NotImplementedError
+
+    def get_plugin_utils(self) -> PluginUtils:
         raise NotImplementedError
