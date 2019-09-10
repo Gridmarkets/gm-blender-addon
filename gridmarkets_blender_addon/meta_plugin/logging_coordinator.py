@@ -47,6 +47,35 @@ class LoggingCoordinator:
     def get_log_history_container(self) -> LogHistoryContainer:
         return self._log_history_container
 
+    def serialize_logs(self) -> str:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        import os
+
+        plugin = PluginFetcher.get_plugin()
+        sys_info = plugin.get_plugin_utils().get_sys_info()
+
+        output = ''
+
+        for log_item in self.get_log_history_container().get_all():
+            output += log_item.get_date() + ' ' + \
+                      log_item.get_time() + ' ' + \
+                      log_item.get_logger_name() + ' ' + \
+                      log_item.get_level() + ' ' + \
+                      log_item.get_message() + os.linesep
+
+        return sys_info + os.linesep + output
+
+    def copy_logs_to_clipboard(self) -> None:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        plugin_utils = plugin.get_plugin_utils()
+        plugin_utils.copy_to_clipboard(self.serialize_logs())
+
+    def save_logs_to_file(self, file_path: str) -> None:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(self.serialize_logs())
+            f.close()
+
     def queue(self, log_item: LogItem) -> None:
         """
         Add the log_item to the queue if operating in multi-threaded mode, otherwise append straight to the log history
