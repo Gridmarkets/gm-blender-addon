@@ -33,7 +33,7 @@ def draw_logging_controls(self, context):
     split = layout.split()
 
     col1 = split.column()
-    col1.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_REMOVE)
+    col1.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH)
 
     col2 = split.column()
     col2.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD)

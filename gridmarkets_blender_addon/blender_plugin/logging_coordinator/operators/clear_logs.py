@@ -25,7 +25,8 @@ from gridmarkets_blender_addon import constants
 class GRIDMARKETS_OT_clear_logs(bpy.types.Operator):
     bl_idname = "gridmarkets.clear_logs"
     bl_label = "Clear logs"
-    bl_options = {'UNDO'}
+    bl_description = "Clear logging history"
+    bl_options = {"REGISTER"}
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
