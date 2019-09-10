@@ -20,22 +20,20 @@
 
 
 def draw_logging_console(self, context):
-    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.log_item.list_items.log_item_list import GRIDMARKETS_UL_log_item
     from gridmarkets_blender_addon.blender_plugin.log_history_container.menus.display_options import \
         GRIDMARKETS_MT_logging_display_options
-    from gridmarkets_blender_addon import constants
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.clear_logs import \
+        GRIDMARKETS_OT_clear_logs
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.copy_logs_to_clipboard import \
+        GRIDMARKETS_OT_copy_logs_to_clipboard
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.save_logs_to_file import \
+        GRIDMARKETS_OT_save_logs_to_file
 
     layout = self.layout
     props = context.scene.props
     log_history_container_props = props.log_history_container
-
-    plugin = PluginFetcher.get_plugin()
-    user_interface = plugin.get_user_interface()
-
-    show_dates = user_interface.show_log_dates()
-    show_times = user_interface.show_log_times()
-    show_names = user_interface.show_logger_names()
 
     row = layout.row()
 
@@ -44,6 +42,19 @@ def draw_logging_console(self, context):
                       log_history_container_props, "focused_log_item",
                       rows=6, sort_lock=True)
 
-    col = row.column(align=True)
-    col.ui_units_x = 1
-    col.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="")
+    col = row.column()
+    col.alignment="RIGHT"
+    col.scale_y = 1.4
+    col.ui_units_x = 5
+    col.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Options")
+
+    col.separator()
+
+    sub = col.column(align = True)
+    sub.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH, text="Clear logs")
+
+    col.separator()
+
+    sub = col.column(align=True)
+    sub.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD, text="Copy logs")
+    sub.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE, text="Save logs")
