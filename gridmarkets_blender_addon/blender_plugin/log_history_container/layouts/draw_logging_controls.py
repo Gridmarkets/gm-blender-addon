@@ -20,35 +20,22 @@
 
 
 def draw_logging_controls(self, context):
-    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-    from gridmarkets_blender_addon.blender_plugin.user_interface.operators.toggle_show_log_dates import \
-        GRIDMARKETS_OT_toggle_show_log_dates
-    from gridmarkets_blender_addon.blender_plugin.user_interface.operators.toggle_show_log_times import \
-        GRIDMARKETS_OT_toggle_show_log_times
-    from gridmarkets_blender_addon.blender_plugin.user_interface.operators.toggle_show_logger_names import \
-        GRIDMARKETS_OT_toggle_show_logger_names
-
-    plugin = PluginFetcher.get_plugin()
-    user_interface = plugin.get_user_interface()
-
-    show_dates = user_interface.show_log_dates()
-    show_times = user_interface.show_log_times()
-    show_names = user_interface.show_logger_names()
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.clear_logs import \
+        GRIDMARKETS_OT_clear_logs
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.copy_logs_to_clipboard import \
+        GRIDMARKETS_OT_copy_logs_to_clipboard
+    from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.save_logs_to_file import \
+        GRIDMARKETS_OT_save_logs_to_file
 
     layout = self.layout
 
     split = layout.split()
 
     col1 = split.column()
-    row = col1.row()
-    row.active = show_dates
-    row.operator(GRIDMARKETS_OT_toggle_show_log_dates.bl_idname)
+    col1.operator(GRIDMARKETS_OT_clear_logs.bl_idname)
 
     col2 = split.column()
-    row = col2.row()
-    row.active = show_times
-    row.operator(GRIDMARKETS_OT_toggle_show_log_times.bl_idname)
+    col2.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname)
 
     row = layout.row()
-    row.active = show_names
-    row.operator(GRIDMARKETS_OT_toggle_show_logger_names.bl_idname)
+    row.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname)
