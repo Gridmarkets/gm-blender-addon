@@ -22,10 +22,9 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 
 import pathlib
-import threading
 
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import draw_summary
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker
 from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProject
 

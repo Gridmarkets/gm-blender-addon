@@ -20,11 +20,8 @@
 
 import bpy
 
-import pathlib
-import threading
-
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import draw_summary
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 

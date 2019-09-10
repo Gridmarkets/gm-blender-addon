@@ -51,7 +51,6 @@ def _get_project_options(scene, context):
          'FILE_NEW', 0)
     ]
 
-
     plugin = PluginFetcher.get_plugin_if_initialised()
 
     if plugin:
