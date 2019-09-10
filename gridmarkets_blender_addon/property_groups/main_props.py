@@ -239,6 +239,12 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
+    is_logging_console_open: bpy.props.BoolProperty(
+        name="Is Logging Console Open",
+        description="Whether or not the logging console is open",
+        default=True
+    )
+
     custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
 
 

@@ -30,6 +30,13 @@ def draw_logging_console(self, context):
         GRIDMARKETS_OT_copy_logs_to_clipboard
     from gridmarkets_blender_addon.blender_plugin.logging_coordinator.operators.save_logs_to_file import \
         GRIDMARKETS_OT_save_logs_to_file
+    from gridmarkets_blender_addon.blender_plugin.log_history_container.operators.toggle_logging_console import \
+        GRIDMARKETS_OT_toggle_logging_console
+
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    user_interface = plugin.get_user_interface()
+    is_open = user_interface.is_logging_console_open()
 
     layout = self.layout
     props = context.scene.props
@@ -37,30 +44,40 @@ def draw_logging_console(self, context):
 
     box = layout.box()
 
-    row = box.row()
+    row = box.row(align=True)
+
+    row.operator(
+        GRIDMARKETS_OT_toggle_logging_console.bl_idname,
+        text="",
+        icon=constants.ICON_DISCLOSURE_TRI_DOWN if is_open else constants.ICON_DISCLOSURE_TRI_RIGHT,
+        emboss=False
+    )
+
     row.label(icon=constants.ICON_CONSOLE, text="Logging console:")
 
-    sub = row.column()
-    sub.alignment="RIGHT"
-    sub.ui_units_x = 6
-    sub.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Diplay options")
+    if is_open:
+        sub = row.column()
+        sub.alignment = "RIGHT"
+        sub.ui_units_x = 6
+        sub.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Diplay options")
 
-    row=box.row()
-    row.template_list(GRIDMARKETS_UL_log_item.bl_idname, "",
-                      log_history_container_props, "log_history_items",
-                      log_history_container_props, "focused_log_item",
-                      rows=6, sort_lock=True)
 
-    col = row.column()
-    col.alignment="RIGHT"
-    col.scale_y = 1.3
-    col.ui_units_x = 1.5
+        row = box.row()
+        row.template_list(GRIDMARKETS_UL_log_item.bl_idname, "",
+                          log_history_container_props, "log_history_items",
+                          log_history_container_props, "focused_log_item",
+                          rows=6, sort_lock=True)
 
-    sub = col.column(align = True)
-    sub.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH, text="")
+        col = row.column()
+        col.alignment = "RIGHT"
+        col.scale_y = 1.3
+        col.ui_units_x = 1.5
 
-    col.separator()
+        sub = col.column(align=True)
+        sub.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH, text="")
 
-    sub = col.column(align=True)
-    sub.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD, text="")
-    sub.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE, text="")
+        col.separator()
+
+        sub = col.column(align=True)
+        sub.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD, text="")
+        sub.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE, text="")

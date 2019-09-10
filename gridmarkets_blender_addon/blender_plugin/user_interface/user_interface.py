@@ -110,3 +110,10 @@ class UserInterface(MetaUserInterface):
 
     def set_show_logger_names(self, enabled: bool) -> None:
         bpy.context.scene.props.user_interface.show_logger_names = enabled
+
+    # console
+    def is_logging_console_open(self) -> bool:
+        return bpy.context.scene.props.is_logging_console_open
+
+    def toggle_logging_console(self) -> None:
+        bpy.context.scene.props.is_logging_console_open = not bpy.context.scene.props.is_logging_console_open
