@@ -53,6 +53,6 @@ def draw_header(self, context):
     # version label
     sub = row.row(align=True)
     sub.enabled = False
-    sub.label(text=plugin.get_version().to_string())
+    sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
 
 
