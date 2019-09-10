@@ -46,14 +46,8 @@ class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
-
-        log.info("Writing logs to file \"%s\"..." % self.filepath);
-
-        with open(self.filepath, 'w', encoding='utf-8') as f:
-            f.write(utils_blender.get_logs(self, context))
-            f.close()
-
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_logging_coordinator().save_logs_to_file(self.filepath)
         return {'FINISHED'}
 
 
