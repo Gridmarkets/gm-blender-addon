@@ -23,20 +23,14 @@ import bpy
 import addon_utils
 import inspect
 import pathlib
-import os
 import collections
 import json
 
 from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon import utils
 from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
-from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
 from gridmarkets.envoy_client import EnvoyClient
-from gridmarkets.project import Project
 from gridmarkets.job import Job
-from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
 from blender_asset_tracer import trace
@@ -555,9 +549,11 @@ def get_addon(module_name):
 
     return None
 
+
 def force_redraw_addon():
     #redraw_region(constants.WINDOW_SPACE_TYPE, constants.PANEL_REGION_TYPE)
     redraw_area(constants.WINDOW_SPACE_TYPE)
+
 
 def redraw_area(area_type):
     # the screen may be None if method is called from a different thread
@@ -586,6 +582,7 @@ def get_addon_window():
 
 def addon_draw_condition(self, context):
     return context.screen.name == constants.INJECTED_SCREEN_NAME
+
 
 def get_spinner(index: int):
     from gridmarkets_blender_addon.icon_loader import IconLoader
@@ -619,8 +616,6 @@ def get_selected_project_options(scene, context, id):
     from gridmarkets_blender_addon.icon_loader import IconLoader
     from gridmarkets_blender_addon import api_constants
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-
-    props = context.scene.props
 
     project_options = [
         # it is always an option to upload as a new project
