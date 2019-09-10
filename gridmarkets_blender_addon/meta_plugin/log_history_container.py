@@ -56,5 +56,5 @@ class LogHistoryContainer(ListContainer, LogItem):
     def get_index(self, log_item: LogItem) -> int:
         return ListContainer.get_index(self, log_item)
 
-    def is_selected(self, log_item: LogItem):
+    def is_selected(self, log_item: LogItem) -> bool:
         return ListContainer.is_selected(self, log_item)
