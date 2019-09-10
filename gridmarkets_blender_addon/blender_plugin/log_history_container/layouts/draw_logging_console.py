@@ -35,8 +35,17 @@ def draw_logging_console(self, context):
     props = context.scene.props
     log_history_container_props = props.log_history_container
 
-    row = layout.box().row()
+    box = layout.box()
 
+    row = box.row()
+    row.label(icon=constants.ICON_CONSOLE, text="Logging console:")
+
+    sub = row.column()
+    sub.alignment="RIGHT"
+    sub.ui_units_x = 6
+    sub.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Diplay options")
+
+    row=box.row()
     row.template_list(GRIDMARKETS_UL_log_item.bl_idname, "",
                       log_history_container_props, "log_history_items",
                       log_history_container_props, "focused_log_item",
@@ -44,17 +53,14 @@ def draw_logging_console(self, context):
 
     col = row.column()
     col.alignment="RIGHT"
-    col.scale_y = 1.4
-    col.ui_units_x = 4.5
-    col.menu(GRIDMARKETS_MT_logging_display_options.bl_idname, icon=constants.ICON_COLLAPSEMENU, text="Options")
-
-    col.separator()
+    col.scale_y = 1.3
+    col.ui_units_x = 1.5
 
     sub = col.column(align = True)
-    sub.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH, text="Clear logs")
+    sub.operator(GRIDMARKETS_OT_clear_logs.bl_idname, icon=constants.ICON_TRASH, text="")
 
     col.separator()
 
     sub = col.column(align=True)
-    sub.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD, text="Copy logs")
-    sub.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE, text="Save logs")
+    sub.operator(GRIDMARKETS_OT_copy_logs_to_clipboard.bl_idname, icon=constants.ICON_COPY_TO_CLIPBOARD, text="")
+    sub.operator(GRIDMARKETS_OT_save_logs_to_file.bl_idname, icon=constants.ICON_SAVE_TO_FILE, text="")

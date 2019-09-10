@@ -30,6 +30,7 @@ from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw
 from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
 from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
 
+_CONSOLE_SEPARATOR_SPACING = 2
 
 def draw_body(self, context):
     layout = self.layout
@@ -76,10 +77,12 @@ def draw_body(self, context):
         else:
             draw_submission_settings(self, context)
             draw_submission_summary(self, context)
+            self.layout.separator(factor=_CONSOLE_SEPARATOR_SPACING)
             draw_logging_console(self, context)
 
     elif props.tab_options == constants.TAB_PROJECTS:
         draw_remote_project_container(self, context)
+        self.layout.separator(factor=_CONSOLE_SEPARATOR_SPACING)
         draw_logging_console(self, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         draw_jobs(self, context)
