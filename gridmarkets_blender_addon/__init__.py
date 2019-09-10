@@ -41,7 +41,7 @@ modulesNames = ['meta_plugin.scene_exporter',
                 'scene_exporters.vray_scene_exporter',
                 'constants',
                 'api_constants',
-                'blender_plugin.plugin_fetcher.plugin_fetcher',
+                #'blender_plugin.plugin_fetcher.plugin_fetcher', # don't reload otherwise state is lost on add-on reload
                 'utils_blender',
                 'icon_loader',
                 'property_groups.main_props',
