@@ -26,6 +26,8 @@ from gridmarkets_blender_addon.blender_plugin.log_item.property_groups.log_item_
 class GRIDMARKETS_UL_log_item(bpy.types.UIList):
     bl_idname = "GRIDMARKETS_UL_log_item"
 
+    LOGGING_INFO_SPACER = '   '
+
     def draw_item(self, context, layout, data, item: LogItemProps, icon, active_data, active_property, index=0,
                   flt_flag=0):
 
@@ -47,13 +49,13 @@ class GRIDMARKETS_UL_log_item(bpy.types.UIList):
         text = ''
 
         if show_date:
-            text += log_item.get_date()
+            text += log_item.get_date() + self.LOGGING_INFO_SPACER
 
         if show_time:
-            text += log_item.get_time()
+            text += log_item.get_time() + self.LOGGING_INFO_SPACER
 
         if show_name:
-            text += log_item.get_logger_name()
+            text += log_item.get_logger_name() + self.LOGGING_INFO_SPACER
 
         text += log_item.get_message()
 

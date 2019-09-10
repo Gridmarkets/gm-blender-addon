@@ -88,7 +88,7 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
     def remove(self, item: T) -> None:
         if item in self._selected:
             self._selected.remove(item)
-            
+
         self._items.remove(item)
 
     def remove_focused(self) -> None:
