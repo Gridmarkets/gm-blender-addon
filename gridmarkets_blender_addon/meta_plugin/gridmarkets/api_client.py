@@ -113,7 +113,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                        packed_project: PackedProject,
                        delete_local_files_after_upload: bool = False) -> RemoteProject:
 
-        if self._envoy_client is None:
+        if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to upload a project.")
 
         project_dir = str(packed_project.get_root_dir())
