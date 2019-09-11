@@ -163,6 +163,8 @@ class APIClient(GridMarketsAPIClient):
         except APIError as e:
             log.error("API Error: " + str(e.user_message))
             raise e
+        finally:
+            log.info("Finished submit operation - Job should appear in the Render Manager if submitted successfully")
 
     def submit_existing_vray_project(self, remote_project: RemoteProject, job_name: str, frame_ranges: str, output_height,
                                      output_width, output_prefix, output_format, output_path: pathlib.Path):
@@ -269,6 +271,8 @@ class APIClient(GridMarketsAPIClient):
         except APIError as e:
             log.error("API Error: " + str(e.user_message))
             raise e
+        finally:
+            log.info("Finished submit operation - Job should appear in the Render Manager if submitted successfully")
 
     def submit_new_blender_project(self, packed_project: PackedProject):
         import bpy
@@ -377,7 +381,7 @@ class APIClient(GridMarketsAPIClient):
         except APIError as e:
             log.error("API Error: " + str(e.user_message))
         finally:
-            log.info("Finished submit operation - Job Should appear in the Render Manager is submitted successfully")
+            log.info("Finished submit operation - Job should appear in the Render Manager if submitted successfully")
             setattr(context.scene.props, "submitting_project", False)
 
     def submit_existing_blender_project(self, remote_project: RemoteProject):
