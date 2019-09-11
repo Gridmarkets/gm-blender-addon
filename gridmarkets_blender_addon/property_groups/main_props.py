@@ -335,8 +335,13 @@ def reset_to_defaults(pos):
     bpy.context.scene.props.submitting_project_status = ""
 
     bpy.context.scene.props.vray.frame_ranges.clear()
-
     bpy.context.scene.props.vray.selected_frame_range = 0
+
+    bpy.context.scene.props.log_history_container.log_history_items.clear()
+    bpy.context.scene.props.log_history_container.focused_log_item = 0
+
+    bpy.context.scene.props.remote_project_container.remote_projects.clear()
+    bpy.context.scene.props.remote_project_container.focused_remote_project = 0
 
     frame_range = bpy.context.scene.props.vray.frame_ranges.add()
     frame_range.name = "Default frame range"
