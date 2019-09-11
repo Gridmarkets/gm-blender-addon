@@ -13,6 +13,7 @@ A Blender add-on for uploading Blender Projects to GridMarkets and for specifyin
 - [Using the Add-on](#using-the-add-on)
   - [Authentication](#authentication)
   - [Submitting a Project](#submitting-a-project)
+  - [Submitting a V-Ray Scene](#submitting-a-v-ray-scene)
 
 ![image showing a preview of the add-on](static/floating_window.png)
 
@@ -25,8 +26,8 @@ how to build the add-on from source.
 
 | Blender Version   | Add-on Download Link|
 |-------------------|--------|
-| 2.80  | [gridmarkets_blender_addon_v2_80.zip](https://gridmarkets-misc.s3.amazonaws.com/Blender/gridmarkets_blender_addon_v2_80_LATEST.zip)  |
-| 2.79  | [gridmarkets_blender_addon_v2_79.zip](https://gridmarkets-misc.s3.amazonaws.com/Blender/gridmarkets_blender_addon_v2_79_LATEST.zip)  |
+| 2.80  | [gridmarkets_blender_addon_v2_80.zip](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon_v2_79.zip)  |
+| 2.79  | [gridmarkets_blender_addon_v2_79.zip](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon_v2_79.zip)  |
 
 ### Building from Sources
 
@@ -81,13 +82,21 @@ The add-on window can be opened by pressing the 'Open GridMarkets add-on' button
 The add-on depends on GridMarkets' Envoy being installed and running in order to work.
 
 ### Authentication
-You must provide your GridMarkets email and access key (__not your password__) before you can upload or submit and 
-projects. You can do this under the __Credentials__ tab or under the add-on preferences section for the add-on. 
+You must provide your GridMarkets email and access key (__not your password__) before you can upload or submit any 
+projects. You can do this under the __Credentials__ tab or under the add-on preferences section for the add-on. The 
+add-on will only display the sign-in window until you have signed in.
 
 ![image showing where to insert email and access key](static/add-on_preferences.png)
 
 For Blender to remember a users credentials between sessions they must click the `Save Preferences` button also shown in 
 the above image.
+
+The add-on will remember any account you use to sign in (so long as you save your preferences). Once you have signed-in
+with at least one account the sign-in menu will a menu labeled `Saved user Profiles` from which you can load your 
+credentials. You can also mark an account with a star which indicates to the add-on to try and automatically sign-in
+using this account when opened.
+
+![image showing multiple accounts](static/multiple_accounts.gif)
 
 ### Submitting a Project
 
@@ -103,8 +112,15 @@ __Job Presets__ tab.
 
 ![image showing the job presets tab](static/job_presets_view.png)
 
-Or you can upload projects in the __Projects__ tab and run jobs against them later.
+Or you can upload projects in the __Projects__ tab and run jobs against them later. This is useful if you want to check
+that your project has been uploaded correctly before submitting a job to it.
 
-![image showing the projects tab](static/projects_view.png)
+![GIF showing the projects tab](static/project_upload.gif)
 
+### Submitting a V-Ray scene
 
+If you are using [V-Ray for Blender](https://docs.chaosgroup.com/display/VFBlender/Quick+Start+Guide) you can submit
+V-Ray projects from Blender to GridMarkets using this add-on. To submit a V-Ray project just select the V-Ray engine 
+and the `Submission Settings` view will change to include a V-Ray project submission form. Job Presets are currently 
+only supported for blender's render engines so the `Job Presets` tab will not display while the V-Ray render engine is
+selected.
