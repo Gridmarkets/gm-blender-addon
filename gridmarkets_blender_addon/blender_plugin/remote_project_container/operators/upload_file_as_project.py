@@ -126,7 +126,6 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
 
                     elif type(result) == RemoteProject:
                         self.remote_project_container.append(result)
-                        pass
 
                     else:
                         raise RuntimeError("Method returned unexpected result:", result)

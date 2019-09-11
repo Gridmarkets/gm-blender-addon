@@ -121,7 +121,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
                     elif type(result) == RemoteProject:
                         self.remote_project_container.append(result)
-                        pass
 
                     else:
                         raise RuntimeError("Method returned unexpected result:", result)
