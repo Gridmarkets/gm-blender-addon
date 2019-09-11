@@ -98,6 +98,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         self.project_file = ""
         self.remap_file = ""
 
+        utils_blender.force_redraw_addon()
         return {'FINISHED'}
 
     def draw(self, context):
