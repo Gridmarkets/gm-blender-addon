@@ -22,7 +22,9 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 
 import pathlib
+from queue import Queue, Empty
 
+from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
     draw_remote_project_summary
@@ -86,22 +88,56 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         default=True
     )
 
-    _timer = None
-    _thread = None
+    bucket = None
+    timer = None
+    thread: ExcThread = None
+    user_interface = None
+    remote_project_container = None
 
-    '''
     def modal(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
+        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
+        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+
         if event.type == 'TIMER':
-            # repaint add-on on timer event
+            self.user_interface.increment_running_operation_spinner()
             utils_blender.force_redraw_addon()
 
-            if not self._thread.isAlive():
-                self._thread.join()
+            if not self.thread.isAlive():
+                try:
+                    result = self.bucket.get(block=False)
+                except Empty:
+                    raise RuntimeError("bucket is Empty")
+                else:
+                    if type(result) == NotSignedInError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == AuthenticationError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InsufficientCreditsError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InvalidRequestError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == APIError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == RemoteProject:
+                        self.remote_project_container.append(result)
+                        pass
+
+                    else:
+                        raise RuntimeError("Method returned unexpected result:", result)
+
+                self.thread.join()
+                self.user_interface.set_is_running_operation_flag(False)
+                context.window_manager.event_timer_remove(self.timer)
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
 
         return {'PASS_THROUGH'}
-    '''
 
     def invoke(self, context, event):
         props = context.scene.props
@@ -110,38 +146,44 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        main_file = pathlib.Path(self.filepath)
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        self.remote_project_container = plugin.get_remote_project_container()
+        self.user_interface = plugin.get_user_interface()
 
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
+        wm = context.window_manager
+        self.bucket = Queue()
+        self.thread = ExcThread(self.bucket, self._execute,
+                                args=(self.filepath, self.project_type, self.project_name, self.remap_file), kwargs={})
+        self.thread.start()
+
+        self.timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+
+        self.user_interface.set_is_running_operation_flag(True)
+        self.user_interface.set_running_operation_message("Uploading project...")
+        return {'RUNNING_MODAL'}
+
+    @staticmethod
+    def _execute(filepath: str, project_type: str, project_name: str, remap_file):
+        main_file = pathlib.Path(filepath)
+
+        if project_type == api_constants.PRODUCTS.BLENDER:
             from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
             packed_project = BlenderFilePacker().pack(main_file,
                                                       TempDirectoryManager.get_temp_directory_manager().get_temp_directory())
-            packed_project.set_name(self.project_name)
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            remap_file = pathlib.Path(self.remap_file)
+            packed_project.set_name(project_name)
+        elif project_type == api_constants.PRODUCTS.VRAY:
+            remap_file = pathlib.Path(remap_file)
             packed_project = PackedVRayProject(main_file.parent, main_file)
-            packed_project.set_name(self.project_name)
+            packed_project.set_name(project_name)
         else:
             raise RuntimeError("Unknown project type")
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_client.upload_project(packed_project)
-
-        return {'FINISHED'}
-        """
-        project_name = pathlib.Path(self.filepath).stem if self.use_file_name else self.project_name
-
-        # run the upload project function in separate thread so that gui is not blocked
-        self._thread = threading.Thread(target=utils_blender.upload_file_as_project,
-                                        args=(context, self.filepath, project_name, TempDirectoryManager.get_temp_directory_manager()),
-                                        kwargs={'operator': self})
-        self._thread.start()
-        self._timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
-        """
+        return api_client.upload_project(packed_project)
 
     def draw(self, context):
         layout = self.layout

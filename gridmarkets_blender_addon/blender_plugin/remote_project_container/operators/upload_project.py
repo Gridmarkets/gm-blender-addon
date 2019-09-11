@@ -124,7 +124,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                         pass
 
                     else:
-                        raise RuntimeError("Sign-in method returned unexpected result:", result)
+                        raise RuntimeError("Method returned unexpected result:", result)
 
                 self.thread.join()
                 self.user_interface.set_is_running_operation_flag(False)
