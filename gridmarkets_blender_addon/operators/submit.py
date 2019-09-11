@@ -126,7 +126,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         wm = context.window_manager
         self.bucket = Queue()
         self.thread = ExcThread(self.bucket, self._execute,
-                                args=(context.scene.props.project_options, self.project_name), kwargs={})
+                                args=(props.project_options, self.project_name), kwargs={})
 
         # summary view can not be open when submitting otherwise crash (since submitting blender scenes still accesses
         # the context)
@@ -141,7 +141,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     @staticmethod
-    def _execute(selected_projec_option, project_name: str):
+    def _execute(selected_project_option, project_name: str):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
         from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
@@ -149,7 +149,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
 
-        if selected_projec_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+        if selected_project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
             packed_project = BlenderSceneExporter().export(temp_dir)
@@ -157,7 +157,7 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
             return api_client.submit_new_blender_project(packed_project)
         else:
             remote_project_container = plugin.get_remote_project_container()
-            remote_project = remote_project_container.get_project_with_id(selected_projec_option)
+            remote_project = remote_project_container.get_project_with_id(selected_project_option)
             api_client.submit_existing_blender_project(remote_project)
             return None
 
