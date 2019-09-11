@@ -80,13 +80,13 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         dir = pathlib.Path(self.project_name)
-        main_file = pathlib.Path(self.project_file)
 
         if self.project_type == api_constants.PRODUCTS.BLENDER:
-            remote_project = RemoteBlenderProject(dir, main_file)
-
+            main_file = pathlib.Path(self.project_file + constants.BLEND_FILE_EXTENSION)
+            remote_project = RemoteBlenderProject(dir, main_file )
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:
+            main_file = pathlib.Path(self.project_file + constants.VRAY_SCENE_FILE_EXTENSION)
             remap_file = dir / pathlib.Path(self.remap_file)
             remote_project = RemoteVRayProject(dir, main_file, remap_file)
 
