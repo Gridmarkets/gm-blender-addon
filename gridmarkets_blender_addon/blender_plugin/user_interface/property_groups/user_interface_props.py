@@ -114,8 +114,13 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
-    # spinner
+    # spinners
     signing_in_spinner: bpy.props.IntProperty(
+        default=1,
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    running_operation_spinner: bpy.props.IntProperty(
         default=1,
         options={'SKIP_SAVE', 'HIDDEN'}
     )
@@ -139,3 +144,12 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         default=False
     )
 
+    is_running_operation: bpy.props.BoolProperty(
+        default=False,
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    running_operation_message: bpy.props.StringProperty(
+        default="",
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )

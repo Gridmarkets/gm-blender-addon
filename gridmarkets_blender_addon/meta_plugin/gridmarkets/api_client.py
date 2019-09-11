@@ -124,8 +124,4 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._envoy_client.upload_project_files(gm_project)
 
-        remote_project = RemoteProject.convert_packed_project(packed_project)
-        remote_project_container = self.get_plugin().get_remote_project_container()
-        remote_project_container.append(remote_project)
-
-        return remote_project
+        return RemoteProject.convert_packed_project(packed_project)

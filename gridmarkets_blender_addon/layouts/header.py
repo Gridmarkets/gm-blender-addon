@@ -41,6 +41,10 @@ def draw_header(self, context):
     # signed in indicator
     sub = row.row(align=True)
 
+    if user_interface.is_running_operation():
+        sub.label(text=user_interface.get_running_operation_message(),
+                  icon_value=utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id)
+
     if user_interface.get_signing_in_flag():
         sub.label( text = "Signing in...",
                    icon_value = utils_blender.get_spinner(user_interface.get_signing_in_spinner()).icon_id)
