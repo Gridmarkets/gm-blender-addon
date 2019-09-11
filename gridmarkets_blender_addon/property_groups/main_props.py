@@ -105,6 +105,14 @@ def _get_job_options(scene, context):
 
 
 def _get_tab_items(scene, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+        if not plugin.get_api_client().is_user_signed_in():
+            return [
+                (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
+            ]
 
     if bpy.context.scene.render.engine == constants.VRAY_RENDER_RT:
         return [
@@ -121,6 +129,24 @@ def _get_tab_items(scene, context):
         (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
         (constants.TAB_LOGGING, constants.TAB_LOGGING, ''),
     ]
+
+
+def _get_tab_option(self):
+    try:
+        value = self["tab_option"]
+
+        # if the selected tab option no longer exists we need to set it to something else
+        options = _get_tab_items(bpy.context.scene, bpy.context)
+        if value >= len(options):
+            value = len(options) - 1
+
+    except KeyError:
+        value = 0
+    return value
+
+
+def _set_tab_option(self, value):
+    self["tab_option"] = value
 
 
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
@@ -229,7 +255,9 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     tab_options: bpy.props.EnumProperty(
         name="Tabs",
         description="The tabs that show at the top of the add-on main window",
-        items = _get_tab_items
+        items = _get_tab_items,
+        get=_get_tab_option,
+        set=_set_tab_option
     )
 
     submission_summary_open: bpy.props.BoolProperty(

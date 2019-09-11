@@ -36,12 +36,19 @@ _CONSOLE_SEPARATOR_SPACING = 2
 
 
 def draw_body(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_client = plugin.get_api_client()
+
     layout = self.layout
     props = context.scene.props
 
-    box = layout.box()
-    row = box.row()
-    row.prop_tabs_enum(props, "tab_options", icon_only=True)
+    if api_client.is_user_signed_in():
+        box = layout.box()
+        row = box.row()
+        row.prop_tabs_enum(props, "tab_options", icon_only=True)
+    else:
+        layout.separator()
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         if context.scene.render.engine == "VRAY_RENDER_RT":
