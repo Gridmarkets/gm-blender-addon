@@ -22,6 +22,7 @@
 def draw_remote_project_container(self, context):
     from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.layouts.projects import _draw_project_info_view, GRIDMARKETS_MT_add_new_project
+    from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
 
     from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import GRIDMARKETS_UL_remote_project
 
@@ -37,3 +38,5 @@ def draw_remote_project_container(self, context):
 
     row = layout.row(align=True)
     row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)
+
+    draw_remote_project(self, context)
