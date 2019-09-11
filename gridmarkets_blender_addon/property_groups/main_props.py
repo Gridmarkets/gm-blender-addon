@@ -303,8 +303,7 @@ def reset_to_defaults(pos):
     bpy.context.scene.props.submitting_project_progress = 0
     bpy.context.scene.props.submitting_project_status = ""
 
-    while len(bpy.context.scene.props.vray.frame_ranges) > 0:
-        bpy.context.scene.props.vray.frame_ranges.pop()
+    bpy.context.scene.props.vray.frame_ranges.clear()
 
     bpy.context.scene.props.vray.selected_frame_range = 0
 
