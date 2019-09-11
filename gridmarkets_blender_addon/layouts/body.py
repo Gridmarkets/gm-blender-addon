@@ -23,16 +23,23 @@ from gridmarkets_blender_addon import constants
 
 from gridmarkets_blender_addon.layouts.submission_settings import draw_submission_settings, draw_submission_summary
 from gridmarkets_blender_addon.layouts.preferences import draw_preferences
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts import draw_remote_project_container
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_container import \
+    draw_remote_project_container
 from gridmarkets_blender_addon.layouts.jobs import draw_jobs
-from gridmarkets_blender_addon.layouts.console import draw_console, draw_compact_console
-from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
+from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
+    draw_logging_console
 
 from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
 from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
 
+_CONSOLE_SEPARATOR_SPACING = 2
+
 
 def draw_body(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_client = plugin.get_api_client()
+
     layout = self.layout
     props = context.scene.props
 
@@ -45,26 +52,32 @@ def draw_body(self, context):
 
     # draw the main body
     col = split.column()
-    box = col.box()
-    row = box.row()
-    row.prop(props, "tab_options", expand=True)
+
+    if api_client.is_user_signed_in():
+        box = col.box()
+        row = box.row()
+        row.prop(props, "tab_options", expand=True)
+    else:
+        col.separator()
+
     col = SimpleNamespace(layout=col)
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         if context.scene.render.engine == "VRAY_RENDER_RT":
             draw_v_ray_submission_form(col, context)
-            draw_compact_console(col, context)
+            draw_logging_console(col, context)
         else:
             draw_submission_settings(col, context)
             draw_submission_summary(col, context)
-            draw_compact_console(col, context)
-
+            col.layout.separator()
+            draw_logging_console(col, context)
     elif props.tab_options == constants.TAB_PROJECTS:
         draw_remote_project_container(col, context)
-        draw_compact_console(col, context)
+        col.layout.separator()
+        draw_logging_console(col, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
         draw_jobs(col, context)
     elif props.tab_options == constants.TAB_CREDENTIALS:
         draw_preferences(col, context)
     elif props.tab_options == constants.TAB_LOGGING:
-        draw_console(col, context)
+        draw_logging_console(col, context)

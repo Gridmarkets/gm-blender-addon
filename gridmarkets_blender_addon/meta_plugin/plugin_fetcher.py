@@ -21,6 +21,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+
 class PluginFetcher(ABC):
 
     _plugin = None
@@ -35,3 +36,7 @@ class PluginFetcher(ABC):
     def get_plugin_if_initialised() -> Optional['Plugin']:
         raise NotImplementedError
 
+    @staticmethod
+    @abstractmethod
+    def delete_cached_plugin() -> None:
+        raise NotImplementedError

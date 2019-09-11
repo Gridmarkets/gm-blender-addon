@@ -21,9 +21,6 @@
 import bpy
 from gridmarkets_blender_addon import constants, utils_blender
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_idname = constants.OPERATOR_OPEN_PREFERENCES_ID_NAME
@@ -31,6 +28,9 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         log.info("Opening GridMarkets add-on preferences menu...")
 
         bpy.ops.screen.userpref_show('INVOKE_DEFAULT')

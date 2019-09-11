@@ -50,7 +50,7 @@ class UserContainerProps(bpy.types.PropertyGroup):
         if plugin:
             user_container = plugin.get_preferences_container().get_user_container()
             item = user_container.get_at(value)
-            user_container.focus_item(item, update_prop=False)
+            user_container.focus_item(item, update_props=False)
 
 
     def _update_default_user(self, context):

@@ -78,6 +78,38 @@ class UserInterface(ABC, PluginAccessor):
     def set_signing_in_flag(self, signing_in: bool) -> None:
         raise NotImplementedError
 
+    # operation
+    def is_running_operation(self) -> bool:
+        raise NotImplementedError
+
+    def set_is_running_operation_flag(self, value: bool) -> None:
+        raise NotImplementedError
+
+    def get_running_operation_message(self) -> str:
+        raise NotImplementedError
+
+    def set_running_operation_message(self, message: str) -> None:
+        raise NotImplementedError
+
     # load profile
     def load_profile(self, user_profile: User):
+        raise NotImplementedError
+
+    # logging
+    def show_log_dates(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_log_dates(self, enabled: bool) -> None:
+        raise NotImplementedError
+
+    def show_log_times(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_log_times(self, enabled: bool) -> None:
+        raise NotImplementedError
+
+    def show_logger_names(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_logger_names(self, enabled: bool) -> None:
         raise NotImplementedError

@@ -21,8 +21,6 @@
 import bpy
 from gridmarkets_blender_addon import constants
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
     """Class to represent the 'Open Manager Portal' operation. Opens the portal in the user's browser."""
@@ -32,6 +30,9 @@ class GRIDMARKETS_OT_Open_Manager_Portal(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         log.info("Opening manager portal...")
 
         # open the render manager url in the users browser

@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon.meta_plugin.project import Project
+from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 import pathlib
 import typing
 
@@ -31,7 +32,6 @@ class RemoteProject(Project):
                  main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
-
         Project.__init__(self,
                          name,
                          root_dir,
@@ -47,3 +47,22 @@ class RemoteProject(Project):
 
     def delete(self) -> None:
         raise NotImplementedError
+
+    @staticmethod
+    def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
+
+        root_dir = pathlib.Path(packed_project.get_name())
+        main_file = packed_project.get_relative_main_file()
+        files = packed_project.get_relative_files()
+        attributes = packed_project.get_attributes()
+
+        # convert all pathlib.Path attributes into a relative path
+        for key, attribute in attributes.items():
+            if type(attribute) is pathlib.Path:
+                attributes[key] = packed_project.get_relative_file_path(attribute)
+
+        return RemoteProject(packed_project.get_name(),
+                             root_dir,
+                             main_file,
+                             files,
+                             attributes)

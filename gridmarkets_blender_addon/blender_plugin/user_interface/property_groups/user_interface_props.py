@@ -114,9 +114,42 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
-    # spinner
+    # spinners
     signing_in_spinner = bpy.props.IntProperty(
         default=1,
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
+    running_operation_spinner = bpy.props.IntProperty(
+        default=1,
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    # logger
+    show_log_dates = bpy.props.BoolProperty(
+        name="Show Logged Dates",
+        description="Toggles the displaying of dates for log items",
+        default=False
+    )
+
+    show_log_times = bpy.props.BoolProperty(
+        name="Show Logged Times",
+        description="Toggles the displaying of times for log items",
+        default=True
+    )
+
+    show_logger_names = bpy.props.BoolProperty(
+        name="Show Logger Names",
+        description="Toggles the displaying of logger names for log items",
+        default=False
+    )
+
+    is_running_operation = bpy.props.BoolProperty(
+        default=False,
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    running_operation_message = bpy.props.StringProperty(
+        default="",
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )

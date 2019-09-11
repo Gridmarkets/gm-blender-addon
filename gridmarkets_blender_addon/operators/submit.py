@@ -19,12 +19,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import threading
-from gridmarkets_blender_addon import constants, utils, utils_blender
-from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
+from queue import Queue, Empty
+
+from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
+from gridmarkets_blender_addon import constants, utils, utils_blender
 
 
 class GRIDMARKETS_OT_Submit(bpy.types.Operator):
@@ -32,9 +31,6 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
     bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
     bl_label = constants.OPERATOR_SUBMIT_LABEL
-
-    _timer = None
-    _thread = None
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
     project_name = bpy.props.StringProperty(
@@ -44,13 +40,54 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         maxlen=256
     )
 
+    bucket = None
+    timer = None
+    thread: ExcThread = None
+    user_interface = None
+    remote_project_container = None
+
     def modal(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
+        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
+        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+
         if event.type == 'TIMER':
-            # repaint add-on on timer event
+            self.user_interface.increment_running_operation_spinner()
             utils_blender.force_redraw_addon()
 
-            if not self._thread.isAlive():
-                self._thread.join()
+            if not self.thread.isAlive():
+                try:
+                    result = self.bucket.get(block=False)
+                except Empty:
+                    raise RuntimeError("bucket is Empty")
+                else:
+                    if type(result) == NotSignedInError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == AuthenticationError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InsufficientCreditsError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InvalidRequestError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == APIError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == RemoteProject:
+                        self.remote_project_container.append(result)
+
+                    elif result is None:
+                        pass
+
+                    else:
+                        raise RuntimeError("Method returned unexpected result:", result)
+
+                self.thread.join()
+                self.user_interface.set_is_running_operation_flag(False)
+                context.window_manager.event_timer_remove(self.timer)
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
 
@@ -71,7 +108,8 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
                 self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=blend_file_name)
             else:
-                self.project_name = utils.create_unique_object_name(remote_projects, name_prefix=constants.PROJECT_PREFIX)
+                self.project_name = utils.create_unique_object_name(remote_projects,
+                                                                    name_prefix=constants.PROJECT_PREFIX)
 
             # create popup
             return context.window_manager.invoke_props_dialog(self, width=400)
@@ -80,43 +118,49 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        props = context.scene.props
+        self.remote_project_container = plugin.get_remote_project_container()
+        self.user_interface = plugin.get_user_interface()
+
+        wm = context.window_manager
+        self.bucket = Queue()
+        self.thread = ExcThread(self.bucket, self._execute,
+                                args=(props.project_options, self.project_name), kwargs={})
+
+        # summary view can not be open when submitting otherwise crash (since submitting blender scenes still accesses
+        # the context)
+        props.submission_summary_open = False
+        self.thread.start()
+
+        self.timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+
+        self.user_interface.set_is_running_operation_flag(True)
+        self.user_interface.set_running_operation_message("Submitting project...")
+        return {'RUNNING_MODAL'}
+
+    @staticmethod
+    def _execute(selected_project_option, project_name: str):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
         from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 
-        props = context.scene.props
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
 
-        selected_project = props.project_options
-
-        if selected_project == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+        if selected_project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
             packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(self.project_name)
-
-            api_client.submit_new_blender_project(packed_project)
+            packed_project.set_name(project_name)
+            return api_client.submit_new_blender_project(packed_project)
         else:
             remote_project_container = plugin.get_remote_project_container()
-            remote_project = remote_project_container.get_project_with_id(selected_project)
+            remote_project = remote_project_container.get_project_with_id(selected_project_option)
             api_client.submit_existing_blender_project(remote_project)
+            return None
 
-
-        return {"FINISHED"}
-        """
-        wm = context.window_manager
-
-        log.info("Creating separate thread for submission process")
-
-        # run the upload project function in separate thread so that gui is not blocked
-        self._thread = threading.Thread(target=utils_blender.submit_job,
-                                        args=(context, TempDirectoryManager.get_temp_directory_manager()),
-                                        kwargs={'new_project_name': self.project_name, 'operator': self})
-        self._thread.start()
-        self._timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
-        """
 
 
 classes = (

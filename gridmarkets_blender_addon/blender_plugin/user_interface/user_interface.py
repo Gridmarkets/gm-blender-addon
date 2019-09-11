@@ -77,12 +77,25 @@ class UserInterface(MetaUserInterface):
     def set_signing_in_flag(self, signing_in: bool) -> None:
         bpy.context.scene.props.user_interface.signing_in_flag = signing_in
 
+    # operation
+    def is_running_operation(self) -> bool:
+        return bpy.context.scene.props.user_interface.is_running_operation
+
+    def set_is_running_operation_flag(self, value: bool) -> None:
+        bpy.context.scene.props.user_interface.is_running_operation = value
+
+    def get_running_operation_message(self) -> str:
+        return bpy.context.scene.props.user_interface.running_operation_message
+
+    def set_running_operation_message(self, message: str) -> None:
+        bpy.context.scene.props.user_interface.running_operation_message = message
+
     # load profile
     def load_profile(self, user_profile: User):
         bpy.context.scene.props.user_interface.auth_email_input = user_profile.get_auth_email()
         bpy.context.scene.props.user_interface.auth_access_key_input = user_profile.get_auth_key()
 
-    # spinner
+    # spinners
     def get_signing_in_spinner(self) -> int:
         return bpy.context.scene.props.user_interface.signing_in_spinner
 
@@ -91,3 +104,38 @@ class UserInterface(MetaUserInterface):
 
         if bpy.context.scene.props.user_interface.signing_in_spinner > 7:
             bpy.context.scene.props.user_interface.signing_in_spinner = 0
+
+    def get_running_operation_spinner(self) -> int:
+        return bpy.context.scene.props.user_interface.running_operation_spinner
+
+    def increment_running_operation_spinner(self) -> None:
+        bpy.context.scene.props.user_interface.running_operation_spinner += 1
+
+        if bpy.context.scene.props.user_interface.running_operation_spinner > 7:
+            bpy.context.scene.props.user_interface.running_operation_spinner = 0
+
+    # logger
+    def show_log_dates(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_log_dates
+
+    def set_show_log_dates(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_log_dates = enabled
+
+    def show_log_times(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_log_times
+
+    def set_show_log_times(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_log_times = enabled
+
+    def show_logger_names(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_logger_names
+
+    def set_show_logger_names(self, enabled: bool) -> None:
+        bpy.context.scene.props.user_interface.show_logger_names = enabled
+
+    # console
+    def is_logging_console_open(self) -> bool:
+        return bpy.context.scene.props.is_logging_console_open
+
+    def toggle_logging_console(self) -> None:
+        bpy.context.scene.props.is_logging_console_open = not bpy.context.scene.props.is_logging_console_open

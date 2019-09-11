@@ -20,17 +20,14 @@
 
 import bpy
 
-import pathlib
-import threading
+from queue import Queue, Empty
 
+from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-from gridmarkets_blender_addon.operators.add_remote_project import draw_summary
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
+    draw_remote_project_summary
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 
 class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
@@ -38,7 +35,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
     bl_icon = constants.ICON_BLEND_FILE
     bl_description = "Upload the current scene as a new project."
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
     project_name = bpy.props.StringProperty(
@@ -86,16 +83,51 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         description="The name of the remap file",
     )
 
-    _timer = None
-    _thread = None
+    bucket = None
+    timer = None
+    thread: ExcThread = None
+    user_interface = None
+    remote_project_container = None
 
     def modal(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
+        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
+        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+
         if event.type == 'TIMER':
-            # repaint add-on on timer event
+            self.user_interface.increment_running_operation_spinner()
             utils_blender.force_redraw_addon()
 
-            if not self._thread.isAlive():
-                self._thread.join()
+            if not self.thread.isAlive():
+                try:
+                    result = self.bucket.get(block=False)
+                except Empty:
+                    raise RuntimeError("bucket is Empty")
+                else:
+                    if type(result) == NotSignedInError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == AuthenticationError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InsufficientCreditsError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == InvalidRequestError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == APIError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif type(result) == RemoteProject:
+                        self.remote_project_container.append(result)
+
+                    else:
+                        raise RuntimeError("Method returned unexpected result:", result)
+
+                self.thread.join()
+                self.user_interface.set_is_running_operation_flag(False)
+                context.window_manager.event_timer_remove(self.timer)
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
 
@@ -132,26 +164,43 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width=400)
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        self.remote_project_container = plugin.get_remote_project_container()
+        self.user_interface = plugin.get_user_interface()
+
+        wm = context.window_manager
+        self.bucket = Queue()
+        self.thread = ExcThread(self.bucket, self._execute, args=(self.project_type, self.project_name), kwargs={})
+        self.thread.start()
+
+        self.timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+
+        self.user_interface.set_is_running_operation_flag(True)
+        self.user_interface.set_running_operation_message("Uploading project...")
+        return {'RUNNING_MODAL'}
+
+    @staticmethod
+    def _execute(project_type: str, project_name: str):
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
         temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
+        if project_type == api_constants.PRODUCTS.BLENDER:
             packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(self.project_name)
+            packed_project.set_name(project_name)
 
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
+        elif project_type == api_constants.PRODUCTS.VRAY:
             packed_project = VRaySceneExporter().export(temp_dir)
-            packed_project.set_name(self.project_name)
+            packed_project.set_name(project_name)
         else:
             raise RuntimeError("Unknown project type")
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_client.upload_project(packed_project)
-
-        return {'FINISHED'}
+        return api_client.upload_project(packed_project, delete_local_files_after_upload=False)
 
     def draw(self, context):
         layout = self.layout
@@ -193,9 +242,10 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
         layout.separator()
 
-        draw_summary(layout, self.project_name, self.project_type,
-                     self.blender_version, self.project_file, self.blender_280_engine, self.blender_279_engine,
-                     self.vray_version, self.remap_file)
+        draw_remote_project_summary(layout, self.project_name, self.project_type,
+                                    self.blender_version, self.project_file, self.blender_280_engine,
+                                    self.blender_279_engine,
+                                    self.vray_version, self.remap_file)
 
 
 classes = (

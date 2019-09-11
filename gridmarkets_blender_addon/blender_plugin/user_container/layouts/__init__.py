@@ -36,10 +36,12 @@ def draw_user_profiles_list(self, context):
     user_profiles_box.alignment = "CENTER"
     user_profiles_box.label(text="Saved User Profiles:")
 
-    sub = user_profiles_box.row()
+    sub = user_profiles_box.column()
     sub.alignment="LEFT"
     sub.enabled = False
     sub.label(text="A list of stored " + constants.COMPANY_NAME + "' profiles for easy access.")
+    sub.label(text="Star a profile to enable automatic sign-in.")
+    sub.scale_y = 0.7
 
     row = user_profiles_box.row()
 
@@ -74,6 +76,7 @@ def draw_sign_in_form(self, context):
     plugin = PluginFetcher.get_plugin()
     user_interface = plugin.get_user_interface()
     user_container = plugin.get_preferences_container().get_user_container()
+    stored_profiles_count = user_container.size()
 
     def _draw_register(layout):
         row = layout.row()
@@ -111,7 +114,19 @@ def draw_sign_in_form(self, context):
     row.alignment = "CENTER"
     row.scale_x = 2
 
-    signin_box = row.box()
+    if stored_profiles_count:
+        signin_box_outer = row.box()
+        signin_box_outer.separator()
+        mid = signin_box_outer.row()
+        col1 = mid.row()
+        signin_box_mid = mid.column()
+        col3 = mid.row()
+        signin_box = signin_box_mid.box()
+    else:
+        signin_box = row.box()
+        signin_box_mid = None
+        signin_box_outer = None
+
     signin_box.label(text=constants.COMPANY_NAME + " Sign-in:", icon_value=iconGM.icon_id)
 
     _draw_string_input_field(signin_box,
@@ -162,11 +177,13 @@ def draw_sign_in_form(self, context):
     register_layout.scale_x = 0.5
     _draw_register(register_layout)
 
-    if user_container.size():
+    if stored_profiles_count:
         from types import SimpleNamespace
-        user_profiles_layout = row.row()
+        signin_box_mid.separator()
+        user_profiles_layout = signin_box_mid.row()
         user_profiles_layout.scale_x = 0.5
         draw_user_profiles_list(SimpleNamespace(layout=user_profiles_layout), context)
+        signin_box_outer.separator()
 
 def draw_user_container(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher

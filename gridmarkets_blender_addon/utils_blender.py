@@ -23,31 +23,25 @@ import bpy
 import addon_utils
 import inspect
 import pathlib
-import os
 import collections
 import json
 
 from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon import utils
 from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
-from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
 from gridmarkets.envoy_client import EnvoyClient
-from gridmarkets.project import Project
 from gridmarkets.job import Job
-from gridmarkets.watch_file import WatchFile
 from gridmarkets.errors import *
 
-from blender_asset_tracer import trace, pack
+from blender_asset_tracer import trace
 
 # global client to reuse
 _envoy_client = None
 
 
 def get_wrapped_logger(name):
-    from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-    return get_wrapped_logger(name)
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    return PluginFetcher.get_plugin().get_logging_coordinator().get_logger(name)
 
 
 def trace_blend_file(blend_file_path, progress_cb=None):
@@ -72,59 +66,6 @@ def trace_blend_file(blend_file_path, progress_cb=None):
             dependencies[str(file_path)].add(assetPath)
 
     return dependencies
-
-
-def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
-    """ Packs a Blender .blend file to a target folder using blender_asset_tracer
-
-    :param blend_file_path: The .blend file to pack
-    :type blend_file_path: str
-    :param target_dir_path: The path to the directory which will contain the packed files
-    :type target_dir_path: str
-    :param progress_cb: The progress reporting callback instance
-    :type progress_cb: blender_asset_tracer.pack.progress.Callback
-    """
-
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-    log.info("Starting pack operation....")
-
-    blend_file_path = pathlib.Path(blend_file_path)
-    project_root_path = blend_file_path.parent
-    target_dir_path = pathlib.Path(target_dir_path)
-
-    log.info("blend_file_path: %s" % str(blend_file_path))
-    log.info("project_root_path: %s" % str(project_root_path))
-    log.info("target_dir_path: %s" % str(target_dir_path))
-
-    # create packer
-    with pack.Packer(blend_file_path,
-                     project_root_path,
-                     target_dir_path,
-                     noop=False,            # no-op mode, only shows what will be done
-                     compress=False,
-                     relative_only=False
-                     ) as packer:
-
-        log.info("Created packer")
-
-        if progress_cb:
-            log.info("Setting packer progress callback...")
-            packer._progress_cb = progress_cb
-
-        # plan the packing operation (must be called before execute)
-        log.info("Plan packing operation...")
-        packer.strategise()
-
-        # attempt to pack the project
-        try:
-            log.info("Plan packing operation...")
-            packer.execute()
-        except pack.transfer.FileTransferError as ex:
-            log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
-                        str(ex.files_remaining[0]))
-            raise SystemExit(1)
-        finally:
-            log.info("Exiting packing operation...")
 
 
 def validate_credentials(email = None, access_key = None):
@@ -235,37 +176,6 @@ def get_envoy_client():
     return _envoy_client
 
 
-def _add_project_to_list(project_name, props):
-
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-    log.info("Starting add_project_to_list operation...")
-
-    # if props already contains a project with the given name
-    existing_projects_with_name = list(filter(lambda x: x.name == project_name, props.projects))
-
-    if existing_projects_with_name:
-        # don't add it to the list and return the existing project
-        log.info("A project with the name %s already exists, returning existing project..." % project_name)
-        return existing_projects_with_name[0]
-
-    # add a project to the list
-    log.info("Adding project to list...")
-
-    project = props.projects.add()
-
-    project.id = utils.get_unique_id(props.projects)
-    project.name = project_name
-
-    # select the new project
-    log.info("Selecting new project...")
-    props.selected_project = len(props.projects) - 1
-
-    # force region to redraw otherwise the list wont update until next event (mouse over, etc)
-    force_redraw_addon()
-
-    return project
-
-
 def get_project_status(project):
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
@@ -294,320 +204,6 @@ def get_project_status(project):
         log.error("API Error: " + str(e.user_message))
 
 
-def clean_up_temporary_files(project_item, progress_callback):
-    """ Checks the status of the project until it has finished uploading and then deletes the temporary files """
-
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-
-    if not constants.PROJECT_STATUS_POLLING_ENABLED:
-        log.info("Uploading Project...")
-        return
-
-    # number of times to retry if receiving malformed responses
-    bad_response_retires = 10
-
-    log.info("Uploading Project...")
-    progress_callback(0, "Uploading Project")
-
-    while bad_response_retires > 0:
-        import time
-
-        # sleep for 10 seconds to give time for the project to upload
-        log.info("Checking project upload status in " + str(10) + " seconds")
-        time.sleep(10)
-
-        try:
-            # create an instance of Envoy client
-            client = get_envoy_client()
-
-            log.info("Checking project status for %s..." % project_item.name)
-            resp = client.get_project_status(project_item.name)
-
-            # convert to string
-            project_item.status = json.dumps(resp)
-            log.info("Project status response: %s" % project_item.status)
-
-            # redraw the add-on to show the latest update
-            force_redraw_addon()
-        except AuthenticationError as e:
-            log.error("Authentication Error: " + e.user_message)
-            bad_response_retires -= 1
-            continue
-        except InsufficientCreditsError as e:
-            log.error("Insufficient Credits Error: " + e.user_message)
-            bad_response_retires -= 1
-            continue
-        except InvalidRequestError as e:
-            log.error("Invalid Request Error: " + e.user_message)
-            bad_response_retires -= 1
-            continue
-        except APIError as e:
-            log.error("API Error: " + str(e.user_message))
-            bad_response_retires -= 1
-            raise e
-            continue
-
-        # parse the json status response
-        project_status = json.loads(project_item.status)
-        uploading_status = project_status['State']
-
-        if uploading_status == 'Completed' or uploading_status == 'Submitted':
-            progress_callback(100, "Uploaded Project")
-            log.info("Uploaded Project")
-            break
-        elif uploading_status == 'Uploading':
-            if "BytesDone" in project_status and "BytesTotal" in project_status:
-                bytes_done = project_status["BytesDone"]
-                bytes_total = project_status["BytesTotal"]
-
-                try:
-                    # try converting to floats
-                    bytes_done_f = float(bytes_done)
-                    bytes_total_f = float(bytes_total)
-
-                    # avoid dividing by zero errors
-                    if bytes_total_f > 0:
-                        percent = (bytes_done_f / bytes_total_f) * 100
-                        progress_callback(percent, "Uploading Project...")
-
-                except ValueError:
-                    log.warning("bytes_done or bytes_total was not a float")
-            continue
-        elif uploading_status == 'Error':
-
-            if 'Message' not in project_status:
-                log.warning("Upload Error: No Error message")
-                bad_response_retires -= 1
-                continue
-
-            error_message = project_status['Message']
-
-            # the api returns an error status even if the project has uploaded correctly but it was uploaded without a
-            # job, we need to check to make sure that this 'Error' isn't just a uploaded project without a job
-            if error_message == "Job validation failed.":
-
-                # check that all the details have finished uploading
-                if 'Details' not in project_status:
-                    log.warning("Project status does not contain 'Details' attribute")
-                else:
-                    details = project_status['Details']
-
-                    details_uploaded = True
-
-                    for key, value in details.items():
-
-                        # the Details attribute can contain it's own details attribute which we should ignore
-                        if key == 'details':
-                            continue
-
-                        if 'BytesDone' not in value:
-                            log.warning("project status detail does not contain 'BytesDone' attribute")
-                            details_uploaded = False
-                            break
-
-                        if 'BytesTotal' not in value:
-                            log.warning("project status detail does not contain 'Bytestotal' attribute")
-                            details_uploaded = False
-                            break
-
-                        bytes_done = value['BytesDone']
-                        bytes_total = value['BytesTotal']
-
-                        # if the detail is not finished uploading then break
-                        if bytes_done != bytes_total:
-                            log.warning("project status detail %s does has not finished uploading" % key)
-                            details_uploaded = False
-                            break
-
-                    if details_uploaded:
-                        progress_callback(100, "Uploaded Project")
-                        log.info("Uploaded Project")
-                        break
-                    else:
-                        log.warning("Not all details have been uploaded")
-
-            else:
-                log.warning("Upload Error: %s" % error_message)
-                bad_response_retires -= 1
-                continue
-
-        else:
-            log.warning("Unrecognised status: %s" % uploading_status)
-            bad_response_retires -= 1
-            continue
-
-    delete_temp_files_for_project(project_item.name)
-
-
-def delete_temp_files_for_project(project_name):
-    """ Attempts to delete the temporary project files for associated with a given project name
-
-    :param project_name: The name of the project
-    :type project_name: str
-    :rtype: void
-    """
-
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-    log.info("Starting delete_temp_files_for_project operation")
-
-    # get the temporary directory manager
-    temporary_directory_manager = TempDirectoryManager.get_temp_directory_manager()
-
-    # find the association for this project
-    association = temporary_directory_manager.get_association_with_project_name(project_name)
-
-    # if the association exists
-    if association:
-        log.info("Found association")
-
-        # delete the temporary files for the project
-        association.delete_temporary_directory()
-    else:
-        log.info("Project association does not exist")
-
-def _scale_percentage(min_percentage, max_percentage, percentage):
-    return min_percentage + ((max_percentage - min_percentage) / 100) * percentage
-
-
-def upload_file_as_project(context, file_path, project_name, temp_dir_manager,
-                   operator=None,
-                   skip_upload=False,
-                   min_progress=0,
-                   max_progress=100,
-                   progress_attribute_name = "uploading_project",
-                   progress_percent_attribute_name = "uploading_project_progress",
-                   progress_status_attribute_name = "uploading_project_status"
-                   ):
-    """Uploads the provided .blend file to Envoy as a new project, using the provided project name.
-
-    :param context: The operator's context
-    :type context: bpy.types.Context
-    :param file_path: The path to the blend file that needs uploading
-    :type file_path: str
-    :param project_name: The name of the project as it will appear in Envoy
-    :type project_name: str
-    :param temp_dir_manager: The temporary directory manager used to store packed projects
-    :type temp_dir_manager: TempDirectoryManager
-    :param operator: The operator that called the function
-    :type operator: bpy.types.Operator
-    :param skip_upload: Pack files but don't upload project files
-    :param operator: An optional instance of an operator so that invalid input can be reported correctly
-    :type operator: bpy.types.Operator
-    :param min_progress: The min value to set the progress too
-    :type min_progress: float
-    :param max_progress: The max value to set the progress too
-    :type max_progress: float
-    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
-    :type progress_attribute_name: str
-    :param progress_percent_attribute_name: The name of the property which represents the operations progress
-    :type progress_percent_attribute_name: str
-    :param progress_status_attribute_name: The name of the property which represents the operations status
-    :type progress_status_attribute_name: str
-    :rtype: void
-    :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-    """
-
-    # helper function for setting the progress of the operation
-    def _set_progress(progress=None, status=None):
-        if progress is not None:
-            # re-scale progress so that it is between the min and max values
-            scaled_progress =_scale_percentage(min_progress, max_progress, progress)
-            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
-
-        if status is not None:
-            setattr(context.scene.props, progress_status_attribute_name, status)
-
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-
-    setattr(context.scene.props, progress_attribute_name, True)
-    _set_progress(progress=0, status="Starting project upload")
-
-    try:
-        # create an instance of Envoy client
-        client = get_envoy_client()
-
-        # create a new temp directory
-        temp_dir_path = temp_dir_manager.get_temp_directory()
-
-        # create directory to contain packed project
-        packed_dir = temp_dir_path / project_name
-
-        log.info("Creating packed directory '%s'..." % str(packed_dir))
-        _set_progress(progress=40, status="Creating packed directory")
-        os.mkdir(str(packed_dir))
-
-        from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
-        blender_scene_exporter = BlenderSceneExporter()
-        blender_scene_exporter.export(packed_dir)
-
-        """
-        # create the progress callback
-        progress_cb = BatProgressCallback(log)
-
-        # pack the .blend file to the pack directory
-        _set_progress(progress=60, status="Packing scene data")
-        pack_blend_file(file_path, str(packed_dir), progress_cb=progress_cb)
-
-        # delete pack-info.txt if it exists
-        pack_info_file = pathlib.Path(packed_dir / 'pack-info.txt')
-        if pack_info_file.is_file():
-            log.info("Removing '%s'..." % str(pack_info_file))
-            pack_info_file.unlink()
-        """
-
-        # create the project
-        project = Project(str(packed_dir), project_name)
-
-        # associate this project with the temp directory so the temp directory can be removed once the project is
-        # complete
-        temp_dir_manager.associate_with_temp_dir(str(temp_dir_path), project, pathlib.Path(file_path).name)
-        # add files to project
-        # only files and folders within the project path can be added, use relative or full path
-        # any other paths passed will be ignored
-        log.info("Adding '" + str(packed_dir) + "' to " + constants.COMPANY_NAME + " project...")
-        project.add_folders(str(packed_dir))
-
-        if skip_upload:
-            log.info("Skipping project upload...")
-        else:
-            client.submit_project(project)  # returns project name
-
-            # add the new project to the projects list
-            project_item = _add_project_to_list(project_name, context.scene.props)
-
-            # callback for keeping track of the upload progress
-            def progress_callback(percent, status):
-                scaled_percent = 80 + percent / (100 / (100 - 80))
-                _set_progress(progress=scaled_percent, status=status)
-
-            clean_up_temporary_files(project_item, progress_callback)
-
-    except InvalidInputError as e:
-        log.warning("Invalid Input Error: " + e.user_message)
-        if operator:
-            operator.report({'ERROR_INVALID_INPUT'}, e.user_message)
-        raise e
-    except AuthenticationError as e:
-        log.error("Authentication Error: " + e.user_message)
-        raise e
-    except InsufficientCreditsError as e:
-        log.error("Insufficient Credits Error: " + e.user_message)
-        raise e
-    except InvalidRequestError as e:
-        log.error("Invalid Request Error: " + e.user_message)
-        raise e
-    except APIError as e:
-        log.error("API Error: " + str(e.user_message))
-        raise e
-    finally:
-        # hide the progress meter if unless skipping upload
-        if not skip_upload:
-            setattr(context.scene.props, progress_attribute_name, False)
-
-
 def get_blend_file_name():
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
@@ -623,83 +219,6 @@ def get_blend_file_name():
         log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
 
     return blend_file_name
-
-
-def upload_project(context, project_name, temp_dir_manager,
-                   operator=None,
-                   skip_upload=False,
-                   min_progress=0,
-                   max_progress=100,
-                   progress_attribute_name = "uploading_project",
-                   progress_percent_attribute_name = "uploading_project_progress",
-                   progress_status_attribute_name = "uploading_project_status"
-                   ):
-    """Uploads the current scene with the provided project name to Envoy.
-
-    :param context: The operator's context
-    :type context: bpy.types.Context
-    :param project_name: The name of the project as it will appear in Envoy
-    :type project_name: str
-    :param temp_dir_manager: The temporary directory manager used to store packed projects
-    :type temp_dir_manager: TempDirectoryManager
-    :param operator: The operator that called the function
-    :type operator: bpy.types.Operator
-    :param skip_upload: Pack files but don't upload project files
-    :param operator: An optional instance of an operator so that invalid input can be reported correctly
-    :type operator: bpy.types.Operator
-    :param min_progress: The min value to set the progress too
-    :type min_progress: float
-    :param max_progress: The max value to set the progress too
-    :type max_progress: float
-    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
-    :type progress_attribute_name: str
-    :param progress_percent_attribute_name: The name of the property which represents the operations progress
-    :type progress_percent_attribute_name: str
-    :param progress_status_attribute_name: The name of the property which represents the operations status
-    :type progress_status_attribute_name: str
-    :rtype: void
-    :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-    """
-
-    # helper function for setting the progress of the operation
-    def _set_progress(progress=None, status=None):
-        if progress is not None:
-            # re-scale progress so that it is between the min and max values
-            scaled_progress = _scale_percentage(min_progress, max_progress, progress)
-            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
-
-        if status is not None:
-            setattr(context.scene.props, progress_status_attribute_name, status)
-
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-
-    setattr(context.scene.props, progress_attribute_name, True)
-    _set_progress(progress=0, status="Starting project upload")
-
-    blend_file_name = get_blend_file_name()
-
-    # create a new temp directory
-    temp_dir_path = temp_dir_manager.get_temp_directory()
-
-    blend_file_path = temp_dir_path / blend_file_name
-
-    # save a copy of the current scene to the temp directory. This is so that if the file has not been saved
-    # or if it has been modified since it's last save then the submitted .blend file will represent the
-    # current state of the scene
-    _set_progress(progress=20, status="Saving scene data")
-    bpy.ops.wm.save_as_mainfile(copy=True, filepath=str(blend_file_path), relative_remap=True,
-                                compress=True)
-    log.info("Saved copy of scene to '%s'" % str(blend_file_path))
-
-    upload_file_as_project(context,str(blend_file_path), project_name, temp_dir_manager,
-                           operator,
-                           skip_upload,
-                           _scale_percentage(min_progress, max_progress, 20),
-                           max_progress,
-                           progress_attribute_name,
-                           progress_percent_attribute_name,
-                           progress_status_attribute_name)
 
 
 def get_blender_frame_range(context):
@@ -910,6 +429,7 @@ def get_supported_blender_280_engines(scene, context):
         (BLENDER_ENGINES.EEVEE, "Eevee", ""),
     ]
 
+
 def get_supported_vray_versions(scene, context):
     from gridmarkets_blender_addon.api_constants import VRAY_VERSIONS
 
@@ -1009,183 +529,6 @@ def get_job(context, render_file, enable_logging=True):
     return job
 
 
-def get_version_string():
-    return 'GM Blender Add-on v' + str(constants.PLUGIN_VERSION['major']) + '.' + str(
-        constants.PLUGIN_VERSION['minor']) + '.' + str(constants.PLUGIN_VERSION['build'])
-
-
-def submit_job(context, temp_dir_manager,
-               new_project_name=None,
-               operator=None,
-               min_progress=0,
-               max_progress=100,
-               progress_attribute_name="submitting_project",
-               progress_percent_attribute_name="submitting_project_progress",
-               progress_status_attribute_name="submitting_project_status"
-               ):
-    """Submits a job to a existing or new project.
-
-    :param context: Depends on the area of Blender which is currently being accessed
-    :type context: bpy.context
-    :param temp_dir_manager: The temporary directory manager used to store packed projects
-    :type temp_dir_manager: TempDirectoryManager
-    :param new_project_name: The name of the project to use if uploading a new project
-    :type new_project_name: str
-    :param operator: An optional instance of an operator so that invalid input can be reported correctly
-    :type operator: bpy.types.Operator
-    :param min_progress: The min value to set the progress too
-    :type min_progress: float
-    :param max_progress: The max value to set the progress too
-    :type max_progress: float
-    :param progress_attribute_name: The name of the property flag which indicated that the operation is running
-    :type progress_attribute_name: str
-    :param progress_percent_attribute_name: The name of the property which represents the operations progress
-    :type progress_percent_attribute_name: str
-    :param progress_status_attribute_name: The name of the property which represents the operations status
-    :type progress_status_attribute_name: str
-    :rtype: void
-    :raises: InvalidInputError, AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-    """
-
-    scene = context.scene
-    props = scene.props
-
-    # get method logger
-    log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
-
-    # define a helper function for setting the progress
-    def _set_progress(progress=None, status=None):
-        if progress is not None:
-            # re-scale progress so that it is between the min and max values
-            scaled_progress = min_progress + ((max_progress - min_progress) / 100) * progress
-            setattr(context.scene.props, progress_percent_attribute_name, scaled_progress)
-
-        if status is not None:
-            setattr(context.scene.props, progress_status_attribute_name, status)
-
-    # set the submitting flag to true
-    setattr(context.scene.props, progress_attribute_name, True)
-
-    # set the progress to 0 and set a status message
-    _set_progress(progress=0, status="Starting job submission")
-
-    # log the start of the operation
-    log.info("Starting submit operation...")
-
-    try:
-        # if the user has selected to upload the current scene as a new project then upload current scene as new project
-        if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
-            log.info("Uploading project for job submit...")
-            _set_progress(progress=10, status="Uploading project")
-
-            if new_project_name is None:
-                raise InvalidInputError("Project name can not be None type")
-
-            project_name = new_project_name
-
-            # upload the project
-            upload_project(context, project_name, temp_dir_manager,
-                           operator=operator,
-                           min_progress=10,
-                           max_progress=40,
-                           progress_attribute_name=progress_attribute_name,
-                           progress_percent_attribute_name=progress_percent_attribute_name,
-                           progress_status_attribute_name=progress_status_attribute_name,
-                           # skip upload here otherwise when we submit this job the project may not have finished
-                           # uploading. Instead use upload project to pack the files and upload when the job is
-                           # submitted
-                           skip_upload=True)
-
-            skip_upload = False
-
-        elif props.project_options.isnumeric():
-            log.info("Project already uploaded, submitting job...")
-            # get the name of the selected project
-            selected_project_option = int(props.project_options)
-            selected_project = props.projects[selected_project_option - constants.PROJECT_OPTIONS_STATIC_COUNT]
-            project_name = selected_project.name
-            skip_upload = True
-        else:
-            raise InvalidInputError(message="Invalid project option")
-
-        association = temp_dir_manager.get_association_with_project_name(project_name)
-        project = association.get_project()
-        render_file = association.get_relative_render_file()
-
-        job = get_job(context, render_file)
-
-        # create an instance of Envoy client
-        client = get_envoy_client()
-
-        # remove all previously run jobs
-        project.jobs = list()
-
-        # add job to project
-        project.add_jobs(job)
-
-        # results regex pattern to download
-        # `project.remote_output_folder` provides the remote root folder under which results are available
-        # below is the regex to look for all folders and files under `project.remote_output_folder`
-        output_pattern = '{0}/.+'.format(project.remote_output_folder)
-
-        download_path = get_job_output_path_abs(context)
-
-        # create a watch file
-        watch_file = WatchFile(output_pattern, download_path)
-
-        # set the output directory
-        project.add_watch_files(watch_file)
-
-        log.info("Submitted Job Settings: \n" +
-                 "\tproject_name: %s\n" % project_name +
-                 "\tjob.app: %s\n" % job.app +
-                 "\tjob.name: %s\n" % job.name +
-                 "\tjob.app_version: %s\n" % job.app_version +
-                 "\tjob.operation: %s\n" % job.operation +
-                 "\tjob.path: %s\n" % job.path +
-                 "\tjob.frames: %s\n" % job.params['frames'] +
-                 "\tjob.output_prefix: %s\n" % job.params['output_prefix'] +
-                 "\tjob.output_format: %s\n" % job.params['output_format'] +
-                 "\tjob.engine: %s\n" % job.params['engine'] +
-                 "\tdownload_path: %s\n" % download_path
-                 )
-
-        # submit project
-        log.info("Submitting job (skip_upload=" + str(skip_upload) + ")...")
-        _set_progress(progress=50, status="Submitting project")
-        client.submit_project(project, skip_upload=skip_upload)
-
-        # skip upload is only false if its a new project, in which case it needs adding to the list
-        if not skip_upload:
-            project_item = _add_project_to_list(project_name, props)
-
-            # callback for keeping track of the upload progress
-            def progress_callback(percent, status):
-                scaled_percent = 50 + percent / 2
-                _set_progress(progress=scaled_percent, status=status)
-
-            clean_up_temporary_files(project_item, progress_callback)
-
-        log.info("Job submitted")
-
-
-    except InvalidInputError as e:
-        log.warning("Invalid Input Error: " + e.user_message)
-        if operator:
-            operator.report({'ERROR_INVALID_INPUT'}, e.user_message)
-    except AuthenticationError as e:
-        log.error("Authentication Error: " + e.user_message)
-    except InsufficientCreditsError as e:
-        log.error("Insufficient Credits Error: " + e.user_message)
-    except InvalidRequestError as e:
-        log.error("Invalid Request Error: " + e.user_message)
-    except APIError as e:
-        log.error("API Error: " + str(e.user_message))
-    finally:
-        log.info("Finished submit operation")
-        setattr(context.scene.props, progress_attribute_name, False)
-
-
 def get_addon(module_name):
     """ Gets a blender add-on
 
@@ -1206,9 +549,11 @@ def get_addon(module_name):
 
     return None
 
+
 def force_redraw_addon():
     #redraw_region(constants.WINDOW_SPACE_TYPE, constants.PANEL_REGION_TYPE)
     redraw_area(constants.WINDOW_SPACE_TYPE)
+
 
 def redraw_area(area_type):
     # the screen may be None if method is called from a different thread
@@ -1238,6 +583,7 @@ def get_addon_window():
 def addon_draw_condition(self, context):
     return context.screen.name == constants.INJECTED_SCREEN_NAME
 
+
 def get_spinner(index: int):
     from gridmarkets_blender_addon.icon_loader import IconLoader
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
@@ -1259,59 +605,17 @@ def get_spinner(index: int):
     else:
         return preview_collection[constants.CUSTOM_SPINNER_ICON_7_ID]
 
-def get_logs(self, context):
-    props = context.scene.props
-    output = ''
-
-    def _get_log_text(item):
-        """ Converts a log item into a textual representation """
-        text = ''
-
-        if item.date:
-            text = text + item.date + ' '
-
-        if item.time:
-            text = text + item.time + ' '
-
-        if item.name:
-            text = text + item.name + ' ' + item.level + ' '
-
-        text = text + item.body
-
-        return text
-
-    for log_item in props.log_items:
-        output = output + os.linesep + _get_log_text(log_item)
-
-    return get_sys_info() + os.linesep + output
-
 
 def is_addon_enabled(addon_name: str):
     is_enabled, is_loaded = addon_utils.check(addon_name)
     return is_enabled and is_loaded
 
 
-def get_sys_info():
-    import platform
-
-    blender_version = bpy.app.version
-    addon_version = constants.PLUGIN_VERSION
-
-    sys_info = "Operating System: " + platform.platform() + os.linesep
-    sys_info = sys_info + "Blender Version: " + str(blender_version[0]) + '.' + str(blender_version[1]) + '.' + \
-               str(blender_version[2]) + os.linesep
-    sys_info = sys_info + "Add-on Version: " + str(addon_version["major"]) + '.' + str(addon_version["minor"]) + \
-               '.' + str(addon_version["build"]) + os.linesep
-
-    return sys_info
-
 def get_selected_project_options(scene, context, id):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.icon_loader import IconLoader
     from gridmarkets_blender_addon import api_constants
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-
-    props = context.scene.props
 
     project_options = [
         # it is always an option to upload as a new project

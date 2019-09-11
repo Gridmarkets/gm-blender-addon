@@ -38,11 +38,12 @@ def draw_header(self, context):
     row.alignment = "CENTER"
     row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
 
-    # get the plugin version as a string
-    version_str = utils_blender.get_version_string()
-
     # signed in indicator
     sub = row.row(align=True)
+
+    if user_interface.is_running_operation():
+        sub.label(text=user_interface.get_running_operation_message(),
+                  icon_value=utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id)
 
     if user_interface.get_signing_in_flag():
         sub.label( text = "Signing in...",
@@ -56,6 +57,6 @@ def draw_header(self, context):
     # version label
     sub = row.row(align=True)
     sub.enabled = False
-    sub.label(text=version_str)
+    sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
 
 

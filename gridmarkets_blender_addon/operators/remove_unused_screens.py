@@ -19,7 +19,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import os
 from gridmarkets_blender_addon import utils_blender
 
 class GRIDMARKETS_OT_remove_unused_screens(bpy.types.Operator):

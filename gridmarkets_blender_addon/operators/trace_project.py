@@ -26,9 +26,6 @@ import os
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
     bl_idname = constants.OPERATOR_TRACE_PROJECT_ID_NAME
@@ -46,6 +43,9 @@ class GRIDMARKETS_OT_trace_project(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         """ Run for every file selected by the user """
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         filename, extension = os.path.splitext(self.filepath)
 
         log.info("Tracing %s" % self.filepath)

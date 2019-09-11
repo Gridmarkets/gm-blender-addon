@@ -184,6 +184,8 @@ def _draw_project_info_view(self, context):
 
 
 def draw_projects(self, context):
+    from types import SimpleNamespace
+
     layout = self.layout
     props = context.scene.props
     project_count = len(props.projects)
@@ -203,7 +205,7 @@ def draw_projects(self, context):
     sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
     row = layout.row(align=True)
-    row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)
+    GRIDMARKETS_MT_add_new_project.draw(SimpleNamespace(layout=row), context)
 
     sub = row.column()
     if project_count <= 0:

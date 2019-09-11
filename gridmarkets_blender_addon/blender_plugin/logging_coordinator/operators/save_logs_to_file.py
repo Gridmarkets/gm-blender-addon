@@ -22,13 +22,12 @@ import bpy
 from bpy_extras.io_utils import ExportHelper
 from gridmarkets_blender_addon import constants, utils_blender
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
-    bl_idname = constants.OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME
-    bl_label = constants.OPERATOR_SAVE_LOGS_TO_FILE_LABEL
+    bl_idname = "gridmarkets.save_logs_to_file"
+    bl_label = "Save logs to file"
+    bl_description = "Copy all the logs (Including system information logs) to a user specified file"
+    bl_options = {"REGISTER"}
 
     filename_ext = ".txt"
 
@@ -48,12 +47,9 @@ class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
     )
 
     def execute(self, context):
-        log.info("Writing logs to file \"%s\"..." % self.filepath);
-
-        with open(self.filepath, 'w', encoding='utf-8') as f:
-            f.write(utils_blender.get_logs(self, context))
-            f.close()
-
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_logging_coordinator().save_logs_to_file(self.filepath)
         return {'FINISHED'}
 
 

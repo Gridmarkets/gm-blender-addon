@@ -19,28 +19,29 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants, utils_blender
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 
-class GRIDMARKETS_OT_copy_logs_to_clipboard(bpy.types.Operator):
-    bl_idname = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME
-    bl_label = constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
-    bl_options = {'UNDO'}
-
+class GRIDMARKETS_OT_toggle_show_log_dates(bpy.types.Operator):
+    bl_idname = "gridmarkets.toggle_show_log_dates"
+    bl_label = "Toggle dates"
+    bl_description = "Toggles the displaying of logged dates in the logging console"
+    bl_options = {"REGISTER"}
 
     def execute(self, context):
-        log.info("Copying logs to clipboard...")
-        bpy.context.window_manager.clipboard = utils_blender.get_logs(self, context)
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        user_interface = plugin.get_user_interface()
+
+        enabled = user_interface.show_log_dates()
+        user_interface.set_show_log_dates(not enabled)
+
         return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_OT_copy_logs_to_clipboard,
+    GRIDMARKETS_OT_toggle_show_log_dates,
 )
+
 
 def register():
     from bpy.utils import register_class
