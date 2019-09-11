@@ -18,27 +18,19 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon import constants
+from abc import ABC, abstractmethod
 
 
-def draw_console(self, context):
-    layout = self.layout
-    props = context.scene.props
-    box = layout.box()
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=6, sort_lock=True)
+class PluginUtils(ABC):
 
-    split = box.split()
-    col1 = split.column()
-    col2 = split.column()
+    @abstractmethod
+    def get_application_version(self) -> str:
+        raise NotImplementedError
 
-    col1.operator(constants.OPERATOR_COPY_LOGS_TO_CLIPBOARD_ID_NAME)
-    col2.operator(constants.OPERATOR_CLEAR_LOGS_ID_NAME)
-    box.operator(constants.OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME)
+    @abstractmethod
+    def get_sys_info(self) -> str:
+        raise NotImplementedError
 
-
-def draw_compact_console(self, context):
-    layout = self.layout
-    props = context.scene.props
-    box = layout.box()
-    box.alignment = "RIGHT"
-    box.template_list("GRIDMARKETS_UL_log", "", props, "log_items", props, "selected_log_item", rows=4, sort_lock=True)
+    @abstractmethod
+    def copy_to_clipboard(self, value: str) -> None:
+        raise NotImplementedError

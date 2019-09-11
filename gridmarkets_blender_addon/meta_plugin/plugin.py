@@ -20,10 +20,12 @@
 
 from abc import ABC, abstractmethod
 from gridmarkets_blender_addon.meta_plugin.plugin_version import PluginVersion
+from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon.meta_plugin.preferences_container import PreferencesContainer
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient
 from gridmarkets_blender_addon.meta_plugin.user_interface import UserInterface
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer
+from gridmarkets_blender_addon.meta_plugin.plugin_utils import PluginUtils
 
 
 class Plugin(ABC):
@@ -34,6 +36,10 @@ class Plugin(ABC):
 
     @abstractmethod
     def get_version(self) -> PluginVersion:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_logging_coordinator(self) -> LoggingCoordinator:
         raise NotImplementedError
 
     @abstractmethod
@@ -50,4 +56,7 @@ class Plugin(ABC):
 
     @abstractmethod
     def get_remote_project_container(self) -> RemoteProjectContainer:
+        raise NotImplementedError
+
+    def get_plugin_utils(self) -> PluginUtils:
         raise NotImplementedError

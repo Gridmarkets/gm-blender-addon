@@ -20,7 +20,6 @@
 
 import bpy
 
-import threading
 from queue import Queue, Empty
 
 from gridmarkets_blender_addon import constants, utils_blender
@@ -29,22 +28,8 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import Inv
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
 from gridmarkets_blender_addon.meta_plugin.errors.api_error import APIError
+from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 
-
-class ExcThread(threading.Thread):
-    def __init__(self, bucket: Queue, target, args=set(), kwargs={}):
-        threading.Thread.__init__(self)
-        self.bucket = bucket
-        self._target = target
-        self._args = args
-        self._kwargs = kwargs
-
-    def run(self):
-        try:
-            result = self._target(*self._args, **self._kwargs)
-            self.bucket.put(result)
-        except Exception as e:
-            self.bucket.put(e)
 
 class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
     bl_idname = "gridmarkets.sign_in_new_user"

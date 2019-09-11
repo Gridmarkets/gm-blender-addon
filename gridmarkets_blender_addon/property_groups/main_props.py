@@ -25,9 +25,10 @@ from gridmarkets_blender_addon import constants, api_constants
 from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 from gridmarkets_blender_addon.property_groups.job_props import JobProps
 from gridmarkets_blender_addon.property_groups.project_props import ProjectProps
-from gridmarkets_blender_addon.property_groups.log_item_props import LogItemProps
 from gridmarkets_blender_addon.blender_plugin.user_interface.property_groups.user_interface_props import UserInterfaceProps
 from gridmarkets_blender_addon.blender_plugin.remote_project.property_groups.remote_project_props import RemoteProjectProps
+from gridmarkets_blender_addon.blender_plugin.log_item.property_groups.log_item_props import LogItemProps
+from gridmarkets_blender_addon.blender_plugin.log_history_container.property_groups.log_history_container_props import LogHistoryContainerProps
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.property_groups.remote_project_container_props import RemoteProjectContainerProps
 from gridmarkets_blender_addon.property_groups.custom_settings_views import CustomSettingsViews
 from gridmarkets_blender_addon.property_groups.vray_props import VRayProps
@@ -49,7 +50,6 @@ def _get_project_options(scene, context):
          constants.PROJECT_OPTIONS_NEW_PROJECT_DESCRIPTION,
          'FILE_NEW', 0)
     ]
-
 
     plugin = PluginFetcher.get_plugin_if_initialised()
 
@@ -105,6 +105,14 @@ def _get_job_options(scene, context):
 
 
 def _get_tab_items(scene, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+        if not plugin.get_api_client().is_user_signed_in():
+            return [
+                (constants.TAB_CREDENTIALS, constants.TAB_CREDENTIALS, ''),
+            ]
 
     if bpy.context.scene.render.engine == constants.VRAY_RENDER_RT:
         return [
@@ -123,6 +131,24 @@ def _get_tab_items(scene, context):
     ]
 
 
+def _get_tab_option(self):
+    try:
+        value = self["tab_option"]
+
+        # if the selected tab option no longer exists we need to set it to something else
+        options = _get_tab_items(bpy.context.scene, bpy.context)
+        if value >= len(options):
+            value = len(options) - 1
+
+    except KeyError:
+        value = 0
+    return value
+
+
+def _set_tab_option(self, value):
+    self["tab_option"] = value
+
+
 class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     """ Class to represent the main state of the plugin. Holds all the properties that are accessible via the interface.
     """
@@ -133,6 +159,10 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     remote_project_container: bpy.props.PointerProperty(
         type=RemoteProjectContainerProps,
+    )
+
+    log_history_container: bpy.props.PointerProperty(
+        type=LogHistoryContainerProps,
     )
 
     vray : bpy.props.PointerProperty(
@@ -169,34 +199,6 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         name="Job",
         description="The list of possible jobs to use on submit",
         items=_get_job_options
-    )
-
-    selected_log_item: bpy.props.IntProperty(
-        default=-1, # must be negative one otherwise the logic that selects new log items wont work
-        options = set()
-    )
-
-    # logging items
-    log_items: bpy.props.CollectionProperty(
-        type=LogItemProps
-    )
-
-    show_log_dates: bpy.props.BoolProperty(
-        name="Show Logged Dates",
-        description="Toggles the displaying of dates for log items",
-        default=False
-    )
-
-    show_log_times: bpy.props.BoolProperty(
-        name="Show Logged Times",
-        description="Toggles the displaying of times for log items",
-        default=True
-    )
-
-    show_log_modules: bpy.props.BoolProperty(
-        name="Show Logged Modules",
-        description="Toggles the displaying of module names for log items",
-        default=False
     )
 
     # upload project progress props
@@ -253,13 +255,21 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     tab_options: bpy.props.EnumProperty(
         name="Tabs",
         description="The tabs that show at the top of the add-on main window",
-        items = _get_tab_items
+        items = _get_tab_items,
+        get=_get_tab_option,
+        set=_set_tab_option
     )
 
     submission_summary_open: bpy.props.BoolProperty(
         name="Submission Summary Open",
         description="Whether or not the submission summary view is open",
         default=False
+    )
+
+    is_logging_console_open: bpy.props.BoolProperty(
+        name="Is Logging Console Open",
+        description="Whether or not the logging console is open",
+        default=True
     )
 
     custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
@@ -272,16 +282,20 @@ classes = (
     VRayProps,
     JobProps,
     ProjectProps,
-    LogItemProps,
     UserInterfaceProps,
     RemoteProjectProps,
     RemoteProjectContainerProps,
+    LogItemProps,
+    LogHistoryContainerProps,
     GRIDMARKETS_PROPS_Addon_Properties,
 )
 
 
 @persistent
 def reset_to_defaults(pos):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    PluginFetcher.delete_cached_plugin()
+
     # options={'SKIP_SAVE'} doesnt work for global properties so we must reset manually
     bpy.context.scene.props.uploading_project = False
     bpy.context.scene.props.uploading_project_progress = 0

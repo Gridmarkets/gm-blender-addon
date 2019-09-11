@@ -64,8 +64,8 @@ class UserContainer(MetaUserContainer):
         except IndexError:
             focused_user = None
 
-    def focus_item(self, item: User, clear_selection=True, update_prop=True) -> None:
-        if update_prop:
+    def focus_item(self, item: User, clear_selection=True, update_props=True) -> None:
+        if update_props:
             saved_profiles = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences.saved_profiles
 
             index = self.get_index(item)

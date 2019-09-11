@@ -19,46 +19,27 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy_extras.io_utils import ExportHelper
-from gridmarkets_blender_addon import constants, utils_blender
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 
-class GRIDMARKETS_OT_save_logs_to_file(bpy.types.Operator, ExportHelper):
-    bl_idname = constants.OPERATOR_SAVE_LOGS_TO_FILE_ID_NAME
-    bl_label = constants.OPERATOR_SAVE_LOGS_TO_FILE_LABEL
-
-    filename_ext = ".txt"
-
-    DEFAULT_FILTER = "*.txt"
-    DEFAULT_NAME = "GM_blender_logs"
-
-    filter_glob: bpy.props.StringProperty(
-        default= DEFAULT_FILTER,
-        options={'HIDDEN'},
-        maxlen=255,  # Max internal buffer length, longer would be clamped.
-    )
-
-    filepath: bpy.props.StringProperty(
-        default= DEFAULT_NAME,
-        options={'HIDDEN'},
-        maxlen=255,
-    )
+class GRIDMARKETS_OT_toggle_show_logger_names(bpy.types.Operator):
+    bl_idname = "gridmarkets.toggle_show_logger_names"
+    bl_label = "Toggle logger names"
+    bl_description = "Toggles the displaying of logger names in the logging console"
+    bl_options = {"REGISTER"}
 
     def execute(self, context):
-        log.info("Writing logs to file \"%s\"..." % self.filepath);
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        user_interface = plugin.get_user_interface()
 
-        with open(self.filepath, 'w', encoding='utf-8') as f:
-            f.write(utils_blender.get_logs(self, context))
-            f.close()
+        enabled = user_interface.show_logger_names()
+        user_interface.set_show_logger_names(not enabled)
 
         return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_OT_save_logs_to_file,
+    GRIDMARKETS_OT_toggle_show_logger_names,
 )
 
 

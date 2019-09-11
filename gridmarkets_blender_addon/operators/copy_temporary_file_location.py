@@ -22,9 +22,6 @@ import bpy
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_copy_temporary_file_location(bpy.types.Operator):
     bl_idname = constants.OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME

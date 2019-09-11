@@ -21,9 +21,6 @@
 import bpy
 from gridmarkets_blender_addon import constants
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_toggle_submission_summary(bpy.types.Operator):
     """ Toggles the submission summary view to open / close it"""
@@ -33,6 +30,9 @@ class GRIDMARKETS_OT_toggle_submission_summary(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+
         props = context.scene.props
         log.info("%s submission summary view" % ("Closing" if props.submission_summary_open else "Opening"))
         props.submission_summary_open = not props.submission_summary_open

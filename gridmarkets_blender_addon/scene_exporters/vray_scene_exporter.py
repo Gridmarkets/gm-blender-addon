@@ -1,15 +1,9 @@
 from gridmarkets_blender_addon.meta_plugin.scene_exporter import SceneExporter
-from gridmarkets_blender_addon import utils_blender
 
 import bpy
-import tempfile
 import pathlib
-import os
 
 from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProject
-
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
 
 _un_modified_render_method = None
 
@@ -25,6 +19,9 @@ def export_vray_scene(engine, scene):
 class VRaySceneExporter(SceneExporter):
 
     def export(self, output_dir: pathlib.Path) -> PackedVRayProject:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(__name__)
+
         try:
             import vb30
         except ImportError:
@@ -62,6 +59,5 @@ class VRaySceneExporter(SceneExporter):
             VRayExporter.useSeparateFiles = useSeparateFiles
             VRayExporter.output_dir = app_output_dir
             vb30.export.RenderScene = _un_modified_render_method
-
 
         return PackedVRayProject(output_dir, output_dir / "scene_scene.vrscene")

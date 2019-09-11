@@ -113,7 +113,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                        packed_project: PackedProject,
                        delete_local_files_after_upload: bool = False) -> RemoteProject:
 
-        if self._envoy_client is None:
+        if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to upload a project.")
 
         project_dir = str(packed_project.get_root_dir())
@@ -124,19 +124,4 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._envoy_client.upload_project_files(gm_project)
 
-        remote_project = RemoteProject(packed_project.get_name(),
-                             packed_project.get_root_dir(),
-                             packed_project.get_relative_main_file(),
-                             packed_project.get_relative_files(),
-                             packed_project.get_attributes())
-
-        attributes = packed_project.get_attributes()
-        if "REMAP_FILE" in attributes:
-            remap_file = packed_project.get_relative_file_path(attributes["REMAP_FILE"])
-            remote_project.set_attribute("REMAP_FILE", remap_file)
-
-
-        remote_project_container = self.get_plugin().get_remote_project_container()
-        remote_project_container.append(remote_project)
-
-        return remote_project
+        return RemoteProject.convert_packed_project(packed_project)

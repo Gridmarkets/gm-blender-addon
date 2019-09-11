@@ -21,9 +21,6 @@
 import bpy
 from gridmarkets_blender_addon import constants, utils_blender
 
-from gridmarkets_blender_addon.blender_logging_wrapper import get_wrapped_logger
-log = get_wrapped_logger(__name__)
-
 
 class GRIDMARKETS_OT_selected_project_status(bpy.types.Operator):
     bl_idname = constants.OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME
