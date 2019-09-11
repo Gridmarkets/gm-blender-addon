@@ -375,7 +375,7 @@ def get_job_render_engine(context, job=None):
 
 
 def get_supported_render_engines():
-    return {"CYCLES", "VRAY_RENDER_RT"}
+    return {"CYCLES", "VRAY_RENDER_RT", "BLENDER_RENDER"}
 
 
 def get_user_friendly_name_for_engine(engine: str):
