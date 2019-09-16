@@ -22,8 +22,9 @@ from gridmarkets_blender_addon import constants
 
 
 def draw_sidebar(self, context):
+    from gridmarkets_blender_addon.operators.open_envoy_url import GRIDMARKETS_OT_open_envoy_url
+
     layout = self.layout
-    props = context.scene.props
 
     layout.label(text="Links")
 
@@ -36,6 +37,10 @@ def draw_sidebar(self, context):
 
     # Cost calculator
     col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
+
+    # Envoy
+    col.operator(GRIDMARKETS_OT_open_envoy_url.bl_idname, icon=constants.ICON_URL, text="Envoy")
+
     col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
     col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
     col.separator()
