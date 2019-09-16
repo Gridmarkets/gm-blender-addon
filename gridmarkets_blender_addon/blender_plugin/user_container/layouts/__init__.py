@@ -188,6 +188,7 @@ def draw_sign_in_form(self, context):
                 GRIDMARKETS_OT_open_envoy_url.bl_idname,
                 text="Here"
             )
+            signin_box.separator()
 
 
     register_layout = signin_box.row()
