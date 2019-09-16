@@ -80,6 +80,8 @@ HELP_URL = "https://www.gridmarkets.com/blender"
 
 GITHUB_REPO = "https://github.com/Gridmarkets/gm-blender-addon"
 
+ENVOY_URL = "https://www.gridmarkets.com/envoy"
+
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
 
