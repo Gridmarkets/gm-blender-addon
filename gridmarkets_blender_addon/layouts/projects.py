@@ -217,10 +217,6 @@ def draw_projects(self, context):
         sub.enabled = False
     sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="Remove Project").action = 'REMOVE'
 
-    # upload status
-    if props.uploading_project:
-        layout.prop(props, "uploading_project_progress", text=props.uploading_project_status)
-
     _draw_project_info_view(self, context)
 
 
