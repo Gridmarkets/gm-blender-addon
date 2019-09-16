@@ -226,32 +226,6 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         default="",
     )
 
-    # submit operation progress props
-    submitting_project: bpy.props.BoolProperty(
-        name="Submitting Project",
-        description="Indicates that a project is being submitted",
-        default=False,
-        options={'SKIP_SAVE'}
-    )
-
-    submitting_project_progress: bpy.props.IntProperty(
-        name="Submitting Project Progress",
-        description="The progress made towards submitting this job",
-        default=0,
-        min=0,
-        max=100,
-        step=1,
-        subtype='PERCENTAGE',
-        options={'SKIP_SAVE'}
-    )
-
-    submitting_project_status: bpy.props.StringProperty(
-        name="Submitting Project Status",
-        description="A brief description of the current status of the submit operation",
-        default="",
-        options={'SKIP_SAVE'}
-    )
-
     tab_options: bpy.props.EnumProperty(
         name="Tabs",
         description="The tabs that show at the top of the add-on main window",
@@ -299,9 +273,6 @@ def reset_to_defaults(pos):
     # options={'SKIP_SAVE'} doesnt work for global properties so we must reset manually
     bpy.context.scene.props.uploading_project = False
     bpy.context.scene.props.uploading_project_progress = 0
-    bpy.context.scene.props.submitting_project = False
-    bpy.context.scene.props.submitting_project_progress = 0
-    bpy.context.scene.props.submitting_project_status = ""
 
     bpy.context.scene.props.vray.frame_ranges.clear()
     bpy.context.scene.props.vray.selected_frame_range = 0

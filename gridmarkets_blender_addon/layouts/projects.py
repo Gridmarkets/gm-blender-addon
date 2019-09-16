@@ -29,21 +29,26 @@ class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
     bl_label = "Add new project"
 
     def draw(self, context):
-        props = context.scene.props
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        is_running_operation = plugin.get_user_interface().is_running_operation()
+
         layout = self.layout
         layout.operator_context = 'INVOKE_AREA'
 
+        # draw upload current scene button
         sub = layout.row()
-        if props.uploading_project or props.submitting_project:
-            # disable upload project button if already submitting or uploading
+        if is_running_operation:
             sub.enabled = False
         sub.operator(constants.OPERATOR_UPLOAD_PROJECT_ID_NAME, text="Upload current scene as new Project")
 
+        # draw upload file button
         sub = layout.row()
+        if is_running_operation:
+            sub.enabled = False
         sub.operator(constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME, text="Upload file as new Project")
 
-        #layout.separator()
-
+        # draw manual entree button
         sub = layout.row()
         sub.operator(constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME, text="Manually enter details for existing Project")
 

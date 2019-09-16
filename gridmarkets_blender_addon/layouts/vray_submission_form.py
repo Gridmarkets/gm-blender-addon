@@ -63,8 +63,11 @@ def _draw_frame_ranges_view(self, context):
 
 
 def draw_v_ray_submission_form(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon import utils_blender, constants
     from types import SimpleNamespace
+
+    plugin = PluginFetcher.get_plugin()
 
     props = context.scene.props
     new_project = props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE
@@ -148,36 +151,33 @@ def draw_v_ray_submission_form(self, context):
     sub.label(text="Defines the path to download the results to.")
     sub.enabled = False
 
-
     submit_text = "Submit V-Ray Project"
     submit_icon = "NONE"
 
     # submit button / progress indicator
     row = box.row(align=True)
     row.scale_y = 2.5
-    if props.submitting_project:
-        row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
+
+    # disable submit button when already running an operation
+    if plugin.get_user_interface().is_running_operation():
+        row.enabled = False
+
+    if not utils_blender.is_addon_enabled("vb30"):
+        row.enabled = False
+
+    vray = props.vray
+
+    op = row.operator('gridmarkets.submit_new_vray_project', text=submit_text, icon=submit_icon)
+
+    if new_project:
+        op.project_name = vray.project_name
     else:
-        # disable submit button when uploading project
-        if props.uploading_project:
-            row.enabled = False
+        op.project_name = project.get_name()
 
-        if not utils_blender.is_addon_enabled("vb30"):
-            row.enabled = False
-
-        vray = props.vray
-
-        op = row.operator('gridmarkets.submit_new_vray_project', text=submit_text, icon=submit_icon)
-
-        if new_project:
-            op.project_name = vray.project_name
-        else:
-            op.project_name = project.get_name()
-
-        op.job_name = vray.job_name
-        op.frame_ranges = utils_blender.get_job_frame_ranges(context, job=vray)
-        op.output_width = vray.output_width
-        op.output_height = vray.output_height
-        op.output_prefix = vray.output_prefix
-        op.output_format = vray.output_format
-        op.output_path = vray.output_path
+    op.job_name = vray.job_name
+    op.frame_ranges = utils_blender.get_job_frame_ranges(context, job=vray)
+    op.output_width = vray.output_width
+    op.output_height = vray.output_height
+    op.output_prefix = vray.output_prefix
+    op.output_format = vray.output_format
+    op.output_path = vray.output_path

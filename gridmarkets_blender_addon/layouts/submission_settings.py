@@ -92,6 +92,9 @@ def draw_submission_summary(self, context):
 
 
 def draw_submission_settings(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
     layout = self.layout
     layout.use_property_split = True
     layout.use_property_decorate = False  # No animating of properties
@@ -128,18 +131,16 @@ def draw_submission_settings(self, context):
     # submit button / progress indicator
     row = box.row(align=True)
     row.scale_y = 2.5
-    if props.submitting_project:
-        row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
-    else:
-        # disable submit button when uploading project
-        if props.uploading_project:
-            row.enabled = False
 
-        # if the engine is not in the supported engines list disable and show a help message
-        render_engine = utils_blender.get_job_render_engine(context)
-        if render_engine not in utils_blender.get_supported_render_engines():
-            row.enabled = False
-            submit_text="Render engine '%s' is not currently supported" % utils_blender.get_user_friendly_name_for_engine(render_engine)
-            submit_icon=constants.ICON_ERROR
+    # disable submit button when already running an operation
+    if plugin.get_user_interface().is_running_operation():
+        row.enabled = False
 
-        row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
+    # if the engine is not in the supported engines list disable and show a help message
+    render_engine = utils_blender.get_job_render_engine(context)
+    if render_engine not in utils_blender.get_supported_render_engines():
+        row.enabled = False
+        submit_text="Render engine '%s' is not currently supported" % utils_blender.get_user_friendly_name_for_engine(render_engine)
+        submit_icon=constants.ICON_ERROR
+
+    row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
