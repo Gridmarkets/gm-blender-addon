@@ -224,7 +224,6 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
 
 
-
 classes = (
     CustomSettingsViews,
     FrameRangeProps,

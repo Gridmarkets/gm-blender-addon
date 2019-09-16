@@ -190,7 +190,6 @@ def draw_user_container(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     api_client = plugin.get_api_client()
-    user_container = plugin.get_preferences_container().get_user_container()
 
     if api_client.is_user_signed_in():
         from gridmarkets_blender_addon.blender_plugin.user_container.operators.sign_out import GRIDMARKETS_OT_sign_out
@@ -222,6 +221,11 @@ def draw_user_container(self, context):
         row.operator(constants.OPERATOR_NULL_ID_NAME, text="Signed in as: " + api_client.get_signed_in_user().get_auth_email())
 
         row = sign_out_box.row()
+
+        # disable sign-out if running an operation
+        if plugin.get_user_interface().is_running_operation():
+            row.enabled = False
+
         row.operator(GRIDMARKETS_OT_sign_out.bl_idname)
 
     else:
