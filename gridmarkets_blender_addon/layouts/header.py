@@ -45,9 +45,6 @@ def draw_header(self, context):
         sub.label(text=user_interface.get_running_operation_message(),
                   icon_value=utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id)
 
-    if user_interface.get_signing_in_flag():
-        sub.label( text = "Signing in...",
-                   icon_value = utils_blender.get_spinner(user_interface.get_signing_in_spinner()).icon_id)
     else:
         if signed_in_user:
             sub.label(text="Signed in as: " + signed_in_user.get_auth_email())

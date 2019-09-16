@@ -136,7 +136,7 @@ def draw_sign_in_form(self, context):
                              "auth_email_input",
                              user_interface.get_auth_email_validity_flag(),
                              user_interface.get_auth_email_validity_message(),
-                             not user_interface.get_signing_in_flag())
+                             not user_interface.is_running_operation())
 
     _draw_string_input_field(signin_box,
                              "Access key:",
@@ -144,34 +144,35 @@ def draw_sign_in_form(self, context):
                              "auth_access_key_input",
                              user_interface.get_auth_access_key_validity_flag(),
                              user_interface.get_auth_access_key_validity_message(),
-                             not user_interface.get_signing_in_flag())
+                             not user_interface.is_running_operation())
 
     sign_in_button = signin_box.row()
     sign_in_button.scale_y = 1.3
-    if user_interface.get_signing_in_flag():
-        sign_in_button.enabled = False
+
+    def _draw_sign_in_button(text=None, icon='NONE', icon_value=0, enabled=True, alert=False):
+        sign_in_button.enabled = enabled
+        sign_in_button.alert = alert
         sign_in_button.operator(
             GRIDMARKETS_OT_sign_in_new_user.bl_idname,
-            text="Signing in...",
-            icon_value=utils_blender.get_spinner(user_interface.get_signing_in_spinner()).icon_id
-        )
-    elif user_interface.get_user_validity_flag():
-        sign_in_button.operator(
-            GRIDMARKETS_OT_sign_in_new_user.bl_idname,
-            text="Sign-in"
+            text=text,
+            icon=icon,
+            icon_value=icon_value
         )
 
-        if not (user_interface.get_auth_email_validity_flag() and
-                user_interface.get_auth_access_key_validity_flag()):
-            sign_in_button.enabled = False
+    # if the add-on is already running an operation then prevent sign-in
+    if user_interface.is_running_operation():
+        icon_value = utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id
+        _draw_sign_in_button(enabled=False, text="Signing in...", icon_value=icon_value)
+
+    elif user_interface.get_user_validity_flag():
+
+        if user_interface.get_auth_email_validity_flag() and user_interface.get_auth_access_key_validity_flag():
+            _draw_sign_in_button(text="Sign-in")
+        else:
+            _draw_sign_in_button(text="Sign-in", enabled=False)
 
     else:
-        sign_in_button.alert = True
-        sign_in_button.operator(
-            GRIDMARKETS_OT_sign_in_new_user.bl_idname,
-            text=user_interface.get_user_validity_message(),
-            icon=constants.ICON_ERROR
-        )
+        _draw_sign_in_button(alert=True, text=user_interface.get_user_validity_message(), icon=constants.ICON_ERROR)
 
     signin_box.separator()
     register_layout = signin_box.row()
@@ -185,6 +186,7 @@ def draw_sign_in_form(self, context):
         user_profiles_layout.scale_x = 0.5
         draw_user_profiles_list(SimpleNamespace(layout=user_profiles_layout), context)
         signin_box_outer.separator()
+
 
 def draw_user_container(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher

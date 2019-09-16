@@ -108,18 +108,7 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
-    # signing_in
-    signing_in_flag: bpy.props.BoolProperty(
-        default=False,
-        options={'SKIP_SAVE', 'HIDDEN'}
-    )
-
-    # spinners
-    signing_in_spinner: bpy.props.IntProperty(
-        default=1,
-        options={'SKIP_SAVE', 'HIDDEN'}
-    )
-
+    # spinner
     running_operation_spinner: bpy.props.IntProperty(
         default=1,
         options={'SKIP_SAVE', 'HIDDEN'}

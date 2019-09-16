@@ -70,13 +70,6 @@ class UserInterface(MetaUserInterface):
     def set_user_validity_message(self, message: str) -> None:
         bpy.context.scene.props.user_interface.user_validity_message = message
 
-    # signing in
-    def get_signing_in_flag(self) -> bool:
-        return bpy.context.scene.props.user_interface.signing_in_flag
-
-    def set_signing_in_flag(self, signing_in: bool) -> None:
-        bpy.context.scene.props.user_interface.signing_in_flag = signing_in
-
     # operation
     def is_running_operation(self) -> bool:
         return bpy.context.scene.props.user_interface.is_running_operation
@@ -95,16 +88,7 @@ class UserInterface(MetaUserInterface):
         bpy.context.scene.props.user_interface.auth_email_input = user_profile.get_auth_email()
         bpy.context.scene.props.user_interface.auth_access_key_input = user_profile.get_auth_key()
 
-    # spinners
-    def get_signing_in_spinner(self) -> int:
-        return bpy.context.scene.props.user_interface.signing_in_spinner
-
-    def increment_signing_in_spinner(self) -> None:
-        bpy.context.scene.props.user_interface.signing_in_spinner += 1
-
-        if bpy.context.scene.props.user_interface.signing_in_spinner > 7:
-            bpy.context.scene.props.user_interface.signing_in_spinner = 0
-
+    # spinner
     def get_running_operation_spinner(self) -> int:
         return bpy.context.scene.props.user_interface.running_operation_spinner
 

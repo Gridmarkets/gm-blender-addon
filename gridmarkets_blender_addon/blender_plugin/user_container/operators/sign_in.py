@@ -45,7 +45,7 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'TIMER':
-            self.user_interface.increment_signing_in_spinner()
+            self.user_interface.increment_running_operation_spinner()
             utils_blender.force_redraw_addon()
 
             if not self.thread.isAlive():
@@ -90,7 +90,7 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
                         raise RuntimeError("Sign-in method returned unexpected result:", result)
 
                 self.thread.join()
-                self.user_interface.set_signing_in_flag(False)
+                self.user_interface.set_is_running_operation_flag(False)
                 context.window_manager.event_timer_remove(self.timer)
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
@@ -117,7 +117,8 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
         self.timer = wm.event_timer_add(0.1, window=context.window)
         wm.modal_handler_add(self)
 
-        self.user_interface.set_signing_in_flag(True)
+        self.user_interface.set_is_running_operation_flag(True)
+        self.user_interface.set_running_operation_message("Signing in...")
         return {'RUNNING_MODAL'}
 
 

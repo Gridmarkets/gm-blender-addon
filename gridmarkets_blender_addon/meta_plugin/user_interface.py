@@ -71,13 +71,6 @@ class UserInterface(ABC, PluginAccessor):
     def set_user_validity_message(self, message: str) -> None:
         raise NotImplementedError
 
-    # signing in
-    def get_signing_in_flag(self) -> bool:
-        raise NotImplementedError
-
-    def set_signing_in_flag(self, signing_in: bool) -> None:
-        raise NotImplementedError
-
     # operation
     def is_running_operation(self) -> bool:
         raise NotImplementedError
