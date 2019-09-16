@@ -52,38 +52,8 @@ def draw_body(self, context):
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         if context.scene.render.engine == "VRAY_RENDER_RT":
-
-            from gridmarkets_blender_addon import utils_blender
-
-            # submit box
-            box = self.layout.box()
-            row = box.column(align=True)
-
-            # project options
-            row.label(text="Project")
-            sub = row.row()
-            sub.enabled = False
-            sub.label(text="The project to run the selected job against.")
-            row.separator()
-            row.prop(props, "project_options", text="")
-
-            submit_text = "Submit V-Ray Project"
-            submit_icon = "NONE"
-
-            # submit button / progress indicator
-            row = box.row(align=True)
-            row.scale_y = 2.5
-            if props.submitting_project:
-                row.prop(props, "submitting_project_progress", text=props.submitting_project_status)
-            else:
-                # disable submit button when uploading project
-                if props.uploading_project:
-                    row.enabled = False
-
-                if not utils_blender.is_addon_enabled("vb30"):
-                    row.enabled = False
-
-                row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
+            draw_v_ray_submission_form(self, context)
+            draw_logging_console(self, context)
         else:
             draw_submission_settings(self, context)
             draw_submission_summary(self, context)
