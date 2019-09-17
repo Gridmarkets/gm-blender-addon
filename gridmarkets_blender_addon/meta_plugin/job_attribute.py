@@ -18,20 +18,23 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import List
+__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute']
+
+from abc import ABC
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 
 
-class JobAttribute(Attribute):
+class JobAttribute(ABC, Attribute):
 
     def __init__(self,
                  key:str,
                  display_name: str,
                  description: str,
-                 inference_sources: List[AttributeInferenceSource],
+                 inference_sources: typing.List[AttributeInferenceSource],
                  is_optional: bool):
 
         Attribute.__init__(self, key, display_name, description)
@@ -41,8 +44,48 @@ class JobAttribute(Attribute):
     def is_optional(self) -> bool:
         return self._is_optional
 
-    def get_inference_sources(self) -> List[AttributeInferenceSource]:
+    def get_inference_sources(self) -> typing.List[AttributeInferenceSource]:
         return self._inference_sources
 
     def get_type(self) -> AttributeType:
         raise NotImplementedError
+
+
+class StringJobAttribute(StringAttributeType, JobAttribute):
+
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 inference_sources: typing.List[AttributeInferenceSource],
+                 is_optional: bool):
+
+        StringAttributeType.__init__(self)
+        JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)
+
+
+class EnumJobAttribute(EnumAttributeType, JobAttribute):
+
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 inference_sources: typing.List[AttributeInferenceSource],
+                 is_optional: bool,
+                 items: typing.List[EnumItem]):
+
+        EnumAttributeType.__init__(self, items)
+        JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)
+
+
+class NullJobAttribute(NullAttributeType, JobAttribute):
+
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 inference_sources: typing.List[AttributeInferenceSource],
+                 is_optional: bool):
+
+        NullAttributeType.__init__(self)
+        JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)

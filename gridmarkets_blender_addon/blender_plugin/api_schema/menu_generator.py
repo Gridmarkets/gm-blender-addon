@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher impo
 def register_menus(self):
     from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
     from gridmarkets_blender_addon.meta_plugin.transition import Transition
-    from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
     from gridmarkets_blender_addon.meta_plugin.attribute import EnumItem, EnumAttribute
     from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants
 

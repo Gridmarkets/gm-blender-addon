@@ -18,12 +18,26 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
+import enum
+import typing
+
+__all__ = ['AttributeType', 'StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType']
 
 
-class Attribute:
+class AttributeType(enum.Enum):
+    STRING = "STRING"
+    ENUM = "ENUM"
+    NULL = "NULL"
 
-    def __init__(self, key:str, display_name: str, description: str):
+
+class StringAttributeType:
+    def get_type(self) -> AttributeType:
+        return AttributeType.STRING
+
+
+class EnumItem:
+
+    def __init__(self, key: str, display_name: str, description: str):
         self._key = key
         self._display_name = display_name
         self._description = description
@@ -37,5 +51,19 @@ class Attribute:
     def get_description(self) -> str:
         return self._description
 
+
+class EnumAttributeType:
+
+    def __init__(self, items: typing.List[EnumItem]):
+        self._items = items
+
     def get_type(self) -> AttributeType:
-        raise NotImplementedError
+        return AttributeType.ENUM.value
+
+    def get_items(self) -> typing.List[EnumItem]:
+        return self._items
+
+
+class NullAttributeType:
+    def get_type(self) -> AttributeType:
+        return AttributeType.NULL

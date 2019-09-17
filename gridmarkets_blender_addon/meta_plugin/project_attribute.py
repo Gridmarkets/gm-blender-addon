@@ -18,17 +18,20 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = ['ProjectAttribute', 'StringProjectAttribute', 'EnumProjectAttribute', 'NullProjectAttribute']
+
+from abc import ABC
 import typing
 
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
 
-class ProjectAttribute(Attribute):
+class ProjectAttribute(ABC, Attribute):
 
-    def __init__(self, id:str, key:str, display_name: str, description: str,
+    def __init__(self, id: str, key: str, display_name: str, description: str,
                  transitions: typing.List[Transition], compatible_job_definitions: typing.List[JobDefinition]):
         Attribute.__init__(self, key, display_name, description)
 
@@ -56,3 +59,46 @@ class ProjectAttribute(Attribute):
 
     def get_children(self) -> typing.List['ProjectAttribute']:
         return list(map(lambda x: x.get_project_attribute(), self.get_transitions()))
+
+
+class StringProjectAttribute(StringAttributeType, ProjectAttribute):
+
+    def __init__(self,
+                 id: str,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 transitions: typing.List[Transition],
+                 compatible_job_definitions: typing.List[JobDefinition]):
+
+        StringAttributeType.__init__(self)
+        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
+
+
+class EnumProjectAttribute(EnumAttributeType, ProjectAttribute):
+
+    def __init__(self,
+                 id: str,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 transitions: typing.List[Transition],
+                 compatible_job_definitions: typing.List[JobDefinition],
+                 items: typing.List[EnumItem]):
+
+        EnumAttributeType.__init__(self, items)
+        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
+
+
+class NullProjectAttribute(NullAttributeType, ProjectAttribute):
+
+    def __init__(self,
+                 id: str,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 transitions: typing.List[Transition],
+                 compatible_job_definitions: typing.List[JobDefinition]):
+
+        NullAttributeType.__init__(self)
+        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)

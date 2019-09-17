@@ -20,10 +20,9 @@
 
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
-from gridmarkets_blender_addon.meta_plugin.attribute import EnumItem, EnumAttribute, StringAttribute
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
+from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumItem
+from gridmarkets_blender_addon.meta_plugin.job_attribute import *
+from gridmarkets_blender_addon.meta_plugin.project_attribute import *
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
@@ -70,6 +69,15 @@ def get_all_sub_elements_text(element: ET.Element, tag_name: str, expect_at_leas
 def get_text(element: ET.Element, tag_name: str, expect_unique_tag: bool = True) -> str:
     element = get_sub_element(element, tag_name, expect_unique_tag)
     return element.text
+
+
+def to_bool(value: str) -> bool:
+    if value == "True":
+        return True
+    elif value == "False":
+        return False
+    else:
+        raise ValueError("Could not convert value: " + value + " to python bool. Expects either 'True' or 'False'.")
 
 
 class GridMarketsAPISchema(APISchema):
@@ -132,54 +140,28 @@ class GridMarketsAPISchema(APISchema):
                 attribute_key = get_attribute(attribute_element, TAG_ATTRIBUTE_KEY_ATTRIBUTE)
                 attribute_display_name = get_text(attribute_element, TAG_DISPLAY_NAME)
                 attribute_description = get_text(attribute_element, TAG_DESCRIPTION)
-                attribute_is_optional = get_text(attribute_element, TAG_OPTIONAL)
+                attribute_is_optional = to_bool(get_text(attribute_element, TAG_OPTIONAL))
 
                 inference_sources_element = get_sub_element(attribute_element, TAG_INFERENCE_SOURCES)
-                attribute_inference_sources = get_all_sub_elements_text(inference_sources_element, TAG_INFERENCE_SOURCE)
+
+                # noinspection PyTypeChecker
+                attribute_inference_sources: typing.List[AttributeInferenceSource] = get_all_sub_elements_text(
+                    inference_sources_element, TAG_INFERENCE_SOURCE)
+
+                for attribute_inference_source in attribute_inference_sources:
+                    if not isinstance(attribute_inference_source, AttributeInferenceSource):
+                        raise ValueError("Attribute inference source is not recognised.")
+
                 attribute_type = get_text(attribute_element, TAG_TYPE)
 
                 if attribute_type == AttributeType.STRING.value:
-
-                    def string_init(self,
-                                    key: str,
-                                    display_name: str,
-                                    description: str,
-                                    inference_sources: typing.List[AttributeInferenceSource],
-                                    is_optional):
-
-                        StringAttribute.__init__(self)
-                        JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)
-
-                    job_attribute_string = type("JobAttributeString",
-                                                (StringAttribute, JobAttribute),
-                                                {
-                                                    "key": attribute_key,
-                                                    "display_name": attribute_display_name,
-                                                    "description": attribute_description,
-                                                    "inference_sources": attribute_inference_sources,
-                                                    "is_optional": attribute_is_optional,
-                                                    "__init__": string_init
-                                                })
-
-                    attributes.append(job_attribute_string(attribute_key,
-                                                           attribute_display_name,
-                                                           attribute_description,
-                                                           attribute_inference_sources,
-                                                           attribute_is_optional))
+                    attributes.append(StringJobAttribute(attribute_key,
+                                                         attribute_display_name,
+                                                         attribute_description,
+                                                         attribute_inference_sources,
+                                                         attribute_is_optional))
 
                 elif attribute_type == AttributeType.ENUM.value:
-
-                    def enum_init(self,
-                                  key: str,
-                                  display_name: str,
-                                  description: str,
-                                  inference_sources: typing.List[AttributeInferenceSource],
-                                  is_optional: bool,
-                                  items: typing.List[EnumItem]):
-
-                        EnumAttribute.__init__(self, items)
-                        JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)
-
                     enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
                     enum_items: typing.List[EnumItem] = []
                     for enum_item_element in enum_items_element:
@@ -188,24 +170,22 @@ class GridMarketsAPISchema(APISchema):
                         enum_item_description = get_text(enum_item_element, TAG_DESCRIPTION)
                         enum_items.append(EnumItem(enum_item_key, enum_item_display_name, enum_item_description))
 
-                    job_attribute_enum = type("JobAttributeEnum",
-                                              (EnumAttribute, JobAttribute),
-                                              {
-                                                  "key": attribute_key,
-                                                  "display_name": attribute_display_name,
-                                                  "description": attribute_description,
-                                                  "inference_sources": attribute_inference_sources,
-                                                  "is_optional": attribute_is_optional,
-                                                  "items": enum_items,
-                                                  "__init__": enum_init
-                                              })
+                    attributes.append(EnumJobAttribute(attribute_key,
+                                                       attribute_display_name,
+                                                       attribute_description,
+                                                       attribute_inference_sources,
+                                                       attribute_is_optional,
+                                                       enum_items))
 
-                    attributes.append(job_attribute_enum(attribute_key,
-                                                         attribute_display_name,
-                                                         attribute_description,
-                                                         attribute_inference_sources,
-                                                         attribute_is_optional,
-                                                         enum_items))
+                elif attribute_type == AttributeType.NULL.value:
+                    attributes.append(NullJobAttribute(attribute_key,
+                                                       attribute_display_name,
+                                                       attribute_description,
+                                                       attribute_inference_sources,
+                                                       attribute_is_optional))
+
+                else:
+                    raise ValueError("Unrecognised attribute type.")
 
             self._job_definitions.append(JobDefinition(job_definition_id, job_definition_display_name, attributes))
 
@@ -239,7 +219,8 @@ class GridMarketsAPISchema(APISchema):
                                                                 transition_formula))
             project_attribute_compatible_job_definitions = []
 
-            compatible_job_definitions_element = get_sub_element(project_attribute_element, TAG_COMPATIBLE_JOB_DEFINITIONS)
+            compatible_job_definitions_element = get_sub_element(project_attribute_element,
+                                                                 TAG_COMPATIBLE_JOB_DEFINITIONS)
             job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element, TAG_JOB_DEFINITION_ID,
                                                            False)
 
@@ -247,48 +228,13 @@ class GridMarketsAPISchema(APISchema):
                 project_attribute_compatible_job_definitions.append(self.get_job_definition_with_id(job_definition_id))
 
             if project_attribute_type == AttributeType.STRING.value:
-
-                def string_init(self,
-                                id: str,
-                                key: str,
-                                display_name: str,
-                                description: str,
-                                transitions: typing.List[Transition],
-                                compatible_job_definitions: typing.List[JobDefinition]):
-                    StringAttribute.__init__(self)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
-
-                project_attribute_string = type("ProjectAttributeString",
-                                                (EnumAttribute, ProjectAttribute),
-                                                {
-                                                    "id": project_attribute_id,
-                                                    "key": project_attribute_key,
-                                                    "display_name": project_attribute_display_name,
-                                                    "description": project_attribute_description,
-                                                    "transitions": project_attribute_transitions,
-                                                    "compatible_job_definitions": project_attribute_compatible_job_definitions,
-                                                    "__init__": string_init
-                                                })
-
-                self._project_attributes.append(project_attribute_string(project_attribute_id,
-                                                                         project_attribute_key,
-                                                                         project_attribute_display_name,
-                                                                         project_attribute_description,
-                                                                         project_attribute_transitions,
-                                                                         project_attribute_compatible_job_definitions))
+                self._project_attributes.append(StringProjectAttribute(project_attribute_id,
+                                                                       project_attribute_key,
+                                                                       project_attribute_display_name,
+                                                                       project_attribute_description,
+                                                                       project_attribute_transitions,
+                                                                       project_attribute_compatible_job_definitions))
             elif project_attribute_type == AttributeType.ENUM.value:
-
-                def enum_init(self,
-                              id: str,
-                              key: str,
-                              display_name: str,
-                              description: str,
-                              transitions: typing.List[Transition],
-                              compatible_job_definitions: typing.List[JobDefinition],
-                              items: typing.List[EnumItem]):
-
-                    EnumAttribute.__init__(self, items)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
 
                 enum_items_element = get_sub_element(project_attribute_element, TAG_ITEMS)
                 enum_items: typing.List[EnumItem] = []
@@ -298,26 +244,24 @@ class GridMarketsAPISchema(APISchema):
                     enum_item_description = get_text(enum_item_element, TAG_DESCRIPTION)
                     enum_items.append(EnumItem(enum_item_key, enum_item_display_name, enum_item_description))
 
-                project_attribute_enum = type("ProjectAttributeEnum",
-                                              (EnumAttribute, ProjectAttribute),
-                                              {
-                                                  "id": project_attribute_id,
-                                                  "key": project_attribute_key,
-                                                  "display_name": project_attribute_display_name,
-                                                  "description": project_attribute_description,
-                                                  "transitions": project_attribute_transitions,
-                                                  "compatible_job_definitions": project_attribute_compatible_job_definitions,
-                                                  "items": enum_items,
-                                                  "__init__": enum_init
-                                              })
+                self._project_attributes.append(EnumProjectAttribute(project_attribute_id,
+                                                                     project_attribute_key,
+                                                                     project_attribute_display_name,
+                                                                     project_attribute_description,
+                                                                     project_attribute_transitions,
+                                                                     project_attribute_compatible_job_definitions,
+                                                                     enum_items))
 
-                self._project_attributes.append(project_attribute_enum(project_attribute_id,
-                                                                       project_attribute_key,
-                                                                       project_attribute_display_name,
-                                                                       project_attribute_description,
-                                                                       project_attribute_transitions,
-                                                                       project_attribute_compatible_job_definitions,
-                                                                       enum_items))
+            elif project_attribute_type == AttributeType.NULL.value:
+                self._project_attributes.append(NullProjectAttribute(project_attribute_id,
+                                                                     project_attribute_key,
+                                                                     project_attribute_display_name,
+                                                                     project_attribute_description,
+                                                                     project_attribute_transitions,
+                                                                     project_attribute_compatible_job_definitions))
+
+            else:
+                raise ValueError("Unrecognised attribute type.")
 
     def get_job_definitions(self) -> typing.List[JobDefinition]:
         return self._job_definitions
