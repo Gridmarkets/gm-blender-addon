@@ -191,7 +191,7 @@
                 <Item>
                     <Key>CYCLES</Key>
                     <DisplayName>Cycles</DisplayName>
-                    <Description>Blender Cycles</Description>
+                    <Description>Blender Cycles.</Description>
                 </Item>
             </Items>
             <Transitions></Transitions>
@@ -209,12 +209,12 @@
                 <Item>
                     <Key>CYCLES</Key>
                     <DisplayName>Cycles</DisplayName>
-                    <Description>Blender Cycles</Description>
+                    <Description>Blender Cycles.</Description>
                 </Item>
                 <Item>
                     <Key>EEVEE</Key>
                     <DisplayName>Eevee</DisplayName>
-                    <Description>Blender Eevee</Description>
+                    <Description>Blender Eevee.</Description>
                 </Item>
             </Items>
             <Transitions></Transitions>
@@ -256,19 +256,19 @@
         <ProjectAttribute id="BLENDER_VERSION">
             <Key>VERSION</Key>
             <DisplayName>Version</DisplayName>
-            <Description>The version of Blender</Description>
+            <Description>The version of Blender.</Description>
             <ValidProject>False</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
                     <Key>2.79</Key>
                     <DisplayName>2.79</DisplayName>
-                    <Description>Blender 2.79</Description>
+                    <Description>Blender 2.79.</Description>
                 </Item>
                 <Item>
                     <Key>2.80</Key>
                     <DisplayName>2.80</DisplayName>
-                    <Description>Blender 2.80</Description>
+                    <Description>Blender 2.80.</Description>
                 </Item>
             </Items>
             <Transitions>
@@ -311,39 +311,39 @@
         <ProjectAttribute id="VRAY_VERSION">
             <Key>VERSION</Key>
             <DisplayName>Version</DisplayName>
-            <Description>The version of V-Ray</Description>
+            <Description>The version of V-Ray.</Description>
             <ValidProject>False</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
                     <Key>3.60.03</Key>
                     <DisplayName>3.60.03</DisplayName>
-                    <Description>V-Ray 3.60.03</Description>
+                    <Description>V-Ray 3.60.03.</Description>
                 </Item>
                 <Item>
                     <Key>3.60.04</Key>
                     <DisplayName>3.60.04</DisplayName>
-                    <Description>V-Ray 3.60.04</Description>
+                    <Description>V-Ray 3.60.04.</Description>
                 </Item>
                 <Item>
                     <Key>3.60.05</Key>
                     <DisplayName>3.60.05</DisplayName>
-                    <Description>V-Ray 3.60.05</Description>
+                    <Description>V-Ray 3.60.05.</Description>
                 </Item>
                 <Item>
                     <Key>4.02.05</Key>
                     <DisplayName>4.02.05</DisplayName>
-                    <Description>V-Ray 4.02.05</Description>
+                    <Description>V-Ray 4.02.05.</Description>
                 </Item>
                 <Item>
                     <Key>4.10.01</Key>
                     <DisplayName>4.10.01</DisplayName>
-                    <Description>V-Ray 4.10.01</Description>
+                    <Description>V-Ray 4.10.01.</Description>
                 </Item>
                 <Item>
                     <Key>4.10.02</Key>
                     <DisplayName>4.10.02</DisplayName>
-                    <Description>V-Ray 4.10.02</Description>
+                    <Description>V-Ray 4.10.02.</Description>
                 </Item>
             </Items>
             <Transitions>
@@ -365,12 +365,12 @@
                 <Item>
                     <Key>blender</Key>
                     <DisplayName>Blender</DisplayName>
-                    <Description>Blender is a professional, free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D printed models, interactive 3D applications and video games</Description>
+                    <Description>Blender is a professional, free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D printed models, interactive 3D applications and video games.</Description>
                 </Item>
                 <Item>
                     <Key>vray</Key>
                     <DisplayName>V-Ray</DisplayName>
-                    <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997</Description>
+                    <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997.</Description>
                 </Item>
             </Items>
             <Transitions>
