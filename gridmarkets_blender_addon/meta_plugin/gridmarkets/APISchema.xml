@@ -182,7 +182,7 @@
             <Description>A blender 2.79 project setup to use the Blender Cycles render engine.</Description>
             <Type>NULL</Type>
             <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_79_INTERNAL_PROJECT">
@@ -190,7 +190,7 @@
             <Description>A blender 2.79 project setup to use the Blender Internal render engine.</Description>
             <Type>NULL</Type>
             <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_CYCLES_PROJECT">
@@ -198,7 +198,7 @@
             <Description>A blender 2.80 project setup to use the Blender Cycles render engine.</Description>
             <Type>NULL</Type>
             <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_EEVEE_PROJECT">
@@ -206,7 +206,7 @@
             <Description>A blender 2.80 project setup to use the Blender Eevee render engine.</Description>
             <Type>NULL</Type>
             <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
@@ -235,7 +235,7 @@
                     <TransitionFormula>INTERNAL</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
@@ -264,7 +264,7 @@
                     <TransitionFormula>INTERNAL</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_79_MAIN_PROJECT_FILE">
@@ -278,7 +278,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_MAIN_PROJECT_FILE">
@@ -292,7 +292,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_VERSION">
@@ -322,7 +322,7 @@
                     <TransitionFormula>2.80</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_PROJECT">
@@ -330,7 +330,7 @@
             <Description>A V-Ray project.</Description>
             <Type>NULL</Type>
             <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_REMAP_FILE">
@@ -343,7 +343,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_SCENE_FILE">
@@ -357,7 +357,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_VERSION">
@@ -403,7 +403,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="PRODUCT">
@@ -433,7 +433,7 @@
                     <TransitionFormula>vray</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
 
         </ProjectAttribute>
 
@@ -448,7 +448,7 @@
                     <TransitionFormula>*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
     </ProjectAttributes>
 </APISchema>

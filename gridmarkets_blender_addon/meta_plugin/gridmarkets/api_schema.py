@@ -103,7 +103,7 @@ class GridMarketsAPISchema(APISchema):
         TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
         ATRRIBUTE_ID = "id"
         TAG_TRANSITION_FORMULA = "TransitionFormula"
-        TAG_COMPATIBLE_JOB_TYPES = "CompatibleJobTypes"
+        TAG_COMPATIBLE_JOB_DEFINITIONS = "CompatibleJobDefinitions"
         TAG_JOB_DEFINITION_ID = "JobDefinitionId"
 
         tree = ET.parse(SCHEMA_DEFINITION_FILE)
@@ -239,7 +239,7 @@ class GridMarketsAPISchema(APISchema):
                                                                 transition_formula))
             project_attribute_compatible_job_definitions = []
 
-            compatible_job_definitions_element = get_sub_element(project_attribute_element, TAG_COMPATIBLE_JOB_TYPES)
+            compatible_job_definitions_element = get_sub_element(project_attribute_element, TAG_COMPATIBLE_JOB_DEFINITIONS)
             job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element, TAG_JOB_DEFINITION_ID,
                                                            False)
 
