@@ -253,9 +253,10 @@ class GridMarketsAPISchema(APISchema):
                                 key: str,
                                 display_name: str,
                                 description: str,
-                                transitions: typing.List[Transition]):
+                                transitions: typing.List[Transition],
+                                compatible_job_definitions: typing.List[JobDefinition]):
                     StringAttribute.__init__(self)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions)
+                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
 
                 project_attribute_string = type("ProjectAttributeString",
                                                 (EnumAttribute, ProjectAttribute),
@@ -265,6 +266,7 @@ class GridMarketsAPISchema(APISchema):
                                                     "display_name": project_attribute_display_name,
                                                     "description": project_attribute_description,
                                                     "transitions": project_attribute_transitions,
+                                                    "compatible_job_definitions": project_attribute_compatible_job_definitions,
                                                     "__init__": string_init
                                                 })
 
@@ -272,7 +274,8 @@ class GridMarketsAPISchema(APISchema):
                                                                          project_attribute_key,
                                                                          project_attribute_display_name,
                                                                          project_attribute_description,
-                                                                         project_attribute_transitions))
+                                                                         project_attribute_transitions,
+                                                                         project_attribute_compatible_job_definitions))
             elif project_attribute_type == AttributeType.ENUM.value:
 
                 def enum_init(self,
@@ -281,10 +284,11 @@ class GridMarketsAPISchema(APISchema):
                               display_name: str,
                               description: str,
                               transitions: typing.List[Transition],
+                              compatible_job_definitions: typing.List[JobDefinition],
                               items: typing.List[EnumItem]):
 
                     EnumAttribute.__init__(self, items)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions)
+                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
 
                 enum_items_element = get_sub_element(project_attribute_element, TAG_ITEMS)
                 enum_items: typing.List[EnumItem] = []
@@ -302,6 +306,7 @@ class GridMarketsAPISchema(APISchema):
                                                   "display_name": project_attribute_display_name,
                                                   "description": project_attribute_description,
                                                   "transitions": project_attribute_transitions,
+                                                  "compatible_job_definitions": project_attribute_compatible_job_definitions,
                                                   "items": enum_items,
                                                   "__init__": enum_init
                                               })
@@ -311,6 +316,7 @@ class GridMarketsAPISchema(APISchema):
                                                                        project_attribute_display_name,
                                                                        project_attribute_description,
                                                                        project_attribute_transitions,
+                                                                       project_attribute_compatible_job_definitions,
                                                                        enum_items))
 
     def get_job_definitions(self) -> typing.List[JobDefinition]:
