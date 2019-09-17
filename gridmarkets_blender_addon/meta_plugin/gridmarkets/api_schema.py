@@ -215,8 +215,7 @@ class GridMarketsAPISchema(APISchema):
                 transition_project_attribute = self.get_project_attribute_with_id(transition_project_attribute_id)
                 transition_formula = get_text(transition_element, TAG_TRANSITION_FORMULA)
 
-                project_attribute_transitions.append(Transition(transition_project_attribute,
-                                                                transition_formula))
+                project_attribute_transitions.append(Transition(transition_formula, transition_project_attribute))
             project_attribute_compatible_job_definitions = []
 
             compatible_job_definitions_element = get_sub_element(project_attribute_element,
