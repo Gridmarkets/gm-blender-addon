@@ -76,8 +76,3 @@ class EnumAttribute:
 
     def get_items(self) -> typing.List[EnumItem]:
         return self._items
-
-
-class StringAttribute:
-    def get_type(self) -> AttributeType:
-        return AttributeType.STRING.value
