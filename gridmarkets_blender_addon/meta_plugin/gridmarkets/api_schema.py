@@ -98,7 +98,6 @@ class GridMarketsAPISchema(APISchema):
         TAG_ATTRIBUTE_KEY_ATTRIBUTE = "key"
         TAG_PROJECT_ATTRIBUTES = "ProjectAttributes"
         TAG_PROJECT_ATTRIBUTE = "ProjectAttribute"
-        TAG_VALID_PROJECT = "ValidProject"
         TAG_TRANSITIONS = "Transitions"
         TAG_TRANSITION = "Transition"
         TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
@@ -225,7 +224,6 @@ class GridMarketsAPISchema(APISchema):
 
             project_attribute_display_name = get_text(project_attribute_element, TAG_DISPLAY_NAME)
             project_attribute_description = get_text(project_attribute_element, TAG_DESCRIPTION)
-            project_attribute_valid_project = (get_text(project_attribute_element, TAG_VALID_PROJECT) == "True")
             project_attribute_type = get_text(project_attribute_element, TAG_TYPE)
             project_attribute_transitions = []
 
@@ -255,10 +253,9 @@ class GridMarketsAPISchema(APISchema):
                                 key: str,
                                 display_name: str,
                                 description: str,
-                                is_valid_project: bool,
                                 transitions: typing.List[Transition]):
                     StringAttribute.__init__(self)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, is_valid_project, transitions)
+                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions)
 
                 project_attribute_string = type("ProjectAttributeString",
                                                 (EnumAttribute, ProjectAttribute),
@@ -267,7 +264,6 @@ class GridMarketsAPISchema(APISchema):
                                                     "key": project_attribute_key,
                                                     "display_name": project_attribute_display_name,
                                                     "description": project_attribute_description,
-                                                    "is_valid_project": project_attribute_valid_project,
                                                     "transitions": project_attribute_transitions,
                                                     "__init__": string_init
                                                 })
@@ -276,7 +272,6 @@ class GridMarketsAPISchema(APISchema):
                                                                          project_attribute_key,
                                                                          project_attribute_display_name,
                                                                          project_attribute_description,
-                                                                         project_attribute_valid_project,
                                                                          project_attribute_transitions))
             elif project_attribute_type == AttributeType.ENUM.value:
 
@@ -285,12 +280,11 @@ class GridMarketsAPISchema(APISchema):
                               key: str,
                               display_name: str,
                               description: str,
-                              is_valid_project: bool,
                               transitions: typing.List[Transition],
                               items: typing.List[EnumItem]):
 
                     EnumAttribute.__init__(self, items)
-                    ProjectAttribute.__init__(self, id, key, display_name, description, is_valid_project, transitions)
+                    ProjectAttribute.__init__(self, id, key, display_name, description, transitions)
 
                 enum_items_element = get_sub_element(project_attribute_element, TAG_ITEMS)
                 enum_items: typing.List[EnumItem] = []
@@ -307,7 +301,6 @@ class GridMarketsAPISchema(APISchema):
                                                   "key": project_attribute_key,
                                                   "display_name": project_attribute_display_name,
                                                   "description": project_attribute_description,
-                                                  "is_valid_project": project_attribute_valid_project,
                                                   "transitions": project_attribute_transitions,
                                                   "items": enum_items,
                                                   "__init__": enum_init
@@ -317,7 +310,6 @@ class GridMarketsAPISchema(APISchema):
                                                                        project_attribute_key,
                                                                        project_attribute_display_name,
                                                                        project_attribute_description,
-                                                                       project_attribute_valid_project,
                                                                        project_attribute_transitions,
                                                                        enum_items))
 

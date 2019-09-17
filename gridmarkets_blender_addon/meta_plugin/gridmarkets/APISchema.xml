@@ -212,7 +212,6 @@
         <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
             <DisplayName>Render Engine</DisplayName>
             <Description>The render engine the project is set to use.</Description>
-            <ValidProject>True</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
@@ -242,7 +241,6 @@
         <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
             <DisplayName>Render Engine</DisplayName>
             <Description>The render engine the project is set to use.</Description>
-            <ValidProject>True</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
@@ -273,7 +271,6 @@
             <Key>MAIN_FILE</Key>
             <DisplayName>Main project file</DisplayName>
             <Description>The main .blend file for your project.</Description>
-            <ValidProject>False</ValidProject>
             <Type>STRING</Type>
             <Transitions>
                 <Transition>
@@ -288,7 +285,6 @@
             <Key>MAIN_FILE</Key>
             <DisplayName>Main project file</DisplayName>
             <Description>The main .blend file for your project.</Description>
-            <ValidProject>False</ValidProject>
             <Type>STRING</Type>
             <Transitions>
                 <Transition>
@@ -303,7 +299,6 @@
             <Key>VERSION</Key>
             <DisplayName>Version</DisplayName>
             <Description>The version of Blender.</Description>
-            <ValidProject>False</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
@@ -341,7 +336,6 @@
         <ProjectAttribute id="VRAY_REMAP_FILE">
             <DisplayName>V-Ray re-map file</DisplayName>
             <Description>The V-Ray re-map file for the project.</Description>
-            <ValidProject>True</ValidProject>
             <Type>STRING</Type>
             <Transitions>
                 <Transition>
@@ -356,7 +350,6 @@
             <Key>MAIN_FILE</Key>
             <DisplayName>V-Ray scene file</DisplayName>
             <Description>The main .vrscene file for the project.</Description>
-            <ValidProject>False</ValidProject>
             <Type>STRING</Type>
             <Transitions>
                 <Transition>
@@ -371,7 +364,6 @@
             <Key>VERSION</Key>
             <DisplayName>Version</DisplayName>
             <Description>The version of V-Ray.</Description>
-            <ValidProject>False</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
@@ -418,7 +410,6 @@
             <Key>PRODUCT</Key>
             <DisplayName>Product</DisplayName>
             <Description>A GridMarkets product.</Description>
-            <ValidProject>False</ValidProject>
             <Type>ENUM</Type>
             <Items>
                 <Item>
@@ -450,7 +441,6 @@
             <Key>PROJECT_NAME</Key>
             <DisplayName>Project name</DisplayName>
             <Description>The name of the project as specified in Envoy.</Description>
-            <ValidProject>False</ValidProject>
             <Type>STRING</Type>
             <Transitions>
                 <Transition>

@@ -27,12 +27,11 @@ from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
 class ProjectAttribute(Attribute):
 
-    def __init__(self, id:str, key:str, display_name: str, description: str, is_valid_project: bool,
+    def __init__(self, id:str, key:str, display_name: str, description: str,
                  transitions: typing.List[Transition]):
         Attribute.__init__(self, key, display_name, description)
 
         self._id = id
-        self._is_valid_project = is_valid_project
         self._transitions = transitions
 
     def get_id(self) -> str:
