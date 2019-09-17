@@ -24,3 +24,4 @@ from enum import Enum
 class AttributeType(Enum):
     STRING = "STRING"
     ENUM = "ENUM"
+    NULL = "NULL"

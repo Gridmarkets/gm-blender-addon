@@ -177,6 +177,38 @@
 
     <ProjectAttributes>
 
+        <ProjectAttribute id="BLENDER_2_79_CYCLES_PROJECT">
+            <DisplayName>Blender 2.79 (Cycles) Project</DisplayName>
+            <Description>A blender 2.79 project setup to use the Blender Cycles render engine.</Description>
+            <Type>NULL</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_79_INTERNAL_PROJECT">
+            <DisplayName>Blender 2.79 (Internal) Project</DisplayName>
+            <Description>A blender 2.79 project setup to use the Blender Internal render engine.</Description>
+            <Type>NULL</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_80_CYCLES_PROJECT">
+            <DisplayName>Blender 2.80 (Cycles) Project</DisplayName>
+            <Description>A blender 2.80 project setup to use the Blender Cycles render engine.</Description>
+            <Type>NULL</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_80_EEVEE_PROJECT">
+            <DisplayName>Blender 2.80 (Eevee) Project</DisplayName>
+            <Description>A blender 2.80 project setup to use the Blender Eevee render engine.</Description>
+            <Type>NULL</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
         <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
             <DisplayName>Render Engine</DisplayName>
             <Description>The render engine the project is set to use.</Description>
@@ -194,10 +226,17 @@
                     <Description>Blender Cycles.</Description>
                 </Item>
             </Items>
-            <Transitions></Transitions>
-            <CompatibleJobTypes>
-                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
-            </CompatibleJobTypes>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_CYCLES_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>CYCLES</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_INTERNAL_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>INTERNAL</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
@@ -217,10 +256,17 @@
                     <Description>Blender Eevee.</Description>
                 </Item>
             </Items>
-            <Transitions></Transitions>
-            <CompatibleJobTypes>
-                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
-            </CompatibleJobTypes>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_80_CYCLES_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>CYCLES</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_80_INTERNAL_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>INTERNAL</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_79_MAIN_PROJECT_FILE">
@@ -284,12 +330,25 @@
             <CompatibleJobTypes></CompatibleJobTypes>
         </ProjectAttribute>
 
+        <ProjectAttribute id="VRAY_PROJECT">
+            <DisplayName>V-Ray Project</DisplayName>
+            <Description>A V-Ray project.</Description>
+            <Type>NULL</Type>
+            <Transitions></Transitions>
+            <CompatibleJobTypes></CompatibleJobTypes>
+        </ProjectAttribute>
+
         <ProjectAttribute id="VRAY_REMAP_FILE">
             <DisplayName>V-Ray re-map file</DisplayName>
             <Description>The V-Ray re-map file for the project.</Description>
             <ValidProject>True</ValidProject>
             <Type>STRING</Type>
-            <Transitions></Transitions>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>VRAY_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>*</TransitionFormula>
+                </Transition>
+            </Transitions>
             <CompatibleJobTypes></CompatibleJobTypes>
         </ProjectAttribute>
 
