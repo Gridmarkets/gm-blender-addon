@@ -25,7 +25,7 @@ from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAP
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import GridMarketsAPISchema
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
@@ -43,7 +43,7 @@ class GridMarketsAPIClient(MetaAPIClient):
     def __init__(self):
         MetaAPIClient.__init__(self)
         self._envoy_client: Optional[EnvoyClient] = None
-        self._api_schema = GridMarketsAPISchema()
+        self._api_schema = XMLAPISchemaParser.parse()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
 
