@@ -18,17 +18,22 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
 import typing
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
 
 
-class APISchema(ABC):
+class APISchema:
 
-    @abstractmethod
+    def __init__(self, job_definitions: typing.List[JobDefinition], project_attributes: typing.List[ProjectAttribute]):
+        self._job_definitions = job_definitions
+        self._project_attributes = project_attributes
+
+    def get_root_project_attribute(self):
+        return self.get_project_attribute_with_id("GM_PROJECT_NAME")
+
     def get_job_definitions(self) -> typing.List[JobDefinition]:
-        raise NotImplementedError
+        return self._job_definitions
 
     def get_job_definition_with_id(self, id: str) -> JobDefinition:
 
@@ -38,9 +43,8 @@ class APISchema(ABC):
 
         raise ValueError("No job definition with id '" + id + "'")
 
-    @abstractmethod
     def get_project_attributes(self) -> typing.List[ProjectAttribute]:
-        raise NotImplementedError
+        return self._project_attributes
 
     def get_project_attribute_with_id(self, id:str) -> ProjectAttribute:
         for project_attribute in self.get_project_attributes():
@@ -48,7 +52,3 @@ class APISchema(ABC):
                 return project_attribute
 
         raise ValueError("No project attribute with id '" + id + "'")
-
-    def get_root_project_attribute(self):
-        return self.get_project_attribute_with_id("GM_PROJECT_NAME")
-
