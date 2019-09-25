@@ -52,5 +52,3 @@ class APISchema(ABC):
     def get_root_project_attribute(self):
         return self.get_project_attribute_with_id("GM_PROJECT_NAME")
 
-    def get_product_project_attribute(self):
-        return self.get_project_attribute_with_id("PRODUCT")

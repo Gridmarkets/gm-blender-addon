@@ -33,9 +33,6 @@ def register_menus(self):
     plugin = PluginFetcher.get_plugin()
     api_schema = plugin.get_api_client().get_api_schema()
 
-    # get the project attribute that specifies the name
-    projects = api_schema.get_product_project_attribute()
-
 
     def register_menus_recursive(attribute: ProjectAttribute):
 
