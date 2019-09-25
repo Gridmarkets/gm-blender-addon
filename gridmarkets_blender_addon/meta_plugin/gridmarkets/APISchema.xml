@@ -260,8 +260,8 @@
                     <TransitionFormula>CYCLES</TransitionFormula>
                 </Transition>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_INTERNAL_PROJECT</ProjectAttributeId>
-                    <TransitionFormula>INTERNAL</TransitionFormula>
+                    <ProjectAttributeId>BLENDER_2_80_EEVEE_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>EEVEE</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
