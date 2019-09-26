@@ -29,21 +29,16 @@ from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
 
-class ProjectAttribute(ABC, Attribute):
+class ProjectAttribute(ABC):
 
-    def __init__(self, id: str, key: str, display_name: str, description: str,
-                 transitions: typing.List[Transition], compatible_job_definitions: typing.List[JobDefinition]):
-        Attribute.__init__(self, key, display_name, description)
-
+    def __init__(self, id: str, transitions: typing.List[Transition],
+                 compatible_job_definitions: typing.List[JobDefinition]):
         self._id = id
         self._transitions = transitions
         self._compatible_job_definitions = compatible_job_definitions
 
     def get_id(self) -> str:
         return self._id
-
-    def get_type(self) -> AttributeType:
-        raise NotImplementedError
 
     def has_transitions(self) -> bool:
         return len(self._transitions) > 0
@@ -70,9 +65,8 @@ class StringProjectAttribute(StringAttributeType, ProjectAttribute):
                  description: str,
                  transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition]):
-
-        StringAttributeType.__init__(self)
-        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
+        StringAttributeType.__init__(self, key, display_name, description)
+        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
 
 
 class EnumProjectAttribute(EnumAttributeType, ProjectAttribute):
@@ -85,9 +79,8 @@ class EnumProjectAttribute(EnumAttributeType, ProjectAttribute):
                  transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition],
                  items: typing.List[EnumItem]):
-
-        EnumAttributeType.__init__(self, items)
-        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
+        EnumAttributeType.__init__(self, key, display_name, description, items)
+        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
 
 
 class NullProjectAttribute(NullAttributeType, ProjectAttribute):
@@ -99,6 +92,5 @@ class NullProjectAttribute(NullAttributeType, ProjectAttribute):
                  description: str,
                  transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition]):
-
-        NullAttributeType.__init__(self)
-        ProjectAttribute.__init__(self, id, key, display_name, description, transitions, compatible_job_definitions)
+        NullAttributeType.__init__(self, key, display_name, description)
+        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)

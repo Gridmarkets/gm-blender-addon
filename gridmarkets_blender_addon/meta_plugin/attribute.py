@@ -18,15 +18,22 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
+import enum
+
+
+class AttributeType(enum.Enum):
+    STRING = "STRING"
+    ENUM = "ENUM"
+    NULL = "NULL"
 
 
 class Attribute:
 
-    def __init__(self, key:str, display_name: str, description: str):
+    def __init__(self, key:str, display_name: str, description: str, attribute_type: AttributeType):
         self._key = key
         self._display_name = display_name
         self._description = description
+        self._attribute_type = attribute_type
 
     def get_key(self) -> str:
         return self._key
@@ -38,4 +45,4 @@ class Attribute:
         return self._description
 
     def get_type(self) -> AttributeType:
-        raise NotImplementedError
+        return self._attribute_type

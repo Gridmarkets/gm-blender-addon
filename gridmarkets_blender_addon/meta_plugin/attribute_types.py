@@ -18,21 +18,16 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import enum
+__all__ = ['StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType']
+
 import typing
-
-__all__ = ['AttributeType', 'StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType']
-
-
-class AttributeType(enum.Enum):
-    STRING = "STRING"
-    ENUM = "ENUM"
-    NULL = "NULL"
+from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
 
 
-class StringAttributeType:
-    def get_type(self) -> AttributeType:
-        return AttributeType.STRING
+class StringAttributeType(Attribute):
+
+    def __init__(self, key:str, display_name: str, description: str):
+        Attribute.__init__(self, key, display_name, description, AttributeType.STRING)
 
 
 class EnumItem:
@@ -52,18 +47,17 @@ class EnumItem:
         return self._description
 
 
-class EnumAttributeType:
+class EnumAttributeType(Attribute):
 
-    def __init__(self, items: typing.List[EnumItem]):
+    def __init__(self, key: str, display_name: str, description: str, items: typing.List[EnumItem]):
+        Attribute.__init__(self, key, display_name, description, AttributeType.ENUM)
         self._items = items
-
-    def get_type(self) -> AttributeType:
-        return AttributeType.ENUM.value
 
     def get_items(self) -> typing.List[EnumItem]:
         return self._items
 
 
-class NullAttributeType:
-    def get_type(self) -> AttributeType:
-        return AttributeType.NULL
+class NullAttributeType(Attribute):
+
+    def __init__(self, key:str, display_name: str, description: str):
+        Attribute.__init__(self, key, display_name, description, AttributeType.NULL)
