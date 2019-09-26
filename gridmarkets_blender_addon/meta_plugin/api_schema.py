@@ -29,7 +29,7 @@ class APISchema:
         self._job_definitions = job_definitions
         self._project_attributes = project_attributes
 
-    def get_root_project_attribute(self):
+    def get_root_project_attribute(self) -> ProjectAttribute:
         return self.get_project_attribute_with_id("GM_PROJECT_NAME")
 
     def get_job_definitions(self) -> typing.List[JobDefinition]:
