@@ -314,11 +314,11 @@
             </Items>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_79_MAIN_PROJECT_FILE</ProjectAttributeId>
                     <TransitionFormula>2.79</TransitionFormula>
                 </Transition>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_80_MAIN_PROJECT_FILE</ProjectAttributeId>
                     <TransitionFormula>2.80</TransitionFormula>
                 </Transition>
             </Transitions>
