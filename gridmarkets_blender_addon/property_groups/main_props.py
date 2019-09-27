@@ -29,6 +29,8 @@ from gridmarkets_blender_addon.blender_plugin.user_interface.property_groups.use
 from gridmarkets_blender_addon.blender_plugin.remote_project.property_groups.remote_project_props import RemoteProjectProps
 from gridmarkets_blender_addon.blender_plugin.log_item.property_groups.log_item_props import LogItemProps
 from gridmarkets_blender_addon.blender_plugin.log_history_container.property_groups.log_history_container_props import LogHistoryContainerProps
+from gridmarkets_blender_addon.blender_plugin.job_preset.property_groups.job_preset_props import JobPresetProps
+from gridmarkets_blender_addon.blender_plugin.job_preset_container.property_groups.job_preset_container_props import JobPresetContainerprops
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.property_groups.remote_project_container_props import RemoteProjectContainerProps
 from gridmarkets_blender_addon.property_groups.custom_settings_views import CustomSettingsViews
 from gridmarkets_blender_addon.property_groups.vray_props import VRayProps
@@ -165,7 +167,11 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         type=LogHistoryContainerProps,
     )
 
-    vray : bpy.props.PointerProperty(
+    job_preset_container: bpy.props.PointerProperty(
+        type=JobPresetContainerprops,
+    )
+
+    vray: bpy.props.PointerProperty(
         type=VRayProps
     )
 
@@ -235,6 +241,8 @@ classes = (
     RemoteProjectContainerProps,
     LogItemProps,
     LogHistoryContainerProps,
+    JobPresetProps,
+    JobPresetContainerprops,
     GRIDMARKETS_PROPS_Addon_Properties,
 )
 

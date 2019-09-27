@@ -18,19 +18,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.preferences_container import PreferencesContainer as MetaPreferencesContainer
-from gridmarkets_blender_addon.blender_plugin.user_container.user_container import UserContainer
-from gridmarkets_blender_addon.blender_plugin.job_preset_container.job_preset_container import JobPresetContainer
+import bpy
 
 
-class PreferencesContainer(MetaPreferencesContainer):
+class JobPresetProps(bpy.types.PropertyGroup):
 
-    def __init__(self, user_container: UserContainer, job_preset_container: JobPresetContainer):
-        self._user_container = user_container
-        self._job_preset_container = job_preset_container
+    name: bpy.props.StringProperty(
+        name="Name",
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
 
-    def get_user_container(self) -> UserContainer:
-        return self._user_container
-
-    def get_job_preset_container(self) -> JobPresetContainer:
-        return self._job_preset_container
+    id: bpy.props.IntProperty(
+        name="id",
+        description="A arbitrary unique identifier generated locally to differentiate between log items",
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )

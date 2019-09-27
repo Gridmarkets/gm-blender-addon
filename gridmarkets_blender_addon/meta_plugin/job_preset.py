@@ -18,19 +18,24 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.preferences_container import PreferencesContainer as MetaPreferencesContainer
-from gridmarkets_blender_addon.blender_plugin.user_container.user_container import UserContainer
-from gridmarkets_blender_addon.blender_plugin.job_preset_container.job_preset_container import JobPresetContainer
+from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 
 
-class PreferencesContainer(MetaPreferencesContainer):
+class JobPreset:
 
-    def __init__(self, user_container: UserContainer, job_preset_container: JobPresetContainer):
-        self._user_container = user_container
-        self._job_preset_container = job_preset_container
+    def __init__(self, name: str, id: str, job_definition: JobDefinition):
+        self._name = name
+        self._id = id
+        self._job_definition = job_definition
 
-    def get_user_container(self) -> UserContainer:
-        return self._user_container
+    def get_name(self) -> str:
+        return self._name
 
-    def get_job_preset_container(self) -> JobPresetContainer:
-        return self._job_preset_container
+    def set_name(self, name: str) -> None:
+        self._name = name
+
+    def get_id(self) -> str:
+        return self._id
+
+    def get_job_definition(self) -> JobDefinition:
+        return self._job_definition

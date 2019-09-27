@@ -28,9 +28,11 @@ from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoo
 from gridmarkets_blender_addon.blender_plugin.log_history_container.log_history_container import LogHistoryContainer
 from gridmarkets_blender_addon.blender_plugin.preferences_container.preferences_container import PreferencesContainer
 from gridmarkets_blender_addon.blender_plugin.user_container.user_container import UserContainer
+from gridmarkets_blender_addon.blender_plugin.job_preset_container.job_preset_container import JobPresetContainer
 from gridmarkets_blender_addon.blender_plugin.api_client.api_client import APIClient
 from gridmarkets_blender_addon.blender_plugin.user_interface.user_interface import UserInterface
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_project_container import RemoteProjectContainer
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_project_container import \
+    RemoteProjectContainer
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 
 
@@ -40,7 +42,7 @@ class Plugin(MetaPlugin):
         version = bl_info['version']
         self._version = PluginVersion(version[0], version[1], version[2])
         self._logging_coordinator = LoggingCoordinator(LogHistoryContainer())
-        self._preferences_container = PreferencesContainer(UserContainer())
+        self._preferences_container = PreferencesContainer(UserContainer(), JobPresetContainer())
         self._api_client = APIClient()
         self._user_interface = UserInterface()
         self._remote_project_container = RemoteProjectContainer()
