@@ -189,6 +189,14 @@ class XMLAPISchemaParser:
                                     attribute_inference_sources,
                                     attribute_is_optional)
 
+        elif attribute_type == AttributeType.BOOLEAN.value:
+            return BooleanJobAttribute(attribute_key,
+                                       attribute_display_name,
+                                       attribute_description,
+                                       attribute_inference_sources,
+                                       attribute_is_optional,
+                                       default_value=job_attribute_default_value)
+
         else:
             raise ValueError("Unrecognised attribute type.")
 
@@ -332,6 +340,15 @@ class XMLAPISchemaParser:
                                         project_attribute_description,
                                         project_attribute_transitions,
                                         project_attribute_compatible_job_definitions)
+
+        elif project_attribute_type == AttributeType.BOOLEAN.value:
+            return BooleanProjectAttribute(project_attribute_id,
+                                           project_attribute_key,
+                                           project_attribute_display_name,
+                                           project_attribute_description,
+                                           project_attribute_transitions,
+                                           project_attribute_compatible_job_definitions,
+                                           default_value=project_attribute_default_value)
         else:
             raise ValueError("Unrecognised attribute type.")
 

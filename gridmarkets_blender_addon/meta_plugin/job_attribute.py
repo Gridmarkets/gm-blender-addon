@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute']
+__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute', 'BooleanJobAttribute']
 
 from abc import ABC
 import typing
@@ -80,4 +80,17 @@ class NullJobAttribute(NullAttributeType, JobAttribute):
                  inference_sources: typing.List[AttributeInferenceSource],
                  is_optional: bool):
         NullAttributeType.__init__(self, key, display_name, description)
+        JobAttribute.__init__(self, inference_sources, is_optional)
+
+
+class BooleanJobAttribute(BooleanAttributeType, JobAttribute):
+
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 inference_sources: typing.List[AttributeInferenceSource],
+                 is_optional: bool,
+                 default_value: typing.Optional[bool] = False):
+        BooleanAttributeType.__init__(self, key, display_name, description, default_value=default_value)
         JobAttribute.__init__(self, inference_sources, is_optional)

@@ -26,6 +26,7 @@ class AttributeType(enum.Enum):
     STRING = "STRING"
     ENUM = "ENUM"
     NULL = "NULL"
+    BOOLEAN = "BOOLEAN"
 
 
 class Attribute(ABC):
