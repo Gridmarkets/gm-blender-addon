@@ -51,8 +51,9 @@ class StringJobAttribute(StringAttributeType, JobAttribute):
                  display_name: str,
                  description: str,
                  inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool):
-        StringAttributeType.__init__(self, key, display_name, description)
+                 is_optional: bool,
+                 default_value: typing.Optional[str] = ""):
+        StringAttributeType.__init__(self, key, display_name, description, default_value=default_value)
         JobAttribute.__init__(self, inference_sources, is_optional)
 
 
@@ -64,8 +65,9 @@ class EnumJobAttribute(EnumAttributeType, JobAttribute):
                  description: str,
                  inference_sources: typing.List[AttributeInferenceSource],
                  is_optional: bool,
-                 items: typing.List[EnumItem]):
-        EnumAttributeType.__init__(self, key, display_name, description, items)
+                 items: typing.List[EnumItem],
+                 default_value: typing.Optional[str] = None):
+        EnumAttributeType.__init__(self, key, display_name, description, items, default_value=default_value)
         JobAttribute.__init__(self, inference_sources, is_optional)
 
 

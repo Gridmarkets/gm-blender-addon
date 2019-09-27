@@ -64,8 +64,9 @@ class StringProjectAttribute(StringAttributeType, ProjectAttribute):
                  display_name: str,
                  description: str,
                  transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition]):
-        StringAttributeType.__init__(self, key, display_name, description)
+                 compatible_job_definitions: typing.List[JobDefinition],
+                 default_value: typing.Optional[str] = ""):
+        StringAttributeType.__init__(self, key, display_name, description, default_value=default_value)
         ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
 
 
@@ -78,8 +79,9 @@ class EnumProjectAttribute(EnumAttributeType, ProjectAttribute):
                  description: str,
                  transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition],
-                 items: typing.List[EnumItem]):
-        EnumAttributeType.__init__(self, key, display_name, description, items)
+                 items: typing.List[EnumItem],
+                 default_value: typing.Optional[str] = None):
+        EnumAttributeType.__init__(self, key, display_name, description, items, default_value=default_value)
         ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
 
 

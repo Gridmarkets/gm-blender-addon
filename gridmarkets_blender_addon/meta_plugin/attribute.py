@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import enum
+from abc import ABC, abstractmethod
 
 
 class AttributeType(enum.Enum):
@@ -27,7 +28,7 @@ class AttributeType(enum.Enum):
     NULL = "NULL"
 
 
-class Attribute:
+class Attribute(ABC):
 
     def __init__(self, key:str, display_name: str, description: str, attribute_type: AttributeType):
         self._key = key
@@ -46,3 +47,7 @@ class Attribute:
 
     def get_type(self) -> AttributeType:
         return self._attribute_type
+
+    @abstractmethod
+    def get_default_value(self) -> any:
+        raise NotImplementedError

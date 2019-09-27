@@ -98,6 +98,7 @@ TAG_INFERENCE_SOURCE = "InferenceSource"
 TAG_ATTRIBUTE_KEY_ATTRIBUTE = "key"
 TAG_PROJECT_ATTRIBUTES = "ProjectAttributes"
 TAG_PROJECT_ATTRIBUTE = "ProjectAttribute"
+TAG_DEFAULT_VALUE = "DefaultValue"
 TAG_TRANSITIONS = "Transitions"
 TAG_TRANSITION = "Transition"
 TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
@@ -152,6 +153,13 @@ class XMLAPISchemaParser:
         inference_sources_element = get_sub_element(job_attribute_element, TAG_INFERENCE_SOURCES)
         attribute_inference_sources = XMLAPISchemaParser._parse_job_inference_sources(inference_sources_element)
 
+        # get default value (optional)
+        job_attribute_default_value_elements = job_attribute_element.findall(TAG_DEFAULT_VALUE)
+        if job_attribute_default_value_elements:
+            job_attribute_default_value = job_attribute_default_value_elements[0].text
+        else:
+            job_attribute_default_value = None
+
         attribute_type = get_text(job_attribute_element, TAG_TYPE)
 
         if attribute_type == AttributeType.STRING.value:
@@ -159,7 +167,8 @@ class XMLAPISchemaParser:
                                       attribute_display_name,
                                       attribute_description,
                                       attribute_inference_sources,
-                                      attribute_is_optional)
+                                      attribute_is_optional,
+                                      default_value=job_attribute_default_value)
 
         elif attribute_type == AttributeType.ENUM.value:
             enum_items_element = get_sub_element(job_attribute_element, TAG_ITEMS)
@@ -170,7 +179,8 @@ class XMLAPISchemaParser:
                                     attribute_description,
                                     attribute_inference_sources,
                                     attribute_is_optional,
-                                    enum_items)
+                                    enum_items,
+                                    default_value=job_attribute_default_value)
 
         elif attribute_type == AttributeType.NULL.value:
             return NullJobAttribute(attribute_key,
@@ -275,6 +285,13 @@ class XMLAPISchemaParser:
         project_attribute_description = get_text(project_attribute_element, TAG_DESCRIPTION)
         project_attribute_type = get_text(project_attribute_element, TAG_TYPE)
 
+        # get default value (optional)
+        project_attribute_default_value_elements = project_attribute_element.findall(TAG_DEFAULT_VALUE)
+        if project_attribute_default_value_elements:
+            project_attribute_default_value = project_attribute_default_value_elements[0].text
+        else:
+            project_attribute_default_value = None
+
         # parse transitions
         transitions_element = get_sub_element(project_attribute_element, TAG_TRANSITIONS)
         project_attribute_transitions = XMLAPISchemaParser._parse_transitions(transitions_element, project_attributes)
@@ -291,7 +308,8 @@ class XMLAPISchemaParser:
                                           project_attribute_display_name,
                                           project_attribute_description,
                                           project_attribute_transitions,
-                                          project_attribute_compatible_job_definitions)
+                                          project_attribute_compatible_job_definitions,
+                                          default_value=project_attribute_default_value)
 
         elif project_attribute_type == AttributeType.ENUM.value:
 
@@ -304,7 +322,8 @@ class XMLAPISchemaParser:
                                         project_attribute_description,
                                         project_attribute_transitions,
                                         project_attribute_compatible_job_definitions,
-                                        enum_items)
+                                        enum_items,
+                                        default_value=project_attribute_default_value)
 
         elif project_attribute_type == AttributeType.NULL.value:
             return NullProjectAttribute(project_attribute_id,

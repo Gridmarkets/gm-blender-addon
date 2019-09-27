@@ -225,6 +225,7 @@
                     <Description>Blender Cycles.</Description>
                 </Item>
             </Items>
+            <DefaultValue>CYCLES</DefaultValue>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_CYCLES_PROJECT</ProjectAttributeId>
@@ -254,6 +255,7 @@
                     <Description>Blender Eevee.</Description>
                 </Item>
             </Items>
+            <DefaultValue>CYCLES</DefaultValue>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_80_CYCLES_PROJECT</ProjectAttributeId>
@@ -312,6 +314,7 @@
                     <Description>Blender 2.80.</Description>
                 </Item>
             </Items>
+            <DefaultValue>2.80</DefaultValue>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_MAIN_PROJECT_FILE</ProjectAttributeId>
@@ -397,6 +400,7 @@
                     <Description>V-Ray 4.10.02.</Description>
                 </Item>
             </Items>
+            <DefaultValue>4.10.02</DefaultValue>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_SCENE_FILE</ProjectAttributeId>
