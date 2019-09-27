@@ -279,7 +279,7 @@ class XMLAPISchemaParser:
 
         # the project key is the same as it's id by default unless an alternative is provided
         key_element = project_attribute_element.find(TAG_KEY)
-        project_attribute_key = key_element.text if key_element else project_attribute_id
+        project_attribute_key = key_element.text if key_element is not None else project_attribute_id
 
         project_attribute_display_name = get_text(project_attribute_element, TAG_DISPLAY_NAME)
         project_attribute_description = get_text(project_attribute_element, TAG_DESCRIPTION)
