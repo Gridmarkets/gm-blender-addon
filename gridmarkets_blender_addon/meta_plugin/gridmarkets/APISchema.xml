@@ -150,26 +150,15 @@
                 </Items>
             </Attribute>
 
-            <Attribute key="render_device">
-                <DisplayName>Render Device</DisplayName>
-                <Description>The render device to use when rendering the scene.</Description>
+            <Attribute key="gpu">
+                <DisplayName>Use GPU Machine</DisplayName>
+                <Description>Defines if a GPU is required for running the job. If false the job will be rendered on a CPU machine. If true a GPU machine will be used.</Description>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>CPU</Key>
-                        <DisplayName>CPU</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>GPU</Key>
-                        <DisplayName>GPU</DisplayName>
-                        <Description></Description>
-                    </Item>
-                </Items>
+                <Type>BOOLEAN</Type>
+                <DefaultValue>False</DefaultValue>
             </Attribute>
 
         </JobDefinition>
