@@ -24,7 +24,7 @@ from gridmarkets_blender_addon.layouts.submission_settings import draw_submissio
 from gridmarkets_blender_addon.layouts.preferences import draw_preferences
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_container import \
     draw_remote_project_container
-from gridmarkets_blender_addon.layouts.jobs import draw_jobs
+from gridmarkets_blender_addon.blender_plugin.job_preset_container.layouts.draw_job_preset_container import draw_job_preset_container
 
 from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
     draw_logging_console
@@ -65,7 +65,7 @@ def draw_body(self, context):
         self.layout.separator(factor=_CONSOLE_SEPARATOR_SPACING)
         draw_logging_console(self, context)
     elif props.tab_options == constants.TAB_JOB_PRESETS:
-        draw_jobs(self, context)
+        draw_job_preset_container(self, context)
     elif props.tab_options == constants.TAB_CREDENTIALS:
         draw_preferences(self, context)
     elif props.tab_options == constants.TAB_LOGGING:

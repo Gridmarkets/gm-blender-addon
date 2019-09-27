@@ -123,7 +123,7 @@ def _draw_view(self, context, operator_id, view_name, draw_handler):
         draw_handler(SimpleNamespace(layout=col), context)
 
 
-def draw_jobs(self, context):
+def draw_job_preset_container(self, context):
     layout = self.layout
     props = context.scene.props
     job_count = len(props.jobs)
