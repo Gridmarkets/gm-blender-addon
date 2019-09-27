@@ -16,24 +16,59 @@
                 <Type>STRING</Type>
             </Attribute>
 
-            <Attribute key="frame_ranges">
-                <DisplayName>Frame ranges</DisplayName>
-                <Description>The frame ranges to render.</Description>
-                <Optional>True</Optional>
+            <Attribute key="app">
+                <DisplayName>Product Type</DisplayName>
+                <Description>The name of the product / app to use.</Description>
+                <Optional>False</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
                 <Type>STRING</Type>
+                <DefaultValue>blender</DefaultValue>
             </Attribute>
 
-            <Attribute key="output_path">
-                <DisplayName>Output Path</DisplayName>
-                <Description>The path to output the render results to.</Description>
+            <Attribute key="app_version">
+                <DisplayName>Product Type</DisplayName>
+                <Description>The version of the product / app to use.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>2.80</DefaultValue>
+            </Attribute>
+
+            <Attribute key="operation">
+                <DisplayName>Operation</DisplayName>
+                <Description>The operation supported by the specified product version to carry out.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>render</DefaultValue>
+            </Attribute>
+
+            <Attribute key="path">
+                <DisplayName>Render File</DisplayName>
+                <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue></DefaultValue>
+            </Attribute>
+
+            <Attribute key="frames">
+                <DisplayName>Frame Ranges</DisplayName>
+                <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
                 <Type>STRING</Type>
+                <DefaultValue>1 1 1</DefaultValue>
             </Attribute>
 
             <Attribute key="output_prefix">
@@ -44,6 +79,7 @@
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
                 <Type>STRING</Type>
+                <DefaultValue>GM_</DefaultValue>
             </Attribute>
 
             <Attribute key="output_format">
@@ -131,6 +167,7 @@
                         <Description></Description>
                     </Item>
                 </Items>
+                <DefaultValue>PNG</DefaultValue>
             </Attribute>
 
             <Attribute key="render_engine">
@@ -148,6 +185,7 @@
                         <Description></Description>
                     </Item>
                 </Items>
+                <DefaultValue>CYCLES</DefaultValue>
             </Attribute>
 
             <Attribute key="gpu">
