@@ -18,7 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType', 'BooleanAttributeType']
+__all__ = ['StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType', 'BooleanAttributeType',
+           'IntegerAttributeType']
 
 import typing
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
@@ -106,4 +107,18 @@ class BooleanAttributeType(Attribute):
         self._default_value = default_value
 
     def get_default_value(self) -> bool:
+        return self._default_value
+
+
+class IntegerAttributeType(Attribute):
+
+    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[int] = 0):
+        Attribute.__init__(self, key, display_name, description, AttributeType.INTEGER)
+
+        if default_value is None:
+            default_value = 0
+
+        self._default_value = default_value
+
+    def get_default_value(self) -> int:
         return self._default_value

@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 __all__ = ['ProjectAttribute', 'StringProjectAttribute', 'EnumProjectAttribute', 'NullProjectAttribute',
-           'BooleanProjectAttribute']
+           'BooleanProjectAttribute', 'IntegerProjectAttribute']
 
 from abc import ABC
 import typing
@@ -110,4 +110,18 @@ class BooleanProjectAttribute(BooleanAttributeType, ProjectAttribute):
                  compatible_job_definitions: typing.List[JobDefinition],
                  default_value: typing.Optional[bool] = False):
         BooleanAttributeType.__init__(self, key, display_name, description, default_value=default_value)
+        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
+
+
+class IntegerProjectAttribute(IntegerAttributeType, ProjectAttribute):
+
+    def __init__(self,
+                 id: str,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 transitions: typing.List[Transition],
+                 compatible_job_definitions: typing.List[JobDefinition],
+                 default_value: typing.Optional[int] = False):
+        IntegerAttributeType.__init__(self, key, display_name, description, default_value=default_value)
         ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)

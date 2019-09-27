@@ -200,6 +200,122 @@
             </Attribute>
 
         </JobDefinition>
+
+        <JobDefinition id="VRAY">
+
+            <DisplayName>V-Ray</DisplayName>
+
+            <Attribute key="name">
+                <DisplayName>Name</DisplayName>
+                <Description>The name of the job.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+            </Attribute>
+
+            <Attribute key="app">
+                <DisplayName>Product Type</DisplayName>
+                <Description>The name of the product / app to use.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>vray</DefaultValue>
+            </Attribute>
+
+            <Attribute key="app_version">
+                <DisplayName>Product Type</DisplayName>
+                <Description>The version of the product / app to use.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>4.10.02</DefaultValue>
+            </Attribute>
+
+            <Attribute key="operation">
+                <DisplayName>Operation</DisplayName>
+                <Description>The operation supported by the specified product version to carry out.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>render</DefaultValue>
+            </Attribute>
+
+            <Attribute key="path">
+                <DisplayName>Render File</DisplayName>
+                <Description>The path to your .vrscene file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.vrscene'.</Description>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue></DefaultValue>
+            </Attribute>
+
+            <Attribute key="frames">
+                <DisplayName>Frame Ranges</DisplayName>
+                <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>1 1 1</DefaultValue>
+            </Attribute>
+
+            <Attribute key="output_Width">
+                <DisplayName>Output Width</DisplayName>
+                <Description>Defines the render output width</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>INTEGER</Type>
+                <DefaultValue>1920</DefaultValue>
+            </Attribute>
+
+            <Attribute key="output_height">
+                <DisplayName>Output Height</DisplayName>
+                <Description>Defines the render output height</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>INTEGER</Type>
+                <DefaultValue>1080</DefaultValue>
+            </Attribute>
+
+            <Attribute key="output_prefix">
+                <DisplayName>Output Prefix</DisplayName>
+                <Description>The prefix to add to render results.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>GM_</DefaultValue>
+            </Attribute>
+
+            <Attribute key="output_format">
+                <DisplayName>Output Format</DisplayName>
+                <Description>The output format to use when rendering the scene.</Description>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+                <Type>STRING</Type>
+                <DefaultValue>PNG</DefaultValue>
+            </Attribute>
+
+        </JobDefinition>
+
     </JobDefinitions>
 
     <ProjectAttributes>

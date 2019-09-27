@@ -18,12 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute', 'BooleanJobAttribute']
+__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute', 'BooleanJobAttribute',
+           'IntegerJobAttribute']
 
 from abc import ABC
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 
@@ -93,4 +93,17 @@ class BooleanJobAttribute(BooleanAttributeType, JobAttribute):
                  is_optional: bool,
                  default_value: typing.Optional[bool] = False):
         BooleanAttributeType.__init__(self, key, display_name, description, default_value=default_value)
+        JobAttribute.__init__(self, inference_sources, is_optional)
+
+
+class IntegerJobAttribute(IntegerAttributeType, JobAttribute):
+
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 inference_sources: typing.List[AttributeInferenceSource],
+                 is_optional: bool,
+                 default_value: typing.Optional[int] = False):
+        IntegerAttributeType.__init__(self, key, display_name, description, default_value=default_value)
         JobAttribute.__init__(self, inference_sources, is_optional)
