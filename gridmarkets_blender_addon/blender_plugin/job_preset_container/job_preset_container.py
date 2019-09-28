@@ -51,7 +51,7 @@ class JobPresetContainer(MetaJobPresetContainer):
 
             job_preset_items = bpy.context.scene.props.job_preset_container.items
             job_preset_item = job_preset_items.add()
-            job_preset_item.id = utils.get_unique_id(job_preset_items)
+            job_preset_item.id = item.get_id()
             job_preset_item.name = item.get_name()
 
             utils_blender.force_redraw_addon()
