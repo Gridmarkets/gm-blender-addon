@@ -33,7 +33,7 @@ class JobPresetProps(bpy.types.PropertyGroup):
         job_preset_container = plugin.get_preferences_container().get_job_preset_container()
 
         for job_preset in job_preset_container.get_all():
-            if job_preset.get_id() == self.id:
+            if job_preset.get_id() == self.unique_identifier:
                 return job_preset.get_name()
 
     def _set_name(self, value):
@@ -44,7 +44,7 @@ class JobPresetProps(bpy.types.PropertyGroup):
             job_preset_container = plugin.get_preferences_container().get_job_preset_container()
 
             for job_preset in job_preset_container.get_all():
-                if job_preset.get_id() == self.id:
+                if job_preset.get_id() == self.unique_identifier:
                     job_preset.set_name(value)
                     break
 
@@ -52,6 +52,10 @@ class JobPresetProps(bpy.types.PropertyGroup):
         name="Name",
         get=_get_name,
         set=_set_name,
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    unique_identifier: bpy.props.StringProperty(
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
