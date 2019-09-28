@@ -68,6 +68,10 @@ def get_all_sub_elements_text(element: ET.Element, tag_name: str, expect_at_leas
 
 def get_text(element: ET.Element, tag_name: str, expect_unique_tag: bool = True) -> str:
     element = get_sub_element(element, tag_name, expect_unique_tag)
+
+    if element.text is None:
+        return ""
+
     return element.text
 
 
