@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+
 def get_unique_id(objects, attribute_name='id'):
     """ Returns an integer ID that has not been used by any other object in the provided list.
 
@@ -41,6 +42,7 @@ def get_unique_id(objects, attribute_name='id'):
 
     # find a number which has not been used yet
     unused_id = 0
+
     while unused_id in used_ids:
         unused_id = unused_id + 1
 
