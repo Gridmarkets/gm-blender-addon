@@ -199,7 +199,7 @@ class XMLAPISchemaParser:
                                        attribute_description,
                                        attribute_inference_sources,
                                        attribute_is_optional,
-                                       default_value=bool(job_attribute_default_value))
+                                       default_value=to_bool(job_attribute_default_value))
 
         elif attribute_type == AttributeType.INTEGER.value:
             return IntegerJobAttribute(attribute_key,
@@ -360,7 +360,7 @@ class XMLAPISchemaParser:
                                            project_attribute_description,
                                            project_attribute_transitions,
                                            project_attribute_compatible_job_definitions,
-                                           default_value=bool(project_attribute_default_value))
+                                           default_value=to_bool(project_attribute_default_value))
 
         elif project_attribute_type == AttributeType.INTEGER.value:
             return IntegerProjectAttribute(project_attribute_id,
