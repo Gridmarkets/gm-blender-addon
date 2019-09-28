@@ -18,19 +18,23 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+
 class PRODUCTS:
     BLENDER = "blender"
     VRAY = "vray"
+
 
 class BLENDER_VERSIONS:
     V_2_81A = "2.81a"
     V_2_80 = "2.80"
     V_2_79B = "2.79b"
 
+
 class BLENDER_ENGINES:
     CYCLES = "CYCLES"
     EEVEE = "EEVEE"
     INTERNAL = "INTERNAL"
+
 
 class VRAY_VERSIONS:
     V_3_60_03 = "3.60.03"
@@ -39,3 +43,7 @@ class VRAY_VERSIONS:
     V_4_02_05 = "4.02.05"
     V_4_10_01 = "4.10.01"
     V_4_10_02 = "4.10.02"
+
+
+class ATTRIBUTE_NAMES:
+    PRODUCT = "app"
