@@ -31,22 +31,22 @@ class JobPresetContainerprops(bpy.types.PropertyGroup):
         if plugin is None:
             return -1
 
-        log_history_container = plugin.get_preferences_container().get_job_preset_container()
-        focused_item = log_history_container.get_focused_item()
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+        focused_item = job_preset_container.get_focused_item()
 
         if focused_item is None:
             return -1
 
-        return log_history_container.get_index(focused_item)
+        return job_preset_container.get_index(focused_item)
 
     def _set_focused_item(self, value):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin_if_initialised()
 
         if plugin:
-            log_history_container = plugin.get_logging_coordinator().get_log_history_container()
-            item = log_history_container.get_at(value)
-            log_history_container.focus_item(item, update_props=False)
+            job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+            item = job_preset_container.get_at(value)
+            job_preset_container.focus_item(item, update_props=False)
 
     focused_item: bpy.props.IntProperty(
         options={'SKIP_SAVE', 'HIDDEN'},
