@@ -23,8 +23,35 @@ import bpy
 
 class JobPresetProps(bpy.types.PropertyGroup):
 
+    def _get_name(self):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin_if_initialised()
+
+        if plugin is None:
+            return ""
+
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+        for job_preset in job_preset_container.get_all():
+            if job_preset.get_id() == self.id:
+                return job_preset.get_name()
+
+    def _set_name(self, value):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin_if_initialised()
+
+        if plugin:
+            job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+            for job_preset in job_preset_container.get_all():
+                if job_preset.get_id() == self.id:
+                    job_preset.set_name(value)
+                    break
+
     name: bpy.props.StringProperty(
         name="Name",
+        get=_get_name,
+        set=_set_name,
         options={'SKIP_SAVE', 'HIDDEN'}
     )
 
