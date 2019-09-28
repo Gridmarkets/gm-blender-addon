@@ -30,6 +30,7 @@ class JobPreset(MetaJobPreset):
     def _reset_properties_to_default(self):
         import bpy
         from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
+        from gridmarkets_blender_addon.blender_plugin.job_attribute.job_attribute import get_default_value
 
         scene = bpy.context.scene
         job_preset_props = getattr(scene, self.get_prop_id())
@@ -37,12 +38,7 @@ class JobPreset(MetaJobPreset):
         job_definition = self.get_job_definition()
         for job_attribute in job_definition.get_attributes():
             if job_attribute.get_type() != AttributeType.NULL:
-                if job_attribute.get_type() == AttributeType.ENUM:
-                    default_value = job_attribute.get_default_value().get_key()
-                else:
-                    default_value = job_attribute.get_default_value()
-
-                setattr(job_preset_props, job_attribute.get_key(), default_value)
+                setattr(job_preset_props, job_attribute.get_key(), get_default_value(job_attribute))
 
     def _register_props(self):
         import bpy
