@@ -27,6 +27,23 @@ class JobPreset(MetaJobPreset):
         MetaJobPreset.__init__(self, name, id, job_definition)
         self._register_props()
 
+    def _reset_properties_to_default(self):
+        import bpy
+        from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
+
+        scene = bpy.context.scene
+        job_preset_props = getattr(scene, self.get_prop_id())
+
+        job_definition = self.get_job_definition()
+        for job_attribute in job_definition.get_attributes():
+            if job_attribute.get_type() != AttributeType.NULL:
+                if job_attribute.get_type() == AttributeType.ENUM:
+                    default_value = job_attribute.get_default_value().get_key()
+                else:
+                    default_value = job_attribute.get_default_value()
+
+                setattr(job_preset_props, job_attribute.get_key(), default_value)
+
     def _register_props(self):
         import bpy
         from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumAttributeType
@@ -86,18 +103,23 @@ class JobPreset(MetaJobPreset):
                 )
 
         # register property group
-        GRIDMARKETS_PROPS_job_preset_attributes = type("GRIDMARKETS_PROPS_job_preset_attributes",
-                                                       (bpy.types.PropertyGroup,),
-                                                       {"__annotations__": properties})
+        self._property_group_class = type("GRIDMARKETS_PROPS_job_preset_attributes",
+                                          (bpy.types.PropertyGroup,),
+                                          {"__annotations__": properties})
 
-
-        print(properties)
-
-        bpy.utils.register_class(GRIDMARKETS_PROPS_job_preset_attributes)
+        bpy.utils.register_class(self._property_group_class)
 
         setattr(bpy.types.Scene,
                 self.get_prop_id(),
-                bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_job_preset_attributes))
+                bpy.props.PointerProperty(type=self._property_group_class))
+
+    def unregister_props(self):
+        import bpy
+
+        # reset values to their defaults otherwise new JobPresets with the same id will use these old values
+        self._reset_properties_to_default()
+        bpy.utils.unregister_class(self._property_group_class)
+        delattr(bpy.types.Scene, self.get_prop_id())
 
     def get_prop_id(self):
         return "job_preset_" + self.get_id()
