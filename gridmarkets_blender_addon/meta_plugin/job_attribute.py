@@ -18,92 +18,30 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['JobAttribute', 'StringJobAttribute', 'EnumJobAttribute', 'NullJobAttribute', 'BooleanJobAttribute',
-           'IntegerJobAttribute']
+__all__ = ['JobAttribute']
 
-from abc import ABC
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.attribute_types import *
+from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 
 
-class JobAttribute(ABC):
+class JobAttribute:
 
     def __init__(self,
+                 attribute: Attribute,
                  inference_sources: typing.List[AttributeInferenceSource],
                  is_optional: bool):
 
+        self._attribute = attribute
         self._inference_sources = inference_sources
         self._is_optional = is_optional
+
+    def get_attribute(self) -> Attribute:
+        return self._attribute
 
     def is_optional(self) -> bool:
         return self._is_optional
 
     def get_inference_sources(self) -> typing.List[AttributeInferenceSource]:
         return self._inference_sources
-
-
-class StringJobAttribute(StringAttributeType, JobAttribute):
-
-    def __init__(self,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool,
-                 default_value: typing.Optional[str] = ""):
-        StringAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        JobAttribute.__init__(self, inference_sources, is_optional)
-
-
-class EnumJobAttribute(EnumAttributeType, JobAttribute):
-
-    def __init__(self,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool,
-                 items: typing.List[EnumItem],
-                 default_value: typing.Optional[str] = None):
-        EnumAttributeType.__init__(self, key, display_name, description, items, default_value=default_value)
-        JobAttribute.__init__(self, inference_sources, is_optional)
-
-
-class NullJobAttribute(NullAttributeType, JobAttribute):
-
-    def __init__(self,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool):
-        NullAttributeType.__init__(self, key, display_name, description)
-        JobAttribute.__init__(self, inference_sources, is_optional)
-
-
-class BooleanJobAttribute(BooleanAttributeType, JobAttribute):
-
-    def __init__(self,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool,
-                 default_value: typing.Optional[bool] = False):
-        BooleanAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        JobAttribute.__init__(self, inference_sources, is_optional)
-
-
-class IntegerJobAttribute(IntegerAttributeType, JobAttribute):
-
-    def __init__(self,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: typing.List[AttributeInferenceSource],
-                 is_optional: bool,
-                 default_value: typing.Optional[int] = False):
-        IntegerAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        JobAttribute.__init__(self, inference_sources, is_optional)

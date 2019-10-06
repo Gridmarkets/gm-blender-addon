@@ -18,28 +18,29 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['ProjectAttribute', 'StringProjectAttribute', 'EnumProjectAttribute', 'NullProjectAttribute',
-           'BooleanProjectAttribute', 'IntegerProjectAttribute']
+__all__ = ['ProjectAttribute']
 
-from abc import ABC
 import typing
 
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
 
-class ProjectAttribute(ABC):
+class ProjectAttribute:
 
-    def __init__(self, id: str, transitions: typing.List[Transition],
+    def __init__(self, id: str, attribute: Attribute, transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition]):
         self._id = id
+        self._attribute = attribute
         self._transitions = transitions
         self._compatible_job_definitions = compatible_job_definitions
 
     def get_id(self) -> str:
         return self._id
+
+    def get_attribute(self) -> Attribute:
+        return self._attribute
 
     def has_transitions(self) -> bool:
         return len(self._transitions) > 0
@@ -55,73 +56,3 @@ class ProjectAttribute(ABC):
 
     def get_children(self) -> typing.List['ProjectAttribute']:
         return list(map(lambda x: x.get_project_attribute(), self.get_transitions()))
-
-
-class StringProjectAttribute(StringAttributeType, ProjectAttribute):
-
-    def __init__(self,
-                 id: str,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition],
-                 default_value: typing.Optional[str] = ""):
-        StringAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
-
-
-class EnumProjectAttribute(EnumAttributeType, ProjectAttribute):
-
-    def __init__(self,
-                 id: str,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition],
-                 items: typing.List[EnumItem],
-                 default_value: typing.Optional[str] = None):
-        EnumAttributeType.__init__(self, key, display_name, description, items, default_value=default_value)
-        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
-
-
-class NullProjectAttribute(NullAttributeType, ProjectAttribute):
-
-    def __init__(self,
-                 id: str,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition]):
-        NullAttributeType.__init__(self, key, display_name, description)
-        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
-
-
-class BooleanProjectAttribute(BooleanAttributeType, ProjectAttribute):
-
-    def __init__(self,
-                 id: str,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition],
-                 default_value: typing.Optional[bool] = False):
-        BooleanAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
-
-
-class IntegerProjectAttribute(IntegerAttributeType, ProjectAttribute):
-
-    def __init__(self,
-                 id: str,
-                 key: str,
-                 display_name: str,
-                 description: str,
-                 transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition],
-                 default_value: typing.Optional[int] = False):
-        IntegerAttributeType.__init__(self, key, display_name, description, default_value=default_value)
-        ProjectAttribute.__init__(self, id, transitions, compatible_job_definitions)
