@@ -37,8 +37,9 @@ class JobPreset(MetaJobPreset):
 
         job_definition = self.get_job_definition()
         for job_attribute in job_definition.get_attributes():
-            if job_attribute.get_type() != AttributeType.NULL:
-                setattr(job_preset_props, job_attribute.get_key(), get_default_value(job_attribute))
+            attribute = job_attribute.get_attribute()
+            if attribute.get_type() != AttributeType.NULL:
+                setattr(job_preset_props, attribute.get_key(), get_default_value(job_attribute))
 
     def _register_props(self):
         import bpy
@@ -50,11 +51,12 @@ class JobPreset(MetaJobPreset):
 
         for job_attribute in job_definition.get_attributes():
 
-            key = job_attribute.get_key()
-            display_name = job_attribute.get_display_name()
-            description = job_attribute.get_description()
-            attribute_type = job_attribute.get_type()
-            default_value = job_attribute.get_default_value()
+            attribute = job_attribute.get_attribute()
+            key = attribute.get_key()
+            display_name = attribute.get_display_name()
+            description = attribute.get_description()
+            attribute_type = attribute.get_type()
+            default_value = attribute.get_default_value()
 
             if attribute_type == AttributeType.STRING:
                 properties[key] = bpy.props.StringProperty(
@@ -66,7 +68,7 @@ class JobPreset(MetaJobPreset):
 
             elif attribute_type == AttributeType.ENUM:
 
-                enum_attribute: EnumAttributeType = job_attribute
+                enum_attribute: EnumAttributeType = attribute
 
                 items = []
                 enum_items = enum_attribute.get_items()

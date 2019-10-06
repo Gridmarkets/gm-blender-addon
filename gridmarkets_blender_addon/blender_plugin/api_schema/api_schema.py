@@ -31,7 +31,7 @@ def get_icon_for_job_definition(job_definition: JobDefinition) -> (str, int):
     icon_value = 0
 
     if product_attribute:
-        product = product_attribute.get_default_value()
+        product = product_attribute.get_attribute().get_default_value()
         preview_collection = icon_loader.IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
 
         if product == api_constants.PRODUCTS.BLENDER:
