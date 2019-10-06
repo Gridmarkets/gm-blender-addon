@@ -39,8 +39,8 @@ class JobDefinition:
         return self._attributes
 
     def get_attribute_with_key(self, key: str) -> typing.Optional[JobAttribute]:
-        for attribute in self.get_attributes():
-            if attribute.get_key() == key:
-                return attribute
+        for job_attribute in self.get_attributes():
+            if job_attribute.get_attribute().get_key() == key:
+                return job_attribute
 
         return None
