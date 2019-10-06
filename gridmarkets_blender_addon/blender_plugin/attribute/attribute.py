@@ -18,13 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
-def get_default_value(job_attribute: JobAttribute) -> any:
+def get_default_value(attribute: Attribute) -> any:
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
 
-    attribute = job_attribute.get_attribute()
     attribute_type: AttributeType = attribute.get_type()
 
     if attribute_type == AttributeType.ENUM:
