@@ -77,7 +77,7 @@ class EnumAttributeType(Attribute):
                     self._default_value = item
                     break
             else:
-                raise ValueError("Default enum value must be a valid enum option, not '" + self._default_value + "'")
+                raise ValueError("Default enum value must be a valid enum option, not '" + str(default_value) + "'")
 
     def get_default_value(self) -> EnumItem:
         return self._default_value
