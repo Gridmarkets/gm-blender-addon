@@ -20,9 +20,10 @@
 
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumItem
-from gridmarkets_blender_addon.meta_plugin.job_attribute import *
-from gridmarkets_blender_addon.meta_plugin.project_attribute import *
+from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import *
+from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
@@ -97,6 +98,7 @@ TAG_TYPE = "Type"
 TAG_ITEMS = "Items"
 TAG_KEY = "Key"
 TAG_ATTRIBUTE = "Attribute"
+TAG_JOB_ATTRIBUTE = "JobAttribute"
 TAG_INFERENCE_SOURCES = "InferenceSources"
 TAG_INFERENCE_SOURCE = "InferenceSource"
 TAG_ATTRIBUTE_KEY_ATTRIBUTE = "key"
@@ -130,6 +132,56 @@ class XMLAPISchemaParser:
         return enum_items
 
     @staticmethod
+    def _parse_attribute(attribute_element: ET.Element) -> Attribute:
+        attribute_key = get_text(attribute_element, TAG_KEY, expect_unique_tag=True)
+        attribute_display_name = get_text(attribute_element, TAG_DISPLAY_NAME, expect_unique_tag=True)
+        attribute_description = get_text(attribute_element, TAG_DESCRIPTION, expect_unique_tag=True)
+        attribute_type = get_text(attribute_element, TAG_TYPE, expect_unique_tag=True)
+
+        # get default value (optional)
+        attribute_default_value_elements = attribute_element.findall(TAG_DEFAULT_VALUE)
+        if attribute_default_value_elements:
+            attribute_default_value = attribute_default_value_elements[0].text
+        else:
+            attribute_default_value = None
+
+        if attribute_type == AttributeType.STRING.value:
+            return StringAttributeType(attribute_key,
+                                       attribute_display_name,
+                                       attribute_description,
+                                       default_value=attribute_default_value)
+
+        elif attribute_type == AttributeType.ENUM.value:
+            enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
+            enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)
+
+            return EnumAttributeType(attribute_key,
+                                     attribute_display_name,
+                                     attribute_description,
+                                     enum_items,
+                                     default_value=attribute_default_value)
+
+        elif attribute_type == AttributeType.NULL.value:
+            return NullAttributeType(attribute_key,
+                                     attribute_display_name,
+                                     attribute_description)
+
+        elif attribute_type == AttributeType.BOOLEAN.value:
+            return BooleanAttributeType(attribute_key,
+                                        attribute_display_name,
+                                        attribute_description,
+                                        default_value=to_bool(attribute_default_value))
+
+        elif attribute_type == AttributeType.INTEGER.value:
+            return IntegerAttributeType(attribute_key,
+                                        attribute_display_name,
+                                        attribute_description,
+                                        default_value=int(attribute_default_value))
+
+        else:
+            raise ValueError("Unrecognised attribute type.")
+
+    @staticmethod
     def _parse_job_inference_sources(inference_sources_element: ET.Element) -> typing.List[AttributeInferenceSource]:
 
         attribute_inference_sources: typing.List[str] = get_all_sub_elements_text(
@@ -149,68 +201,13 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_job_attribute(job_attribute_element: ET.Element) -> JobAttribute:
-        attribute_key = get_attribute(job_attribute_element, TAG_ATTRIBUTE_KEY_ATTRIBUTE)
-        attribute_display_name = get_text(job_attribute_element, TAG_DISPLAY_NAME)
-        attribute_description = get_text(job_attribute_element, TAG_DESCRIPTION)
+        attribute_element = get_sub_element(job_attribute_element, TAG_ATTRIBUTE, expect_unique_tag=True)
+        attribute = XMLAPISchemaParser._parse_attribute(attribute_element)
         attribute_is_optional = to_bool(get_text(job_attribute_element, TAG_OPTIONAL))
-
         inference_sources_element = get_sub_element(job_attribute_element, TAG_INFERENCE_SOURCES)
         attribute_inference_sources = XMLAPISchemaParser._parse_job_inference_sources(inference_sources_element)
 
-        # get default value (optional)
-        job_attribute_default_value_elements = job_attribute_element.findall(TAG_DEFAULT_VALUE)
-        if job_attribute_default_value_elements:
-            job_attribute_default_value = job_attribute_default_value_elements[0].text
-        else:
-            job_attribute_default_value = None
-
-        attribute_type = get_text(job_attribute_element, TAG_TYPE)
-
-        if attribute_type == AttributeType.STRING.value:
-            return StringJobAttribute(attribute_key,
-                                      attribute_display_name,
-                                      attribute_description,
-                                      attribute_inference_sources,
-                                      attribute_is_optional,
-                                      default_value=job_attribute_default_value)
-
-        elif attribute_type == AttributeType.ENUM.value:
-            enum_items_element = get_sub_element(job_attribute_element, TAG_ITEMS)
-            enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)
-
-            return EnumJobAttribute(attribute_key,
-                                    attribute_display_name,
-                                    attribute_description,
-                                    attribute_inference_sources,
-                                    attribute_is_optional,
-                                    enum_items,
-                                    default_value=job_attribute_default_value)
-
-        elif attribute_type == AttributeType.NULL.value:
-            return NullJobAttribute(attribute_key,
-                                    attribute_display_name,
-                                    attribute_description,
-                                    attribute_inference_sources,
-                                    attribute_is_optional)
-
-        elif attribute_type == AttributeType.BOOLEAN.value:
-            return BooleanJobAttribute(attribute_key,
-                                       attribute_display_name,
-                                       attribute_description,
-                                       attribute_inference_sources,
-                                       attribute_is_optional,
-                                       default_value=to_bool(job_attribute_default_value))
-
-        elif attribute_type == AttributeType.INTEGER.value:
-            return IntegerJobAttribute(attribute_key,
-                                       attribute_display_name,
-                                       attribute_description,
-                                       attribute_inference_sources,
-                                       attribute_is_optional,
-                                       default_value=int(job_attribute_default_value))
-
-        else:
-            raise ValueError("Unrecognised attribute type.")
+        return JobAttribute(attribute, attribute_inference_sources, attribute_is_optional)
 
     @staticmethod
     def _parse_job_definition(job_definition_element: ET.Element) -> JobDefinition:
@@ -221,7 +218,7 @@ class XMLAPISchemaParser:
         job_definition_id = get_attribute(job_definition_element, ID_ATTRIBUTE)
         job_definition_display_name = get_text(job_definition_element, TAG_DISPLAY_NAME)
 
-        attribute_elements = get_all_sub_elements(job_definition_element, TAG_ATTRIBUTE, expect_at_least_one=True)
+        attribute_elements = get_all_sub_elements(job_definition_element, TAG_JOB_ATTRIBUTE, expect_at_least_one=True)
 
         attributes = []
         for attribute_element in attribute_elements:
@@ -297,20 +294,8 @@ class XMLAPISchemaParser:
 
         project_attribute_id = get_attribute(project_attribute_element, ATRRIBUTE_ID)
 
-        # the project key is the same as it's id by default unless an alternative is provided
-        key_element = project_attribute_element.find(TAG_KEY)
-        project_attribute_key = key_element.text if key_element is not None else project_attribute_id
-
-        project_attribute_display_name = get_text(project_attribute_element, TAG_DISPLAY_NAME)
-        project_attribute_description = get_text(project_attribute_element, TAG_DESCRIPTION)
-        project_attribute_type = get_text(project_attribute_element, TAG_TYPE)
-
-        # get default value (optional)
-        project_attribute_default_value_elements = project_attribute_element.findall(TAG_DEFAULT_VALUE)
-        if project_attribute_default_value_elements:
-            project_attribute_default_value = project_attribute_default_value_elements[0].text
-        else:
-            project_attribute_default_value = None
+        attribute_element = get_sub_element(project_attribute_element, TAG_ATTRIBUTE, expect_unique_tag=True)
+        attribute = XMLAPISchemaParser._parse_attribute(attribute_element)
 
         # parse transitions
         transitions_element = get_sub_element(project_attribute_element, TAG_TRANSITIONS)
@@ -319,59 +304,11 @@ class XMLAPISchemaParser:
         # parse compatible job definitions
         compatible_job_definitions_element = get_sub_element(project_attribute_element,
                                                              TAG_COMPATIBLE_JOB_DEFINITIONS)
-        project_attribute_compatible_job_definitions = XMLAPISchemaParser._parse_compatible_job_definitions(
+        compatible_job_definitions = XMLAPISchemaParser._parse_compatible_job_definitions(
             compatible_job_definitions_element, job_definitions)
 
-        if project_attribute_type == AttributeType.STRING.value:
-            return StringProjectAttribute(project_attribute_id,
-                                          project_attribute_key,
-                                          project_attribute_display_name,
-                                          project_attribute_description,
-                                          project_attribute_transitions,
-                                          project_attribute_compatible_job_definitions,
-                                          default_value=project_attribute_default_value)
-
-        elif project_attribute_type == AttributeType.ENUM.value:
-
-            enum_items_element = get_sub_element(project_attribute_element, TAG_ITEMS)
-            enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)
-
-            return EnumProjectAttribute(project_attribute_id,
-                                        project_attribute_key,
-                                        project_attribute_display_name,
-                                        project_attribute_description,
-                                        project_attribute_transitions,
-                                        project_attribute_compatible_job_definitions,
-                                        enum_items,
-                                        default_value=project_attribute_default_value)
-
-        elif project_attribute_type == AttributeType.NULL.value:
-            return NullProjectAttribute(project_attribute_id,
-                                        project_attribute_key,
-                                        project_attribute_display_name,
-                                        project_attribute_description,
-                                        project_attribute_transitions,
-                                        project_attribute_compatible_job_definitions)
-
-        elif project_attribute_type == AttributeType.BOOLEAN.value:
-            return BooleanProjectAttribute(project_attribute_id,
-                                           project_attribute_key,
-                                           project_attribute_display_name,
-                                           project_attribute_description,
-                                           project_attribute_transitions,
-                                           project_attribute_compatible_job_definitions,
-                                           default_value=to_bool(project_attribute_default_value))
-
-        elif project_attribute_type == AttributeType.INTEGER.value:
-            return IntegerProjectAttribute(project_attribute_id,
-                                           project_attribute_key,
-                                           project_attribute_display_name,
-                                           project_attribute_description,
-                                           project_attribute_transitions,
-                                           project_attribute_compatible_job_definitions,
-                                           default_value=int(project_attribute_default_value))
-        else:
-            raise ValueError("Unrecognised attribute type.")
+        return ProjectAttribute(project_attribute_id, attribute, project_attribute_transitions,
+                                compatible_job_definitions)
 
     @staticmethod
     def _parse_project_attributes(api_schema_element: ET.Element,
