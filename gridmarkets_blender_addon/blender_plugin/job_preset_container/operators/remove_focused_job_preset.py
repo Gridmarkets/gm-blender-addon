@@ -41,6 +41,16 @@ class GRIDMARKETS_OT_remove_focused_job_preset(bpy.types.Operator):
         focused_job_preset = job_preset_container.get_focused_item()
 
         if focused_job_preset:
+            index = job_preset_container.get_index(focused_job_preset)
+            if index == 0:
+                new_index = index + 1
+            else:
+                new_index = index - 1
+
+            item = job_preset_container.get_at(new_index)
+            if item:
+                job_preset_container.focus_item(item)
+
             job_preset_container.remove(focused_job_preset)
             focused_job_preset.unregister_props()
 
