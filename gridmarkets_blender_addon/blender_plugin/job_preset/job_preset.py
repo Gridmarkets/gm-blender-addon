@@ -20,10 +20,12 @@
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
+from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
 class JobPreset(MetaJobPreset):
 
+    INFERENCE_SOURCE_KEY = "INFERENCE_SOURCE"
     JOB_PRESET_KEY = "job_preset_"
 
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
@@ -43,6 +45,10 @@ class JobPreset(MetaJobPreset):
             attribute = job_attribute.get_attribute()
             if attribute.get_type() != AttributeType.NULL:
                 setattr(job_preset_props, attribute.get_key(), get_default_value(job_attribute.get_attribute()))
+
+                # reset inference source to default
+                inference_sources = job_attribute.get_inference_sources()
+                setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0])
 
     def _register_props(self):
         import bpy
@@ -102,6 +108,13 @@ class JobPreset(MetaJobPreset):
                     default=default_value,
                     options={'SKIP_SAVE'}
                 )
+
+            # every job attribute has at least one possible inference source
+            properties[self.INFERENCE_SOURCE_KEY + key] = bpy.props.StringProperty(
+                name=self.INFERENCE_SOURCE_KEY,
+                description="The source to read the attribute value from.",
+                default=str(job_attribute.get_inference_sources()[0])
+            )
 
         # register property group
         self._property_group_class = type("GRIDMARKETS_PROPS_job_preset_attributes",
