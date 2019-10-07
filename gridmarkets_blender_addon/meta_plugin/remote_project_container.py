@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import List
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
@@ -26,5 +26,5 @@ from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
 class RemoteProjectContainer(ListContainer[RemoteProject]):
 
-    def __init__(self, remote_projects: List[RemoteProject]):
+    def __init__(self, remote_projects: typing.List[RemoteProject]):
         ListContainer.__init__(self, remote_projects)

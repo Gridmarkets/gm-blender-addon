@@ -18,9 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import abstractmethod
 import pathlib
-from typing import List, Set, Dict
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.local_project import LocalProject
 
@@ -31,8 +30,8 @@ class PackedProject(LocalProject):
                  name: str,
                  root_dir: pathlib.Path,
                  main_file: pathlib.Path,
-                 files: Set[pathlib.Path],
-                 attributes: Dict[str, any]):
+                 files: typing.Set[pathlib.Path],
+                 attributes: typing.Dict[str, any]):
 
         LocalProject.__init__(self,
                               name,
@@ -55,7 +54,7 @@ class PackedProject(LocalProject):
     def get_relative_main_file(self) -> pathlib.Path:
         return self.get_relative_file_path(self.get_main_file())
 
-    def get_relative_files(self) -> Set[pathlib.Path]:
+    def get_relative_files(self) -> typing.Set[pathlib.Path]:
         relative_files = map(self.get_relative_file_path, self.get_files())
         return set(relative_files)
 

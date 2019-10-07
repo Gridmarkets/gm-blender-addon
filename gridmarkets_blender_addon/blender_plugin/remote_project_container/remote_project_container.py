@@ -20,14 +20,10 @@
 
 import bpy
 
-from typing import List, Optional
-
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer as \
     MetaRemoteProjectContainer
 from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-
-from gridmarkets_blender_addon import constants
 
 
 @attach_blender_plugin

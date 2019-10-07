@@ -19,12 +19,12 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC, abstractmethod
-from typing import List
+import typing
 from gridmarkets_blender_addon.meta_plugin.service_provider import ServiceProvider
 
 
 class ServiceProviderDiscoverer(ABC):
 
     @abstractmethod
-    def get_services(self) -> List[ServiceProvider]:
+    def get_services(self) -> typing.List[ServiceProvider]:
         raise NotImplementedError

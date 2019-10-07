@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC, abstractmethod
-from typing import Optional
+import typing
 
 
 class PluginFetcher(ABC):
@@ -33,7 +33,7 @@ class PluginFetcher(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_plugin_if_initialised() -> Optional['Plugin']:
+    def get_plugin_if_initialised() -> typing.Optional['Plugin']:
         raise NotImplementedError
 
     @staticmethod

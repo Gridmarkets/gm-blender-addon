@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import List, Optional
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
 from gridmarkets_blender_addon.meta_plugin.user import User
@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.meta_plugin.user import User
 
 class UserContainer(ListContainer[User]):
 
-    def __init__(self, users: List[User], default_user: Optional[User] = None):
+    def __init__(self, users: typing.List[User], default_user: typing.Optional[User] = None):
         ListContainer.__init__(self, users)
 
         self._default_user = None
@@ -45,10 +45,10 @@ class UserContainer(ListContainer[User]):
 
         ListContainer.remove(self, item)
 
-    def get_default_user(self) -> Optional[User]:
+    def get_default_user(self) -> typing.Optional[User]:
         return self._default_user
 
-    def set_default_user(self, user: Optional[User]) -> None:
+    def set_default_user(self, user: typing.Optional[User]) -> None:
 
         if user is None:
             self._default_user = None

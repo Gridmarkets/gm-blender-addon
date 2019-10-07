@@ -18,7 +18,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import List, Set
 import os
 import pathlib
 import re

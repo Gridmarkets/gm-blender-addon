@@ -19,20 +19,20 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC
-from typing import Generic, Optional, TypeVar, List
+import typing
 from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
 
 
-T = TypeVar('T')
+T = typing.TypeVar('T')
 
 
-class ListContainer(ABC, Generic[T], PluginAccessor):
+class ListContainer(ABC, typing.Generic[T], PluginAccessor):
 
-    def __init__(self, items: List[T]):
+    def __init__(self, items: typing.List[T]):
         self._items = items
         self._selected = []
 
-    def get_focused_item(self) -> Optional[T]:
+    def get_focused_item(self) -> typing.Optional[T]:
         if len(self._selected) == 0:
             return None
 
@@ -47,7 +47,7 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
 
         self._selected.append(item)
 
-    def get_selected(self) -> List[T]:
+    def get_selected(self) -> typing.List[T]:
         return self._selected
 
     def deselect(self, item) -> None:
@@ -64,7 +64,7 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
     def deselect_all(self):
         self._selected = []
 
-    def get_all(self) -> List[T]:
+    def get_all(self) -> typing.List[T]:
         return self._items
 
     def get_at(self, index: int) -> T:

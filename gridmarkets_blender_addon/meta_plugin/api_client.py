@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC, abstractmethod
-from typing import Optional
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.user import User
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
@@ -30,6 +30,7 @@ from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
+
 
 class APIClient(ABC, PluginAccessor):
 
@@ -71,7 +72,7 @@ class APIClient(ABC, PluginAccessor):
     def connected(self) -> bool:
         raise NotImplementedError
 
-    def get_signed_in_user(self) -> Optional[User]:
+    def get_signed_in_user(self) -> typing.Optional[User]:
         return self._signed_in_user
 
     @abstractmethod

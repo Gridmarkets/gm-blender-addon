@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import Optional
+import typing
 
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAPIClient
@@ -42,7 +42,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def __init__(self):
         MetaAPIClient.__init__(self)
-        self._envoy_client: Optional[EnvoyClient] = None
+        self._envoy_client: typing.Optional[EnvoyClient] = None
         self._api_schema = XMLAPISchemaParser.parse()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
@@ -67,7 +67,7 @@ class GridMarketsAPIClient(MetaAPIClient):
     def connected(self) -> bool:
         raise NotImplementedError
 
-    def get_signed_in_user(self) -> Optional[User]:
+    def get_signed_in_user(self) -> typing.Optional[User]:
         return MetaAPIClient.get_signed_in_user(self)
 
     def get_api_schema(self) -> APISchema:

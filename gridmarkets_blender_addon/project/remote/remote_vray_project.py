@@ -1,5 +1,4 @@
 import pathlib
-from typing import List, Set
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
 

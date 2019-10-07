@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC, abstractmethod
-from typing import Dict, Set, Optional
+import typing
 import pathlib
 
 
@@ -29,8 +29,8 @@ class Project(ABC):
                  name: str,
                  root_dir: pathlib.Path,
                  main_file: pathlib.Path,
-                 files: Set[pathlib.Path],
-                 attributes: Dict[str, any]):
+                 files: typing.Set[pathlib.Path],
+                 attributes: typing.Dict[str, any]):
         self._name = name
         self._root_dir = root_dir
         self._main_file = main_file
@@ -43,7 +43,7 @@ class Project(ABC):
     def set_name(self, name: str) -> None:
         self._name = name
 
-    def get_attributes(self) -> Dict[str, any]:
+    def get_attributes(self) -> typing.Dict[str, any]:
         return self._attributes
 
     def get_attribute(self, key: str) -> any:
@@ -63,8 +63,8 @@ class Project(ABC):
     def get_root_dir(self) -> pathlib.Path:
         return self._root_dir
 
-    def get_main_file(self) -> Optional[pathlib.Path]:
+    def get_main_file(self) -> typing.Optional[pathlib.Path]:
         return self._main_file
 
-    def get_files(self) -> Set[pathlib.Path]:
+    def get_files(self) -> typing.Set[pathlib.Path]:
         return self._files
