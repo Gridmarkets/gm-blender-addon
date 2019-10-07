@@ -22,21 +22,32 @@ __all__ = ['StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttribut
            'IntegerAttributeType']
 
 import typing
+import enum
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
+
+
+class StringSubtype(enum.Enum):
+    NONE = "NONE"
+    FRAME_RANGES = "FRAME_RANGES"
 
 
 class StringAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[str] = ""):
+    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[str] = "",
+                 subtype: StringSubtype = StringSubtype.NONE.value):
         Attribute.__init__(self, key, display_name, description, AttributeType.STRING)
 
         if default_value is None:
             default_value = ""
 
         self._default_value = default_value
+        self._subtype = subtype
 
     def get_default_value(self) -> str:
         return self._default_value
+
+    def get_subtype(self) -> StringSubtype:
+        return self._subtype
 
 
 class EnumItem:
