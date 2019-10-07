@@ -24,7 +24,7 @@ import bpy
 class GRIDMARKETS_OT_set_inference_source(bpy.types.Operator):
     bl_idname = "gridmarkets.set_inference_source"
     bl_label = "Set Inference Source"
-    bl_description = "Sets the source from which to infer the job attributes value."
+    bl_description = "Sets the source from which to infer the job attributes value"
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     inference_source: bpy.props.StringProperty()
