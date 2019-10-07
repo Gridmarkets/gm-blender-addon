@@ -23,6 +23,9 @@ from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 
 
 class JobPreset(MetaJobPreset):
+
+    JOB_PRESET_KEY = "job_preset_"
+
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
         MetaJobPreset.__init__(self, name, id, job_definition)
         self._register_props()
@@ -120,4 +123,12 @@ class JobPreset(MetaJobPreset):
         delattr(bpy.types.Scene, self.get_prop_id())
 
     def get_prop_id(self):
-        return "job_preset_" + self.get_id()
+        return self.JOB_PRESET_KEY + self.get_id()
+
+    def get_property_group(self):
+        import bpy
+        return getattr(bpy.context.scene, self.get_prop_id())
+
+    def _get_attribute_value(self, attribute: Attribute):
+        props = self.get_property_group()
+        return getattr(props, attribute.get_key())
