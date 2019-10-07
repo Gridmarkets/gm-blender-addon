@@ -23,3 +23,5 @@ from enum import Enum
 
 class AttributeInferenceSource(Enum):
     USER_DEFINED = "USER_DEFINED"
+    CONSTANT = "CONSTANT"
+    PROJECT = "PROJECT"

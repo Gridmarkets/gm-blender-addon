@@ -29,7 +29,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -57,7 +57,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -71,6 +71,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
@@ -258,7 +259,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -286,7 +287,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -300,6 +301,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
