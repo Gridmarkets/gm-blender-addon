@@ -20,14 +20,17 @@
 
 import bpy
 
-from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
+import typing
+
+from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
 from gridmarkets_blender_addon.meta_plugin.job_preset_container import JobPresetContainer as MetaJobPresetContainer
+from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon import utils_blender
 
 
 @attach_blender_plugin
-class JobPresetContainer(MetaJobPresetContainer):
+class JobPresetContainer(MetaJobPresetContainer, ListContainer[JobPreset]):
 
     def __init__(self):
         MetaJobPresetContainer.__init__(self, [])
