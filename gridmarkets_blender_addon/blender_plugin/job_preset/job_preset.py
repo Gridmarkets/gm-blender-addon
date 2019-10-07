@@ -63,7 +63,7 @@ class JobPreset(MetaJobPreset):
             attribute = job_attribute.get_attribute()
             key = attribute.get_key()
             display_name = attribute.get_display_name()
-            description = attribute.get_description()
+            description = attribute.get_description().rstrip('.')  # Blender adds periods by default
             attribute_type = attribute.get_type()
             default_value = attribute.get_default_value()
 
