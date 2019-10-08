@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+
 def _draw_frame_ranges_view(self, context):
     from gridmarkets_blender_addon import constants, utils_blender
 
@@ -55,7 +56,7 @@ def _draw_frame_ranges_view(self, context):
     sub.operator(constants.OPERATOR_VRAY_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN, text="").action = 'DOWN'
 
     # display warning if overlapping frame ranges
-    if utils_blender.do_frame_ranges_overlap(props.vray):
+    if utils_blender.do_frame_ranges_overlap(frame_ranges):
         sub = layout.row()
         sub.enabled=False
         sub.label(text="Warning: frame ranges overlap. You will still be charged for overlapping frames but will "
