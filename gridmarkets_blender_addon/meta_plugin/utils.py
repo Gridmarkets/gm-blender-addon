@@ -50,3 +50,15 @@ def get_files_in_directory(directory:pathlib.Path) -> typing.Set[pathlib.Path]:
             files.add(item)
 
     return files
+
+
+def get_deep_attribute(obj, attribute_path: str or typing.List[str]):
+
+    if type(attribute_path) == str:
+        return get_deep_attribute(obj, attribute_path.split('.'))
+
+    current_object = obj
+    for attribute_name in attribute_path:
+        current_object = getattr(current_object, attribute_name)
+
+    return current_object
