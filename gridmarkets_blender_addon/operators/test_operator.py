@@ -19,22 +19,36 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import utils_blender
 
-class GRIDMARKETS_OT_remove_unused_screens(bpy.types.Operator):
-    bl_idname = "gridmarkets.delete_unused_screens"
-    bl_label = "Delete unused screens"
+
+class GRIDMARKETS_OT_test_operator(bpy.types.Operator):
+    bl_idname = "gridmarkets.test_operator"
+    bl_label = "test operator"
     #bl_options = {'INTERNAL'}
 
     def execute(self, context):
+        from gridmarkets import EnvoyClient
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        log = plugin.get_logging_coordinator().get_logger()
 
-        utils_blender.is_addon_enabled("vb30")
+        user = plugin.get_api_client().get_signed_in_user()
+
+        # create an instance of Envoy client
+        client = EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
+
+        # get product resolver
+        resolver = client.get_product_resolver()
+
+        # get all products
+        products = resolver.get_all_types()
+        log.info(str(products))
 
         return {"FINISHED"}
 
 
 classes = (
-    GRIDMARKETS_OT_remove_unused_screens,
+    GRIDMARKETS_OT_test_operator,
 )
 
 
