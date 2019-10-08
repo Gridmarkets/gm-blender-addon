@@ -29,11 +29,16 @@ class GRIDMARKETS_UL_job_preset(bpy.types.UIList):
     def draw_item(self, context, layout, data, item: LogItemProps, icon, active_data, active_property, index=0,
                   flt_flag=0):
 
-        plugin = PluginFetcher.get_plugin()
-        user_interface = plugin.get_user_interface()
-        job_preset_item = plugin.get_preferences_container().get_job_preset_container().get_at(index)
+        from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
 
-        layout.label(ext=item.name)
+        plugin = PluginFetcher.get_plugin()
+        job_preset_item = plugin.get_preferences_container().get_job_preset_container().get_at(index)
+        job_definition = job_preset_item.get_job_definition()
+
+        row = layout.row()
+
+        icon = get_icon_for_job_definition(job_definition)
+        row.prop(item, 'name', text='', emboss=False, translate=False, icon=icon[0], icon_value=icon[1])
 
 
 classes = (
