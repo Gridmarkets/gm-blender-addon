@@ -229,6 +229,11 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
 
+    project_defined: bpy.props.StringProperty(
+        default="<Value inferred from project>",
+        options={'HIDDEN', 'SKIP_SAVE'}
+    )
+
 
 classes = (
     CustomSettingsViews,
