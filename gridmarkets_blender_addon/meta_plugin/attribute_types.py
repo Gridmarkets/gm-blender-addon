@@ -18,8 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['StringAttributeType', 'EnumAttributeType', 'EnumItem', 'NullAttributeType', 'BooleanAttributeType',
-           'IntegerAttributeType']
+__all__ = ['StringAttributeType', 'StringSubtype', 'EnumAttributeType', 'EnumItem', 'NullAttributeType',
+           'BooleanAttributeType', 'IntegerAttributeType']
 
 import typing
 import enum
@@ -34,11 +34,14 @@ class StringSubtype(enum.Enum):
 class StringAttributeType(Attribute):
 
     def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[str] = "",
-                 subtype: StringSubtype = StringSubtype.NONE.value):
+                 subtype: typing.Optional[StringSubtype] = StringSubtype.NONE.value):
         Attribute.__init__(self, key, display_name, description, AttributeType.STRING)
 
         if default_value is None:
             default_value = ""
+
+        if subtype is None:
+            subtype = StringSubtype.NONE.value
 
         self._default_value = default_value
         self._subtype = subtype
