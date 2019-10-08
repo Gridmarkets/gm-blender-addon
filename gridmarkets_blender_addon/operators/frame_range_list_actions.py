@@ -20,6 +20,7 @@
 
 import bpy
 from gridmarkets_blender_addon import constants, utils
+from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
 
 class GRIDMARKETS_OT_frame_range_list_actions(bpy.types.Operator):
@@ -38,52 +39,63 @@ class GRIDMARKETS_OT_frame_range_list_actions(bpy.types.Operator):
         )
     )
 
-    def invoke(self, context, event):
-        props = context.scene.props
-        selected_job = props.jobs[props.selected_job]
-        index = selected_job.selected_frame_range
+    property_group_attribute: bpy.props.StringProperty()
+    focused_item_attribute: bpy.props.StringProperty()
+    collection_attribute: bpy.props.StringProperty()
 
-        # do not perform any action if disabled
-        if not selected_job.use_custom_frame_ranges:
-            return {"FINISHED"}
+    def invoke(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.utils import get_deep_attribute
+
+        property_group = get_deep_attribute(bpy, self.property_group_attribute)
+        focused_item = getattr(property_group, self.focused_item_attribute)
+        collection = getattr(property_group, self.collection_attribute)
+
+        def set_focused_item(value: int):
+            setattr(property_group, self.focused_item_attribute, value)
 
         # if the currently selected frame_range does not exist then the only allowed action is 'ADD'
         try:
-            item = selected_job.frame_ranges[index]
+            item = collection[focused_item]
         except IndexError:
             pass
         else:
-            if self.action == 'DOWN' and index < len(selected_job.frame_ranges) - 1:
-                selected_job.selected_frame_range += 1
+            if self.action == 'DOWN' and focused_item < len(collection) - 1:
+                set_focused_item(focused_item + 1)
 
-            elif self.action == 'UP' and index >= 1:
-                selected_job.selected_frame_range -= 1
+            elif self.action == 'UP' and focused_item >= 1:
+                set_focused_item(focused_item - 1)
 
             elif self.action == 'REMOVE':
                 # never remove the last frame range
-                if len(selected_job.frame_ranges) < 2:
+                if len(collection) < 2:
                     return {"FINISHED"}
 
-                selected_job.frame_ranges.remove(index)
+                collection.remove(focused_item)
 
-                if selected_job.selected_frame_range > 0:
-                    selected_job.selected_frame_range -= 1
+                # if the collection only has one item after the removal, make sure that item is enabled
+                if len(collection) == 1:
+                    collection[0].enabled = True
+
+                if focused_item > 0:
+                    set_focused_item(focused_item - 1)
 
             elif self.action == 'EDIT':
-                bpy.ops.gridmarkets.edit_frame_range('INVOKE_DEFAULT')
+                bpy.ops.gridmarkets.edit_frame_range('INVOKE_DEFAULT',
+                                                     property_group_attribute=self.property_group_attribute,
+                                                     focused_item_attribute=self.focused_item_attribute,
+                                                     collection_attribute=self.collection_attribute)
 
         if self.action == 'ADD':
-
             # add a frame range to the list
-            frame_range = selected_job.frame_ranges.add()
+            frame_range = collection.add()
 
-            frame_range.name = utils.create_unique_object_name(selected_job.frame_ranges, name_prefix=constants.FRAME_RANGE_PREFIX)
+            frame_range.name = utils.create_unique_object_name(collection, name_prefix=constants.FRAME_RANGE_PREFIX)
             frame_range.enabled = True
             frame_range.frame_start = constants.DEFAULT_FRAME_RANGE_START_VALUE
             frame_range.frame_end = constants.DEFAULT_FRAME_RANGE_END_VALUE
             frame_range.frame_step = constants.DEFAULT_FRAME_RANGE_STEP_VALUE
 
-            selected_job.selected_frame_range = len(selected_job.frame_ranges) - 1
+            set_focused_item(len(collection) - 1)
 
         return {"FINISHED"}
 
