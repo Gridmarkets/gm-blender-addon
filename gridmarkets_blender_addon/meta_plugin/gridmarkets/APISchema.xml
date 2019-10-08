@@ -83,6 +83,7 @@
                     <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>1 1 1</DefaultValue>
+                    <Subtype>FRAME_RANGES</Subtype>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -312,6 +313,7 @@
                     <DisplayName>Frame Ranges</DisplayName>
                     <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
                     <Type>STRING</Type>
+                    <Subtype>FRAME_RANGES</Subtype>
                     <DefaultValue>1 1 1</DefaultValue>
                 </Attribute>
                 <Optional>True</Optional>

@@ -43,9 +43,11 @@ def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one
     return elements
 
 
-def get_sub_element(element: ET.Element, tag_name: str, expect_unique_tag: bool = True) -> ET.Element:
-    elements = element.findall(tag_name)
+def get_sub_element(element: ET.Element,
+                    tag_name: str,
+                    expect_unique_tag: bool = True) -> typing.Optional[ET.Element]:
 
+    elements = element.findall(tag_name)
     if len(elements) == 0:
         raise ValueError("The <" + element.tag + "> element must contain exactly one <" + tag_name + "> child element")
 
@@ -76,6 +78,18 @@ def get_text(element: ET.Element, tag_name: str, expect_unique_tag: bool = True)
     return element.text
 
 
+def get_text_optional(element: ET.Element, tag_name: str) -> typing.Optional[str]:
+    elements = element.findall(tag_name)
+
+    if len(elements) <= 0:
+        return None
+
+    if len(elements) > 1:
+        raise ValueError("More than one optional '" + tag_name + "' tag.")
+
+    return elements[0].text
+
+
 def to_bool(value: str) -> bool:
     if value == "True":
         return True
@@ -95,6 +109,7 @@ TAG_DISPLAY_NAME = "DisplayName"
 TAG_DESCRIPTION = "Description"
 TAG_OPTIONAL = "Optional"
 TAG_TYPE = "Type"
+TAG_SUBTYPE = "Subtype"
 TAG_ITEMS = "Items"
 TAG_KEY = "Key"
 TAG_ATTRIBUTE = "Attribute"
@@ -137,19 +152,15 @@ class XMLAPISchemaParser:
         attribute_display_name = get_text(attribute_element, TAG_DISPLAY_NAME, expect_unique_tag=True)
         attribute_description = get_text(attribute_element, TAG_DESCRIPTION, expect_unique_tag=True)
         attribute_type = get_text(attribute_element, TAG_TYPE, expect_unique_tag=True)
-
-        # get default value (optional)
-        attribute_default_value_elements = attribute_element.findall(TAG_DEFAULT_VALUE)
-        if attribute_default_value_elements:
-            attribute_default_value = attribute_default_value_elements[0].text
-        else:
-            attribute_default_value = None
+        attribute_default_value = get_text_optional(attribute_element, TAG_DEFAULT_VALUE)
+        attribute_subtype = get_text_optional(attribute_element, TAG_SUBTYPE)
 
         if attribute_type == AttributeType.STRING.value:
             return StringAttributeType(attribute_key,
                                        attribute_display_name,
                                        attribute_description,
-                                       default_value=attribute_default_value)
+                                       default_value=attribute_default_value,
+                                       subtype=attribute_subtype)
 
         elif attribute_type == AttributeType.ENUM.value:
             enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
