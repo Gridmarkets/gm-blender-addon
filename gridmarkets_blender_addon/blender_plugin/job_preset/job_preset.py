@@ -24,9 +24,11 @@ from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
 class JobPreset(MetaJobPreset):
-
     INFERENCE_SOURCE_KEY = "INFERENCE_SOURCE"
     JOB_PRESET_KEY = "job_preset_"
+
+    FRAME_RANGE_COLLECTION = "_collection"
+    FRAME_RANGE_FOCUSED = "_focused"
 
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
         MetaJobPreset.__init__(self, name, id, job_definition)
@@ -34,7 +36,8 @@ class JobPreset(MetaJobPreset):
 
     def _reset_properties_to_default(self):
         import bpy
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
+        from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+        from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype, StringAttributeType
         from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_default_value
 
         scene = bpy.context.scene
@@ -43,8 +46,24 @@ class JobPreset(MetaJobPreset):
         job_definition = self.get_job_definition()
         for job_attribute in job_definition.get_attributes():
             attribute = job_attribute.get_attribute()
-            if attribute.get_type() != AttributeType.NULL:
-                setattr(job_preset_props, attribute.get_key(), get_default_value(job_attribute.get_attribute()))
+            attribute_type = attribute.get_type()
+            if attribute_type != AttributeType.NULL:
+
+                # subtypes must be handled differently
+                if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
+                    setattr(job_preset_props, attribute.get_key() + self.FRAME_RANGE_FOCUSED, 0)
+
+                    collection = getattr(job_preset_props, attribute.get_key() + self.FRAME_RANGE_COLLECTION)
+                    collection.clear()
+
+                    frame_range = collection.add()
+                    frame_range.name = "Default frame range"
+                    frame_range.enabled = True
+                    frame_range.frame_start = 1
+                    frame_range.frame_end = 256
+                    frame_range.frame_step = 1
+                else:
+                    setattr(job_preset_props, attribute.get_key(), get_default_value(job_attribute.get_attribute()))
 
                 # reset inference source to default
                 inference_sources = job_attribute.get_inference_sources()
@@ -52,7 +71,10 @@ class JobPreset(MetaJobPreset):
 
     def _register_props(self):
         import bpy
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumAttributeType
+        from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+        from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, StringAttributeType, \
+            StringSubtype
+        from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
         job_definition = self.get_job_definition()
 
@@ -68,12 +90,28 @@ class JobPreset(MetaJobPreset):
             default_value = attribute.get_default_value()
 
             if attribute_type == AttributeType.STRING:
-                properties[key] = bpy.props.StringProperty(
-                    name=display_name,
-                    description=description,
-                    default=default_value,
-                    options={'SKIP_SAVE'}
-                )
+                string_attribute: StringAttributeType = attribute
+                subtype = string_attribute.get_subtype()
+
+                if subtype == StringSubtype.NONE.value:
+                    properties[key] = bpy.props.StringProperty(
+                        name=display_name,
+                        description=description,
+                        default=default_value,
+                        options={'SKIP_SAVE'}
+                    )
+
+                elif subtype == StringSubtype.FRAME_RANGES.value:
+                    properties[key + self.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
+                        type=FrameRangeProps,
+                        options={'SKIP_SAVE'}
+                    )
+
+                    properties[key + self.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
+                        options={'SKIP_SAVE'}
+                    )
+                else:
+                    raise ValueError("Unrecognised String subtype '" + subtype + "'.")
 
             elif attribute_type == AttributeType.ENUM:
 
@@ -126,6 +164,8 @@ class JobPreset(MetaJobPreset):
         setattr(bpy.types.Scene,
                 self.get_prop_id(),
                 bpy.props.PointerProperty(type=self._property_group_class))
+
+        self._reset_properties_to_default()
 
     def unregister_props(self):
         import bpy
