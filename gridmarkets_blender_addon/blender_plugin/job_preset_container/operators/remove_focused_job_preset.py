@@ -29,14 +29,8 @@ class GRIDMARKETS_OT_remove_focused_job_preset(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
-        from gridmarkets_blender_addon import utils, constants
 
         plugin = PluginFetcher.get_plugin()
-        api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
-        job_definitions = api_schema.get_job_definitions()
-
         job_preset_container = plugin.get_preferences_container().get_job_preset_container()
         focused_job_preset = job_preset_container.get_focused_item()
 
