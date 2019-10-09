@@ -25,7 +25,7 @@ def draw_job_attribute(self, context, job_preset, job_attribute: JobAttribute, c
     from types import SimpleNamespace
     from gridmarkets_blender_addon.blender_plugin.job_attribute.operators.set_inference_source import \
         GRIDMARKETS_OT_set_inference_source
-    from gridmarkets_blender_addon.layouts.draw_frame_range_container import draw_frame_range_container
+    from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
     from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
     from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
@@ -55,15 +55,10 @@ def draw_job_attribute(self, context, job_preset, job_attribute: JobAttribute, c
         input_row.enabled = False
 
     elif inference_source == AttributeInferenceSource.USER_DEFINED.value:
-
-        if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
-            draw_frame_range_container(SimpleNamespace(layout=input_row),
-                                       context,
-                                       'context.scene.' + job_preset.get_prop_id(),
-                                       attribute.get_key() + '_collection',
-                                       attribute.get_key() + '_focused')
-        else:
-            input_row.prop(job_preset_props, attribute.get_key(), text="")
+        draw_attribute_input(SimpleNamespace(layout=input_row),
+                             context,
+                             job_preset_props,
+                             attribute)
 
     elif inference_source == AttributeInferenceSource.PROJECT.value:
         input_row.prop(props, "project_defined", text="")
