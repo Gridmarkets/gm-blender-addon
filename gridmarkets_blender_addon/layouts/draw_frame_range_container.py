@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-def draw_frame_range_container(self, context, property_group_attr: str, collection: str, focused_item_attr: str):
+def draw_frame_range_container(self, context, property_group, collection: str, focused_item_attr: str):
     import bpy
     from gridmarkets_blender_addon.meta_plugin.utils import get_deep_attribute
     from gridmarkets_blender_addon import constants, utils_blender
@@ -27,7 +27,6 @@ def draw_frame_range_container(self, context, property_group_attr: str, collecti
     layout = self.layout.column()
     props = context.scene.props
 
-    property_group = get_deep_attribute(bpy, property_group_attr)
     frame_ranges = getattr(property_group, collection)
     focused_item = getattr(property_group, focused_item_attr)
     frame_range_count = len(frame_ranges)
@@ -41,7 +40,7 @@ def draw_frame_range_container(self, context, property_group_attr: str, collecti
     def draw_operator(element, action, icon):
         op = element.operator(constants.OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME, icon=icon, text="")
         op.action = action
-        op.property_group_attribute = property_group_attr
+        op.property_group_attribute = property_group.path_from_id()
         op.focused_item_attribute = focused_item_attr
         op.collection_attribute = collection
 
