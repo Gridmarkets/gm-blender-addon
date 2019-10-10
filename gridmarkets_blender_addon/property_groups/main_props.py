@@ -301,4 +301,3 @@ def unregister():
 
     # remove event handler
     bpy.app.handlers.load_post.remove(reset_to_defaults)
-
