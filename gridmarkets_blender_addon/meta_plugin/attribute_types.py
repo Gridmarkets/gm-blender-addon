@@ -24,6 +24,7 @@ __all__ = ['StringAttributeType', 'StringSubtype', 'EnumAttributeType', 'EnumIte
 import typing
 import enum
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
+from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
 
 
 class StringSubtype(enum.Enum):
@@ -66,6 +67,19 @@ class StringAttributeType(Attribute):
 
     def get_min_length(self) -> typing.Optional[int]:
         return self._min_length
+
+    def validate_value(self, value: any) -> None:
+        if value is None:
+            raise InvalidAttributeError("value must not be None")
+
+        if type(value) != str:
+            raise InvalidAttributeError("value must be string type")
+
+        if self._max_length is not None and len(value) > self._max_length:
+            raise InvalidAttributeError("value be be a maximum of " + str(self._max_length) + " characters long")
+
+        if self._min_length is not None and len(value) < self._min_length:
+            raise InvalidAttributeError("value be be a minimum of " + str(self._min_length) + " characters long")
 
 
 class EnumItem:
@@ -114,6 +128,19 @@ class EnumAttributeType(Attribute):
     def get_items(self) -> typing.List[EnumItem]:
         return self._items
 
+    def validate_value(self, value: any) -> None:
+        if value is None:
+            raise InvalidAttributeError("value must not be None")
+
+        if type(value) != str:
+            raise InvalidAttributeError("value must be string type")
+
+        for item in self.get_items():
+            if item.get_key() == value:
+                return
+        else:
+            raise InvalidAttributeError("value must be one of the possible enum values")
+
 
 class NullAttributeType(Attribute):
 
@@ -123,6 +150,10 @@ class NullAttributeType(Attribute):
 
     def get_default_value(self) -> None:
         return self._default_value
+
+    def validate_value(self, value: any) -> None:
+        if value is not None:
+            raise InvalidAttributeError("value must be None")
 
 
 class BooleanAttributeType(Attribute):
@@ -138,6 +169,13 @@ class BooleanAttributeType(Attribute):
     def get_default_value(self) -> bool:
         return self._default_value
 
+    def validate_value(self, value: any) -> None:
+        if value is None:
+            raise InvalidAttributeError("value must not be None")
+
+        if type(value) != bool:
+            raise InvalidAttributeError("value must be bool type")
+
 
 class IntegerAttributeType(Attribute):
 
@@ -151,3 +189,10 @@ class IntegerAttributeType(Attribute):
 
     def get_default_value(self) -> int:
         return self._default_value
+
+    def validate_value(self, value: any) -> None:
+        if value is None:
+            raise InvalidAttributeError("value must not be None")
+
+        if type(value) != int:
+            raise InvalidAttributeError("value must be int type")

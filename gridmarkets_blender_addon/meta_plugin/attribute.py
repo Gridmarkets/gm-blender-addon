@@ -53,3 +53,7 @@ class Attribute(ABC):
     @abstractmethod
     def get_default_value(self) -> any:
         raise NotImplementedError
+
+    @abstractmethod
+    def validate_value(self, value: any) -> None:
+        raise NotImplementedError
