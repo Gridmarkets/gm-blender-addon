@@ -71,8 +71,6 @@ class JobPreset(MetaJobPreset):
                 setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0])
 
     def register_props(self):
-        print("Register props!!!!")
-
         import bpy
         from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
         from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, StringAttributeType, \
