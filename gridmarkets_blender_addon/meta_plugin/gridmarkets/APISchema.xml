@@ -12,6 +12,7 @@
                     <DisplayName>Name</DisplayName>
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
+                    <DefaultValue>Cycles Job</DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
@@ -243,6 +244,7 @@
                     <DisplayName>Name</DisplayName>
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
+                    <DefaultValue>V-Ray Job</DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
