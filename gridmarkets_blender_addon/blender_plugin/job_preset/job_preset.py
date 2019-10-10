@@ -32,7 +32,8 @@ class JobPreset(MetaJobPreset):
 
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
         MetaJobPreset.__init__(self, name, id, job_definition)
-        self._register_props()
+        self.register_props()
+        self._reset_properties_to_default()
 
     def _reset_properties_to_default(self):
         import bpy
@@ -69,7 +70,9 @@ class JobPreset(MetaJobPreset):
                 inference_sources = job_attribute.get_inference_sources()
                 setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0])
 
-    def _register_props(self):
+    def register_props(self):
+        print("Register props!!!!")
+
         import bpy
         from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
         from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, StringAttributeType, \
@@ -164,8 +167,6 @@ class JobPreset(MetaJobPreset):
         setattr(bpy.types.Scene,
                 self.get_prop_id(),
                 bpy.props.PointerProperty(type=self._property_group_class))
-
-        self._reset_properties_to_default()
 
     def unregister_props(self):
         import bpy
