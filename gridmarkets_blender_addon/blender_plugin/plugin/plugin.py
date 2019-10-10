@@ -71,3 +71,13 @@ class Plugin(MetaPlugin):
 
     def get_plugin_utils(self) -> PluginUtils:
         return self._plugin_utils
+
+    def register_dynamic_props(self) -> None:
+        job_presets = self._preferences_container.get_job_preset_container().get_all()
+        for job_preset in job_presets:
+            job_preset.register_props()
+
+    def unregister_dynamic_props(self) -> None:
+        job_presets = self._preferences_container.get_job_preset_container().get_all()
+        for job_preset in job_presets:
+            job_preset.unregister_props()
