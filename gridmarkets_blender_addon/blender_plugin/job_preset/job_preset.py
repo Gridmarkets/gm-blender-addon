@@ -94,11 +94,14 @@ class JobPreset(MetaJobPreset):
                 string_attribute: StringAttributeType = attribute
                 subtype = string_attribute.get_subtype()
 
+                max_length = string_attribute.get_max_length()
+
                 if subtype == StringSubtype.NONE.value:
                     properties[key] = bpy.props.StringProperty(
                         name=display_name,
                         description=description,
                         default=default_value,
+                        maxlen=0 if max_length is None else max_length,
                         options={'SKIP_SAVE'}
                     )
 

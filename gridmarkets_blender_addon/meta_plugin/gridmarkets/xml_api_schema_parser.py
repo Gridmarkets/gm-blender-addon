@@ -90,6 +90,15 @@ def get_text_optional(element: ET.Element, tag_name: str) -> typing.Optional[str
     return elements[0].text
 
 
+def get_optional_number(element: ET.Element, tag_name: str) -> typing.Optional[int]:
+    text = get_text_optional(element, tag_name)
+
+    if text is None:
+        return None
+
+    return int(text)
+
+
 def to_bool(value: str) -> bool:
     if value == "True":
         return True
@@ -127,6 +136,8 @@ ATRRIBUTE_ID = "id"
 TAG_TRANSITION_FORMULA = "TransitionFormula"
 TAG_COMPATIBLE_JOB_DEFINITIONS = "CompatibleJobDefinitions"
 TAG_JOB_DEFINITION_ID = "JobDefinitionId"
+TAG_MAX_LENGTH = "MaxLength"
+TAG_MIN_LENGTH = "MinLength"
 
 
 class XMLAPISchemaParser:
@@ -156,11 +167,17 @@ class XMLAPISchemaParser:
         attribute_subtype = get_text_optional(attribute_element, TAG_SUBTYPE)
 
         if attribute_type == AttributeType.STRING.value:
+
+            max_length = get_optional_number(attribute_element, TAG_MAX_LENGTH)
+            min_length = get_optional_number(attribute_element, TAG_MIN_LENGTH)
+
             return StringAttributeType(attribute_key,
                                        attribute_display_name,
                                        attribute_description,
                                        default_value=attribute_default_value,
-                                       subtype=attribute_subtype)
+                                       subtype=attribute_subtype,
+                                       max_length=max_length,
+                                       min_length=min_length)
 
         elif attribute_type == AttributeType.ENUM.value:
             enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)

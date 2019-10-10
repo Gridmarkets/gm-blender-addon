@@ -33,8 +33,15 @@ class StringSubtype(enum.Enum):
 
 class StringAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[str] = "",
-                 subtype: typing.Optional[StringSubtype] = StringSubtype.NONE.value):
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 default_value: typing.Optional[str] = "",
+                 subtype: typing.Optional[StringSubtype] = StringSubtype.NONE.value,
+                 max_length: typing.Optional[int] = None,
+                 min_length: typing.Optional[int] = None):
+
         Attribute.__init__(self, key, display_name, description, AttributeType.STRING)
 
         if default_value is None:
@@ -45,12 +52,20 @@ class StringAttributeType(Attribute):
 
         self._default_value = default_value
         self._subtype = subtype
+        self._max_length = max_length
+        self._min_length = min_length
 
     def get_default_value(self) -> str:
         return self._default_value
 
     def get_subtype(self) -> StringSubtype:
         return self._subtype
+
+    def get_max_length(self) -> typing.Optional[int]:
+        return self._max_length
+
+    def get_min_length(self) -> typing.Optional[int]:
+        return self._min_length
 
 
 class EnumItem:
