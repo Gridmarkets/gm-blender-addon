@@ -24,10 +24,14 @@ import bpy
 class FrameRangeProps(bpy.types.PropertyGroup):
 
     def get_frame_start(self):
-        return self['frame_start']
+        if 'frame_start' in self:
+            return self['frame_start']
+        return 0
 
     def get_frame_end(self):
-        return self['frame_end']
+        if 'frame_end' in self:
+            return self['frame_end']
+        return 0
 
     def set_frame_start(self, value):
         if 'frame_end' in self and value > self['frame_end']:
