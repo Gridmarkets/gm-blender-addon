@@ -170,9 +170,6 @@ class JobPreset(MetaJobPreset):
 
     def unregister_props(self):
         import bpy
-
-        # reset values to their defaults otherwise new JobPresets with the same id will use these old values
-        self._reset_properties_to_default()
         bpy.utils.unregister_class(self._property_group_class)
         delattr(bpy.types.Scene, self.get_prop_id())
 
