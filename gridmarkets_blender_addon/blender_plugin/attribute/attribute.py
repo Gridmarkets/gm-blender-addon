@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
@@ -33,3 +34,27 @@ def get_default_value(attribute: Attribute) -> any:
         return None
 
     return attribute.get_default_value()
+
+
+def get_value(property_group, attribute: Attribute) -> any:
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
+
+    attribute_type = attribute.get_type()
+
+    if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
+        frame_ranges: typing.List[FrameRangeProps] = getattr(property_group,
+                                                             attribute.get_key() + JobPreset.FRAME_RANGE_COLLECTION)
+
+        def serialise_frame_range(frame_range: FrameRangeProps):
+            start = str(frame_range.frame_start)
+            end = str(frame_range.frame_end)
+            step = str(frame_range.frame_step)
+
+            return start + ' ' + end + ' ' + step
+
+        serialised_ranges = map(serialise_frame_range, frame_ranges)
+        return ','.join(serialised_ranges)
+
+    return getattr(property_group, attribute.get_key())
