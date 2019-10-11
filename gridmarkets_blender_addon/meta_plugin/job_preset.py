@@ -49,7 +49,7 @@ class JobPreset(ABC):
         """
         raise NotImplementedError
 
-    def get_attribute_value(self, attribute_key) -> any:
+    def get_attribute_value(self, attribute_key: str) -> any:
         job_attribute = self._job_definition.get_attribute_with_key(attribute_key)
 
         if job_attribute is None:
