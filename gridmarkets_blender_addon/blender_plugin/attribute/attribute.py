@@ -36,16 +36,19 @@ def get_default_value(attribute: Attribute) -> any:
     return attribute.get_default_value()
 
 
-def get_value(property_group, attribute: Attribute) -> any:
+def get_value(property_group, attribute: Attribute, prop_id: str = None) -> any:
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
+
+    # use the attribute key as the prop id by default unless one was provided
+    prop_id = attribute.get_key() if prop_id is None else prop_id
 
     attribute_type = attribute.get_type()
 
     if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
         frame_ranges: typing.List[FrameRangeProps] = getattr(property_group,
-                                                             attribute.get_key() + JobPreset.FRAME_RANGE_COLLECTION)
+                                                             prop_id + JobPreset.FRAME_RANGE_COLLECTION)
 
         def serialise_frame_range(frame_range: FrameRangeProps):
             start = str(frame_range.frame_start)
@@ -57,4 +60,4 @@ def get_value(property_group, attribute: Attribute) -> any:
         serialised_ranges = map(serialise_frame_range, frame_ranges)
         return ','.join(serialised_ranges)
 
-    return getattr(property_group, attribute.get_key())
+    return getattr(property_group, prop_id)
