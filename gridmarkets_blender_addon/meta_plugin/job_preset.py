@@ -20,7 +20,9 @@
 
 from abc import ABC, abstractmethod
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
+from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
+from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
 
 class JobPreset(ABC):
@@ -42,6 +44,14 @@ class JobPreset(ABC):
     def get_job_definition(self) -> JobDefinition:
         return self._job_definition
 
+    def get_attribute_with_key(self, attribute_key: str) -> JobAttribute:
+        job_attribute = self._job_definition.get_attribute_with_key(attribute_key)
+
+        if job_attribute is None:
+            raise ValueError("Could not find attribute with key '" + attribute_key + "'.")
+
+        return job_attribute
+
     @abstractmethod
     def _get_attribute_value(self, attribute: Attribute) -> any:
         """ Applications have different ways of storing GUI values, this method will return the field input for a
@@ -50,10 +60,6 @@ class JobPreset(ABC):
         raise NotImplementedError
 
     def get_attribute_value(self, attribute_key: str) -> any:
-        job_attribute = self._job_definition.get_attribute_with_key(attribute_key)
-
-        if job_attribute is None:
-            raise ValueError("Could not find attribute with key '" + attribute_key + "'.")
-
+        job_attribute = self.get_attribute_with_key(attribute_key)
         attribute = job_attribute.get_attribute()
         return self._get_attribute_value(attribute)
