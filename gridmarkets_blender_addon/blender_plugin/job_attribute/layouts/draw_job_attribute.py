@@ -19,17 +19,17 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 
 
-def draw_job_attribute(self, context, job_preset, job_attribute: JobAttribute, col1, col2, col3):
+def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobAttribute, col1, col2, col3):
     from types import SimpleNamespace
     from gridmarkets_blender_addon.blender_plugin.job_attribute.operators.set_inference_source import \
         GRIDMARKETS_OT_set_inference_source
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
     from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-    from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
-    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
 
     scene = context.scene
     props = scene.props
@@ -48,7 +48,7 @@ def draw_job_attribute(self, context, job_preset, job_attribute: JobAttribute, c
     display_name_row = col1.row()
     display_name_row.label(text=attribute.get_display_name() + ":")
 
-    input_row = col2.row()
+    input_row = col2.column()
 
     if inference_source == AttributeInferenceSource.CONSTANT.value:
         input_row.prop(job_preset_props, attribute.get_key(), text="")

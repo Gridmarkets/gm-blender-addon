@@ -23,9 +23,12 @@ from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 def draw_attribute_input(self, context, prop_container, attribute: Attribute, prop_id: str = None):
 
+    from types import SimpleNamespace
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
     from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
     from gridmarkets_blender_addon.layouts.draw_frame_range_container import draw_frame_range_container
+    from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
+    from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
 
     attribute_type = attribute.get_type()
 
@@ -33,13 +36,33 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
     if attribute_type == AttributeType.NULL:
         return
 
+    layout = self.layout
+    col = layout.column()
+
+    # use the attribute key as the prop id by default unless one was provided
     prop_id = attribute.get_key() if prop_id is None else prop_id
 
+    # validate user input
+    attribute_value = get_value(prop_container, attribute, prop_id)
+
+    validation_message = None
+    try:
+        attribute.validate_value(attribute_value)
+    except InvalidAttributeError as e:
+        validation_message = e.user_message
+
+        # set alert to true if input is invalid
+        col.alert = True
+
     if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
-        draw_frame_range_container(self,
+        draw_frame_range_container(SimpleNamespace(layout=col),
                                    context,
                                    prop_container,
                                    prop_id + '_collection',
                                    prop_id + '_focused')
     else:
-        self.layout.prop(prop_container, prop_id, text="")
+        col.prop(prop_container, prop_id, text="")
+
+    # display validation message
+    if validation_message:
+        col.label(text=validation_message.capitalize())
