@@ -17,10 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
+from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
+from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
 
 class JobPreset(MetaJobPreset):
@@ -181,8 +183,19 @@ class JobPreset(MetaJobPreset):
         import bpy
         return getattr(bpy.context.scene, self.get_prop_id())
 
-    def _get_attribute_value(self, attribute: Attribute):
+    def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None):
         from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
 
         job_preset_properties = self.get_property_group()
-        return get_value(job_preset_properties, attribute)
+        return get_value(job_preset_properties, job_attribute.get_attribute())
+
+    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> AttributeInferenceSource:
+        job_preset_properties = self.get_property_group()
+        return getattr(job_preset_properties, self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key())
+
+    def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
+                                              inference_source: AttributeInferenceSource) -> None:
+        job_preset_properties = self.get_property_group()
+        setattr(job_preset_properties,
+                self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
+                inference_source)

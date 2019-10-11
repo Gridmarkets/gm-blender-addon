@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from abc import ABC, abstractmethod
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
+from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
@@ -44,15 +44,15 @@ class JobPreset(ABC):
     def get_job_definition(self) -> JobDefinition:
         return self._job_definition
 
-
     @abstractmethod
-    def _get_attribute_value(self, attribute: Attribute) -> any:
-        """ Applications have different ways of storing GUI values, this method will return the field input for a
-            JobPreset attribute.
-        """
+    def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None) -> any:
         raise NotImplementedError
 
-    def get_attribute_value(self, attribute_key: str) -> any:
-        job_attribute = self.get_attribute_with_key(attribute_key)
-        attribute = job_attribute.get_attribute()
-        return self._get_attribute_value(attribute)
+    @abstractmethod
+    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> AttributeInferenceSource:
+        raise NotImplementedError
+
+    @abstractmethod
+    def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
+                                              inference_source: AttributeInferenceSource) -> None:
+        raise NotImplementedError

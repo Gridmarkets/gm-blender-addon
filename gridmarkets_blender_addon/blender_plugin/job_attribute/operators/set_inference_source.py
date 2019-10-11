@@ -29,25 +29,18 @@ class GRIDMARKETS_OT_set_inference_source(bpy.types.Operator):
 
     inference_source: bpy.props.StringProperty()
     job_preset_prop_id: bpy.props.StringProperty()
-    job_preset_index: bpy.props.IntProperty()
     job_attribute_key: bpy.props.StringProperty()
 
     def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
 
         if self.inference_source:
-            job_preset_props = getattr(context.scene, self.job_preset_prop_id)
-
             plugin = PluginFetcher.get_plugin()
             job_preset_container = plugin.get_preferences_container().get_job_preset_container()
             for job_preset in job_preset_container.get_all():
                 if job_preset.get_prop_id() == self.job_preset_prop_id:
                     job_attribute = job_preset.get_job_definition().get_attribute_with_key(self.job_attribute_key)
-                    attribute = job_attribute.get_attribute()
-
-                    setattr(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + attribute.get_key(),
-                            self.inference_source)
+                    job_preset.set_attribute_active_inference_source(job_attribute, self.inference_source)
                     break
             else:
                 raise ValueError("Could not find job preset")
