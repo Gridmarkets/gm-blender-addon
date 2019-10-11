@@ -44,13 +44,6 @@ class JobPreset(ABC):
     def get_job_definition(self) -> JobDefinition:
         return self._job_definition
 
-    def get_attribute_with_key(self, attribute_key: str) -> JobAttribute:
-        job_attribute = self._job_definition.get_attribute_with_key(attribute_key)
-
-        if job_attribute is None:
-            raise ValueError("Could not find attribute with key '" + attribute_key + "'.")
-
-        return job_attribute
 
     @abstractmethod
     def _get_attribute_value(self, attribute: Attribute) -> any:
