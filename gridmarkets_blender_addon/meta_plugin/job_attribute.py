@@ -33,6 +33,9 @@ class JobAttribute:
                  inference_sources: typing.List[AttributeInferenceSource],
                  is_optional: bool):
 
+        if inference_sources is None or len(inference_sources) < 1:
+            raise ValueError("JobAttribute has no inference sources")
+
         self._attribute = attribute
         self._inference_sources = inference_sources
         self._is_optional = is_optional
