@@ -95,7 +95,7 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         """ Called after the user clicks the 'ok' button on the popup """
         from gridmarkets_blender_addon.meta_plugin.utils import get_deep_attribute
 
-        property_group = get_deep_attribute(bpy, self.property_group_attribute)
+        property_group = get_deep_attribute(bpy.context.scene, self.property_group_attribute)
         focused_item = getattr(property_group, self.focused_item_attribute)
         collection = getattr(property_group, self.collection_attribute)
 
