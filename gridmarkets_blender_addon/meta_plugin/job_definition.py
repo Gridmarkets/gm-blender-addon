@@ -38,9 +38,9 @@ class JobDefinition:
     def get_attributes(self) -> typing.List[JobAttribute]:
         return self._attributes
 
-    def get_attribute_with_key(self, key: str) -> typing.Optional[JobAttribute]:
+    def get_attribute_with_key(self, key: str) -> JobAttribute:
         for job_attribute in self.get_attributes():
             if job_attribute.get_attribute().get_key() == key:
                 return job_attribute
-
-        return None
+        else:
+            raise ValueError("Could not find attribute with key '" + key + "'")
