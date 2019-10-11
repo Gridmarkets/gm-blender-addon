@@ -182,5 +182,7 @@ class JobPreset(MetaJobPreset):
         return getattr(bpy.context.scene, self.get_prop_id())
 
     def _get_attribute_value(self, attribute: Attribute):
-        props = self.get_property_group()
-        return getattr(props, attribute.get_key())
+        from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
+
+        job_preset_properties = self.get_property_group()
+        return get_value(job_preset_properties, attribute)
