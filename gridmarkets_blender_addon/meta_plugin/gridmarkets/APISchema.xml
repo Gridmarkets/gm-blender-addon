@@ -4,7 +4,7 @@
     <JobDefinitions>
         <JobDefinition id="BLENDER_CYCLES">
 
-            <DisplayName>Blender Cycles</DisplayName>
+            <DisplayName>Blender Cycles (2.80)</DisplayName>
 
             <JobAttribute>
                 <Attribute>
@@ -37,14 +37,14 @@
             <JobAttribute>
                 <Attribute>
                     <Key>app_version</Key>
-                    <DisplayName>Product Type</DisplayName>
+                    <DisplayName>Product Version</DisplayName>
                     <Description>The version of the product / app to use.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>2.80</DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -88,6 +88,7 @@
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
@@ -193,6 +194,7 @@
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
@@ -214,7 +216,7 @@
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
-                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>CONSTANT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -245,6 +247,8 @@
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>V-Ray Job</DefaultValue>
+                    <MaxLength>5</MaxLength>
+                    <MinLength>1</MinLength>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>

@@ -33,6 +33,8 @@ from gridmarkets_blender_addon.blender_plugin.api_client.api_client import APICl
 from gridmarkets_blender_addon.blender_plugin.user_interface.user_interface import UserInterface
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_project_container import \
     RemoteProjectContainer
+from gridmarkets_blender_addon.blender_plugin.application_pool_attribute_source.application_pool_attribute_source import \
+    ApplicationPoolAttributeSource
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 
 
@@ -47,6 +49,7 @@ class Plugin(MetaPlugin):
         self._user_interface = UserInterface()
         self._remote_project_container = RemoteProjectContainer()
         self._plugin_utils = PluginUtils()
+        self._application_pool_attribute_source = ApplicationPoolAttributeSource()
 
     def get_name(self) -> str:
         return bl_info['name']
@@ -68,6 +71,9 @@ class Plugin(MetaPlugin):
 
     def get_remote_project_container(self) -> RemoteProjectContainer:
         return self._remote_project_container
+
+    def get_application_pool_attribute_source(self) -> ApplicationPoolAttributeSource:
+        return self._application_pool_attribute_source
 
     def get_plugin_utils(self) -> PluginUtils:
         return self._plugin_utils

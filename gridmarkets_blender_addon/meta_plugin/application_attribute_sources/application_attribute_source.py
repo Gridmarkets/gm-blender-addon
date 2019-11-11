@@ -18,11 +18,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from enum import Enum
+from abc import ABC, abstractmethod
 
 
-class AttributeInferenceSource(Enum):
-    USER_DEFINED = "USER_DEFINED"
-    CONSTANT = "CONSTANT"
-    PROJECT = "PROJECT"
-    APPLICATION = "APPLICATION"
+class ApplicationAttributeSource(ABC):
+
+    @abstractmethod
+    def get_attribute_value(self, app: str, version: str, key: str):
+        raise NotImplementedError

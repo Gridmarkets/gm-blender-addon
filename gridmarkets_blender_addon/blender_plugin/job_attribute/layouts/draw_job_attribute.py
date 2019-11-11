@@ -54,6 +54,9 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
         input_row.prop(job_preset_props, attribute.get_key(), text="")
         input_row.enabled = False
 
+    elif inference_source == AttributeInferenceSource.APPLICATION.value:
+        input_row.label(text=str(job_preset.get_attribute_value(job_attribute)))
+
     elif inference_source == AttributeInferenceSource.USER_DEFINED.value:
         draw_attribute_input(SimpleNamespace(layout=input_row),
                              context,
@@ -79,6 +82,9 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
         op.inference_source = expected_inference_source
         op.job_preset_prop_id = job_preset.get_prop_id()
         op.job_attribute_key = attribute.get_key()
+
+    draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "A",
+                                 AttributeInferenceSource.APPLICATION.value)
 
     draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "U",
                                  AttributeInferenceSource.USER_DEFINED.value)

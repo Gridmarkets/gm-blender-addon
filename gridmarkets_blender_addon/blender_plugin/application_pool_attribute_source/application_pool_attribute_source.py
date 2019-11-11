@@ -18,11 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from enum import Enum
+from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import \
+    ApplicationPoolAttributeSource as MetaApplicationPoolAttributeSource
 
 
-class AttributeInferenceSource(Enum):
-    USER_DEFINED = "USER_DEFINED"
-    CONSTANT = "CONSTANT"
-    PROJECT = "PROJECT"
-    APPLICATION = "APPLICATION"
+class ApplicationPoolAttributeSource(MetaApplicationPoolAttributeSource):
+
+    def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':
+        from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.blender_attribute_source import \
+            BlenderAttributeSource
+
+        return BlenderAttributeSource()
+
+    def get_vray_attribute_source(self) -> 'ApplicationAttributeSource':
+        pass

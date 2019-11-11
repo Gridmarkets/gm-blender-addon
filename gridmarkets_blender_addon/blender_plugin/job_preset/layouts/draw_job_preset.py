@@ -96,6 +96,7 @@ def draw_job_preset(self, context):
             sub.enabled = False
             sub.label(text=source_description)
 
+        _draw_source_hint("Application (A)", "The value is inferred from the application.")
         _draw_source_hint("User Input Field (U)", "The value is read from the provided input field.")
         _draw_source_hint("Project Inferred Value (P)", "The value will be read from the project's attributes when you submit.")
         _draw_source_hint("Constant (C)","Uses a pre-defined constant value.")

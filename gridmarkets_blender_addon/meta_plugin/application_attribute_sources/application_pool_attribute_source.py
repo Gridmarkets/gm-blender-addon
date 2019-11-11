@@ -17,12 +17,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+from abc import ABC, abstractmethod
 
-from enum import Enum
+from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_attribute_source import \
+    ApplicationAttributeSource
 
 
-class AttributeInferenceSource(Enum):
-    USER_DEFINED = "USER_DEFINED"
-    CONSTANT = "CONSTANT"
-    PROJECT = "PROJECT"
-    APPLICATION = "APPLICATION"
+class ApplicationPoolAttributeSource(ABC):
+
+    def get_attribute_value(self, app: str, version: str, key: str):
+        if app == 'blender':
+            return self.get_blender_attribute_source().get_attribute_value(app, version, key)
+        else:
+            raise ValueError("Unrecognised application: " + str(app))
+
+    @abstractmethod
+    def get_blender_attribute_source(self) -> ApplicationAttributeSource:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_vray_attribute_source(self) -> ApplicationAttributeSource:
+        raise NotImplementedError

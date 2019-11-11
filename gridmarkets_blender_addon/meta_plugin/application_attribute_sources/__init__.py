@@ -17,12 +17,3 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-from enum import Enum
-
-
-class AttributeInferenceSource(Enum):
-    USER_DEFINED = "USER_DEFINED"
-    CONSTANT = "CONSTANT"
-    PROJECT = "PROJECT"
-    APPLICATION = "APPLICATION"

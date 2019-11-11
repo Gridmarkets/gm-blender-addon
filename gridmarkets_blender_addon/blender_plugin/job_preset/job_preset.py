@@ -186,8 +186,37 @@ class JobPreset(MetaJobPreset):
     def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None):
         from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
 
+        inference_source = self.get_attribute_active_inference_source(job_attribute)
+
+        attribute = job_attribute.get_attribute()
         job_preset_properties = self.get_property_group()
-        return get_value(job_preset_properties, job_attribute.get_attribute())
+
+        if inference_source == AttributeInferenceSource.APPLICATION.value:
+            from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+
+            plugin = PluginFetcher.get_plugin()
+            application_pool_attribute_source = plugin.get_application_pool_attribute_source()
+
+            job_definition = self.get_job_definition()
+
+            # app and app_version are two attributes which can not be application defined so there is no risk of
+            # infinite recursion.
+            app = self.get_attribute_value(job_definition.get_attribute_with_key('app'), project_source = project_source)
+            version = self.get_attribute_value(job_definition.get_attribute_with_key('app_version'), project_source = project_source)
+            key = job_attribute.get_attribute().get_key()
+
+            return application_pool_attribute_source.get_attribute_value(app, version, key)
+        elif inference_source == AttributeInferenceSource.CONSTANT.value:
+            return attribute.get_default_value()
+        elif inference_source == AttributeInferenceSource.PROJECT.value:
+            if project_source is None:
+                raise ValueError("Must provide project source for attribute '" + attribute.get_display_name() + "'")
+
+            return project_source.get_attribute(attribute.get_key())
+        elif inference_source == AttributeInferenceSource.USER_DEFINED.value:
+            return get_value(job_preset_properties, job_attribute.get_attribute())
+        else:
+            raise ValueError("Unknown inference source: " + str(inference_source))
 
     def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> AttributeInferenceSource:
         job_preset_properties = self.get_property_group()

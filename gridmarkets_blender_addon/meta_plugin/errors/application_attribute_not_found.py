@@ -18,11 +18,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from enum import Enum
+from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
 
 
-class AttributeInferenceSource(Enum):
-    USER_DEFINED = "USER_DEFINED"
-    CONSTANT = "CONSTANT"
-    PROJECT = "PROJECT"
-    APPLICATION = "APPLICATION"
+class ApplicationAttributeNotFound(PluginError):
+
+    def __init__(self, app: str, app_version: str, key: str):
+        PluginError.__init__(self, "Could not find attribute '" + key + "' for app '" + app + " (" + app_version + ")'")
