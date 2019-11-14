@@ -29,7 +29,7 @@ from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
 
 class JobPreset(MetaJobPreset):
-    INFERENCE_SOURCE_KEY = "INFERENCE_SOURCE"
+    INFERENCE_SOURCE_KEY = "Attribute Inference Source"
     JOB_PRESET_KEY = "job_preset_"
 
     FRAME_RANGE_COLLECTION = "_collection"
