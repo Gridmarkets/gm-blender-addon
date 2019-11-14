@@ -273,7 +273,7 @@
             <JobAttribute>
                 <Attribute>
                     <Key>app_version</Key>
-                    <DisplayName>Product Type</DisplayName>
+                    <DisplayName>Product Version</DisplayName>
                     <Description>The version of the product / app to use.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>4.10.02</DefaultValue>
