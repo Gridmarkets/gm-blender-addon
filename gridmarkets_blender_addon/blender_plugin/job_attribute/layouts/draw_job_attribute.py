@@ -66,3 +66,4 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
     col3.alignment="EXPAND"
     col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
                            text="")
+    col3.enabled = len(job_attribute.get_inference_sources()) > 1
