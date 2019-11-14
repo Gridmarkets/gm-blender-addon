@@ -27,7 +27,7 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
     from gridmarkets_blender_addon.blender_plugin.job_attribute.operators.set_inference_source import \
         GRIDMARKETS_OT_set_inference_source
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
-    from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
+    from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
     from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
 
@@ -50,20 +50,20 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
 
     input_row = col2.column()
 
-    if inference_source == AttributeInferenceSource.CONSTANT.value:
+    if inference_source == InferenceSource.CONSTANT.value:
         input_row.prop(job_preset_props, attribute.get_key(), text="")
         input_row.enabled = False
 
-    elif inference_source == AttributeInferenceSource.APPLICATION.value:
+    elif inference_source == InferenceSource.APPLICATION.value:
         input_row.label(text=str(job_preset.get_attribute_value(job_attribute)))
 
-    elif inference_source == AttributeInferenceSource.USER_DEFINED.value:
+    elif inference_source == InferenceSource.USER_DEFINED.value:
         draw_attribute_input(SimpleNamespace(layout=input_row),
                              context,
                              job_preset_props,
                              attribute)
 
-    elif inference_source == AttributeInferenceSource.PROJECT.value:
+    elif inference_source == InferenceSource.PROJECT.value:
         input_row.prop(props, "project_defined", text="")
         input_row.enabled = False
 

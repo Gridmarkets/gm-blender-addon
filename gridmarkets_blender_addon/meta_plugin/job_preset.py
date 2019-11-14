@@ -20,7 +20,7 @@
 
 from abc import ABC, abstractmethod
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
+from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
@@ -49,10 +49,10 @@ class JobPreset(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> AttributeInferenceSource:
+    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> InferenceSource:
         raise NotImplementedError
 
     @abstractmethod
     def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
-                                              inference_source: AttributeInferenceSource) -> None:
+                                              inference_source: InferenceSource) -> None:
         raise NotImplementedError

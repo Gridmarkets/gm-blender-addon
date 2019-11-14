@@ -24,7 +24,7 @@ from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, Attribute
 from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
-from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
+from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
 
 import xml.etree.ElementTree as ET
@@ -210,12 +210,12 @@ class XMLAPISchemaParser:
             raise ValueError("Unrecognised attribute type.")
 
     @staticmethod
-    def _parse_job_inference_sources(inference_sources_element: ET.Element) -> typing.List[AttributeInferenceSource]:
+    def _parse_job_inference_sources(inference_sources_element: ET.Element) -> typing.List[InferenceSource]:
 
         attribute_inference_sources: typing.List[str] = get_all_sub_elements_text(
             inference_sources_element, TAG_INFERENCE_SOURCE)
 
-        recognised_inference_source_values = set(source.value for source in AttributeInferenceSource)
+        recognised_inference_source_values = set(source.value for source in InferenceSource)
 
         # check the inference source is a recognised string
         for attribute_inference_source in attribute_inference_sources:
@@ -223,7 +223,7 @@ class XMLAPISchemaParser:
                 raise ValueError("Attribute inference source " + attribute_inference_source + " is not recognised.")
 
         # noinspection PyTypeChecker
-        validated_inference_sources: typing.List[AttributeInferenceSource] = attribute_inference_sources
+        validated_inference_sources: typing.List[InferenceSource] = attribute_inference_sources
 
         return validated_inference_sources
 

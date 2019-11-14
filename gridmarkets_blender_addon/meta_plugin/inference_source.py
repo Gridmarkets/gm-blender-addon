@@ -21,7 +21,7 @@
 from enum import Enum
 
 
-class AttributeInferenceSource(Enum):
+class InferenceSource(Enum):
     USER_DEFINED = "USER_DEFINED"
     CONSTANT = "CONSTANT"
     PROJECT = "PROJECT"
