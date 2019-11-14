@@ -73,7 +73,7 @@ class JobPreset(MetaJobPreset):
 
                 # reset inference source to default
                 inference_sources = job_attribute.get_inference_sources()
-                setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0])
+                setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0].get_id())
 
     def register_props(self):
         import bpy
@@ -159,14 +159,15 @@ class JobPreset(MetaJobPreset):
             # every job attribute has at least one possible inference source
             inference_source_items = []
             for inference_source in job_attribute.get_inference_sources():
-                inference_source_items.append((inference_source,
-                                               string.capwords(inference_source.lower(), "_").replace("_", " "), ""))
+                inference_source_items.append((inference_source.get_id(),
+                                               inference_source.get_display_name(),
+                                               inference_source.get_description()))
 
             properties[self.INFERENCE_SOURCE_KEY + key] = bpy.props.EnumProperty(
                 name=self.INFERENCE_SOURCE_KEY,
                 description="The source to read the attribute value from.",
                 items=inference_source_items,
-                default=str(job_attribute.get_inference_sources()[0]),
+                default=str(job_attribute.get_inference_sources()[0].get_id()),
                 options={'SKIP_SAVE'}
             )
 
@@ -201,7 +202,7 @@ class JobPreset(MetaJobPreset):
         attribute = job_attribute.get_attribute()
         job_preset_properties = self.get_property_group()
 
-        if inference_source == InferenceSource.APPLICATION.value:
+        if inference_source == InferenceSource.get_application_inference_source():
             from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
 
             plugin = PluginFetcher.get_plugin()
@@ -216,25 +217,27 @@ class JobPreset(MetaJobPreset):
             key = job_attribute.get_attribute().get_key()
 
             return application_pool_attribute_source.get_attribute_value(app, version, key)
-        elif inference_source == InferenceSource.CONSTANT.value:
+        elif inference_source == InferenceSource.get_constant_inference_source():
             return attribute.get_default_value()
-        elif inference_source == InferenceSource.PROJECT.value:
+        elif inference_source == InferenceSource.get_project_inference_source():
             if project_source is None:
                 raise ValueError("Must provide project source for attribute '" + attribute.get_display_name() + "'")
 
             return project_source.get_attribute(attribute.get_key())
-        elif inference_source == InferenceSource.USER_DEFINED.value:
+        elif inference_source == InferenceSource.get_user_defined_inference_source():
             return get_value(job_preset_properties, job_attribute.get_attribute())
         else:
             raise ValueError("Unknown inference source: " + str(inference_source))
 
     def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> InferenceSource:
         job_preset_properties = self.get_property_group()
-        return getattr(job_preset_properties, self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key())
+        inference_source_id = getattr(job_preset_properties,
+                                      self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key())
+        return InferenceSource.get_inference_source(inference_source_id)
 
     def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
                                               inference_source: InferenceSource) -> None:
         job_preset_properties = self.get_property_group()
         setattr(job_preset_properties,
                 self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
-                inference_source)
+                inference_source.get_id())

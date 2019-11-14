@@ -24,12 +24,9 @@ from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPr
 
 def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobAttribute, col1, col2, col3):
     from types import SimpleNamespace
-    from gridmarkets_blender_addon.blender_plugin.job_attribute.operators.set_inference_source import \
-        GRIDMARKETS_OT_set_inference_source
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
     from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-    from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
 
     scene = context.scene
     props = scene.props
@@ -42,28 +39,27 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
     if attribute_type == AttributeType.NULL:
         return
 
-    inference_sources = job_attribute.get_inference_sources()
-    inference_source = getattr(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + attribute.get_key())
+    inference_source = job_preset.get_attribute_active_inference_source(job_attribute)
 
     display_name_row = col1.row()
     display_name_row.label(text=attribute.get_display_name() + ":")
 
     input_row = col2.column()
 
-    if inference_source == InferenceSource.CONSTANT.value:
+    if inference_source == InferenceSource.get_constant_inference_source():
         input_row.prop(job_preset_props, attribute.get_key(), text="")
         input_row.enabled = False
 
-    elif inference_source == InferenceSource.APPLICATION.value:
+    elif inference_source == InferenceSource.get_application_inference_source():
         input_row.label(text=str(job_preset.get_attribute_value(job_attribute)))
 
-    elif inference_source == InferenceSource.USER_DEFINED.value:
+    elif inference_source == InferenceSource.get_user_defined_inference_source():
         draw_attribute_input(SimpleNamespace(layout=input_row),
                              context,
                              job_preset_props,
                              attribute)
 
-    elif inference_source == InferenceSource.PROJECT.value:
+    elif inference_source == InferenceSource.get_project_inference_source():
         input_row.prop(props, "project_defined", text="")
         input_row.enabled = False
 

@@ -215,17 +215,7 @@ class XMLAPISchemaParser:
         attribute_inference_sources: typing.List[str] = get_all_sub_elements_text(
             inference_sources_element, TAG_INFERENCE_SOURCE)
 
-        recognised_inference_source_values = set(source.value for source in InferenceSource)
-
-        # check the inference source is a recognised string
-        for attribute_inference_source in attribute_inference_sources:
-            if attribute_inference_source not in recognised_inference_source_values:
-                raise ValueError("Attribute inference source " + attribute_inference_source + " is not recognised.")
-
-        # noinspection PyTypeChecker
-        validated_inference_sources: typing.List[InferenceSource] = attribute_inference_sources
-
-        return validated_inference_sources
+        return list(map(lambda x: InferenceSource.get_inference_source(x), attribute_inference_sources))
 
     @staticmethod
     def _parse_job_attribute(job_attribute_element: ET.Element) -> JobAttribute:
