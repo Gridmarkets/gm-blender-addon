@@ -123,3 +123,10 @@ class UserInterface(MetaUserInterface):
 
     def toggle_logging_console(self) -> None:
         bpy.context.scene.props.is_logging_console_open = not bpy.context.scene.props.is_logging_console_open
+
+    # job preset
+    def get_show_hidden_job_preset_attributes(self) -> bool:
+        return bpy.context.scene.props.user_interface.show_hidden_job_preset_attributes
+
+    def set_show_hidden_job_preset_attributes(self, value: bool) -> None:
+        bpy.context.scene.props.user_interface.show_hidden_job_preset_attributes = value

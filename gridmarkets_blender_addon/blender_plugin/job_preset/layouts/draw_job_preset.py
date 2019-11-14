@@ -71,9 +71,28 @@ def draw_job_preset(self, context):
             column.enabled = False
 
         for job_attribute in attributes:
+            if job_attribute.get_attribute().get_type() == AttributeType.NULL:
+                continue
+
+            if not plugin.get_user_interface().get_show_hidden_job_preset_attributes():
+                if len(job_attribute.get_inference_sources()) == 1:
+                    from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
+
+                    if job_attribute.get_inference_sources()[0] == InferenceSource.get_constant_inference_source():
+                        continue
+
+                    if job_attribute.get_inference_sources()[0] == InferenceSource.get_project_inference_source():
+                        continue
+
             columns = _get_columns(col)
-            if job_attribute.get_attribute().get_type() != AttributeType.NULL:
-                draw_job_attribute(self, context, job_preset, job_attribute, columns[0], columns[1], columns[2])
+            draw_job_attribute(self, context, job_preset, job_attribute, columns[0], columns[1], columns[2])
+
+        col.separator()
+
+        row = col.row(align=True)
+        row.alignment = "RIGHT"
+        row.label(text="Show Hidden Job Preset Attributes")
+        row.prop(scene.props.user_interface, "show_hidden_job_preset_attributes", text="")
 
         col.separator()
         col.label(text="Some Job Preset attributes let you choose between different sources. These Sources Include:",

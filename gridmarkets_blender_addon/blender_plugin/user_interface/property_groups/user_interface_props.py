@@ -142,3 +142,10 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         default="",
         options={'SKIP_SAVE', 'HIDDEN'}
     )
+
+    # job preset
+    show_hidden_job_preset_attributes: bpy.props.BoolProperty(
+        name="Show Hidden Job Preset Attributes",
+        default=False,
+        options={'SKIP_SAVE'}
+    )

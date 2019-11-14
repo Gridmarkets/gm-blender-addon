@@ -106,3 +106,10 @@ class UserInterface(ABC, PluginAccessor):
 
     def set_show_logger_names(self, enabled: bool) -> None:
         raise NotImplementedError
+
+    # job preset
+    def get_show_hidden_job_preset_attributes(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_hidden_job_preset_attributes(self, value: bool) -> None:
+        raise NotImplementedError
