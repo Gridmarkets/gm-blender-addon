@@ -54,13 +54,12 @@ def draw_job_preset(self, context):
             temp_col = split.column()
             row = temp_col.row(align=True)
 
+            split = row.split(factor=0.8)
             # attribute input column
-            col2 = row.row()
+            col2 = split.column()
 
             # attribute inference source column
-            row.separator()
-            col3 = row.row(align=True)
-            col3.alignment = "RIGHT"
+            col3 = split.column()
 
             return col1, col2, col3
 

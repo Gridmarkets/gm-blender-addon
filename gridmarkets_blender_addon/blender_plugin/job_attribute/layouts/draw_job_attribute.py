@@ -67,30 +67,6 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
         input_row.prop(props, "project_defined", text="")
         input_row.enabled = False
 
-    inference_buttons = col3.row(align=True)
-    inference_buttons.alignment = "RIGHT"
-
-    def draw_inference_source_button(operator, label, expected_inference_source: str):
-        set_inference_source = getattr(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + attribute.get_key())
-        depress = set_inference_source == expected_inference_source
-
-        sub = inference_buttons.row(align=True)
-        sub.alignment = "LEFT"
-        sub.ui_units_x = 1
-        sub.enabled = expected_inference_source in inference_sources
-        op = sub.operator(operator.bl_idname, text=label if sub.enabled else " ", depress=depress)
-        op.inference_source = expected_inference_source
-        op.job_preset_prop_id = job_preset.get_prop_id()
-        op.job_attribute_key = attribute.get_key()
-
-    draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "A",
-                                 AttributeInferenceSource.APPLICATION.value)
-
-    draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "U",
-                                 AttributeInferenceSource.USER_DEFINED.value)
-
-    draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "P",
-                                 AttributeInferenceSource.PROJECT.value)
-
-    draw_inference_source_button(GRIDMARKETS_OT_set_inference_source, "C",
-                                 AttributeInferenceSource.CONSTANT.value)
+    col3.alignment="EXPAND"
+    col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
+                           text="")

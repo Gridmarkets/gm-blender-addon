@@ -17,6 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+
+import string
+
 from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
@@ -154,10 +157,17 @@ class JobPreset(MetaJobPreset):
                 )
 
             # every job attribute has at least one possible inference source
-            properties[self.INFERENCE_SOURCE_KEY + key] = bpy.props.StringProperty(
+            inference_source_items = []
+            for inference_source in job_attribute.get_inference_sources():
+                inference_source_items.append((inference_source,
+                                               string.capwords(inference_source.lower(), "_").replace("_", " "), ""))
+
+            properties[self.INFERENCE_SOURCE_KEY + key] = bpy.props.EnumProperty(
                 name=self.INFERENCE_SOURCE_KEY,
                 description="The source to read the attribute value from.",
-                default=str(job_attribute.get_inference_sources()[0])
+                items=inference_source_items,
+                default=str(job_attribute.get_inference_sources()[0]),
+                options={'SKIP_SAVE'}
             )
 
         # register property group
