@@ -95,25 +95,33 @@ def draw_job_preset(self, context):
 
         box = layout.box()
         col = box.column()
-        split1_factor = 0.2
+        split1_factor = 0.3 if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else 0.2
 
         def _get_columns(parent_layout):
             job_attribute_row = parent_layout.row()
 
-            # attribute display name column
             split = job_attribute_row.split(factor=split1_factor)
-            col1 = split.column(align=True)
-            temp_col = split.column()
+
+            temp_col = split.column(align=True)
             row = temp_col.row(align=True)
 
+            # attribute display name column
+            col1 = row.column(align=True)
+
+            # attribute key column
+            key_column = row.column() if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else None
+
+            temp_col = split.column()
+            row = temp_col.row(align=True)
             split = row.split(factor=0.8)
+
             # attribute input column
             col2 = split.column()
 
             # attribute inference source column
             col3 = split.column()
 
-            return col1, col2, col3
+            return col1, col2, col3, key_column
 
         columns = _get_columns(col)
         columns[0].label(text="Attribute Name")
@@ -129,6 +137,10 @@ def draw_job_preset(self, context):
 
         source_header_row_operator = source_header_row.row()
         source_header_row_operator.operator(GRIDMARKETS_OT_open_inference_source_help.bl_idname, text="", icon=constants.ICON_INFO, emboss=False)
+
+        if plugin.get_user_interface().get_show_hidden_job_preset_attributes():
+            columns[3].label(text="Attribute Key")
+            columns[3].enabled = False
 
         col.separator()
 
@@ -147,7 +159,7 @@ def draw_job_preset(self, context):
                         continue
 
             columns = _get_columns(col)
-            draw_job_attribute(self, context, job_preset, job_attribute, columns[0], columns[1], columns[2])
+            draw_job_attribute(self, context, job_preset, job_attribute, columns[0], columns[3], columns[1], columns[2])
 
         col.separator()
 

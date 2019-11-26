@@ -22,12 +22,14 @@ from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 
 
-def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobAttribute, col1, col2, col3):
+def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobAttribute, col1, key_column, col2, col3):
     from types import SimpleNamespace
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
     from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 
+    plugin = PluginFetcher.get_plugin()
     scene = context.scene
     props = scene.props
 
@@ -43,6 +45,11 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
 
     display_name_row = col1.row()
     display_name_row.label(text=attribute.get_display_name() + ":")
+
+    if plugin.get_user_interface().get_show_hidden_job_preset_attributes():
+        key_row = key_column.row()
+        key_row.enabled = False
+        key_row.label(text=attribute.get_key())
 
     input_row = col2.column()
 
