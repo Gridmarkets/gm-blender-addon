@@ -31,6 +31,12 @@ class InferenceSource:
     PROJECT = "PROJECT"
     APPLICATION = "APPLICATION"
 
+    # descriptions
+    USER_DEFINED_DESCRIPTION = "Use the value specified by the user in the form field"
+    CONSTANT_DESCRIPTION = "Use the pre-defined constant value for this attribute"
+    PROJECT_DESCRIPTION = "Read the value from the project's attributes when you submit"
+    APPLICATION_DESCRIPTION = "Use the value specified by the application"
+
     _user_defined: 'InferenceSource' = None
     _constant: 'InferenceSource' = None
     _project: 'InferenceSource' = None
@@ -83,23 +89,27 @@ class InferenceSource:
     @staticmethod
     def get_user_defined_inference_source():
         if InferenceSource._user_defined is None:
-            InferenceSource._user_defined = InferenceSource(InferenceSource.USER_DEFINED, "User Defined", "")
+            InferenceSource._user_defined = InferenceSource(InferenceSource.USER_DEFINED, "User Defined",
+                                                            InferenceSource.USER_DEFINED_DESCRIPTION)
         return InferenceSource._user_defined
 
     @staticmethod
     def get_constant_inference_source():
         if InferenceSource._constant is None:
-            InferenceSource._constant = InferenceSource(InferenceSource.CONSTANT, "Constant", "")
+            InferenceSource._constant = InferenceSource(InferenceSource.CONSTANT, "Constant",
+                                                        InferenceSource.CONSTANT_DESCRIPTION)
         return InferenceSource._constant
 
     @staticmethod
     def get_project_inference_source():
         if InferenceSource._project is None:
-            InferenceSource._project = InferenceSource(InferenceSource.PROJECT, "Project", "")
+            InferenceSource._project = InferenceSource(InferenceSource.PROJECT, "Project",
+                                                       InferenceSource.PROJECT_DESCRIPTION)
         return InferenceSource._project
 
     @staticmethod
     def get_application_inference_source():
         if InferenceSource._application is None:
-            InferenceSource._application = InferenceSource(InferenceSource.APPLICATION, "Application", "")
+            InferenceSource._application = InferenceSource(InferenceSource.APPLICATION, "Application",
+                                                           InferenceSource.APPLICATION_DESCRIPTION)
         return InferenceSource._application
