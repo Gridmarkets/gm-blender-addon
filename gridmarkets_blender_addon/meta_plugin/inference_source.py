@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
+
 
 class InferenceSource:
     """
@@ -85,6 +87,15 @@ class InferenceSource:
 
         if source_id == InferenceSource.APPLICATION:
             return InferenceSource.get_application_inference_source()
+
+    @staticmethod
+    def get_all_inference_source_types() -> typing.List['InferenceSource']:
+        inference_sources = list()
+        inference_sources.append(InferenceSource.get_user_defined_inference_source())
+        inference_sources.append(InferenceSource.get_constant_inference_source())
+        inference_sources.append(InferenceSource.get_project_inference_source())
+        inference_sources.append(InferenceSource.get_application_inference_source())
+        return inference_sources
 
     @staticmethod
     def get_user_defined_inference_source():
