@@ -9,7 +9,7 @@
             <JobAttribute>
                 <Attribute>
                     <Key>name</Key>
-                    <DisplayName>Name</DisplayName>
+                    <DisplayName>Job Name</DisplayName>
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>Cycles Job</DefaultValue>
@@ -243,7 +243,7 @@
             <JobAttribute>
                 <Attribute>
                     <Key>name</Key>
-                    <DisplayName>Name</DisplayName>
+                    <DisplayName>Job Name</DisplayName>
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>V-Ray Job</DefaultValue>
