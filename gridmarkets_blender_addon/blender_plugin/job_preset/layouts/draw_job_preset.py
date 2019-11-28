@@ -25,6 +25,7 @@ from gridmarkets_blender_addon import constants
 class GRIDMARKETS_OT_open_inference_source_help(bpy.types.Operator):
     bl_idname = "gridmarkets.open_inference_source_help"
     bl_label = "Open Inference Source Help"
+    bl_options = {'INTERNAL'}
 
     def invoke(self, context, event):
         from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
