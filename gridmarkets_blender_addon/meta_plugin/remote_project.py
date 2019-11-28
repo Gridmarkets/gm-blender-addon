@@ -46,6 +46,9 @@ class RemoteProject(Project):
     def delete(self) -> None:
         raise NotImplementedError
 
+    def get_size(self) -> int:
+        raise NotImplementedError
+
     @staticmethod
     def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
         from gridmarkets_blender_addon import constants

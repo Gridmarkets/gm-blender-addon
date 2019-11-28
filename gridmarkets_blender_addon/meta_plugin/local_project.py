@@ -46,3 +46,9 @@ class LocalProject(Project):
     @abstractmethod
     def delete(self) -> None:
         raise NotImplementedError
+
+    def get_size(self) -> int:
+        project_size = 0
+        for file in self.get_files():
+            project_size += file.stat().st_size
+        return project_size

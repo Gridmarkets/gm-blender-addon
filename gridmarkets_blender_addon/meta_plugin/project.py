@@ -63,3 +63,13 @@ class Project(ABC):
 
     def get_files(self) -> typing.Set[pathlib.Path]:
         return self._files
+
+    @abstractmethod
+    def get_size(self) -> int:
+        """
+        Gets the size of the project in bytes.
+
+        :return: The size of the project in bytes.
+        :rtype: int
+        """
+        raise NotImplementedError
