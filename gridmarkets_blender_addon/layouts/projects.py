@@ -37,16 +37,17 @@ class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
         layout.scale_y = 2
         layout.operator_context = 'INVOKE_AREA'
 
+        # disable menu options if already running operation
+        enabled = not plugin.get_user_interface().is_running_operation()
+
         # draw upload current scene button
         sub = layout.row()
-        if is_running_operation:
-            sub.enabled = False
+        sub.enabled = enabled
         sub.operator(constants.OPERATOR_UPLOAD_PROJECT_ID_NAME, text="Upload current scene as new Project")
 
         # draw upload file button
         sub = layout.row()
-        if is_running_operation:
-            sub.enabled = False
+        sub.enabled = enabled
         sub.operator(constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME, text="Upload file as new Project")
 
         # draw manual entree button

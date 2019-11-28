@@ -21,7 +21,7 @@
 
 def draw_remote_project_container(self, context):
     from gridmarkets_blender_addon import constants
-    from gridmarkets_blender_addon.layouts.projects import GRIDMARKETS_MT_add_new_project
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
     from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
         GRIDMARKETS_OT_open_remote_project_definition_popup
@@ -31,6 +31,8 @@ def draw_remote_project_container(self, context):
 
     layout = self.layout
     props = context.scene.props
+    plugin = PluginFetcher.get_plugin()
+
     remote_project_container_props = props.remote_project_container
 
     # draw header
@@ -48,5 +50,6 @@ def draw_remote_project_container(self, context):
     row = layout.row(align=True)
     row.scale_y = 2.5
     row.operator("gridmarkets.open_add_project_menu", text="Add New Project")
-    
+    row.enabled = not plugin.get_user_interface().is_running_operation()
+
     draw_remote_project(self, context)
