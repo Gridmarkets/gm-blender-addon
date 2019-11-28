@@ -21,14 +21,23 @@
 
 def draw_remote_project_container(self, context):
     from gridmarkets_blender_addon import constants
-    from gridmarkets_blender_addon.layouts.projects import _draw_project_info_view, GRIDMARKETS_MT_add_new_project
+    from gridmarkets_blender_addon.layouts.projects import GRIDMARKETS_MT_add_new_project
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
+    from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
+        GRIDMARKETS_OT_open_remote_project_definition_popup
 
-    from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import GRIDMARKETS_UL_remote_project
+    from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import \
+        GRIDMARKETS_UL_remote_project
 
     layout = self.layout
     props = context.scene.props
     remote_project_container_props = props.remote_project_container
+
+    # draw header
+    row = layout.row(align=True)  #
+    row.label(text="Remote Projects", icon=constants.ICON_REMOTE_PROJECT)
+    row.operator(GRIDMARKETS_OT_open_remote_project_definition_popup.bl_idname, text="",
+                 icon=constants.ICON_INFO, emboss=False)
 
     row = layout.row()
     row.template_list(GRIDMARKETS_UL_remote_project.bl_idname, "",
