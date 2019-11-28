@@ -30,7 +30,7 @@ class GRIDMARKETS_OT_open_inference_source_help(bpy.types.Operator):
     def invoke(self, context, event):
         from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 
-        def draw_help(self, layout):
+        def draw_help(self, context):
             layout = self.layout
             layout.scale_y = 0.8
 
