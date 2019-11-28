@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManage
 
 class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
     bl_idname = "GRIDMARKETS_MT_add_new_project"
-    bl_label = "Add new project"
+    bl_label = ""
 
     def draw(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -34,6 +34,7 @@ class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
         is_running_operation = plugin.get_user_interface().is_running_operation()
 
         layout = self.layout
+        layout.scale_y = 2
         layout.operator_context = 'INVOKE_AREA'
 
         # draw upload current scene button

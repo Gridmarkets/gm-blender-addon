@@ -46,6 +46,7 @@ def draw_remote_project_container(self, context):
                       rows=2)
 
     row = layout.row(align=True)
-    row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)
-
+    row.scale_y = 2.5
+    row.operator("gridmarkets.open_add_project_menu", text="Add New Project")
+    
     draw_remote_project(self, context)
