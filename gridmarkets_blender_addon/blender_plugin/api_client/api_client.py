@@ -87,7 +87,8 @@ class APIClient(GridMarketsAPIClient):
             PRODUCT_TYPE = "vray"
             PRODUCT_VERSION = products[-1]
             OPERATION = "render"
-            PATH = '/' + packed_project.get_name() + '/' + str(packed_project.get_relative_main_file())
+            PATH = '/' + packed_project.get_name() + '/' + \
+                   str(packed_project.get_relative_file_path(packed_project.get_attribute(constants.MAIN_PROJECT_FILE)))
             FRAMES = frame_ranges
             OUTPUT_HEIGHT = output_height
             OUTPUT_WIDTH = output_width
@@ -167,6 +168,7 @@ class APIClient(GridMarketsAPIClient):
         import inspect
         from gridmarkets_blender_addon.utils_blender import get_wrapped_logger
         from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
+        from gridmarkets_blender_addon import constants
 
         from gridmarkets.project import Project
         from gridmarkets.job import Job
@@ -194,7 +196,7 @@ class APIClient(GridMarketsAPIClient):
             PRODUCT_TYPE = "vray"
             PRODUCT_VERSION = products[-1]
             OPERATION = "render"
-            PATH = '/' + remote_project.get_name() + '/' + str(remote_project.get_main_file())
+            PATH = '/' + remote_project.get_name() + '/' + str(remote_project.get_attribute(constants.MAIN_PROJECT_FILE))
             FRAMES = frame_ranges
             OUTPUT_HEIGHT = output_height
             OUTPUT_WIDTH = output_width
@@ -273,6 +275,7 @@ class APIClient(GridMarketsAPIClient):
         import inspect
         from gridmarkets_blender_addon.utils_blender import get_wrapped_logger
         from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
+        from gridmarkets_blender_addon import constants
 
         from gridmarkets.project import Project
         from gridmarkets.watch_file import WatchFile
@@ -301,7 +304,8 @@ class APIClient(GridMarketsAPIClient):
         # any other paths passed will be ignored
         project.add_folders(packed_project.get_root_dir())
 
-        render_file = '/' + packed_project.get_name() + '/' + str(packed_project.get_relative_main_file())
+        render_file = '/' + packed_project.get_name() + '/' + \
+                      str(packed_project.get_relative_file_path(packed_project.get_attribute(constants.MAIN_PROJECT_FILE)))
 
         job = utils_blender.get_job(context, render_file)
 
@@ -348,6 +352,7 @@ class APIClient(GridMarketsAPIClient):
         import bpy
         import inspect
         from gridmarkets_blender_addon.utils_blender import get_wrapped_logger
+        from gridmarkets_blender_addon import constants
 
         from gridmarkets.project import Project
         from gridmarkets.watch_file import WatchFile
@@ -366,7 +371,8 @@ class APIClient(GridMarketsAPIClient):
 
         project = Project(str(remote_project.get_root_dir()), remote_project.get_name())
 
-        render_file = '/' + remote_project.get_name() + '/' + str(remote_project.get_main_file())
+        render_file = '/' + remote_project.get_name() + '/' + \
+                      str(remote_project.get_attribute(constants.MAIN_PROJECT_FILE))
 
         job = utils_blender.get_job(context, render_file)
 

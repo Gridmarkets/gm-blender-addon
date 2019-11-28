@@ -29,14 +29,12 @@ class PackedProject(LocalProject):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
 
         LocalProject.__init__(self,
                               name,
                               root_dir,
-                              main_file,
                               files,
                               attributes)
 
@@ -50,9 +48,6 @@ class PackedProject(LocalProject):
             raise ValueError("file must be on same drive as project directory")
 
         return file.relative_to(root_dir)
-
-    def get_relative_main_file(self) -> pathlib.Path:
-        return self.get_relative_file_path(self.get_main_file())
 
     def get_relative_files(self) -> typing.Set[pathlib.Path]:
         relative_files = map(self.get_relative_file_path, self.get_files())

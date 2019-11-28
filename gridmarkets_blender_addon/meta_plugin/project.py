@@ -28,12 +28,10 @@ class Project(ABC):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
         self._name = name
         self._root_dir = root_dir
-        self._main_file = main_file
         self._files = files
         self._attributes = attributes
 
@@ -62,9 +60,6 @@ class Project(ABC):
 
     def get_root_dir(self) -> pathlib.Path:
         return self._root_dir
-
-    def get_main_file(self) -> typing.Optional[pathlib.Path]:
-        return self._main_file
 
     def get_files(self) -> typing.Set[pathlib.Path]:
         return self._files

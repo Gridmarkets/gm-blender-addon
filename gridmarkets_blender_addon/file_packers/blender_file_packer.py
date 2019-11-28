@@ -30,6 +30,7 @@ class BlenderFilePacker(FilePacker):
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
         from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        from gridmarkets_blender_addon import constants
 
         plugin = PluginFetcher.get_plugin()
         logging_coordinator = plugin.get_logging_coordinator()
@@ -46,9 +47,8 @@ class BlenderFilePacker(FilePacker):
 
         return PackedProject(output_dir.stem,
                              output_dir,
-                             output_dir / target_file.name,
-                             set(),
-                             {"PRODUCT": "blender"})
+                             {output_dir / target_file.name},
+                             {"PRODUCT": "blender", constants.MAIN_PROJECT_FILE: output_dir / target_file.name})
 
     @staticmethod
     def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):

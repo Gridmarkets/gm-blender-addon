@@ -23,6 +23,7 @@ import pathlib
 import re
 import json
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+from gridmarkets_blender_addon import constants
 
 _PATH_MAPPINGS = {'Z:': "/data/input"}
 
@@ -105,28 +106,31 @@ class PackedVRayProject(PackedProject):
     def __init__(self, packed_dir: pathlib.Path, main_file: pathlib.Path):
         from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
 
+        self._file_last_updated = str(os.path.getmtime(main_file)).replace('.', '-')
+        remap_file_path = self.create_remap_file()
+
         attributes = {
-            "PRODUCT": "vray"
+            "PRODUCT": "vray",
+            constants.MAIN_PROJECT_FILE: main_file,
+            RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY: remap_file_path
         }
 
         PackedProject.__init__(self,
                                packed_dir.stem,
                                packed_dir,
-                               main_file,
-                               set(),  # empty set for now since they are not used
+                               {main_file, remap_file_path},
                                attributes)
 
-        self._file_last_updated = str(os.path.getmtime(main_file)).replace('.', '-')
-        remap_file_path = self.create_remap_file()
-        self.set_attribute(RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY, remap_file_path)
 
     def get_remap_file(self) -> pathlib.Path:
         from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
         return self.get_attribute(RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY)
 
     def create_remap_file(self) -> pathlib.Path:
-        remap_file = "{}-{}.xml".format(self.get_main_file().name, self._file_last_updated)
-        src_path = os.path.dirname(str(self.get_main_file()))
+        from gridmarkets_blender_addon import constants
+
+        remap_file = "{}-{}.xml".format(self.get_attribute(constants.MAIN_PROJECT_FILE).name, self._file_last_updated)
+        src_path = os.path.dirname(str(self.get_attribute(constants.MAIN_PROJECT_FILE)))
         remap_file_path = os.path.join(src_path, remap_file)
 
         if not os.path.exists(remap_file_path):
@@ -136,8 +140,9 @@ class PackedVRayProject(PackedProject):
 
     def parse_scene_file(self):
         #print("Parsing scene file...")
+        from gridmarkets_blender_addon import constants
 
-        scene_file = str(self.get_main_file())
+        scene_file = str(self.get_attribute(constants.MAIN_PROJECT_FILE))
 
         src_dir_name = os.path.split(scene_file)[0]
 

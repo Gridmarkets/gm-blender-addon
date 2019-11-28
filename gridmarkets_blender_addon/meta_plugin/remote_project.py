@@ -29,13 +29,11 @@ class RemoteProject(Project):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
         Project.__init__(self,
                          name,
                          root_dir,
-                         main_file,
                          files,
                          attributes)
 
@@ -50,19 +48,23 @@ class RemoteProject(Project):
 
     @staticmethod
     def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
+        from gridmarkets_blender_addon import constants
 
         root_dir = pathlib.Path(packed_project.get_name())
-        main_file = packed_project.get_relative_main_file()
         files = packed_project.get_relative_files()
         attributes = packed_project.get_attributes()
+
+        attributes[constants.MAIN_PROJECT_FILE] = packed_project.get_relative_file_path(
+            packed_project.get_attribute(constants.MAIN_PROJECT_FILE))
 
         # convert all pathlib.Path attributes into a relative path
         for key, attribute in attributes.items():
             if type(attribute) is pathlib.Path:
                 attributes[key] = packed_project.get_relative_file_path(attribute)
 
+        # TODO update files into relative files
+
         return RemoteProject(packed_project.get_name(),
                              root_dir,
-                             main_file,
                              files,
                              attributes)

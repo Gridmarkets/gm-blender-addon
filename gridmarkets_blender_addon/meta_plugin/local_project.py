@@ -30,14 +30,12 @@ class LocalProject(Project):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
 
         Project.__init__(self,
                          name,
                          root_dir,
-                         main_file,
                          files,
                          attributes)
 
