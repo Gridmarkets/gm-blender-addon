@@ -57,12 +57,9 @@ class RemoteProject(Project):
         files = packed_project.get_relative_files()
         attributes = packed_project.get_attributes()
 
-        attributes[constants.MAIN_PROJECT_FILE] = packed_project.get_relative_file_path(
-            packed_project.get_attribute(constants.MAIN_PROJECT_FILE))
-
         # convert all pathlib.Path attributes into a relative path
         for key, attribute in attributes.items():
-            if type(attribute) is pathlib.Path:
+            if isinstance(attribute, pathlib.Path):
                 attributes[key] = packed_project.get_relative_file_path(attribute)
 
         # TODO update files into relative files

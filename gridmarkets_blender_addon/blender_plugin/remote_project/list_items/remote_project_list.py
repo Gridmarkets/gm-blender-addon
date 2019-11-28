@@ -30,6 +30,8 @@ class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
         from gridmarkets_blender_addon.icon_loader import IconLoader
         plugin = PluginFetcher.get_plugin()
 
+        layout.alignment = "LEFT"
+
         remote_project = plugin.get_remote_project_container().get_at(index)
 
         preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
@@ -41,7 +43,6 @@ class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
             layout.label(text=remote_project.get_name(), icon=constants.ICON_BLENDER)
         else:
             layout.label(text=remote_project.get_name())
-
 
 
 
