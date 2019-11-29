@@ -51,7 +51,6 @@ class RemoteProject(Project):
 
     @staticmethod
     def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
-        from gridmarkets_blender_addon import constants
 
         root_dir = pathlib.Path(packed_project.get_name())
         files = packed_project.get_relative_files()
