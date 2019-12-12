@@ -83,7 +83,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         if self.project_type == api_constants.PRODUCTS.BLENDER:
             main_file = pathlib.Path(self.project_file + constants.BLEND_FILE_EXTENSION)
-            remote_project = RemoteBlenderProject(dir, main_file )
+            remote_project = RemoteBlenderProject(dir, main_file)
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:
             main_file = pathlib.Path(self.project_file + constants.VRAY_SCENE_FILE_EXTENSION)
@@ -114,9 +114,9 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             layout.prop(self, "project_file")
             project_file = self.project_file + constants.BLEND_FILE_EXTENSION
 
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
+            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
                 layout.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
+            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
                 layout.prop(self, "blender_279_engine")
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:

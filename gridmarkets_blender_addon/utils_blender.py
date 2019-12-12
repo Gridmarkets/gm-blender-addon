@@ -232,7 +232,7 @@ def get_default_blender_job(context, render_file):
     return Job(
         "Default Blender Job",                                      # JOB_NAME
         constants.JOB_PRODUCT_TYPE,                                 # PRODUCT_TYPE
-        constants.JOB_PRODUCT_VERSION,                              # PRODUCT_VERSION
+        map_blender_version_to_api_product_version(),               # PRODUCT_VERSION
         constants.JOB_OPERATION,                                    # OPERATION
         render_file,                                                # RENDER_FILE
         frames = get_blender_frame_range(context),                  # FRAMES
@@ -407,8 +407,9 @@ def get_supported_blender_versions(scene, context):
     from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
 
     return [
+        (BLENDER_VERSIONS.V_2_81A, "2.81a", ""),
         (BLENDER_VERSIONS.V_2_80, "2.80", ""),
-        (BLENDER_VERSIONS.V_2_79, "2.79", ""),
+        (BLENDER_VERSIONS.V_2_79B, "2.79b", ""),
     ]
 
 
@@ -428,6 +429,30 @@ def get_supported_blender_280_engines(scene, context):
         (BLENDER_ENGINES.CYCLES, "Cycles", ""),
         (BLENDER_ENGINES.EEVEE, "Eevee", ""),
     ]
+
+
+def map_blender_version_to_api_product_version():
+    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+    blender_version = bpy.app.version
+
+    major = blender_version[0]
+    minor = blender_version[1]
+    build = blender_version[2]
+
+    # we only support Blender 2.** releases
+    if major != 2:
+        raise Exception("Blender version not supported")
+
+    if minor == 79:
+        return BLENDER_VERSIONS.V_2_79B
+    elif minor == 80:
+        return BLENDER_VERSIONS.V_2_80
+    elif minor == 81:
+        return BLENDER_VERSIONS.V_2_81A
+    elif minor < 90:
+        return BLENDER_VERSIONS.V_2_81A # return the latest blender 2.8* version that we support
+    else:
+        raise Exception("Blender version not supported")
 
 
 def get_supported_vray_versions(scene, context):
@@ -514,7 +539,7 @@ def get_job(context, render_file, enable_logging=True):
         job = Job(
             selected_job.name,
             constants.JOB_PRODUCT_TYPE,
-            constants.JOB_PRODUCT_VERSION,
+            map_blender_version_to_api_product_version(),
             constants.JOB_OPERATION,
             render_file,
             frames=get_job_frame_ranges(context, job=selected_job),
