@@ -23,8 +23,9 @@ class PRODUCTS:
     VRAY = "vray"
 
 class BLENDER_VERSIONS:
+    V_2_81A = "2.81a"
     V_2_80 = "2.80"
-    V_2_79 = "2.79"
+    V_2_79B = "2.79b"
 
 class BLENDER_ENGINES:
     CYCLES = "CYCLES"

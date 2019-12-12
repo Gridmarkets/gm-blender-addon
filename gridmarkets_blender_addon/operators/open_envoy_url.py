@@ -18,30 +18,42 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 from gridmarkets_blender_addon import constants
 
 
-def draw_sidebar(self, context):
-    from gridmarkets_blender_addon.operators.open_envoy_url import GRIDMARKETS_OT_open_envoy_url
+class GRIDMARKETS_OT_open_envoy_url(bpy.types.Operator):
+    bl_idname = "gridmarkets.open_envoy_url"
+    bl_label = "Open Envoy URL"
+    bl_options = {'REGISTER'}
 
-    layout = self.layout
+    def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
 
-    layout.label(text="Links")
+        log.info("Opening Envoy URL")
 
-    col = layout.column()
-    col.scale_x = 1
-    col.scale_y = 2
+        # open the render manager url in the users browser
+        bpy.ops.wm.url_open(url=constants.ENVOY_URL)
+        return {"FINISHED"}
 
-    # Portal manager link
-    col.operator(constants.OPERATOR_OPEN_MANAGER_PORTAL_ID_NAME, icon=constants.ICON_URL)
 
-    # Cost calculator
-    col.operator(constants.OPERATOR_OPEN_COST_CALCULATOR_ID_NAME, icon=constants.ICON_URL)
+classes = (
+    GRIDMARKETS_OT_open_envoy_url,
+)
 
-    # Envoy
-    col.operator(GRIDMARKETS_OT_open_envoy_url.bl_idname, icon=constants.ICON_URL, text="Envoy")
 
-    col.operator(constants.OPERATOR_OPEN_PREFERENCES_ID_NAME, icon=constants.ICON_PREFERENCES, text="Preferences")
-    col.operator(constants.OPERATOR_OPEN_HELP_URL_ID_NAME, icon=constants.ICON_HELP)
-    col.separator()
-    col.operator(constants.OPERATOR_OPEN_REPOSITORY_ID_NAME, icon=constants.ICON_URL, text="View on GitHub")
+def register():
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)

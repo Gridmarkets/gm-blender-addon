@@ -200,9 +200,9 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
         if self.project_type == api_constants.PRODUCTS.BLENDER:
             layout.prop(self, "blender_version")
 
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
+            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
                 layout.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
+            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
                 layout.prop(self, "blender_279_engine")
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:

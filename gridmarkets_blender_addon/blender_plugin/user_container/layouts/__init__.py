@@ -61,6 +61,7 @@ def draw_user_profiles_list(self, context):
 def draw_sign_in_form(self, context):
     from gridmarkets_blender_addon import constants, utils_blender
     from gridmarkets_blender_addon.icon_loader import IconLoader
+    from gridmarkets_blender_addon.operators.open_envoy_url import GRIDMARKETS_OT_open_envoy_url
 
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.user_container.operators.sign_in import GRIDMARKETS_OT_sign_in_new_user
@@ -172,9 +173,24 @@ def draw_sign_in_form(self, context):
             _draw_sign_in_button(text="Sign-in", enabled=False)
 
     else:
-        _draw_sign_in_button(alert=True, text=user_interface.get_user_validity_message(), icon=constants.ICON_ERROR)
+        user_validity_message = user_interface.get_user_validity_message()
 
-    signin_box.separator()
+        _draw_sign_in_button(alert=True, text=user_validity_message, icon=constants.ICON_ERROR)
+
+        if user_validity_message == "Unable to connect to Envoy.":
+            row = signin_box.row()
+            row.scale_x = 0.5
+            row.alignment = "CENTER"
+            row.emboss = "PULLDOWN_MENU"
+
+            row.label(text="Check you have started Envoy. If you have not installed Envoy yet you can get it")
+            row.operator(
+                GRIDMARKETS_OT_open_envoy_url.bl_idname,
+                text="Here"
+            )
+            signin_box.separator()
+
+
     register_layout = signin_box.row()
     register_layout.scale_x = 0.5
     _draw_register(register_layout)
