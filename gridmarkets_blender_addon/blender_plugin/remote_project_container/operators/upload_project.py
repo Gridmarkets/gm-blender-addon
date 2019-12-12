@@ -158,7 +158,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             except TypeError:
                 self.report({"WARNING"}, scene.render.engine + " is not supported with this product type")
                 return {"FINISHED"}
-            self.blender_version = api_constants.BLENDER_VERSIONS.V_2_80
+            self.blender_version = utils_blender.map_blender_version_to_api_product_version()
 
         # create popup
         return context.window_manager.invoke_props_dialog(self, width=400)
@@ -224,9 +224,9 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             sub1 = layout.row()
             sub1.enabled = False
 
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
+            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
                 sub1.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
+            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
                 sub1.prop(self, "blender_279_engine")
 
         elif self.project_type == api_constants.PRODUCTS.VRAY:
