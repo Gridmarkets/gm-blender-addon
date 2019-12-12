@@ -52,8 +52,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
         # save old settings so that they can be restored later
         old_settings = {'x': render.resolution_x,
                         'y': render.resolution_y,
-                        'res_percent': render.resolution_percentage,
-                        'display_mode': render.display_mode}
+                        'res_percent': render.resolution_percentage}
 
         # try finally block so that old settings are guaranteed to be restored
         try:
@@ -67,7 +66,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
             render.resolution_y = constants.DEFAULT_WINDOW_HIEGHT * scale_factor
             render.resolution_percentage = 100
-            render.display_mode = "WINDOW"
 
             # Call image editor window. This window just happens to use the render resolution settings for its
             # dimensions.
@@ -102,7 +100,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             render.resolution_x = old_settings['x']
             render.resolution_y = old_settings['y']
             render.resolution_percentage = old_settings['res_percent']
-            render.display_mode = old_settings['display_mode']
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()

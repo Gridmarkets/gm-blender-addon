@@ -90,9 +90,6 @@ DEFAULT_WINDOW_HIEGHT = 550
 
 BLENDER_TEMP_DIRECTORY = '/tmp\\'
 
-# plugin version
-PLUGIN_VERSION = { "major": 1, "minor": 0, "build" : 1}
-
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
 
@@ -182,7 +179,6 @@ JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION = "Use Blender's render settings when 
 
 # API constants
 JOB_PRODUCT_TYPE = "blender"
-JOB_PRODUCT_VERSION = "2.80"
 JOB_OPERATION = "render"
 
 # add-on tabs

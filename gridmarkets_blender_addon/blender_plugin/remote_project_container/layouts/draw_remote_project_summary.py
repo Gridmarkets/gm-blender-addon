@@ -2,6 +2,7 @@ def draw_remote_project_summary(layout, project_name, project_type,
                                 blender_version, project_file, blender_280_engine, blender_279_engine,
                                 vray_version, remap_file):
 
+    import bpy
     from gridmarkets_blender_addon import api_constants
 
     box = layout.box()
@@ -24,10 +25,10 @@ def draw_remote_project_summary(layout, project_name, project_type,
         col1.label(text="Project File:")
         col2.label(text=project_name + '/' + project_file)
 
-        if blender_version == api_constants.BLENDER_VERSIONS.V_2_80:
+        if bpy.app.version[1] >= 80:
             col1.label(text="Engine")
             col2.label(text=blender_280_engine)
-        elif blender_version == api_constants.BLENDER_VERSIONS.V_2_79:
+        elif bpy.app.version[1] <= 79:
             col1.label(text="Engine")
             col2.label(text=blender_279_engine)
 
