@@ -22,6 +22,102 @@ import bpy
 from gridmarkets_blender_addon import constants
 
 
+def register_schema(api_client):
+    from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumAttributeType, \
+        StringAttributeType, StringSubtype
+    import bpy
+
+    properties = {}
+
+    def register_project_attribute_props(project_attribute: ProjectAttribute, indent):
+
+        id = project_attribute.get_id()
+
+        attribute = project_attribute.get_attribute()
+        display_name = attribute.get_display_name()
+        description = attribute.get_description()
+        attribute_type = attribute.get_type()
+        key = attribute.get_key()
+        default = attribute.get_default_value()
+
+        if attribute_type == AttributeType.STRING:
+            string_attribute: StringAttributeType = attribute
+            subtype = string_attribute.get_subtype()
+
+            if subtype == StringSubtype.NONE.value:
+                properties[id] = bpy.props.StringProperty(
+                    name=display_name,
+                    description=description,
+                    default=default,
+                    options={'SKIP_SAVE'}
+                )
+
+            elif subtype == StringSubtype.FRAME_RANGES.value:
+                properties[id + JobPreset.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
+                    type=FrameRangeProps,
+                    options={'SKIP_SAVE'}
+                )
+
+                properties[id + JobPreset.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
+                    options={'SKIP_SAVE'}
+                )
+            else:
+                raise ValueError("Unrecognised String subtype '" + subtype + "'.")
+
+        elif attribute_type == AttributeType.ENUM:
+
+            enum_attribute: EnumAttributeType = attribute
+
+            items = []
+            enum_items = enum_attribute.get_items()
+
+            for enum_item in enum_items:
+                items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
+
+            properties[id] = bpy.props.EnumProperty(
+                name=display_name,
+                description=description,
+                items=items,
+                default=default.get_key(),
+                options={'SKIP_SAVE'}
+            )
+
+        elif attribute_type == AttributeType.BOOLEAN:
+            properties[id] = bpy.props.BoolProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                options={'SKIP_SAVE'}
+            )
+
+        elif attribute_type == AttributeType.INTEGER:
+            properties[id] = bpy.props.IntProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                options={'SKIP_SAVE'}
+            )
+
+        for child_attribute in project_attribute.get_children():
+            register_project_attribute_props(child_attribute, indent + 4)
+
+    # register Project Attribute props
+    api_schema = api_client.get_api_schema()
+    root_project_attribute = api_schema.get_root_project_attribute()
+
+    register_project_attribute_props(root_project_attribute, 0)
+
+    # register property group
+    GRIDMARKETS_PROPS_project_attributes = type("GRIDMARKETS_PROPS_project_attributes", (bpy.types.PropertyGroup,),
+                                                {"__annotations__": properties})
+
+    bpy.utils.register_class(GRIDMARKETS_PROPS_project_attributes)
+    bpy.types.Scene.project_attributes = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes)
+
+
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_idname = constants.OPERATOR_OPEN_ADDON_ID_NAME
     bl_label = constants.OPERATOR_OPEN_ADDON_LABEL
@@ -36,7 +132,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
         for window in context.window_manager.windows:
             screen = window.screen
             if screen.name == constants.INJECTED_SCREEN_NAME:
-
                 # create a new context for the delete and close operations
                 c = {"screen": screen, "window": window}
 
@@ -114,6 +209,8 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
                 user_container.focus_item(default_user)
                 user_container.load_focused_profile()
                 bpy.ops.gridmarkets.sign_in_new_user({"screen": screen, "window": window}, "INVOKE_DEFAULT")
+
+        register_schema(api_client)
 
         return {"FINISHED"}
 
