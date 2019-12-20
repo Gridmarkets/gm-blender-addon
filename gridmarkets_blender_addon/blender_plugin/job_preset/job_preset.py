@@ -167,7 +167,7 @@ class JobPreset(MetaJobPreset):
                 name=self.INFERENCE_SOURCE_KEY,
                 description="The source to read the attribute value from.",
                 items=inference_source_items,
-                default=str(job_attribute.get_inference_sources()[0].get_id()),
+                default=str(job_attribute.get_default_inference_source().get_id()),
                 options={'SKIP_SAVE'}
             )
 
