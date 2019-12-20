@@ -20,7 +20,6 @@
 
 from gridmarkets_blender_addon import bl_info
 
-from gridmarkets_blender_addon.meta_plugin.api_client import APIClient
 from gridmarkets_blender_addon.meta_plugin.plugin import Plugin as MetaPlugin
 from gridmarkets_blender_addon.meta_plugin.plugin_version import PluginVersion
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
