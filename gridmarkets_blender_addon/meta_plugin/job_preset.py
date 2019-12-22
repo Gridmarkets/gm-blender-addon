@@ -18,19 +18,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
+
+import typing
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute
 
 
-class JobPreset(ABC):
+class JobPreset:
 
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
         self._name = name
         self._id = id
         self._job_definition = job_definition
+
+        self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
+                                               job_definition.get_attributes()))
 
     def get_name(self) -> str:
         return self._name
@@ -44,6 +46,25 @@ class JobPreset(ABC):
     def get_job_definition(self) -> JobDefinition:
         return self._job_definition
 
+    def get_job_preset_attributes(self) -> typing.List[JobPresetAttribute]:
+        return self._job_preset_attributes
+
+    def get_job_preset_attribute_by_key(self, key: str) -> JobPresetAttribute:
+        for job_preset_attribute in self.get_job_preset_attributes():
+            if job_preset_attribute.get_key() == key:
+                return job_preset_attribute
+
+        raise ValueError("No JobPresetAttribute with that key.")
+
+    def get_job_preset_attribute_by_id(self, id: str) -> JobPresetAttribute:
+        for job_preset_attribute in self.get_job_preset_attributes():
+            if job_preset_attribute.get_id() == id:
+                return job_preset_attribute
+
+        raise ValueError("No JobPresetAttribute with that id.")
+
+
+    """
     @abstractmethod
     def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None) -> any:
         raise NotImplementedError
@@ -56,3 +77,4 @@ class JobPreset(ABC):
     def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
                                               inference_source: InferenceSource) -> None:
         raise NotImplementedError
+    """

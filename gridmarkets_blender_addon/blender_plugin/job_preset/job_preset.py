@@ -18,25 +18,25 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import string
-
-from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
 
 class JobPreset(MetaJobPreset):
     INFERENCE_SOURCE_KEY = "Attribute Inference Source"
-    JOB_PRESET_KEY = "job_preset_"
+    JOB_PRESET_ID_PREFIX = "job_preset_"
 
     FRAME_RANGE_COLLECTION = "_collection"
     FRAME_RANGE_FOCUSED = "_focused"
 
     def __init__(self, name: str, id: str, job_definition: JobDefinition):
-        MetaJobPreset.__init__(self, name, id, job_definition)
+        self._name = name
+        self._id = id
+        self._job_definition = job_definition
+        self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
+                                               job_definition.get_attributes()))
+
         self.register_props()
         self._reset_properties_to_default()
 
@@ -47,7 +47,7 @@ class JobPreset(MetaJobPreset):
         from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_default_value
 
         scene = bpy.context.scene
-        job_preset_props = getattr(scene, self.get_prop_id())
+        job_preset_props = getattr(scene, self.get_id())
 
         job_definition = self.get_job_definition()
         for job_attribute in job_definition.get_attributes():
@@ -179,21 +179,19 @@ class JobPreset(MetaJobPreset):
         bpy.utils.register_class(self._property_group_class)
 
         setattr(bpy.types.Scene,
-                self.get_prop_id(),
+                self.get_id(),
                 bpy.props.PointerProperty(type=self._property_group_class))
 
     def unregister_props(self):
         import bpy
         bpy.utils.unregister_class(self._property_group_class)
-        delattr(bpy.types.Scene, self.get_prop_id())
-
-    def get_prop_id(self):
-        return self.JOB_PRESET_KEY + self.get_id()
+        delattr(bpy.types.Scene, self.get_id())
 
     def get_property_group(self):
         import bpy
-        return getattr(bpy.context.scene, self.get_prop_id())
+        return getattr(bpy.context.scene, self.get_id())
 
+    """
     def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None):
         from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
 
@@ -241,3 +239,7 @@ class JobPreset(MetaJobPreset):
         setattr(job_preset_properties,
                 self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
                 inference_source.get_id())
+    """
+
+
+from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.job_preset_attribute import JobPresetAttribute

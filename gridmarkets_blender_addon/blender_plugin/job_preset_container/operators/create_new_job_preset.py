@@ -52,7 +52,7 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
 
                 job_preset_items = bpy.context.scene.props.job_preset_container.items
 
-                job_preset_id = str(utils.get_unique_id(job_preset_items))
+                job_preset_id = JobPreset.JOB_PRESET_ID_PREFIX + str(utils.get_unique_id(job_preset_items))
                 name = utils.create_unique_object_name(job_preset_items, name_prefix=(
                             job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_'))
                 job_preset = JobPreset(name, job_preset_id, job_definition)

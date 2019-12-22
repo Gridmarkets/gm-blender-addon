@@ -18,12 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
-from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute
 
 
-def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobAttribute, col1, key_column, col2, col3):
+def draw_job_preset_attribute(self, context, job_preset_attribute: JobPresetAttribute, col1, key_column, col2, col3):
     from types import SimpleNamespace
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
     from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
@@ -33,7 +33,10 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
     scene = context.scene
     props = scene.props
 
-    job_preset_props = getattr(scene, job_preset.get_prop_id())
+    job_preset = job_preset_attribute.get_parent_preset()
+    job_attribute = job_preset_attribute.get_job_attribute()
+
+    job_preset_props = getattr(scene, job_preset.get_id())
 
     attribute = job_attribute.get_attribute()
     attribute_type = attribute.get_type()
@@ -41,7 +44,7 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
     if attribute_type == AttributeType.NULL:
         return
 
-    inference_source = job_preset.get_attribute_active_inference_source(job_attribute)
+    inference_source = job_preset_attribute.get_inference_source()
 
     display_name_row = col1.row()
     display_name_row.label(text=attribute.get_display_name() + ":")
@@ -58,7 +61,7 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
         input_row.enabled = False
 
     elif inference_source == InferenceSource.get_application_inference_source():
-        input_row.label(text=str(job_preset.get_attribute_value(job_attribute)))
+        input_row.label(text=str(job_preset_attribute.eval(plugin=plugin)))
 
     elif inference_source == InferenceSource.get_user_defined_inference_source():
         draw_attribute_input(SimpleNamespace(layout=input_row),
@@ -71,6 +74,5 @@ def draw_job_attribute(self, context, job_preset: JobPreset, job_attribute: JobA
         input_row.enabled = False
 
     col3.alignment="EXPAND"
-    col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
-                           text="")
+    col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_preset_attribute.get_key(), text="")
     col3.enabled = len(job_attribute.get_inference_sources()) > 1

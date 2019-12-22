@@ -38,7 +38,7 @@ class GRIDMARKETS_OT_set_inference_source(bpy.types.Operator):
             plugin = PluginFetcher.get_plugin()
             job_preset_container = plugin.get_preferences_container().get_job_preset_container()
             for job_preset in job_preset_container.get_all():
-                if job_preset.get_prop_id() == self.job_preset_prop_id:
+                if job_preset.get_id() == self.job_preset_prop_id:
                     job_attribute = job_preset.get_job_definition().get_attribute_with_key(self.job_attribute_key)
                     job_preset.set_attribute_active_inference_source(job_attribute, self.inference_source)
                     break

@@ -21,6 +21,7 @@
 
 def draw_remote_project(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon import constants
     plugin = PluginFetcher.get_plugin()
 
     layout = self.layout
@@ -43,8 +44,11 @@ def draw_remote_project(self, context):
         col1.label(text="Root directory:")
         col2.label(text=str(remote_project.get_root_dir()))
 
-        col1.label(text="Main project file:")
-        col2.label(text=str(remote_project.get_main_file()))
+        col1.label(text="File Count:")
+        col2.label(text=str(len(remote_project.get_files())))
+
+        #col1.label(text="Project Size (bytes):")
+        #col2.label(text=str(remote_project.get_size()))
 
         row = box.row()
         split = row.split(factor=0.2)

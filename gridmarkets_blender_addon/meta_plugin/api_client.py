@@ -94,10 +94,9 @@ class APIClient(ABC, PluginAccessor):
     @abstractmethod
     def submit_new_project(self,
                            project: PackedProject,
-                           job: Job,
+                           jobs: typing.List[JobPreset],
                            delete_local_files_after_upload: bool = False) -> RemoteProject:
         raise NotImplemented
-
     
     @abstractmethod
     def submit_to_remote_project(self,

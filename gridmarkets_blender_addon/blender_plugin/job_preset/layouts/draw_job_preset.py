@@ -76,7 +76,7 @@ def draw_job_preset(self, context):
     from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
-    from gridmarkets_blender_addon.blender_plugin.job_attribute.layouts.draw_job_attribute import draw_job_attribute
+    from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import draw_job_preset_attribute
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 
     layout = self.layout
@@ -91,8 +91,6 @@ def draw_job_preset(self, context):
         icon = get_icon_for_job_definition(job_definition)
 
         layout.label(text=job_preset.get_name(), icon=icon[0], icon_value=icon[1])
-
-        attributes = job_definition.get_attributes()
 
         box = layout.box()
         col = box.column()
@@ -145,22 +143,28 @@ def draw_job_preset(self, context):
 
         col.separator()
 
-        for job_attribute in attributes:
+        for job_preset_attribute in job_preset.get_job_preset_attributes():
+
+            job_attribute = job_preset_attribute.get_job_attribute()
             if job_attribute.get_attribute().get_type() == AttributeType.NULL:
                 continue
 
+            # If hidden job preset attributes are not visible
             if not plugin.get_user_interface().get_show_hidden_job_preset_attributes():
+
+                # Then hide attributes which only have one inference source and it is either constant or project defined
+                # We hide these since they are not modifiable by the user so they can be hidden.
                 if len(job_attribute.get_inference_sources()) == 1:
                     from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 
-                    if job_attribute.get_inference_sources()[0] == InferenceSource.get_constant_inference_source():
+                    if job_preset_attribute.get_inference_source() == InferenceSource.get_constant_inference_source():
                         continue
 
-                    if job_attribute.get_inference_sources()[0] == InferenceSource.get_project_inference_source():
+                    if job_preset_attribute.get_inference_source() == InferenceSource.get_project_inference_source():
                         continue
 
             columns = _get_columns(col)
-            draw_job_attribute(self, context, job_preset, job_attribute, columns[0], columns[3], columns[1], columns[2])
+            draw_job_preset_attribute(self, context, job_preset_attribute, columns[0], columns[3], columns[1], columns[2])
 
         col.separator()
 
