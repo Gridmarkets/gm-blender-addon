@@ -369,8 +369,11 @@ def get_supported_render_engines():
     return {"CYCLES", "VRAY_RENDER_RT"}
 
 
-def get_user_friendly_name_for_engine(engine: str):
-    if engine == "CYCLES":
+def get_user_friendly_name_for_engine(engine: str = None):
+
+    if engine is None:
+        engine = bpy.context.scene.render.engine
+
     if engine == constants.RENDER_ENGINE_CYCLES:
         return "Cycles"
     elif engine == constants.RENDER_ENGINE_EEVEE:
