@@ -371,14 +371,15 @@ def get_supported_render_engines():
 
 def get_user_friendly_name_for_engine(engine: str):
     if engine == "CYCLES":
+    if engine == constants.RENDER_ENGINE_CYCLES:
         return "Cycles"
-    elif engine == "BLENDER_EEVEE":
+    elif engine == constants.RENDER_ENGINE_EEVEE:
         return "Eevee"
-    elif engine == "BLENDER_RENDER":
+    elif engine == constants.RENDER_ENGINE_BLENDER_INTERNAL:
         return "Blender Internal"
-    elif engine == "BLENDER_WORKBENCH":
+    elif engine == constants.RENDER_ENGINE_BLENDER_WORKBENCH:
         return "Blender Workbench"
-    elif engine == "VRAY_RENDER_RT":
+    elif engine == constants.RENDER_ENGINE_VRAY_RT:
         return "V-Ray"
     else:
         # if not know just return the enum name for it
