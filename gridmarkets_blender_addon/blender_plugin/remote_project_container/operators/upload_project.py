@@ -34,7 +34,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
     bl_icon = constants.ICON_BLEND_FILE
-    bl_description = "Upload the current scene as a new project."
+    bl_description = "Upload the current scene as a new project"
     bl_options = {'REGISTER'}
 
     # getters, setters and properties are all copied from <properties.FrameRangeProps>
