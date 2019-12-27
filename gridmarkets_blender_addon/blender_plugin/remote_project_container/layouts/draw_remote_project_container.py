@@ -20,18 +20,20 @@
 
 
 def draw_remote_project_container(self, context):
-    from gridmarkets_blender_addon import constants
+    from gridmarkets_blender_addon import constants, utils_blender
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
     from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
         GRIDMARKETS_OT_open_remote_project_definition_popup
-
     from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import \
         GRIDMARKETS_UL_remote_project
+    from gridmarkets_blender_addon.blender_plugin.remote_project_container.menus.upload_options import \
+        GRIDMARKETS_MT_project_upload_options
 
     layout = self.layout
     props = context.scene.props
     plugin = PluginFetcher.get_plugin()
+    user_interface = plugin.get_user_interface()
 
     remote_project_container_props = props.remote_project_container
 
@@ -49,7 +51,17 @@ def draw_remote_project_container(self, context):
 
     row = layout.row(align=True)
     row.scale_y = 2.5
-    row.operator("gridmarkets.open_add_project_menu", text="Add New Project")
-    row.enabled = not plugin.get_user_interface().is_running_operation()
+
+    def get_upload_tuple():
+        method = user_interface.get_project_upload_method()
+        if method == constants.UPLOAD_CURRENT_SCENE_VALUE:
+            return constants.UPLOAD_CURRENT_SCENE_TUPLE
+        elif method == constants.UPLOAD_PROJECT_FILES_VALUE:
+            return constants.UPLOAD_PROJECT_FILES_TUPLE
+        elif method == constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_VALUE:
+            return constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE
+
+    tuple = get_upload_tuple()
+    row.operator_menu_hold(tuple[0], text=tuple[1], menu=GRIDMARKETS_MT_project_upload_options.bl_idname)
 
     draw_remote_project(self, context)

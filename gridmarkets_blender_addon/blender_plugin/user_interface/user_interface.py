@@ -130,3 +130,10 @@ class UserInterface(MetaUserInterface):
 
     def set_show_hidden_job_preset_attributes(self, value: bool) -> None:
         bpy.context.scene.props.user_interface.show_hidden_job_preset_attributes = value
+
+    # project upload method
+    def get_project_upload_method(self) -> str:
+        return bpy.context.scene.props.user_interface.project_upload_method
+
+    def set_project_upload_method(self, value: str) -> None:
+        bpy.context.scene.props.user_interface.project_upload_method = value

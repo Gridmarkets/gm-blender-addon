@@ -18,41 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-
-
-class GRIDMARKETS_MT_add_new_project(bpy.types.Menu):
-    bl_idname = "GRIDMARKETS_MT_add_new_project"
-    bl_label = ""
-
-    def draw(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        is_running_operation = plugin.get_user_interface().is_running_operation()
-
-        layout = self.layout
-        layout.scale_y = 2
-        layout.operator_context = 'INVOKE_AREA'
-
-        # disable menu options if already running operation
-        enabled = not plugin.get_user_interface().is_running_operation()
-
-        # draw upload current scene button
-        sub = layout.row()
-        sub.enabled = enabled
-        sub.operator(constants.OPERATOR_UPLOAD_PROJECT_ID_NAME, text="Upload current scene as new Project")
-
-        # draw upload file button
-        sub = layout.row()
-        sub.enabled = enabled
-        sub.operator(constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME, text="Upload file as new Project")
-
-        # draw manual entree button
-        sub = layout.row()
-        sub.operator(constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME, text="Manually enter details for existing Project")
 
 
 def _get_value(project_status, key):
@@ -188,56 +155,3 @@ def _draw_project_info_view(self, context):
         if constants.PROJECT_STATUS_POLLING_ENABLED:
             col.separator()
             _draw_project_status(col, project)
-
-
-def draw_projects(self, context):
-    layout = self.layout
-    props = context.scene.props
-    project_count = len(props.projects)
-
-    row = layout.row()
-    row.template_list("GRIDMARKETS_UL_project", "", props, "projects", props, "selected_project", rows=2)
-
-    col = row.column()
-
-    sub = col.column(align=True)
-
-    # disable up and down buttons if there are less than 2 projects
-    if project_count < 2:
-        sub.enabled = False
-
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_UP, text="").action = 'UP'
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_TRIA_DOWN,
-                 text="").action = 'DOWN'
-
-    row = layout.row(align=True)
-    row.menu_contents(GRIDMARKETS_MT_add_new_project.bl_idname)
-
-    sub = row.column()
-    if project_count <= 0:
-        # disable remove button if there are no projects to remove
-        sub.enabled = False
-    sub.operator(constants.OPERATOR_PROJECT_LIST_ACTIONS_ID_NAME, icon=constants.ICON_REMOVE, text="Remove Project").action = 'REMOVE'
-
-    _draw_project_info_view(self, context)
-
-
-classes = (
-    GRIDMARKETS_MT_add_new_project,
-)
-
-
-def register():
-    from bpy.utils import register_class
-
-    # register classes
-    for cls in classes:
-        register_class(cls)
-
-
-def unregister():
-    from bpy.utils import unregister_class
-
-    # unregister classes
-    for cls in reversed(classes):
-        unregister_class(cls)

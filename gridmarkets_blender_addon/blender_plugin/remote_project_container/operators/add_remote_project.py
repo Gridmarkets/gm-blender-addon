@@ -30,7 +30,6 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.d
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_ADD_REMOTE_PROJECT_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_options = set()
 
     project_name: bpy.props.StringProperty(

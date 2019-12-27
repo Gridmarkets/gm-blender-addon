@@ -35,7 +35,6 @@ from gridmarkets_blender_addon.project.packed_vray_project import PackedVRayProj
 class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
     bl_idname = constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_options = {'UNDO'}
 
     _filter_glob = '*' + constants.BLEND_FILE_EXTENSION + ';*' + constants.VRAY_SCENE_FILE_EXTENSION

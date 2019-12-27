@@ -20,6 +20,7 @@
 
 import bpy
 from gridmarkets_blender_addon.blender_plugin.user.property_groups.user_props import UserProps
+from gridmarkets_blender_addon import constants
 
 
 class UserInterfaceProps(bpy.types.PropertyGroup):
@@ -148,4 +149,15 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         name="Show Hidden Job Preset Attributes",
         default=False,
         options={'SKIP_SAVE'}
+    )
+
+    # project upload method
+    project_upload_method: bpy.props.EnumProperty(
+        name='Project Upload Method',
+        items=(
+            constants.UPLOAD_CURRENT_SCENE_TUPLE,
+            constants.UPLOAD_PROJECT_FILES_TUPLE,
+            constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE
+        ),
+        options={'SKIP_SAVE', 'HIDDEN'}
     )

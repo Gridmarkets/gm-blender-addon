@@ -17,30 +17,3 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-import bpy
-
-
-class GRIDMARKETS_OT_open_add_project_menu(bpy.types.Operator):
-    bl_idname = "gridmarkets.open_add_project_menu"
-    bl_label = "Open Add Project Menu"
-    bl_description = "Opens a menu of different ways of adding a new project"
-    bl_options = {'INTERNAL'}
-
-    def invoke(self, context, event):
-        from gridmarkets_blender_addon.layouts.projects import GRIDMARKETS_MT_add_new_project
-        bpy.ops.wm.call_menu(name=GRIDMARKETS_MT_add_new_project.bl_idname)
-        return {'FINISHED'}
-
-
-classes = (
-    GRIDMARKETS_OT_open_add_project_menu,
-)
-
-
-def register():
-    from bpy.utils import register_class
-
-    # register classes
-    for cls in classes:
-        register_class(cls)
