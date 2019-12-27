@@ -25,6 +25,8 @@ import typing
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.transition import Transition
+from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
+    RejectedTransitionInputError
 
 
 class ProjectAttribute:
@@ -53,6 +55,16 @@ class ProjectAttribute:
 
     def get_compatible_job_definitions(self) -> typing.List[JobDefinition]:
         return self._compatible_job_definitions
+
+    def transition(self, input: any) -> 'ProjectAttribute':
+        for transition in self._transitions:
+            try:
+                project_attribute = transition.transition(input)
+                return project_attribute
+            except RejectedTransitionInputError:
+                pass
+
+        raise RejectedTransitionInputError()
 
     def get_children(self) -> typing.List['ProjectAttribute']:
         return list(map(lambda x: x.get_project_attribute(), self.get_transitions()))
