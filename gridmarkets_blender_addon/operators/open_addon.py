@@ -115,7 +115,9 @@ def register_schema(api_client):
                                                 {"__annotations__": properties})
 
     bpy.utils.register_class(GRIDMARKETS_PROPS_project_attributes)
-    bpy.types.Scene.project_attributes = bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes)
+    setattr(bpy.types.Scene,
+            constants.PROJECT_ATTRIBUTES_POINTER_KEY,
+            bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes))
 
 
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
