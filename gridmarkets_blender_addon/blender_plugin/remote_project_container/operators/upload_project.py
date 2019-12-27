@@ -33,7 +33,6 @@ from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySc
 class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_description = "Upload the current scene as a new project"
     bl_options = {'REGISTER'}
 
@@ -147,6 +146,28 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
         else:
             self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
+
+        # Check the render engine is supported
+        render_engine = context.scene.render.engine
+        if render_engine not in utils_blender.get_supported_render_engines():
+            render_engine_name = utils_blender.get_user_friendly_name_for_engine(render_engine)
+
+            def draw_render_engine_warning_popup(self, context):
+                layout = self.layout
+
+                message = constants.COMPANY_NAME + " does not currently support packing projects using the '" + \
+                          render_engine_name + "' render engine."
+
+                layout.label(text=message, icon=constants.ICON_ERROR)
+                layout.separator_spacer()
+                layout.label(text="The render engines we currently support for blender are:")
+
+                for engine in utils_blender.get_supported_render_engines():
+                    self.layout.label(text='• ' + utils_blender.get_user_friendly_name_for_engine(engine))
+
+            bpy.context.window_manager.popup_menu(draw_render_engine_warning_popup, title="Unsupported Render Engine",
+                                                  icon=constants.ICON_BLANK)
+            return {'FINISHED'}
 
         if scene.render.engine == "VRAY_RENDER_RT":
             self.project_type = api_constants.PRODUCTS.VRAY
