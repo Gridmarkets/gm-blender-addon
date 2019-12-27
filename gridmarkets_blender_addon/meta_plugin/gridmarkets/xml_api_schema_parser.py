@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
 from gridmarkets_blender_addon.meta_plugin.attribute_types import *

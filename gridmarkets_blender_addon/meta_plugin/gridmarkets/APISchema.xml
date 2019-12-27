@@ -330,7 +330,7 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>output_Width</Key>
+                    <Key>output_width</Key>
                     <DisplayName>Output Width</DisplayName>
                     <Description>Defines the render output width</Description>
                     <Type>INTEGER</Type>
