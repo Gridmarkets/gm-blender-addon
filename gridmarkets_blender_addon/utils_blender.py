@@ -689,3 +689,17 @@ def get_selected_project_options(scene, context, id):
                     (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
 
     return project_options
+
+
+def draw_render_engine_warning_popup(self, context):
+    layout = self.layout
+
+    message = constants.COMPANY_NAME + " does not currently support packing projects using the '" + \
+              context.scene.render.engine + "' render engine."
+
+    layout.label(text=message, icon=constants.ICON_ERROR)
+    layout.separator_spacer()
+    layout.label(text="The render engines we currently support for blender are:")
+
+    for engine in get_supported_render_engines():
+        self.layout.label(text='• ' + get_user_friendly_name_for_engine(engine))

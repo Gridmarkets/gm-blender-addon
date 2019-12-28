@@ -154,10 +154,6 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
     # project upload method
     project_upload_method: bpy.props.EnumProperty(
         name='Project Upload Method',
-        items=(
-            constants.UPLOAD_CURRENT_SCENE_TUPLE,
-            constants.UPLOAD_PROJECT_FILES_TUPLE,
-            constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE
-        ),
+        items=constants.PROJECT_ACTION_OPERATORS,
         options={'SKIP_SAVE', 'HIDDEN'}
     )

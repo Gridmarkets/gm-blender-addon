@@ -54,12 +54,10 @@ def draw_remote_project_container(self, context):
 
     def get_upload_tuple():
         method = user_interface.get_project_upload_method()
-        if method == constants.UPLOAD_CURRENT_SCENE_VALUE:
-            return constants.UPLOAD_CURRENT_SCENE_TUPLE
-        elif method == constants.UPLOAD_PROJECT_FILES_VALUE:
-            return constants.UPLOAD_PROJECT_FILES_TUPLE
-        elif method == constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_VALUE:
-            return constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE
+        for tuple in constants.PROJECT_ACTION_OPERATORS:
+            if tuple[0] == method:
+                return tuple
+        raise RuntimeError("Could not find project action tuple")
 
     tuple = get_upload_tuple()
     row.operator_menu_hold(tuple[0], text=tuple[1], menu=GRIDMARKETS_MT_project_upload_options.bl_idname)
