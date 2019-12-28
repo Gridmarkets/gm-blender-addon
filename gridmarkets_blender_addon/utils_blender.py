@@ -204,21 +204,26 @@ def get_project_status(project):
         log.error("API Error: " + str(e.user_message))
 
 
-def get_blend_file_name():
+def get_project_name(default_name = constants.PROJECT_PREFIX):
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting project name...")
 
-    # if the file has been saved
     if bpy.context.blend_data.is_saved:
-        # use the name of the saved .blend file
         blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
-    else:
-        # otherwise create a name for the packed .blend file
-        blend_file_name = 'main_GM_blend_file_packed.blend'
-        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
 
-    return blend_file_name
+        if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
+            blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
+
+        log.info(".blend file is saved, using '%s' as project name." % blend_file_name)
+        return blend_file_name
+    else:
+        log.info(".blend file is not saved, using '%s' as project name." % default_name)
+        return default_name
+
+
+def get_blend_file_name():
+    return get_project_name(default_name='main_GM_blend_file_packed.blend')
 
 
 def get_blender_frame_range(context):
