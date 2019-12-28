@@ -123,9 +123,9 @@ OPERATOR_PROJECT_LIST_ACTIONS_LABEL = "Project List Actions"
 OPERATOR_JOB_LIST_ACTIONS_ID_NAME= "gridmarkets.job_list_actions"
 OPERATOR_JOB_LIST_ACTIONS_LABEL = "Job List Actions"
 OPERATOR_UPLOAD_PROJECT_ID_NAME = "gridmarkets.upload_project"
-OPERATOR_UPLOAD_PROJECT_LABEL = "Upload the current scene as a new Project"
+OPERATOR_UPLOAD_PROJECT_LABEL = "Pack and upload the current scene as a new project"
 OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME = "gridmarkets.upload_file_as_project"
-OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL = "Upload project files as a new project"
+OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL = "Pack and upload .blend file as a new project"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.frame_range_list_actions"
 OPERATOR_FRAME_RANGE_LIST_ACTIONS_LABEL = "Frame Range List Actions"
 OPERATOR_VRAY_FRAME_RANGE_LIST_ACTIONS_ID_NAME = "gridmarkets.vray_frame_range_list_actions"
@@ -234,12 +234,12 @@ ICON_BLANK = 'BLANK1'  # blank takes up space where as NONE does not
 # upload method enum values
 UPLOAD_CURRENT_SCENE_VALUE = OPERATOR_UPLOAD_PROJECT_ID_NAME
 UPLOAD_CURRENT_SCENE_LABEL = OPERATOR_UPLOAD_PROJECT_LABEL
-UPLOAD_CURRENT_SCENE_DESCRIPTION = 'Upload a new project to ' + COMPANY_NAME + ' based on your current scene'
+UPLOAD_CURRENT_SCENE_DESCRIPTION = 'Packs your current scene to a temporary directory and uploads it as a new project to ' + COMPANY_NAME
 UPLOAD_CURRENT_SCENE_TUPLE = (UPLOAD_CURRENT_SCENE_VALUE, UPLOAD_CURRENT_SCENE_LABEL, UPLOAD_CURRENT_SCENE_DESCRIPTION, ICON_PROJECT, 0)
 
 UPLOAD_PROJECT_FILES_VALUE = OPERATOR_UPLOAD_FILE_AS_PROJECT_ID_NAME
 UPLOAD_PROJECT_FILES_LABEL = OPERATOR_UPLOAD_FILE_AS_PROJECT_LABEL
-UPLOAD_PROJECT_FILES_DESCRIPTION = 'Upload a new project to ' + COMPANY_NAME + ' based on project files from your local filesystem'
+UPLOAD_PROJECT_FILES_DESCRIPTION = 'Packs a provided .blend file to a temporary directory and uploads it as a new project to ' + COMPANY_NAME
 UPLOAD_PROJECT_FILES_TUPLE = (UPLOAD_PROJECT_FILES_VALUE, UPLOAD_PROJECT_FILES_LABEL, UPLOAD_PROJECT_FILES_DESCRIPTION, ICON_FILE_FOLDER, 1)
 
 UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_VALUE = OPERATOR_ADD_REMOTE_PROJECT_ID_NAME

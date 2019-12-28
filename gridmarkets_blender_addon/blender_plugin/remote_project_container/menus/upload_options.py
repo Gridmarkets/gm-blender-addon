@@ -37,7 +37,7 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
 
         upload_method = user_interface.get_project_upload_method()
 
-        layout.label(text="Choose Upload Method:")
+        layout.label(text="Upload Actions:")
         layout.separator()
 
         def draw_operator_option(layout, upload_method_tuple):
@@ -54,6 +54,9 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
 
         draw_operator_option(layout, constants.UPLOAD_CURRENT_SCENE_TUPLE)
         draw_operator_option(layout, constants.UPLOAD_PROJECT_FILES_TUPLE)
+
+        layout.label(text="Misc Actions:")
+        layout.separator()
         draw_operator_option(layout, constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE)
 
 
