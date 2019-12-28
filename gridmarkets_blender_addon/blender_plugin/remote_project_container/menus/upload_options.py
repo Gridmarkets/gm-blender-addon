@@ -58,6 +58,7 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
         layout.label(text="Misc Actions:")
         layout.separator()
         draw_operator_option(layout, constants.PACK_CURRENT_SCENE_TUPLE)
+        draw_operator_option(layout, constants.PACK_BLEND_FILE_TUPLE)
         draw_operator_option(layout, constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE)
 
 
