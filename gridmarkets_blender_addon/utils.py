@@ -103,3 +103,14 @@ def create_unique_object_name(objects, attribute_name='name', name_prefix = ""):
         i = i+1
 
     return name_prefix + str(i)
+
+
+def get_desktop_path() -> str:
+    import os
+
+    if os.name == 'nt':
+        return os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+    elif os.name == 'posix':
+        return os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+    else:
+        return ""
