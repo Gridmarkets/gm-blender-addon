@@ -103,7 +103,3 @@ class APIClient(ABC, PluginAccessor):
                                  job: Job) -> RemoteProject:
         raise NotImplemented
     """
-
-    @abstractmethod
-    def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
-        raise NotImplementedError
