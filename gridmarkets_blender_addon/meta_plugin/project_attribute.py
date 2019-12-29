@@ -64,7 +64,7 @@ class ProjectAttribute:
             except RejectedTransitionInputError:
                 pass
 
-        raise RejectedTransitionInputError()
+        raise RejectedTransitionInputError(message="No transition possible for input '" + str(input) + "'")
 
     def get_children(self) -> typing.List['ProjectAttribute']:
         return list(map(lambda x: x.get_project_attribute(), self.get_transitions()))
