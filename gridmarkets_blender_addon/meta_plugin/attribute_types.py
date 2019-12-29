@@ -38,12 +38,13 @@ class StringAttributeType(Attribute):
                  key: str,
                  display_name: str,
                  description: str,
+                 subtype_kwargs: typing.Dict,
                  default_value: typing.Optional[str] = "",
                  subtype: typing.Optional[StringSubtype] = StringSubtype.NONE.value,
                  max_length: typing.Optional[int] = None,
                  min_length: typing.Optional[int] = None):
 
-        Attribute.__init__(self, key, display_name, description, AttributeType.STRING)
+        Attribute.__init__(self, key, display_name, description, AttributeType.STRING, subtype_kwargs)
 
         if default_value is None:
             default_value = ""
@@ -106,11 +107,16 @@ class EnumSubtype(enum.Enum):
 
 class EnumAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str, items: typing.List[EnumItem],
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 subtype_kwargs: typing.Dict,
+                 items: typing.List[EnumItem],
                  default_value: typing.Optional[str] = None,
                  subtype: typing.Optional[EnumSubtype] = EnumSubtype.NONE.value):
 
-        Attribute.__init__(self, key, display_name, description, AttributeType.ENUM)
+        Attribute.__init__(self, key, display_name, description, AttributeType.ENUM, subtype_kwargs)
 
         if len(items) <= 0 and subtype != EnumSubtype.PRODUCT_VERSIONS.value:
             raise ValueError("Enum '" + key + "' must have at least one possible value")
@@ -149,6 +155,10 @@ class EnumAttributeType(Attribute):
         if type(value) != str:
             raise InvalidAttributeError("value must be string type")
 
+        # don't compare items for product version enums because they are dynamic
+        if self.get_subtype() == EnumSubtype.PRODUCT_VERSIONS.value:
+            return
+
         for item in self.get_items():
             if item.get_key() == value:
                 return
@@ -158,8 +168,8 @@ class EnumAttributeType(Attribute):
 
 class NullAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str):
-        Attribute.__init__(self, key, display_name, description, AttributeType.NULL)
+    def __init__(self, key: str, display_name: str, description: str, subtype_kwargs: typing.Dict):
+        Attribute.__init__(self, key, display_name, description, AttributeType.NULL, subtype_kwargs)
         self._default_value = None
 
     def get_default_value(self) -> None:
@@ -172,8 +182,14 @@ class NullAttributeType(Attribute):
 
 class BooleanAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[bool] = ""):
-        Attribute.__init__(self, key, display_name, description, AttributeType.BOOLEAN)
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 subtype_kwargs: typing.Dict,
+                 default_value: typing.Optional[bool] = ""):
+
+        Attribute.__init__(self, key, display_name, description, AttributeType.BOOLEAN, subtype_kwargs)
 
         if default_value is None:
             default_value = False
@@ -193,8 +209,14 @@ class BooleanAttributeType(Attribute):
 
 class IntegerAttributeType(Attribute):
 
-    def __init__(self, key: str, display_name: str, description: str, default_value: typing.Optional[int] = 0):
-        Attribute.__init__(self, key, display_name, description, AttributeType.INTEGER)
+    def __init__(self,
+                 key: str,
+                 display_name: str,
+                 description: str,
+                 subtype_kwargs: typing.Dict,
+                 default_value: typing.Optional[int] = 0):
+
+        Attribute.__init__(self, key, display_name, description, AttributeType.INTEGER, subtype_kwargs)
 
         if default_value is None:
             default_value = 0

@@ -200,6 +200,7 @@ class XMLAPISchemaParser:
             return StringAttributeType(attribute_key,
                                        attribute_display_name,
                                        attribute_description,
+                                       attribute_subtype_kwargs,
                                        default_value=attribute_default_value,
                                        subtype=attribute_subtype,
                                        max_length=max_length,
@@ -216,6 +217,7 @@ class XMLAPISchemaParser:
             return EnumAttributeType(attribute_key,
                                      attribute_display_name,
                                      attribute_description,
+                                     attribute_subtype_kwargs,
                                      enum_items,
                                      default_value=attribute_default_value,
                                      subtype=attribute_subtype)
@@ -223,18 +225,21 @@ class XMLAPISchemaParser:
         elif attribute_type == AttributeType.NULL.value:
             return NullAttributeType(attribute_key,
                                      attribute_display_name,
-                                     attribute_description)
+                                     attribute_description,
+                                     attribute_subtype_kwargs)
 
         elif attribute_type == AttributeType.BOOLEAN.value:
             return BooleanAttributeType(attribute_key,
                                         attribute_display_name,
                                         attribute_description,
+                                        attribute_subtype_kwargs,
                                         default_value=to_bool(attribute_default_value))
 
         elif attribute_type == AttributeType.INTEGER.value:
             return IntegerAttributeType(attribute_key,
                                         attribute_display_name,
                                         attribute_description,
+                                        attribute_subtype_kwargs,
                                         default_value=int(attribute_default_value))
 
         else:

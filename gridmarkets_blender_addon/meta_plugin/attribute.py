@@ -33,14 +33,18 @@ class AttributeType(enum.Enum):
 
 class Attribute(ABC):
 
-    def __init__(self, key:str, display_name: str, description: str, attribute_type: AttributeType,
-                 subtype_kwargs: typing.Dict = None):
+    def __init__(self,
+                 key:str,
+                 display_name: str,
+                 description: str,
+                 attribute_type: AttributeType,
+                 subtype_kwargs: typing.Dict):
 
         self._key = key
         self._display_name = display_name
         self._description = description
         self._attribute_type = attribute_type
-        self._subtype_kwargs = {} if subtype_kwargs is None else subtype_kwargs
+        self._subtype_kwargs = subtype_kwargs
 
     def get_key(self) -> str:
         return self._key
