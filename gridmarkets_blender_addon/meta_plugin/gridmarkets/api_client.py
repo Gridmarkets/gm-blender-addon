@@ -47,6 +47,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         # used for caching projects
         self._cache_projects = None
+        self._product_resolver = None
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
 
@@ -130,7 +131,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         return RemoteProject.convert_packed_project(packed_project)
 
     def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
-        if self._cache_projects is None:
+        if ignore_cache or self._cache_projects is None:
             import requests
             r = requests.get(self._envoy_client.url + '/projects')
             json = r.json()
@@ -140,3 +141,15 @@ class GridMarketsAPIClient(MetaAPIClient):
             self._cache_projects = projects
 
         return self._cache_projects
+
+    def get_product_versions(self, product: str, ignore_cache: bool = False) -> typing.List[str]:
+        if ignore_cache or self._product_resolver is None:
+            # get product resolver
+            resolver = self._envoy_client.get_product_resolver()
+
+            # cache all products
+            self._product_resolver = resolver.get_all_types()
+
+        # sorted by latest version to oldest version
+        return sorted(self._product_resolver.get(product, {}).get("versions", []), key=lambda s: s.casefold(),
+                      reverse=True)
