@@ -510,7 +510,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>.*</TransitionFormula>
+                    <TransitionFormula>(.*)(.blend)$</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -526,7 +526,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>.*</TransitionFormula>
+                    <TransitionFormula>(.*)(.blend)$</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
