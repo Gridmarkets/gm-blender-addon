@@ -510,7 +510,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -526,7 +526,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -538,28 +538,22 @@
                 <DisplayName>Version</DisplayName>
                 <Description>The version of Blender.</Description>
                 <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>2.79</Key>
-                        <DisplayName>2.79</DisplayName>
-                        <Description>Blender 2.79.</Description>
-                    </Item>
-                    <Item>
-                        <Key>2.80</Key>
-                        <DisplayName>2.80</DisplayName>
-                        <Description>Blender 2.80.</Description>
-                    </Item>
-                </Items>
-                <DefaultValue>2.80</DefaultValue>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>blender</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_MAIN_PROJECT_FILE</ProjectAttributeId>
-                    <TransitionFormula>2.79</TransitionFormula>
+                    <TransitionFormula>^([2]\.)([1-7]\d)</TransitionFormula>
                 </Transition>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_80_MAIN_PROJECT_FILE</ProjectAttributeId>
-                    <TransitionFormula>2.80</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -586,7 +580,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_PROJECT</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -602,7 +596,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_REMAP_FILE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -651,7 +645,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_SCENE_FILE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -700,7 +694,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>PRODUCT</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>

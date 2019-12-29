@@ -35,15 +35,9 @@ class Transition:
         return self._project_attribute
 
     def transition(self, input: any) -> 'ProjectAttribute':
-        if self._transition_formula == '*':
-            return self._project_attribute
+        import re
 
-        if type(input) == str:
-            if self._transition_formula == input:
-                return self._project_attribute
-
-        if type(input) == int:
-            if int(self._transition_formula) == input:
-                return self._project_attribute
+        if re.match(self.get_transition_formula(), str(input)):
+            return self.get_project_attribute()
 
         raise RejectedTransitionInputError
