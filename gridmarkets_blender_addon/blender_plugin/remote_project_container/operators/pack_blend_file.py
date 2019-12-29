@@ -44,7 +44,7 @@ class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
     plugin = None
 
     blend_file: bpy.props.StringProperty(
-        name="Export Path",
+        name="Blend file",
         description="The path to pack your project to",
         subtype='FILE_PATH'
     )
