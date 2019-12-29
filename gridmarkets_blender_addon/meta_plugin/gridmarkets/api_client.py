@@ -45,6 +45,9 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._envoy_client: typing.Optional[EnvoyClient] = None
         self._api_schema = XMLAPISchemaParser.parse()
 
+        # used for caching projects
+        self._cache_projects = None
+
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
 
         try:
@@ -125,3 +128,15 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._envoy_client.upload_project_files(gm_project)
 
         return RemoteProject.convert_packed_project(packed_project)
+
+    def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
+        if self._cache_projects is None:
+            import requests
+            r = requests.get(self._envoy_client.url + '/projects')
+            json = r.json()
+            projects = json.get("projects", [])
+            projects = list(map(lambda project: project.get('name', ''), projects))
+            projects = sorted(projects, key=lambda s: s.casefold())
+            self._cache_projects = projects
+
+        return self._cache_projects

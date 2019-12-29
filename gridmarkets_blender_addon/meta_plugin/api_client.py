@@ -61,7 +61,6 @@ class APIClient(ABC, PluginAccessor):
 
         user_container.append(user)
 
-
     def sign_out(self) -> None:
         self._signed_in_user = None
 
@@ -104,3 +103,7 @@ class APIClient(ABC, PluginAccessor):
                                  job: Job) -> RemoteProject:
         raise NotImplemented
     """
+
+    @abstractmethod
+    def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
+        raise NotImplementedError
