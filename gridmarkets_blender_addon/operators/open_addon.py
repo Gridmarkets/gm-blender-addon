@@ -27,7 +27,7 @@ def register_schema(api_client):
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumAttributeType, \
-        StringAttributeType, StringSubtype
+        EnumSubtype, StringAttributeType, StringSubtype
     import bpy
 
     properties = {}
@@ -68,14 +68,22 @@ def register_schema(api_client):
                 raise ValueError("Unrecognised String subtype '" + subtype + "'.")
 
         elif attribute_type == AttributeType.ENUM:
-
             enum_attribute: EnumAttributeType = attribute
-
+            subtype = enum_attribute.get_subtype()
             items = []
-            enum_items = enum_attribute.get_items()
 
-            for enum_item in enum_items:
-                items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
+            if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
+                product = enum_attribute.get_subtype_kwargs().get("PRODUCT")
+
+                def _get_product_versions(self, context):
+                    versions = api_client.get_product_versions(product)
+                    return list(map(lambda version: (version, version, ''), versions))
+
+                items = _get_product_versions
+            else:
+                enum_items = enum_attribute.get_items()
+                for enum_item in enum_items:
+                    items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
 
             properties[id] = bpy.props.EnumProperty(
                 name=display_name,
