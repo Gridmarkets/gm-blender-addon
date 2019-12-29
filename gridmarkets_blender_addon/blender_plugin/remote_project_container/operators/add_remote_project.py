@@ -27,15 +27,24 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.d
     draw_remote_project_summary
 
 
+def _get_remote_root_directories(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    api_client = plugin.get_api_client()
+    projects = api_client.get_root_directories()
+
+    return list(map(lambda project: (project, project, ''), projects))
+
+
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_ADD_REMOTE_PROJECT_LABEL
     bl_options = set()
 
-    project_name: bpy.props.StringProperty(
+    project_name: bpy.props.EnumProperty(
         name="Project Name",
-        default="",
-        maxlen=256
+        items=_get_remote_root_directories
     )
 
     project_type: bpy.props.EnumProperty(
@@ -74,6 +83,12 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     )
 
     def invoke(self, context, event):
+
+        # If the user has no projects display a warning message
+        if len(_get_remote_root_directories(self, context)) == 0:
+            self.report({'ERROR'}, "No existing projects detected. You must have already uploaded a project to use this option.")
+            return {"FINISHED"}
+
         return context.window_manager.invoke_props_dialog(self, width=400)
 
     def execute(self, context):
@@ -106,6 +121,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         layout.separator()
 
         layout.prop(self, "project_name")
+
+
         layout.prop(self, "project_type")
 
         if self.project_type == api_constants.PRODUCTS.BLENDER:
