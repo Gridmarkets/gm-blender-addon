@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
 from gridmarkets_blender_addon.meta_plugin.attribute_types import *
@@ -121,6 +122,7 @@ TAG_TYPE = "Type"
 TAG_SUBTYPE = "Subtype"
 TAG_ITEMS = "Items"
 TAG_KEY = "Key"
+TAG_VALUE = "Value"
 TAG_ATTRIBUTE = "Attribute"
 TAG_JOB_ATTRIBUTE = "JobAttribute"
 TAG_INFERENCE_SOURCES = "InferenceSources"
@@ -132,12 +134,14 @@ TAG_DEFAULT_VALUE = "DefaultValue"
 TAG_TRANSITIONS = "Transitions"
 TAG_TRANSITION = "Transition"
 TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
-ATRRIBUTE_ID = "id"
+ATTRIBUTE_ID = "id"
 TAG_TRANSITION_FORMULA = "TransitionFormula"
 TAG_COMPATIBLE_JOB_DEFINITIONS = "CompatibleJobDefinitions"
 TAG_JOB_DEFINITION_ID = "JobDefinitionId"
 TAG_MAX_LENGTH = "MaxLength"
 TAG_MIN_LENGTH = "MinLength"
+TAG_SUBTYPE_KWARGS = "SubtypeKwargs"
+TAG_SUBTYPE_KWARG = "SubtypeKwarg"
 
 
 class XMLAPISchemaParser:
@@ -158,6 +162,27 @@ class XMLAPISchemaParser:
         return enum_items
 
     @staticmethod
+    def _parse_subtype_kwargs(attribute_element: ET.Element):
+        subtype_kwargs_attributes = get_all_sub_elements(attribute_element, TAG_SUBTYPE_KWARGS)
+
+        if len(subtype_kwargs_attributes) > 1:
+            raise ValueError("The <" + attribute_element.tag +
+                             "> element must contain at most one <" + TAG_SUBTYPE_KWARGS + "> child element")
+
+        subtype_kwargs = {}
+
+        if len(subtype_kwargs_attributes):
+            subtype_kwargs_attribute = subtype_kwargs_attributes[0]
+            subtype_kwarg_attributes = get_all_sub_elements(subtype_kwargs_attribute, TAG_SUBTYPE_KWARG)
+            for subtype_kwarg_attribute in subtype_kwarg_attributes:
+                key = get_text(subtype_kwarg_attribute, TAG_KEY)
+                value = get_text(subtype_kwarg_attribute, TAG_VALUE)
+                subtype_kwargs[key] = value
+
+        return subtype_kwargs
+
+
+    @staticmethod
     def _parse_attribute(attribute_element: ET.Element) -> Attribute:
         attribute_key = get_text(attribute_element, TAG_KEY, expect_unique_tag=True)
         attribute_display_name = get_text(attribute_element, TAG_DISPLAY_NAME, expect_unique_tag=True)
@@ -165,6 +190,7 @@ class XMLAPISchemaParser:
         attribute_type = get_text(attribute_element, TAG_TYPE, expect_unique_tag=True)
         attribute_default_value = get_text_optional(attribute_element, TAG_DEFAULT_VALUE)
         attribute_subtype = get_text_optional(attribute_element, TAG_SUBTYPE)
+        attribute_subtype_kwargs = XMLAPISchemaParser._parse_subtype_kwargs(attribute_element)
 
         if attribute_type == AttributeType.STRING.value:
 
@@ -180,14 +206,19 @@ class XMLAPISchemaParser:
                                        min_length=min_length)
 
         elif attribute_type == AttributeType.ENUM.value:
-            enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
-            enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)
+
+            if attribute_subtype == constants.ENUM_SUBTYPE_PRODUCT_VERSIONS:
+                enum_items = []
+            else:
+                enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
+                enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)
 
             return EnumAttributeType(attribute_key,
                                      attribute_display_name,
                                      attribute_description,
                                      enum_items,
-                                     default_value=attribute_default_value)
+                                     default_value=attribute_default_value,
+                                     subtype=attribute_subtype)
 
         elif attribute_type == AttributeType.NULL.value:
             return NullAttributeType(attribute_key,
@@ -310,7 +341,7 @@ class XMLAPISchemaParser:
                                  project_attributes: typing.List[ProjectAttribute],
                                  job_definitions: typing.List[JobDefinition]) -> ProjectAttribute:
 
-        project_attribute_id = get_attribute(project_attribute_element, ATRRIBUTE_ID)
+        project_attribute_id = get_attribute(project_attribute_element, ATTRIBUTE_ID)
 
         attribute_element = get_sub_element(project_attribute_element, TAG_ATTRIBUTE, expect_unique_tag=True)
         attribute = XMLAPISchemaParser._parse_attribute(attribute_element)

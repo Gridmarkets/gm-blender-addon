@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import enum
+import typing
 from abc import ABC, abstractmethod
 
 
@@ -32,11 +33,14 @@ class AttributeType(enum.Enum):
 
 class Attribute(ABC):
 
-    def __init__(self, key:str, display_name: str, description: str, attribute_type: AttributeType):
+    def __init__(self, key:str, display_name: str, description: str, attribute_type: AttributeType,
+                 subtype_kwargs: typing.Dict = None):
+
         self._key = key
         self._display_name = display_name
         self._description = description
         self._attribute_type = attribute_type
+        self._subtype_kwargs = {} if subtype_kwargs is None else subtype_kwargs
 
     def get_key(self) -> str:
         return self._key
@@ -49,6 +53,9 @@ class Attribute(ABC):
 
     def get_type(self) -> AttributeType:
         return self._attribute_type
+
+    def get_subtype_kwargs(self) -> typing.Dict:
+        return self._subtype_kwargs
 
     @abstractmethod
     def get_default_value(self) -> any:

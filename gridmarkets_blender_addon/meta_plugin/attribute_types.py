@@ -108,17 +108,20 @@ class EnumAttributeType(Attribute):
 
     def __init__(self, key: str, display_name: str, description: str, items: typing.List[EnumItem],
                  default_value: typing.Optional[str] = None,
-                 subtype: typing.Optional[EnumSubtype] = EnumSubtype.NONE):
+                 subtype: typing.Optional[EnumSubtype] = EnumSubtype.NONE.value):
 
         Attribute.__init__(self, key, display_name, description, AttributeType.ENUM)
 
-        if len(items) <= 0:
-            raise ValueError("Enum must have at least one possible value")
+        if len(items) <= 0 and subtype != EnumSubtype.PRODUCT_VERSIONS.value:
+            raise ValueError("Enum '" + key + "' must have at least one possible value")
 
         self._items = items
         self._subtype = subtype
 
-        if default_value is None:
+        if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
+            # items and default value do not matter for PRODUCT_VERSIONS subtype
+            self._default_value = EnumItem(None, None, None)
+        elif default_value is None:
             # by default use the first enum item as a default value if no default value was provided
             self._default_value = items[0]
         else:
