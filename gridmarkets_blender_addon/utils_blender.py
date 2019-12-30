@@ -431,6 +431,13 @@ def get_supported_blender_280_engines(scene, context):
     ]
 
 
+def get_closest_matching_product_version(product, versions):
+    blender_version = bpy.app.version
+    version_string = str(blender_version[0]) + '.' + str(blender_version[1]) + '.' + str(blender_version[2])
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_client import GridMarketsAPIClient
+    return GridMarketsAPIClient.get_closest_matching_product_version(version_string, product, versions)
+
+
 def map_blender_version_to_api_product_version():
     from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_VERSIONS
     blender_version = bpy.app.version

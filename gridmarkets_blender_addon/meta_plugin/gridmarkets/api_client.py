@@ -160,3 +160,20 @@ class GridMarketsAPIClient(MetaAPIClient):
         json = r.json()
         all_files = json.get('project_files', {}).get('all_files', [])
         return sorted(map(lambda file: file.get('Name', ''), all_files), key=lambda s: s.casefold())
+
+    @staticmethod
+    def get_closest_matching_product_version(product_version: str,
+                                             product: str,
+                                             product_versions: typing.List[str]) -> typing.Optional[str]:
+
+        if not len(product_versions):
+            return None
+
+        # first check to see if the provided version exactly matches a version option
+        for version_option in product_versions:
+            if version_option == product_version:
+                return version_option
+
+        # if not then we are down to heuristics
+        import difflib
+        return difflib.get_close_matches(product_version, product_versions)[0]
