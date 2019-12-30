@@ -124,12 +124,28 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             setattr(project_attributes, "PRODUCT", api_constants.PRODUCTS.BLENDER)
 
     @staticmethod
+    def reset_product_version_value(context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        scene = context.scene
+        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        product_versions = plugin.get_api_client().get_product_versions(api_constants.PRODUCTS.BLENDER)
+
+        # attempt to reset the product version to the closest matching version
+        # only do for blender versions
+        value = utils_blender.get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, product_versions)
+        if value is not None:
+            setattr(project_attributes, api_constants.BLENDER_VERSIONS_ENUM_ID, value)
+
+    @staticmethod
     def boilerplate_invoke(operator, context, event):
         if GRIDMARKETS_OT_upload_project.check_render_engine(context) == {'FINISHED'}:
             return {'FINISHED'}
 
         GRIDMARKETS_OT_upload_project.reset_project_value(context)
         GRIDMARKETS_OT_upload_project.reset_product_value(context)
+        GRIDMARKETS_OT_upload_project.reset_product_version_value(context)
 
         # create popup
         return context.window_manager.invoke_props_dialog(operator, width=500)
