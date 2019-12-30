@@ -153,3 +153,10 @@ class GridMarketsAPIClient(MetaAPIClient):
         # sorted by latest version to oldest version
         return sorted(self._product_resolver.get(product, {}).get("versions", []), key=lambda s: s.casefold(),
                       reverse=True)
+
+    def get_remote_project_files(self, project_name: str):
+        import requests
+        r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
+        json = r.json()
+        all_files = json.get('project_files', {}).get('all_files', [])
+        return sorted(map(lambda file: file.get('Name', ''), all_files), key=lambda s: s.casefold())
