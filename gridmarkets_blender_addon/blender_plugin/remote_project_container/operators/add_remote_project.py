@@ -77,16 +77,12 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         set_project_attribute_value(root, self.project_name)
         files = api_client.get_remote_project_files(self.project_name)
 
-        # validate project
-        def _get_project_attributes(project_attribute, attributes=None):
-
-            if attributes is None:
-                raise ValueError
+        def _do_file_paths_exist(project_attribute):
 
             attribute = project_attribute.get_attribute()
 
             if attribute.get_type() == AttributeType.NULL:
-                return attributes
+                return True
 
             value = get_project_attribute_value(project_attribute)
 
@@ -94,14 +90,16 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
                 if value not in files:
                     self.report({'ERROR'}, "File path '" + str(value) + "' does not exist.")
-                    raise ValueError()
+                    return False
 
-            attributes[attribute.get_key()] = value
+            return _do_file_paths_exist(project_attribute.transition(value))
 
-            return _get_project_attributes(project_attribute.transition(value), attributes)
+        # check files actually exist on the remote project
+        if not _do_file_paths_exist(root):
+            return {'FINISHED'}
 
         try:
-            attributes = _get_project_attributes(root, attributes={})
+            attributes = utils_blender.get_project_attributes()
             remote_project = RemoteProject(attributes.get('PROJECT_NAME'),
                                            attributes.get('PRODUCT'),
                                            [],

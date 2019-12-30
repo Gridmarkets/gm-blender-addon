@@ -698,6 +698,32 @@ def get_selected_project_options(scene, context, id):
     return project_options
 
 
+def get_project_attributes(project_attribute=None, attributes=None):
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
+    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
+
+    # if no project attribute is passed start from the root attribute
+    if project_attribute is None:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        attributes = attributes if attributes is not None else {}
+        return get_project_attributes(plugin.get_api_client().get_api_schema().get_root_project_attribute(), attributes)
+
+    if attributes is None:
+        raise ValueError
+
+    attribute = project_attribute.get_attribute()
+
+    if attribute.get_type() == AttributeType.NULL:
+        return attributes
+
+    # add attribute value
+    value = get_project_attribute_value(project_attribute)
+    attributes[attribute.get_key()] = value
+
+    return get_project_attributes(project_attribute.transition(value), attributes)
+
+
 def draw_render_engine_warning_popup(self, context):
     layout = self.layout
 

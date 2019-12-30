@@ -25,6 +25,16 @@ ENUM_SUBTYPE_PRODUCT_VERSIONS = "PRODUCT_VERSIONS"
 BLENDER_VERSIONS_ENUM_ID = "BLENDER_VERSION"
 
 
+class API_KEYS:
+    PROJECT_NAME = "PROJECT_NAME"
+    APP = "app"
+    APP_VERSION = "app_version"
+    PATH = "path"
+    OUTPUT_PREFIX = "output_prefix"
+    OUTPUT_FORMAT = "output_format"
+    RENDER_ENGINE = "engine"
+
+
 class PRODUCTS:
     BLENDER = "blender"
     VRAY = "vray"
