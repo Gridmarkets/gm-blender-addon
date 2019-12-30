@@ -114,8 +114,55 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         except RejectedTransitionInputError as e:
             return {'FINISHED'}
 
-    def draw(self, context):
+    @staticmethod
+    def draw_project_attribute(layout, context, project_attribute):
         from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
+
+        attribute = project_attribute.get_attribute()
+
+        # Null attributes represet a base case
+        if attribute.get_type() == AttributeType.NULL:
+            return
+
+        project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        value = get_project_attribute_value(project_attribute)
+
+        split = layout.split(factor=0.25)
+        col1 = split.column()
+        col1.label(text=attribute.get_display_name())
+
+        col2 = split.column()
+
+        try:
+            project_attribute.transition(value)
+        except RejectedTransitionInputError as e:
+            col2.alert = True
+
+        draw_attribute_input(types.SimpleNamespace(layout=col2), context, project_props, attribute,
+                             prop_id=project_attribute.get_id())
+
+        if len(attribute.get_description()):
+            row = layout.row()
+            row.label(text=attribute.get_description())
+            row.enabled = False
+
+        layout.separator()
+
+        GRIDMARKETS_OT_add_remote_project.draw_project_attribute(layout, context, project_attribute.transition(value))
+
+    @staticmethod
+    def draw_project_attributes(layout, context, project_attribute):
+        try:
+            GRIDMARKETS_OT_add_remote_project.draw_project_attribute(layout, context, project_attribute)
+
+        except RejectedTransitionInputError as e:
+            layout.separator()
+            row = layout.row(align=True)
+            row.alignment = 'CENTER'
+            row.label(text="Warning: Project settings are invalid. " + e.user_message)
+            layout.separator()
+
+    def draw(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_schema = plugin.get_api_client().get_api_schema()
@@ -137,49 +184,9 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         layout.separator()
 
-        def draw_project_attribute(project_attribute):
-            attribute = project_attribute.get_attribute()
+        product_project_attribute = root.transition(self.project_name)
+        GRIDMARKETS_OT_add_remote_project.draw_project_attributes(layout, context, product_project_attribute)
 
-            # Null attributes represet a base case
-            if attribute.get_type() == AttributeType.NULL:
-                return
-
-            project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-            value = get_project_attribute_value(project_attribute)
-
-            split = layout.split(factor=0.25)
-            col1 = split.column()
-            col1.label(text=attribute.get_display_name())
-
-            col2 = split.column()
-
-            try:
-                project_attribute.transition(value)
-            except RejectedTransitionInputError as e:
-                col2.alert = True
-
-            draw_attribute_input(types.SimpleNamespace(layout=col2), context, project_props, attribute,
-                                 prop_id=project_attribute.get_id())
-
-            if len(attribute.get_description()):
-                row = layout.row()
-                row.label(text=attribute.get_description())
-                row.enabled = False
-
-            layout.separator()
-
-            draw_project_attribute(project_attribute.transition(value))
-
-        try:
-            product_project_attribute = root.transition(self.project_name)
-            draw_project_attribute(product_project_attribute)
-
-        except RejectedTransitionInputError as e:
-            layout.separator()
-            row = layout.row(align=True)
-            row.alignment = 'CENTER'
-            row.label(text="Warning: Project settings are invalid. " + e.user_message)
-            layout.separator()
 
 
 classes = (

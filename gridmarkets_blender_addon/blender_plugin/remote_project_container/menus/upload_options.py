@@ -59,6 +59,7 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
 
         draw_operator_option(layout, constants.UPLOAD_CURRENT_SCENE_TUPLE)
         draw_operator_option(layout, constants.UPLOAD_PROJECT_FILES_TUPLE)
+        draw_operator_option(layout, constants.UPLOAD_PACKED_PROJECT_TUPLE)
 
         draw_header(layout, "Packing Actions:", icon=constants.ICON_FILE_FOLDER)
         draw_operator_option(layout, constants.PACK_CURRENT_SCENE_TUPLE)
