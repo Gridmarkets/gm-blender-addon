@@ -95,6 +95,7 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
     remote_project_container = None
 
     def modal(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
         from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
         from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
         from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
@@ -126,6 +127,9 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
 
                     elif type(result) == RemoteProject:
                         self.remote_project_container.append(result)
+
+                    elif isinstance(result, PluginError):
+                        self.report({'ERROR'}, result.user_message)
 
                     else:
                         raise RuntimeError("Method returned unexpected result:", result)

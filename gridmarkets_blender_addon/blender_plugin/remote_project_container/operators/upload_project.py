@@ -42,6 +42,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     plugin = None
 
     def modal(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
         from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
         from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
         from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
@@ -69,6 +70,9 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                         self.report({'ERROR'}, result.user_message)
 
                     elif type(result) == APIError:
+                        self.report({'ERROR'}, result.user_message)
+
+                    elif isinstance(result, PluginError):
                         self.report({'ERROR'}, result.user_message)
 
                     elif type(result) == RemoteProject:
