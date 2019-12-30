@@ -19,16 +19,16 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import pathlib
 import types
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
     RejectedTransitionInputError
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-    get_project_attribute_value
+    get_project_attribute_value, set_project_attribute_value
+
 
 def _get_remote_root_directories(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -74,9 +74,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         api_schema = api_client.get_api_schema()
         root = api_schema.get_root_project_attribute()
 
-        # set project name prop
-        project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-
+        set_project_attribute_value(root, self.project_name)
         files = api_client.get_remote_project_files(self.project_name)
 
         # validate project
