@@ -221,9 +221,10 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         else:
             layout.prop(project_attributes, "BLENDER_VERSION", text="Blender Version")
 
-            row = layout.row()
-            row.label(text="This should be the same (or as close as possible) to the version of Blender your currently using.")
-            row.enabled = False
+            col = layout.column()
+            col.label(text="This should be the same (or as close as possible) to the version of Blender your currently using.")
+            col.label(text="For reference you are using: " + bpy.app.version_string)
+            col.enabled = False
 
         layout.separator()
 
