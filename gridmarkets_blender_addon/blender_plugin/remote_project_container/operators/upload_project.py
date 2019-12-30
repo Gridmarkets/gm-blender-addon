@@ -198,7 +198,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        project_attributes = getattr(scene, api_constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
 
         layout.separator()
 
