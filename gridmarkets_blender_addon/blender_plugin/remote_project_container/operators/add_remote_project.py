@@ -27,11 +27,8 @@ from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
     RejectedTransitionInputError
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.project.remote.remote_blender_project import RemoteBlenderProject
-from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
-    draw_remote_project_summary
-
+from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+    get_project_attribute_value
 
 def _get_remote_root_directories(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -64,7 +61,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         # If the user has no projects display a warning message
         if len(projects) == 0:
-            self.report({'ERROR'}, "No existing projects detected. You must have already uploaded a project to use this option.")
+            self.report({'ERROR'},
+                        "No existing projects detected. You must have already uploaded a project to use this option.")
             return {"FINISHED"}
 
         return context.window_manager.invoke_props_dialog(self, width=400)
@@ -78,12 +76,11 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         # set project name prop
         project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        setattr(project_props, root.get_id(), self.project_name)
 
         files = api_client.get_remote_project_files(self.project_name)
 
         # validate project
-        def _get_project_attributes(project_attribute, attributes = None):
+        def _get_project_attributes(project_attribute, attributes=None):
 
             if attributes is None:
                 raise ValueError
@@ -93,7 +90,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             if attribute.get_type() == AttributeType.NULL:
                 return attributes
 
-            value = getattr(project_props, project_attribute.get_id())
+            value = get_project_attribute_value(project_attribute)
 
             # check file paths exist
             if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
@@ -120,7 +117,6 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             return {'FINISHED'}
         except RejectedTransitionInputError as e:
             return {'FINISHED'}
-
 
     def draw(self, context):
         from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
@@ -153,7 +149,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
                 return
 
             project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-            value = getattr(project_props, project_attribute.get_id())
+            value = get_project_attribute_value(project_attribute)
 
             split = layout.split(factor=0.25)
             col1 = split.column()
