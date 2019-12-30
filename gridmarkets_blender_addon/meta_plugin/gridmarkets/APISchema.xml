@@ -505,6 +505,7 @@
                 <Key>MAIN_FILE</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
+                <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
                 <Type>STRING</Type>
                 <Subtype>FILE_PATH</Subtype>
             </Attribute>
@@ -522,6 +523,7 @@
                 <Key>MAIN_FILE</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
+                <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
                 <Type>STRING</Type>
                 <Subtype>FILE_PATH</Subtype>
             </Attribute>
