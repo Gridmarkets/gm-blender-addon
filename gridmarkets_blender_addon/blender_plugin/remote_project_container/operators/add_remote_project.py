@@ -20,7 +20,13 @@
 
 import bpy
 import pathlib
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
+import types
+from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
+from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
+    RejectedTransitionInputError
+from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.project.remote.remote_blender_project import RemoteBlenderProject
 from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
@@ -47,45 +53,17 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         items=_get_remote_root_directories
     )
 
-    project_type: bpy.props.EnumProperty(
-        name="Project Type",
-        items=utils_blender.get_supported_products
-    )
-
-    blender_280_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_280_engines
-    )
-
-    blender_279_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_279_engines
-    )
-
-    blender_version: bpy.props.EnumProperty(
-        name="Blender version",
-        items=utils_blender.get_supported_blender_versions
-    )
-
-    vray_version: bpy.props.EnumProperty(
-        name="V-Ray version",
-        items=utils_blender.get_supported_vray_versions
-    )
-
-    project_file: bpy.props.StringProperty(
-        name="Project file",
-        description="The name of your project",
-    )
-
-    remap_file: bpy.props.StringProperty(
-        name="Re-map file",
-        description="The name of the remap file",
-    )
-
     def invoke(self, context, event):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        api_client = plugin.get_api_client()
+
+        # refresh projects list
+        projects = api_client.get_root_directories(ignore_cache=True)
 
         # If the user has no projects display a warning message
-        if len(_get_remote_root_directories(self, context)) == 0:
+        if len(projects) == 0:
             self.report({'ERROR'}, "No existing projects detected. You must have already uploaded a project to use this option.")
             return {"FINISHED"}
 
@@ -93,60 +71,123 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        dir = pathlib.Path(self.project_name)
-
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
-            main_file = pathlib.Path(self.project_file + constants.BLEND_FILE_EXTENSION)
-            remote_project = RemoteBlenderProject(dir, main_file)
-
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            main_file = pathlib.Path(self.project_file + constants.VRAY_SCENE_FILE_EXTENSION)
-            remap_file = dir / pathlib.Path(self.remap_file)
-            remote_project = RemoteVRayProject(dir, main_file, remap_file)
-
         plugin = PluginFetcher.get_plugin()
-        plugin.get_remote_project_container().append(remote_project)
+        api_client = plugin.get_api_client()
+        api_schema = api_client.get_api_schema()
+        root = api_schema.get_root_project_attribute()
 
-        # reset string inputs, enum inputs don't really need to reset to default values
-        self.project_name = ""
-        self.project_file = ""
-        self.remap_file = ""
+        # set project name prop
+        project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        setattr(project_props, root.get_id(), self.project_name)
 
-        utils_blender.force_redraw_addon()
-        return {'FINISHED'}
+        files = api_client.get_remote_project_files(self.project_name)
+
+        # validate project
+        def _get_project_attributes(project_attribute, attributes = None):
+
+            if attributes is None:
+                raise ValueError
+
+            attribute = project_attribute.get_attribute()
+
+            if attribute.get_type() == AttributeType.NULL:
+                return attributes
+
+            value = getattr(project_props, project_attribute.get_id())
+
+            # check file paths exist
+            if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+                if value not in files:
+                    self.report({'ERROR'}, "File path '" + str(value) + "' does not exist.")
+                    raise ValueError()
+
+            attributes[attribute.get_key()] = value
+
+            return _get_project_attributes(project_attribute.transition(value), attributes)
+
+        try:
+            attributes = _get_project_attributes(root, attributes={})
+            remote_project = RemoteProject(attributes.get('PROJECT_NAME'),
+                                           attributes.get('PRODUCT'),
+                                           [],
+                                           attributes)
+
+            plugin.get_remote_project_container().append(remote_project)
+            utils_blender.force_redraw_addon()
+            return {'FINISHED'}
+
+        except ValueError as e:
+            return {'FINISHED'}
+        except RejectedTransitionInputError as e:
+            return {'FINISHED'}
+
 
     def draw(self, context):
+        from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+        root = api_schema.get_root_project_attribute()
         layout = self.layout
 
         layout.separator()
 
-        layout.prop(self, "project_name")
+        split = layout.split(factor=0.25)
+        col1 = split.column()
+        col1.label(text="Project name:")
 
+        col2 = split.column()
+        col2.prop(self, "project_name", text="")
 
-        layout.prop(self, "project_type")
-
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
-            layout.prop(self, "blender_version")
-            layout.prop(self, "project_file")
-            project_file = self.project_file + constants.BLEND_FILE_EXTENSION
-
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
-                layout.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
-                layout.prop(self, "blender_279_engine")
-
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            layout.prop(self, "vray_version")
-            layout.prop(self, "project_file")
-            project_file = self.project_file + constants.VRAY_SCENE_FILE_EXTENSION
-            layout.prop(self, "remap_file")
+        row = layout.row()
+        row.label(text=root.get_attribute().get_description())
+        row.enabled = False
 
         layout.separator()
 
-        draw_remote_project_summary(layout, self.project_name, self.project_type,
-                                    self.blender_version, project_file, self.blender_280_engine,
-                                    self.blender_279_engine,
-                                    self.vray_version, self.remap_file)
+        def draw_project_attribute(project_attribute):
+            attribute = project_attribute.get_attribute()
+
+            # Null attributes represet a base case
+            if attribute.get_type() == AttributeType.NULL:
+                return
+
+            project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+            value = getattr(project_props, project_attribute.get_id())
+
+            split = layout.split(factor=0.25)
+            col1 = split.column()
+            col1.label(text=attribute.get_display_name())
+
+            col2 = split.column()
+
+            try:
+                project_attribute.transition(value)
+            except RejectedTransitionInputError as e:
+                col2.alert = True
+
+            draw_attribute_input(types.SimpleNamespace(layout=col2), context, project_props, attribute,
+                                 prop_id=project_attribute.get_id())
+
+            if len(attribute.get_description()):
+                row = layout.row()
+                row.label(text=attribute.get_description())
+                row.enabled = False
+
+            layout.separator()
+
+            draw_project_attribute(project_attribute.transition(value))
+
+        try:
+            product_project_attribute = root.transition(self.project_name)
+            draw_project_attribute(product_project_attribute)
+
+        except RejectedTransitionInputError as e:
+            layout.separator()
+            row = layout.row(align=True)
+            row.alignment = 'CENTER'
+            row.label(text="Warning: Project settings are invalid. " + e.user_message)
+            layout.separator()
 
 
 classes = (
