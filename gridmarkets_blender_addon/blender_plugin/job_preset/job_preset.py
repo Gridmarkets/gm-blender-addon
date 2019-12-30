@@ -77,11 +77,13 @@ class JobPreset(MetaJobPreset):
 
     def register_props(self):
         import bpy
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, StringAttributeType, \
-            StringSubtype
+        from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, EnumSubtype, \
+            StringAttributeType,StringSubtype
         from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
+        plugin = PluginFetcher.get_plugin()
         job_definition = self.get_job_definition()
 
         properties = {}
@@ -109,7 +111,6 @@ class JobPreset(MetaJobPreset):
                         maxlen=0 if max_length is None else max_length,
                         options={'SKIP_SAVE'}
                     )
-
                 elif subtype == StringSubtype.FRAME_RANGES.value:
                     properties[key + self.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
                         type=FrameRangeProps,
@@ -119,18 +120,36 @@ class JobPreset(MetaJobPreset):
                     properties[key + self.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
                         options={'SKIP_SAVE'}
                     )
+                elif subtype == StringSubtype.FILE_PATH.value:
+                    properties[key] = bpy.props.StringProperty(
+                        name=display_name,
+                        description=description,
+                        default=default_value,
+                        subtype='FILE_PATH',
+                        maxlen=0 if max_length is None else max_length,
+                        options={'SKIP_SAVE'}
+                    )
                 else:
                     raise ValueError("Unrecognised String subtype '" + subtype + "'.")
 
             elif attribute_type == AttributeType.ENUM:
 
                 enum_attribute: EnumAttributeType = attribute
-
+                subtype = enum_attribute.get_subtype()
                 items = []
-                enum_items = enum_attribute.get_items()
 
-                for enum_item in enum_items:
-                    items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
+                if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
+                    product = enum_attribute.get_subtype_kwargs().get("PRODUCT")
+
+                    def _get_product_versions(self, context):
+                        versions = plugin.get_api_client().get_product_versions(product)
+                        return list(map(lambda version: (version, version, ''), versions))
+
+                    items = _get_product_versions
+                else:
+                    enum_items = enum_attribute.get_items()
+                    for enum_item in enum_items:
+                        items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
 
                 properties[key] = bpy.props.EnumProperty(
                     name=display_name,

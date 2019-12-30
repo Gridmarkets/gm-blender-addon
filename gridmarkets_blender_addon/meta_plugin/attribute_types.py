@@ -18,7 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['StringAttributeType', 'StringSubtype', 'EnumAttributeType', 'EnumItem', 'NullAttributeType',
+__all__ = ['StringAttributeType', 'StringSubtype', 'EnumAttributeType', 'EnumItem', 'EnumSubtype', 'NullAttributeType',
            'BooleanAttributeType', 'IntegerAttributeType']
 
 import typing
@@ -30,6 +30,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import
 class StringSubtype(enum.Enum):
     NONE = "NONE"
     FRAME_RANGES = "FRAME_RANGES"
+    FILE_PATH = "FILE_PATH"
 
 
 class StringAttributeType(Attribute):

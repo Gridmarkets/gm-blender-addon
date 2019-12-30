@@ -47,14 +47,16 @@ def register_schema(api_client):
             string_attribute: StringAttributeType = attribute
             subtype = string_attribute.get_subtype()
 
+            max_length = string_attribute.get_max_length()
+
             if subtype == StringSubtype.NONE.value:
                 properties[id] = bpy.props.StringProperty(
                     name=display_name,
                     description=description,
                     default=default,
+                    maxlen=0 if max_length is None else max_length,
                     options={'SKIP_SAVE'}
                 )
-
             elif subtype == StringSubtype.FRAME_RANGES.value:
                 properties[id + JobPreset.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
                     type=FrameRangeProps,
@@ -62,6 +64,15 @@ def register_schema(api_client):
                 )
 
                 properties[id + JobPreset.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
+                    options={'SKIP_SAVE'}
+                )
+            elif subtype == StringSubtype.FILE_PATH.value:
+                properties[id] = bpy.props.StringProperty(
+                    name=display_name,
+                    description=description,
+                    default=default,
+                    subtype='FILE_PATH',
+                    maxlen=0 if max_length is None else max_length,
                     options={'SKIP_SAVE'}
                 )
             else:
