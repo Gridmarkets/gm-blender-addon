@@ -25,7 +25,8 @@ import pathlib
 from queue import Queue, Empty
 
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
     draw_remote_project_summary
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker

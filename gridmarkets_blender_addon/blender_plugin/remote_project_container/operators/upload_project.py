@@ -22,8 +22,10 @@ import bpy
 
 from queue import Queue, Empty
 
+
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 
@@ -96,7 +98,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
     @staticmethod
     def reset_project_value(context):
         from types import SimpleNamespace
-        from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import ROOT_ATTRIBUTE_ID
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
 
         plugin = PluginFetcher.get_plugin()
@@ -107,7 +108,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                               plugin.get_remote_project_container().get_all())
 
         setattr(project_attributes,
-                ROOT_ATTRIBUTE_ID,
+                api_constants.ROOT_ATTRIBUTE_ID,
                 utils.create_unique_object_name(remote_projects,
                                                 name_prefix=utils_blender.get_project_name()))
 
@@ -159,12 +160,11 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import ROOT_ATTRIBUTE_ID
         project_attributes = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
 
         args = (
             getattr(project_attributes, "PRODUCT"),
-            getattr(project_attributes, ROOT_ATTRIBUTE_ID)
+            getattr(project_attributes, api_constants.ROOT_ATTRIBUTE_ID)
         )
 
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
@@ -196,15 +196,14 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         return api_client.upload_project(packed_project, delete_local_files_after_upload=False)
 
     def draw(self, context):
-        from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import ROOT_ATTRIBUTE_ID
         layout = self.layout
         scene = context.scene
-        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        project_attributes = getattr(scene, api_constants.PROJECT_ATTRIBUTES_POINTER_KEY)
 
         layout.separator()
 
         # project input
-        layout.prop(project_attributes, ROOT_ATTRIBUTE_ID)
+        layout.prop(project_attributes, api_constants.ROOT_ATTRIBUTE_ID)
         row = layout.row()
         row.label(text="This is the name of the remote folder which your project will be uploaded to.")
         row.enabled = False

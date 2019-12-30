@@ -32,7 +32,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error impor
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
 from gridmarkets_blender_addon.meta_plugin.errors.api_error import APIError
 from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 from gridmarkets import EnvoyClient, Project as GMProject
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
@@ -102,13 +102,13 @@ class GridMarketsAPIClient(MetaAPIClient):
                 raise APIError(message=e_msg)
 
         elif not (has_email or has_key):
-            message = "No " + constants.COMPANY_NAME + " email address or access key provided."
+            message = "No " + api_constants.COMPANY_NAME + " email address or access key provided."
             raise InvalidUserError(message=message)
         elif not has_email:
-            message = "No " + constants.COMPANY_NAME + " email address provided."
+            message = "No " + api_constants.COMPANY_NAME + " email address provided."
             raise InvalidEmailError(message=message)
         elif not has_key:
-            message = "No " + constants.COMPANY_NAME + " access key provided."
+            message = "No " + api_constants.COMPANY_NAME + " access key provided."
             raise InvalidAccessKeyError(message=message)
 
         return True

@@ -23,7 +23,8 @@ from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 
 def get_icon_for_job_definition(job_definition: JobDefinition) -> (str, int):
     """ Gets the icon and icon_value values for a JobDefinition """
-    from gridmarkets_blender_addon import api_constants, constants, icon_loader
+    from gridmarkets_blender_addon import constants, icon_loader
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
     product_attribute = job_definition.get_attribute_with_key(api_constants.ATTRIBUTE_NAMES.PRODUCT)
 

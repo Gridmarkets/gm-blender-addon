@@ -20,7 +20,8 @@
 
 import bpy
 from bpy.app.handlers import persistent
-from gridmarkets_blender_addon import constants, api_constants
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 from gridmarkets_blender_addon.property_groups.job_props import JobProps

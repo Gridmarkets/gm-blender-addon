@@ -22,3 +22,33 @@ COMPANY_NAME = "GridMarkets"
 ROOT_ATTRIBUTE_ID = "GM_PROJECT_NAME"
 
 ENUM_SUBTYPE_PRODUCT_VERSIONS = "PRODUCT_VERSIONS"
+
+
+class PRODUCTS:
+    BLENDER = "blender"
+    VRAY = "vray"
+
+
+class BLENDER_VERSIONS:
+    V_2_81A = "2.81a"
+    V_2_80 = "2.80"
+    V_2_79B = "2.79b"
+
+
+class BLENDER_ENGINES:
+    CYCLES = "CYCLES"
+    EEVEE = "EEVEE"
+    INTERNAL = "INTERNAL"
+
+
+class VRAY_VERSIONS:
+    V_3_60_03 = "3.60.03"
+    V_3_60_04 = "3.60.04"
+    V_3_60_05 = "3.60.05"
+    V_4_02_05 = "4.02.05"
+    V_4_10_01 = "4.10.01"
+    V_4_10_02 = "4.10.02"
+
+
+class ATTRIBUTE_NAMES:
+    PRODUCT = "app"

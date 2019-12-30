@@ -395,7 +395,7 @@ def get_user_friendly_name_for_engine(engine: str = None):
 
 
 def get_supported_products(scene, context):
-    from gridmarkets_blender_addon.api_constants import PRODUCTS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import PRODUCTS
 
     return [
         (PRODUCTS.BLENDER, "Blender", ""),
@@ -404,7 +404,7 @@ def get_supported_products(scene, context):
 
 
 def get_supported_blender_versions(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_VERSIONS
 
     return [
         (BLENDER_VERSIONS.V_2_81A, "2.81a", ""),
@@ -414,7 +414,7 @@ def get_supported_blender_versions(scene, context):
 
 
 def get_supported_blender_279_engines(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_ENGINES
 
     return [
         (BLENDER_ENGINES.CYCLES, "Cycles", ""),
@@ -423,7 +423,7 @@ def get_supported_blender_279_engines(scene, context):
 
 
 def get_supported_blender_280_engines(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_ENGINES
 
     return [
         (BLENDER_ENGINES.CYCLES, "Cycles", ""),
@@ -432,7 +432,7 @@ def get_supported_blender_280_engines(scene, context):
 
 
 def map_blender_version_to_api_product_version():
-    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_VERSIONS
     blender_version = bpy.app.version
 
     major = blender_version[0]
@@ -456,7 +456,7 @@ def map_blender_version_to_api_product_version():
 
 
 def get_supported_vray_versions(scene, context):
-    from gridmarkets_blender_addon.api_constants import VRAY_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import VRAY_VERSIONS
 
     return [
         (VRAY_VERSIONS.V_3_60_03, "3.60.03", ""),
@@ -639,7 +639,7 @@ def is_addon_enabled(addon_name: str):
 def get_selected_project_options(scene, context, id):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.icon_loader import IconLoader
-    from gridmarkets_blender_addon import api_constants
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
 
     project_options = [

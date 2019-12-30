@@ -24,7 +24,7 @@ import pathlib
 from queue import Empty
 
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils, utils_blender
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 
