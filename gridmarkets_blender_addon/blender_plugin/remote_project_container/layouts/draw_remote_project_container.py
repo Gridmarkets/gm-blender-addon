@@ -27,30 +27,11 @@ def draw_remote_project_container(self, context):
         GRIDMARKETS_OT_open_remote_project_definition_popup
     from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import \
         GRIDMARKETS_UL_remote_project
-    from gridmarkets_blender_addon.blender_plugin.remote_project_container.menus.upload_options import \
-        GRIDMARKETS_MT_project_upload_options
 
     layout = self.layout
     props = context.scene.props
     plugin = PluginFetcher.get_plugin()
     user_interface = plugin.get_user_interface()
-
-    remote_project_container_props = props.remote_project_container
-
-    # draw header
-    row = layout.row(align=True)  #
-    row.label(text="Remote Projects", icon=constants.ICON_REMOTE_PROJECT)
-    row.operator(GRIDMARKETS_OT_open_remote_project_definition_popup.bl_idname, text="",
-                 icon=constants.ICON_INFO, emboss=False)
-
-    row = layout.row()
-    row.template_list(GRIDMARKETS_UL_remote_project.bl_idname, "",
-                      remote_project_container_props, "remote_projects",
-                      remote_project_container_props, "focused_remote_project",
-                      rows=2)
-
-    row = layout.row(align=True)
-    row.scale_y = 2.5
 
     def get_upload_tuple():
         method = user_interface.get_project_upload_method()
@@ -60,6 +41,35 @@ def draw_remote_project_container(self, context):
         raise RuntimeError("Could not find project action tuple")
 
     tuple = get_upload_tuple()
-    row.operator_menu_hold(tuple[0], text=tuple[1], menu=GRIDMARKETS_MT_project_upload_options.bl_idname)
+
+    remote_project_container_props = props.remote_project_container
+
+    col = layout.column(align=True)
+
+    row = col.row(align=True)
+    row.scale_y = 2.5
+
+    box=col.box()
+
+    from types import SimpleNamespace
+    from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import GRIDMARKETS_OT_add_remote_project
+    GRIDMARKETS_OT_add_remote_project.draw(SimpleNamespace(layout=box), context)
+
+    layout.separator()
+
+    # draw header
+    row = layout.row(align=True)  #
+    row.label(text="Remote Projects", icon=constants.ICON_REMOTE_PROJECT)
+    row.operator(GRIDMARKETS_OT_open_remote_project_definition_popup.bl_idname, text="",
+                 icon=constants.ICON_INFO, emboss=False)
+
+    layout.separator()
+
+    row = layout.row()
+    col = row.column()
+    col.template_list(GRIDMARKETS_UL_remote_project.bl_idname, "",
+                      remote_project_container_props, "remote_projects",
+                      remote_project_container_props, "focused_remote_project",
+                      rows=2)
 
     draw_remote_project(self, context)

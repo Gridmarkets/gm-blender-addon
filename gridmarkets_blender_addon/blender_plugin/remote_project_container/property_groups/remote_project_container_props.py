@@ -22,6 +22,16 @@ import bpy
 from gridmarkets_blender_addon.blender_plugin.remote_project.property_groups.remote_project_props import RemoteProjectProps
 
 
+def _get_remote_root_directories(self, context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    api_client = plugin.get_api_client()
+    projects = api_client.get_root_directories()
+
+    return list(map(lambda project: (project, project, ''), projects))
+
+
 class RemoteProjectContainerProps(bpy.types.PropertyGroup):
 
     def _get_focused_remote_project(self):
@@ -56,4 +66,9 @@ class RemoteProjectContainerProps(bpy.types.PropertyGroup):
 
     remote_projects: bpy.props.CollectionProperty(
         type=RemoteProjectProps
+    )
+
+    project_name: bpy.props.EnumProperty(
+        name="Project Name",
+        items=_get_remote_root_directories
     )

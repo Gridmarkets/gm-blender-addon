@@ -35,6 +35,10 @@ from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_su
 _CONSOLE_SEPARATOR_SPACING = 2
 
 
+# new imports
+from gridmarkets_blender_addon.menus import *
+
+
 def draw_body(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
@@ -43,12 +47,16 @@ def draw_body(self, context):
     layout = self.layout
     props = context.scene.props
 
-    if api_client.is_user_signed_in():
-        box = layout.box()
-        row = box.row()
-        row.prop_tabs_enum(props, "tab_options", icon_only=True)
-    else:
+    # only show the login screen if not logged in
+    if not api_client.is_user_signed_in():
         layout.separator()
+        draw_preferences(self, context)
+        return
+
+    """
+    box = layout.box()
+    row = box.row()
+    row.prop_tabs_enum(props, "tab_options", icon_only=True)
 
     if props.tab_options == constants.TAB_SUBMISSION_SETTINGS:
         if context.scene.render.engine == "VRAY_RENDER_RT":
@@ -70,3 +78,4 @@ def draw_body(self, context):
         draw_preferences(self, context)
     elif props.tab_options == constants.TAB_LOGGING:
         draw_logging_console(self, context)
+    """

@@ -31,25 +31,10 @@ from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribut
     get_project_attribute_value, set_project_attribute_value
 
 
-def _get_remote_root_directories(self, context):
-    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-    plugin = PluginFetcher.get_plugin()
-
-    api_client = plugin.get_api_client()
-    projects = api_client.get_root_directories()
-
-    return list(map(lambda project: (project, project, ''), projects))
-
-
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_ADD_REMOTE_PROJECT_LABEL
     bl_options = set()
-
-    project_name: bpy.props.EnumProperty(
-        name="Project Name",
-        items=_get_remote_root_directories
-    )
 
     def invoke(self, context, event):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -75,8 +60,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         api_schema = api_client.get_api_schema()
         root = api_schema.get_root_project_attribute()
 
-        set_project_attribute_value(root, self.project_name)
-        files = api_client.get_remote_project_files(self.project_name)
+        set_project_attribute_value(root, context.scene.props.remote_project_container.project_name)
+        files = api_client.get_remote_project_files(context.scene.props.remote_project_container.project_name)
 
         def _do_file_paths_exist(project_attribute):
 
@@ -144,11 +129,10 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
                              prop_id=project_attribute.get_id())
 
         if len(attribute.get_description()):
-            row = layout.row()
-            row.label(text=attribute.get_description())
-            row.enabled = False
-
-        layout.separator()
+            #row = col2.row()
+            #row.label(text=attribute.get_description())
+            #row.enabled = False
+            pass
 
         GRIDMARKETS_OT_add_remote_project.draw_project_attribute(layout, context, project_attribute.transition(value))
 
@@ -178,15 +162,15 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         col1.label(text="Project name:")
 
         col2 = split.column()
-        col2.prop(self, "project_name", text="")
+        col2.prop(context.scene.props.remote_project_container, "project_name", text="")
 
-        row = layout.row()
-        row.label(text=root.get_attribute().get_description())
-        row.enabled = False
+        #row = layout.row()
+        #row.label(text=root.get_attribute().get_description())
+        #row.enabled = False
+        #row.scale_y = 0.3
+        #layout.separator(factor=0)
 
-        layout.separator()
-
-        product_project_attribute = root.transition(self.project_name)
+        product_project_attribute = root.transition(context.scene.props.remote_project_container.project_name)
         GRIDMARKETS_OT_add_remote_project.draw_project_attributes(layout, context, product_project_attribute)
 
 

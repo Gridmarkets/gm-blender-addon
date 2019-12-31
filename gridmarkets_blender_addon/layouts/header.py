@@ -20,7 +20,7 @@
 
 from gridmarkets_blender_addon.icon_loader import IconLoader
 from gridmarkets_blender_addon import constants, utils_blender
-
+from gridmarkets_blender_addon.menus import *
 
 def draw_header(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -36,7 +36,9 @@ def draw_header(self, context):
     # display company icon and version
     row = layout.row()
     row.alignment = "CENTER"
-    row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
+    row.label(text="", icon_value=iconGM.icon_id)
+
+    draw_header_menus(row, context)
 
     # signed in indicator
     sub = row.row(align=True)
@@ -45,15 +47,23 @@ def draw_header(self, context):
         sub.label(text=user_interface.get_running_operation_message(),
                   icon_value=utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id)
 
+    # right aligned content
+    layout.separator_spacer()
+
+    row = layout.row()
+    #row.emboss = 'PULLDOWN_MENU'
+    row.alignment = 'RIGHT'
+    if signed_in_user:
+        text = "Signed in as: " + signed_in_user.get_auth_email()
+
+        row.menu(GRIDMARKETS_MT_misc_options.bl_idname, text="", icon_value=preview_collection[constants.USER_ICON_ID].icon_id)
     else:
-        if signed_in_user:
-            sub.label(text="Signed in as: " + signed_in_user.get_auth_email())
-        else:
-            sub.label(text="Not signed in", icon=constants.ICON_ERROR)
+        row.label(text="Not signed in", icon=constants.ICON_ERROR)
+
 
     # version label
-    sub = row.row(align=True)
-    sub.enabled = False
-    sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
+    #sub = row.row(align=True)
+    #sub.enabled = False
+    #sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
 
 
