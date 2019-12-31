@@ -667,12 +667,12 @@ def get_selected_project_options(scene, context, id):
 
         # iterate through uploaded projects and add them as options
         for i, project in enumerate(remote_projects):
-            project_product = project.get_attribute("PRODUCT")
+            project_product = project.get_attribute(api_constants.API_KEYS.APP)
 
             # get the correct icon
-            if project_product == "vray":
+            if project_product == api_constants.PRODUCTS.VRAY:
                 icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            elif project_product == "blender":
+            elif project_product == api_constants.PRODUCTS.BLENDER:
                 icon = constants.ICON_BLENDER
             else:
                 icon = constants.ICON_PROJECT

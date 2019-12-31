@@ -20,6 +20,7 @@
 
 import bpy
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
 def register_schema(api_client):
@@ -84,7 +85,7 @@ def register_schema(api_client):
             items = []
 
             if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                product = enum_attribute.get_subtype_kwargs().get("PRODUCT")
+                product = enum_attribute.get_subtype_kwargs().get(api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
 
                 def _get_product_versions(self, context):
                     versions = api_client.get_product_versions(product)

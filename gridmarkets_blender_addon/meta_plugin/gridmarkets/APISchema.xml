@@ -436,7 +436,7 @@
 
         <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
             <Attribute>
-                <Key>BLENDER_2_79_RENDER_ENGINE</Key>
+                <Key>engine</Key>
                 <DisplayName>Render Engine</DisplayName>
                 <Description>The render engine the project is set to use.</Description>
                 <Type>ENUM</Type>
@@ -469,7 +469,7 @@
 
         <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
             <Attribute>
-                <Key>BLENDER_2_80_RENDER_ENGINE</Key>
+                <Key>engine</Key>
                 <DisplayName>Render Engine</DisplayName>
                 <Description>The render engine the project is set to use.</Description>
                 <Type>ENUM</Type>
@@ -502,7 +502,7 @@
 
         <ProjectAttribute id="BLENDER_2_79_MAIN_PROJECT_FILE">
             <Attribute>
-                <Key>MAIN_FILE</Key>
+                <Key>path</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
                 <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
@@ -520,7 +520,7 @@
 
         <ProjectAttribute id="BLENDER_2_80_MAIN_PROJECT_FILE">
             <Attribute>
-                <Key>MAIN_FILE</Key>
+                <Key>path</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
                 <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
@@ -538,7 +538,7 @@
 
         <ProjectAttribute id="BLENDER_VERSION">
             <Attribute>
-                <Key>VERSION</Key>
+                <Key>app_version</Key>
                 <DisplayName>Version</DisplayName>
                 <Description>The version of Blender.</Description>
                 <Type>ENUM</Type>
@@ -592,7 +592,7 @@
 
         <ProjectAttribute id="VRAY_SCENE_FILE">
             <Attribute>
-                <Key>MAIN_FILE</Key>
+                <Key>path</Key>
                 <DisplayName>V-Ray scene file</DisplayName>
                 <Description>The main .vrscene file for the project.</Description>
                 <Type>STRING</Type>
@@ -608,7 +608,7 @@
 
         <ProjectAttribute id="VRAY_VERSION">
             <Attribute>
-                <Key>VERSION</Key>
+                <Key>app_version</Key>
                 <DisplayName>Version</DisplayName>
                 <Description>The version of V-Ray.</Description>
                 <Type>ENUM</Type>
@@ -657,7 +657,7 @@
 
         <ProjectAttribute id="PRODUCT">
             <Attribute>
-                <Key>PRODUCT</Key>
+                <Key>app</Key>
                 <DisplayName>Product</DisplayName>
                 <Description>A GridMarkets product.</Description>
                 <Type>ENUM</Type>
@@ -690,7 +690,7 @@
 
         <ProjectAttribute id="GM_PROJECT_NAME">
             <Attribute>
-                <Key>PROJECT_NAME</Key>
+                <Key>project_name</Key>
                 <DisplayName>Project name</DisplayName>
                 <Description>The name of the project as specified in Envoy.</Description>
                 <Type>STRING</Type>

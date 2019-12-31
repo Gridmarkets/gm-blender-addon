@@ -20,6 +20,7 @@
 
 import bpy
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
 class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
@@ -35,11 +36,11 @@ class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
         remote_project = plugin.get_remote_project_container().get_at(index)
 
         preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-        product = remote_project.get_attribute("PRODUCT")
-        if product == "vray":
+        product = remote_project.get_attribute(api_constants.API_KEYS.APP)
+        if product == api_constants.PRODUCTS.VRAY:
             icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
             layout.label(text=remote_project.get_name(), icon_value=icon)
-        elif product == "blender":
+        elif product == api_constants.PRODUCTS.BLENDER:
             layout.label(text=remote_project.get_name(), icon=constants.ICON_BLENDER)
         else:
             layout.label(text=remote_project.get_name())

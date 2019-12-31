@@ -30,8 +30,8 @@ class RemoteVRayProject(RemoteProject):
         from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
         attributes = {
-            "MAIN_PROJECT_FILE": main_file,
-            "PRODUCT": api_constants.PRODUCTS.VRAY,
+            api_constants.API_KEYS.PATH: main_file,
+            api_constants.API_KEYS.APP: api_constants.PRODUCTS.VRAY,
             self.ATTRIBUTE_REMAP_FILE_KEY: remap_file
         }
 

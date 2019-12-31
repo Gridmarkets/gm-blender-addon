@@ -23,7 +23,7 @@ import pathlib
 import re
 import json
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 _PATH_MAPPINGS = {'Z:': "/data/input"}
 
@@ -110,8 +110,8 @@ class PackedVRayProject(PackedProject):
         remap_file_path = self.create_remap_file()
 
         attributes = {
-            "PRODUCT": "vray",
-            constants.MAIN_PROJECT_FILE: main_file,
+            api_constants.API_KEYS.APP: api_constants.PRODUCTS.VRAY,
+            api_constants.API_KEYS.PATH: main_file,
             RemoteVRayProject.ATTRIBUTE_REMAP_FILE_KEY: remap_file_path
         }
 
@@ -129,8 +129,8 @@ class PackedVRayProject(PackedProject):
     def create_remap_file(self) -> pathlib.Path:
         from gridmarkets_blender_addon import constants
 
-        remap_file = "{}-{}.xml".format(self.get_attribute(constants.MAIN_PROJECT_FILE).name, self._file_last_updated)
-        src_path = os.path.dirname(str(self.get_attribute(constants.MAIN_PROJECT_FILE)))
+        remap_file = "{}-{}.xml".format(self.get_attribute(api_constants.API_KEYS.PATH).name, self._file_last_updated)
+        src_path = os.path.dirname(str(self.get_attribute(api_constants.API_KEYS.PATH)))
         remap_file_path = os.path.join(src_path, remap_file)
 
         if not os.path.exists(remap_file_path):
@@ -142,7 +142,7 @@ class PackedVRayProject(PackedProject):
         #print("Parsing scene file...")
         from gridmarkets_blender_addon import constants
 
-        scene_file = str(self.get_attribute(constants.MAIN_PROJECT_FILE))
+        scene_file = str(self.get_attribute(api_constants.API_KEYS.PATH))
 
         src_dir_name = os.path.split(scene_file)[0]
 

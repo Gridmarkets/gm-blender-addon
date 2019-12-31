@@ -118,29 +118,37 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
     @staticmethod
     def reset_product_value(context):
-        scene = context.scene
-        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+            set_project_attribute_value
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
 
         # set the product
-        if scene.render.engine == "VRAY_RENDER_RT":
-            setattr(project_attributes, "PRODUCT", api_constants.PRODUCTS.VRAY)
+        if context.scene.render.engine == constants.VRAY_RENDER_RT:
+            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.VRAY)
         else:
-            setattr(project_attributes, "PRODUCT", api_constants.PRODUCTS.BLENDER)
+            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.BLENDER)
 
     @staticmethod
     def reset_product_version_value(context):
+        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+            get_project_attribute_value, set_project_attribute_value
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
 
         scene = context.scene
-        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
         product_versions = plugin.get_api_client().get_product_versions(api_constants.PRODUCTS.BLENDER)
 
         # attempt to reset the product version to the closest matching version
         # only do for blender versions
         value = utils_blender.get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, product_versions)
         if value is not None:
-            setattr(project_attributes, api_constants.BLENDER_VERSIONS_ENUM_ID, value)
+            blender_versions_attribute = api_schema.get_project_attribute_with_id(api_constants.BLENDER_VERSIONS_ENUM_ID)
+            set_project_attribute_value(blender_versions_attribute, value)
 
     @staticmethod
     def boilerplate_invoke(operator, context, event):
@@ -180,11 +188,18 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        project_attributes = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+            get_project_attribute_value
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
+        name_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
 
         args = (
-            getattr(project_attributes, "PRODUCT"),
-            getattr(project_attributes, api_constants.ROOT_ATTRIBUTE_ID)
+            get_project_attribute_value(product_attribute),
+            get_project_attribute_value(name_attribute)
         )
 
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,

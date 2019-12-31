@@ -21,6 +21,7 @@
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
 class JobPreset(MetaJobPreset):
@@ -139,7 +140,7 @@ class JobPreset(MetaJobPreset):
                 items = []
 
                 if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                    product = enum_attribute.get_subtype_kwargs().get("PRODUCT")
+                    product = enum_attribute.get_subtype_kwargs().get(api_constants.API_KEYS.APP)
 
                     def _get_product_versions(self, context):
                         versions = plugin.get_api_client().get_product_versions(product)

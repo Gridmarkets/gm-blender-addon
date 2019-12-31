@@ -18,11 +18,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 import pathlib
 
 from gridmarkets_blender_addon.meta_plugin.file_packer import FilePacker
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-
 
 class BlenderFilePacker(FilePacker):
     BAT_PACK_INFO_FILE_NAME = "pack-info.txt"
@@ -30,8 +30,7 @@ class BlenderFilePacker(FilePacker):
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
         from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon import constants
-
+        from gridmarkets_blender_addon import utils_blender
         plugin = PluginFetcher.get_plugin()
         logging_coordinator = plugin.get_logging_coordinator()
         log = logging_coordinator.get_logger(__name__)
@@ -45,10 +44,13 @@ class BlenderFilePacker(FilePacker):
             log.info("Removing '%s'..." % str(pack_info_file))
             pack_info_file.unlink()
 
-        return PackedProject(output_dir.stem,
+        project_name = output_dir.stem
+        attributes = utils_blender.get_project_attributes()
+
+        return PackedProject(project_name,
                              output_dir,
-                             {output_dir / target_file.name},
-                             {"PRODUCT": "blender", constants.MAIN_PROJECT_FILE: output_dir / target_file.name})
+                             set(),
+                             attributes)
 
     @staticmethod
     def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
