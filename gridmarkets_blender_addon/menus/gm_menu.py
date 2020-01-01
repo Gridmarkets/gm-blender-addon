@@ -28,7 +28,6 @@ from .about_menu import GRIDMARKETS_MT_about_menu
 class GRIDMARKETS_MT_gm_menu(bpy.types.Menu):
     bl_idname = "GRIDMARKETS_MT_gm_menu"
     bl_label = ""
-    icon = constants.ICON_COLLAPSEMENU
 
     @staticmethod
     def get_icon() -> int:
@@ -41,4 +40,3 @@ class GRIDMARKETS_MT_gm_menu(bpy.types.Menu):
         layout.operator("wm.url_open", text=constants.COMPANY_NAME, icon='URL',).url = constants.GRIDMARKETS_WEBSITE_URL
         layout.separator()
         layout.menu(GRIDMARKETS_MT_about_menu.bl_idname)
-        layout.separator()

@@ -21,6 +21,7 @@
 __all__ = ['GRIDMARKETS_MT_about_menu',
            'GRIDMARKETS_MT_auth_menu',
            'GRIDMARKETS_MT_gm_menu',
+           'GRIDMARKETS_MT_help_menu',
            'GRIDMARKETS_MT_misc_options',
            'GRIDMARKETS_MT_project_packing_options',
            'GRIDMARKETS_MT_switch_user_menu',
@@ -32,6 +33,7 @@ import bpy
 from .about_menu import GRIDMARKETS_MT_about_menu
 from .auth_menu import GRIDMARKETS_MT_auth_menu
 from .gm_menu import GRIDMARKETS_MT_gm_menu
+from.help_menu import GRIDMARKETS_MT_help_menu
 from .misc_options import GRIDMARKETS_MT_misc_options
 from .packing_options import GRIDMARKETS_MT_project_packing_options
 from .switch_user_menu import GRIDMARKETS_MT_switch_user_menu
@@ -58,11 +60,15 @@ def draw_header_menus(layout: bpy.types.UILayout, context: bpy.types.Context):
     row = menu_row.row(align=True)
     row.menu(GRIDMARKETS_MT_misc_options.bl_idname)
 
+    row = menu_row.row(align=True)
+    row.menu(GRIDMARKETS_MT_help_menu.bl_idname)
+
 
 classes = (
     GRIDMARKETS_MT_about_menu,
     GRIDMARKETS_MT_auth_menu,
     GRIDMARKETS_MT_gm_menu,
+    GRIDMARKETS_MT_help_menu,
     GRIDMARKETS_MT_misc_options,
     GRIDMARKETS_MT_project_packing_options,
     GRIDMARKETS_MT_switch_user_menu,

@@ -88,7 +88,11 @@ RENDER_MANAGER_URL = "https://portal.gridmarkets.com"
 
 COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
+FAQ_URL = "https://www.gridmarkets.com/faq"
+
 HELP_URL = "https://www.gridmarkets.com/blender"
+
+SECURITY_URL = "https://www.gridmarkets.com/security"
 
 GRIDMARKETS_WEBSITE_URL = "https://www.gridmarkets.com/"
 
@@ -97,6 +101,9 @@ LICENCE_URL = "https://github.com/Gridmarkets/gm-blender-addon/blob/master/LICEN
 RELEASE_NOTES_URL = "https://github.com/Gridmarkets/gm-blender-addon/releases"
 
 ENVOY_URL = "https://www.gridmarkets.com/envoy"
+ENVOY_LOGS_URL = "http://localhost:8090/logs"
+
+SUPPORT_EMAIL = "support@gridmarkets.com"
 
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
@@ -183,6 +190,8 @@ OPERATOR_OPEN_ADDON_ID_NAME = "gridmarkets.open_addon"
 OPERATOR_OPEN_ADDON_LABEL = "Open " + COMPANY_NAME + " add-on"
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_ID_NAME = "gridmarkets.delete_temporary_project_files"
 OPERATOR_COPY_TEMPORARY_FILE_LOCATION_LABEL = "Delete temporary project files"
+OPERATOR_COPY_SUPPORT_EMAIL_ID_NAME = "gridmarkets.copy_support_email"
+OPERATOR_COPY_SUPPORT_EMAIL_LABEL = "Support"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_ID_NAME = "gridmarkets.get_selected_project_status"
 OPERATOR_GET_SELECTED_PROJECT_STATUS_LABEL = "Get selected project status"
 OPERATOR_NULL_ID_NAME = "gridmarkets.null_operator"
