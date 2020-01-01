@@ -24,7 +24,7 @@ import pathlib
 from queue import Empty
 
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 
@@ -42,12 +42,6 @@ class GRIDMARKETS_OT_pack_current_scene(bpy.types.Operator):
     timer = None
     thread: ExcThread = None
     plugin = None
-
-    filepath: bpy.props.StringProperty(
-        name="Export Path",
-        description="The path to pack your project to",
-        subtype='DIR_PATH'
-    )
 
     def modal(self, context, event):
         from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
@@ -73,19 +67,23 @@ class GRIDMARKETS_OT_pack_current_scene(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
-    def invoke(self, context, event):
-        if self.filepath == None or self.filepath == "":
-            self.filepath = utils.get_desktop_path()
-
-        return GRIDMARKETS_OT_upload_project.boilerplate_invoke(self, context, event)
-
     def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        user_interface = plugin.get_user_interface()
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
+
+        if not user_interface.is_render_engine_supported():
+            return {'FINISHED'}
+
+        export_path = pathlib.Path(plugin.get_user_interface().get_export_path())
 
         args = (
             context.scene.render.engine,
-            pathlib.Path(self.filepath)
+            export_path
         )
 
+        log.info("Pack current scene to '" + str(export_path) + "'")
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
                                                                  context,
                                                                  GRIDMARKETS_OT_pack_current_scene._execute,
@@ -101,18 +99,6 @@ class GRIDMARKETS_OT_pack_current_scene(bpy.types.Operator):
             packed_project = VRaySceneExporter().export(export_dir)
 
         return packed_project
-
-    def draw(self, context):
-        layout = self.layout
-
-        layout.separator()
-        layout.prop(self, 'filepath')
-
-        row = layout.row()
-        row.label(text="The path to save your packed scene to.")
-        row.enabled = False
-
-        layout.separator()
 
 
 classes = (

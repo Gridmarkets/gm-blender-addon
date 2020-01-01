@@ -89,16 +89,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
-    @staticmethod
-    def check_render_engine(context):
-        render_engine = context.scene.render.engine
-        if render_engine not in utils_blender.get_supported_render_engines():
-            bpy.context.window_manager.popup_menu(utils_blender.draw_render_engine_warning_popup,
-                                                  title="Unsupported Render Engine",
-                                                  icon=constants.ICON_BLANK)
-            return {'FINISHED'}
-        return {'PASS_THROUGH'}
-
 
     @staticmethod
     def boilerplate_invoke(operator, context, event):

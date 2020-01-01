@@ -223,3 +223,13 @@ class UserInterface(MetaUserInterface):
         UserInterface.reset_product_version_value()
         UserInterface.reset_export_path()
         UserInterface.reset_blend_file_path()
+
+    @staticmethod
+    def is_render_engine_supported() -> bool:
+        render_engine = bpy.context.scene.render.engine
+        if render_engine not in utils_blender.get_supported_render_engines():
+            bpy.context.window_manager.popup_menu(utils_blender.draw_render_engine_warning_popup,
+                                                  title="Unsupported Render Engine",
+                                                  icon=constants.ICON_BLANK)
+            return False
+        return True
