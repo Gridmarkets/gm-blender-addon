@@ -36,6 +36,7 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.property_
 from gridmarkets_blender_addon.property_groups.custom_settings_views import CustomSettingsViews
 from gridmarkets_blender_addon.property_groups.vray_props import VRayProps
 
+_BLEND_FILE = "*" + constants.BLEND_FILE_EXTENSION
 
 def _get_project_options(scene, context):
     """ Returns a list of items representing project options """
@@ -228,6 +229,22 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
 
     custom_settings_views: bpy.props.PointerProperty(type=CustomSettingsViews)
 
+    # path to the .blend file that you want to pack
+    blend_file_path: bpy.props.StringProperty(
+        name="Blend file",
+        description="The path to your .blend file that you want to pack",
+        default=_BLEND_FILE,
+        subtype='FILE_PATH'
+    )
+
+    # path to a directory that you want to pack the .blend file to
+    export_path: bpy.props.StringProperty(
+        name="Export Path",
+        description="A path to a directory that you want to pack your .blend file to",
+        subtype='DIR_PATH'
+    )
+
+    # a constant that is actually a prop to keep the formatting the same as other props
     project_defined: bpy.props.StringProperty(
         default="<Value inferred from project>",
         options={'HIDDEN', 'SKIP_SAVE'}
@@ -253,6 +270,7 @@ classes = (
 
 @persistent
 def reset_to_defaults(pos):
+    from gridmarkets_blender_addon import utils
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     PluginFetcher.delete_cached_plugin()
 

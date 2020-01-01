@@ -43,18 +43,6 @@ class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
     thread: ExcThread = None
     plugin = None
 
-    blend_file: bpy.props.StringProperty(
-        name="Blend file",
-        description="The path to pack your project to",
-        subtype='FILE_PATH'
-    )
-
-    filepath: bpy.props.StringProperty(
-        name="Export Path",
-        description="The path to pack your project to",
-        subtype='DIR_PATH'
-    )
-
     def modal(self, context, event):
         from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 
@@ -79,18 +67,12 @@ class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
-    def invoke(self, context, event):
-        if self.filepath == None or self.filepath == "":
-            self.filepath = utils.get_desktop_path()
+    def execute(self, context: bpy.types.Context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
 
-        if (self.blend_file == None or self.blend_file == "") and bpy.context.blend_data.is_saved:
-            self.blend_file = bpy.context.blend_data.filepath
-
-        return GRIDMARKETS_OT_upload_project.boilerplate_invoke(self, context, event)
-
-    def execute(self, context):
-
-        blend_file = pathlib.Path(self.blend_file)
+        blend_file = pathlib.Path(plugin.get_user_interface().get_blend_file_path())
 
         if not blend_file.exists():
             self.report({'ERROR'}, "File '" + str(blend_file) + "' does not exist")
@@ -104,9 +86,13 @@ class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
             self.report({'ERROR'}, "File does not have a .blend extension")
             return {"FINISHED"}
 
+        export_path = pathlib.Path(plugin.get_user_interface().get_export_path())
+
+        log.info("Packing blend file '" + str(blend_file) + "' to directory '" + str(export_path) + "'")
+
         args = (
             blend_file,
-            pathlib.Path(self.filepath)
+            export_path
         )
 
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
@@ -120,27 +106,6 @@ class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
     def _execute(target_file: pathlib.Path, output_dir: pathlib.Path):
         packed_project = BlenderFilePacker().pack(target_file, output_dir)
         return packed_project
-
-    def draw(self, context):
-        layout = self.layout
-
-        # blend file
-        layout.separator()
-        layout.prop(self, 'blend_file')
-
-        row = layout.row()
-        row.label(text="The path to to the .blend file you want to pack.")
-        row.enabled = False
-
-        # export path
-        layout.separator()
-        layout.prop(self, 'filepath')
-
-        row = layout.row()
-        row.label(text="The path to save your packed scene to.")
-        row.enabled = False
-
-        layout.separator()
 
 
 classes = (

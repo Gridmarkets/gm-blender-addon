@@ -147,8 +147,9 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+        plugin = PluginFetcher.get_plugin()
 
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
         log.info("Opening " + constants.COMPANY_NAME + " add-on preferences menu...")
 
         for window in context.window_manager.windows:
@@ -217,9 +218,6 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             render.resolution_x = old_settings['x']
             render.resolution_y = old_settings['y']
             render.resolution_percentage = old_settings['res_percent']
-
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
 
         api_client = plugin.get_api_client()
 

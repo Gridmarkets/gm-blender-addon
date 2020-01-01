@@ -79,6 +79,10 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._cache_projects.reset_and_clear_cache()
         self._product_resolver.reset_and_clear_cache()
 
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_user_interface().reset_project_attribute_props()
+
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
 

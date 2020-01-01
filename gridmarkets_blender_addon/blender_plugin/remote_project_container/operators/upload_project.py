@@ -99,56 +99,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             return {'FINISHED'}
         return {'PASS_THROUGH'}
 
-    @staticmethod
-    def reset_project_value(context):
-        from types import SimpleNamespace
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-
-        plugin = PluginFetcher.get_plugin()
-        scene = context.scene
-        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-
-        remote_projects = map(lambda remote_project: SimpleNamespace(name=remote_project.get_name()),
-                              plugin.get_remote_project_container().get_all())
-
-        setattr(project_attributes,
-                api_constants.ROOT_ATTRIBUTE_ID,
-                utils.create_unique_object_name(remote_projects,
-                                                name_prefix=utils_blender.get_project_name()))
-
-    @staticmethod
-    def reset_product_value(context):
-        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            set_project_attribute_value
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
-
-        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
-
-        # set the product
-        if context.scene.render.engine == constants.VRAY_RENDER_RT:
-            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.VRAY)
-        else:
-            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.BLENDER)
-
-    @staticmethod
-    def reset_product_version_value(context):
-        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            get_project_attribute_value, set_project_attribute_value
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
-
-        scene = context.scene
-        product_versions = plugin.get_api_client().get_product_versions(api_constants.PRODUCTS.BLENDER)
-
-        # attempt to reset the product version to the closest matching version
-        # only do for blender versions
-        value = utils_blender.get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, product_versions)
-        if value is not None:
-            blender_versions_attribute = api_schema.get_project_attribute_with_id(api_constants.BLENDER_VERSIONS_ENUM_ID)
-            set_project_attribute_value(blender_versions_attribute, value)
 
     @staticmethod
     def boilerplate_invoke(operator, context, event):

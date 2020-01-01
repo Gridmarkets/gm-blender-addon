@@ -20,6 +20,9 @@
 
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.user_interface import UserInterface as MetaUserInterface
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon import constants, utils, utils_blender
+
 import bpy
 
 
@@ -143,3 +146,80 @@ class UserInterface(MetaUserInterface):
 
     def set_layout(self, value: str) -> None:
         bpy.context.scene.props.user_interface.ui_layout = value
+
+    @staticmethod
+    def reset_project_value() -> None:
+        from types import SimpleNamespace
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+
+        plugin = PluginFetcher.get_plugin()
+        scene = bpy.context.scene
+        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+
+        remote_projects = map(lambda remote_project: SimpleNamespace(name=remote_project.get_name()),
+                              plugin.get_remote_project_container().get_all())
+
+        setattr(project_attributes,
+                api_constants.ROOT_ATTRIBUTE_ID,
+                utils.create_unique_object_name(remote_projects,
+                                                name_prefix=utils_blender.get_project_name()))
+
+    @staticmethod
+    def reset_product_value() -> None:
+        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+            set_project_attribute_value
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
+
+        # set the product
+        if bpy.context.scene.render.engine == constants.VRAY_RENDER_RT:
+            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.VRAY)
+        else:
+            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.BLENDER)
+
+    @staticmethod
+    def reset_product_version_value() -> None:
+        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+            set_project_attribute_value
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+
+        product_versions = plugin.get_api_client().get_product_versions(api_constants.PRODUCTS.BLENDER)
+
+        # attempt to reset the product version to the closest matching version
+        # only do for blender versions
+        value = utils_blender.get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, product_versions)
+        if value is not None:
+            blender_versions_attribute = api_schema.get_project_attribute_with_id(api_constants.BLENDER_VERSIONS_ENUM_ID)
+            set_project_attribute_value(blender_versions_attribute, value)
+
+    @staticmethod
+    def reset_export_path() -> None:
+        bpy.context.scene.props.export_path = utils.get_desktop_path()
+
+    @staticmethod
+    def get_export_path() -> str:
+        return bpy.context.scene.props.export_path
+
+    @staticmethod
+    def reset_blend_file_path() -> None:
+        if bpy.context.blend_data.is_saved:
+            bpy.context.scene.props.blend_file_path = bpy.context.blend_data.filepath
+        else:
+            bpy.context.scene.props.blend_file_path = ""
+
+    @staticmethod
+    def get_blend_file_path() -> str:
+        return bpy.context.scene.props.blend_file_path
+
+    @staticmethod
+    def reset_project_attribute_props() -> None:
+        UserInterface.reset_project_value()
+        UserInterface.reset_product_value()
+        UserInterface.reset_product_version_value()
+        UserInterface.reset_export_path()
+        UserInterface.reset_blend_file_path()
