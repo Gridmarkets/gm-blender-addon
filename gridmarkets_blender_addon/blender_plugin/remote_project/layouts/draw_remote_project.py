@@ -18,13 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 
-def draw_remote_project(self, context):
+
+def draw_remote_project(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon import constants
     plugin = PluginFetcher.get_plugin()
-
-    layout = self.layout
 
     remote_project = plugin.get_remote_project_container().get_focused_item()
 
@@ -73,5 +73,3 @@ def draw_remote_project(self, context):
         for key, attribute in remote_project.get_attributes().items():
             keys.label(text=key)
             values.label(text=str(attribute))
-
-

@@ -20,6 +20,7 @@
 
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.menus import *
+from gridmarkets_blender_addon.operators.set_ui_layout import GRIDMARKETS_OT_set_layout
 
 
 def draw_header(self, context):
@@ -42,6 +43,16 @@ def draw_header(self, context):
 
     # right aligned content
     layout.separator_spacer()
+
+    ui_layout = user_interface.get_layout()
+
+    # projects
+    t = constants.REMOTE_PROJECTS_LAYOUT_TUPLE
+    row = layout.row()
+    row.operator(GRIDMARKETS_OT_set_layout.bl_idname, text=t[1]).layout = t[0]
+    if ui_layout == constants.REMOTE_PROJECTS_LAYOUT_VALUE:
+        row.enabled = False
+
 
     row = layout.row(align=True)
     row.alignment = 'RIGHT'

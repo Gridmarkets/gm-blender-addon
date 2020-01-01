@@ -18,8 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 
-def draw_remote_project_container(self, context):
+def draw_remote_project_container(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon import constants, utils_blender
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
@@ -28,7 +29,6 @@ def draw_remote_project_container(self, context):
     from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import \
         GRIDMARKETS_UL_remote_project
 
-    layout = self.layout
     props = context.scene.props
     plugin = PluginFetcher.get_plugin()
     user_interface = plugin.get_user_interface()
@@ -40,30 +40,13 @@ def draw_remote_project_container(self, context):
                 return tuple
         raise RuntimeError("Could not find project action tuple")
 
-    tuple = get_upload_tuple()
-
     remote_project_container_props = props.remote_project_container
-
-    col = layout.column(align=True)
-
-    row = col.row(align=True)
-    row.scale_y = 2.5
-
-    box=col.box()
-
-    from types import SimpleNamespace
-    from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import GRIDMARKETS_OT_add_remote_project
-    GRIDMARKETS_OT_add_remote_project.draw(SimpleNamespace(layout=box), context)
-
-    layout.separator()
 
     # draw header
     row = layout.row(align=True)  #
     row.label(text="Remote Projects", icon=constants.ICON_REMOTE_PROJECT)
     row.operator(GRIDMARKETS_OT_open_remote_project_definition_popup.bl_idname, text="",
                  icon=constants.ICON_INFO, emboss=False)
-
-    layout.separator()
 
     row = layout.row()
     col = row.column()
@@ -72,4 +55,4 @@ def draw_remote_project_container(self, context):
                       remote_project_container_props, "focused_remote_project",
                       rows=2)
 
-    draw_remote_project(self, context)
+    draw_remote_project(layout, context)
