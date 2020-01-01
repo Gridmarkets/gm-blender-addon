@@ -55,6 +55,7 @@ class GRIDMARKETS_OT_switch_user(bpy.types.Operator):
         user_interface.set_auth_email(self.auth_email)
         user_interface.set_auth_access_key(self.auth_accessKey)
 
+        plugin.get_api_client().sign_out()
         get_deep_attribute(bpy.ops, GRIDMARKETS_OT_sign_in_new_user.bl_idname)()
         return {'FINISHED'}
 
