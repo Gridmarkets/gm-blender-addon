@@ -41,7 +41,11 @@ class APIClient(GridMarketsAPIClient):
         utils_blender.force_redraw_addon()
 
     def sign_out(self) -> None:
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
         GridMarketsAPIClient.sign_out(self)
+        plugin.get_remote_project_container().reset()
         utils_blender.force_redraw_addon()
 
     def connected(self) -> bool:

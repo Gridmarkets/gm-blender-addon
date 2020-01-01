@@ -77,3 +77,7 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
                 return self.get_at(i)
 
         raise ValueError("no remote project with id: " + str(id))
+
+    def reset(self) -> None:
+        MetaRemoteProjectContainer.reset(self)
+        bpy.context.scene.props.remote_project_container.remote_projects.clear()
