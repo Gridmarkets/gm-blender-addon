@@ -44,7 +44,7 @@ class Plugin(MetaPlugin):
         self._version = PluginVersion(version[0], version[1], version[2])
         self._logging_coordinator = LoggingCoordinator(LogHistoryContainer())
         self._preferences_container = PreferencesContainer(UserContainer(), JobPresetContainer())
-        self._api_client = APIClient()
+        self._api_client = APIClient(self._logging_coordinator)
         self._user_interface = UserInterface()
         self._remote_project_container = RemoteProjectContainer()
         self._plugin_utils = PluginUtils()

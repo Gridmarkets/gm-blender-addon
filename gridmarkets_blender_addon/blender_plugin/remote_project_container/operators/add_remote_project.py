@@ -36,23 +36,6 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     bl_label = constants.OPERATOR_ADD_REMOTE_PROJECT_LABEL
     bl_options = set()
 
-    def invoke(self, context, event):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-
-        api_client = plugin.get_api_client()
-
-        # refresh projects list
-        projects = api_client.get_root_directories(ignore_cache=True)
-
-        # If the user has no projects display a warning message
-        if len(projects) == 0:
-            self.report({'ERROR'},
-                        "No existing projects detected. You must have already uploaded a project to use this option.")
-            return {"FINISHED"}
-
-        return context.window_manager.invoke_props_dialog(self, width=400)
-
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
@@ -60,7 +43,17 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         api_schema = api_client.get_api_schema()
         root = api_schema.get_root_project_attribute()
 
-        set_project_attribute_value(root, context.scene.props.remote_project_container.project_name)
+        project_name = context.scene.props.remote_project_container.project_name
+
+        # set project name
+        set_project_attribute_value(root, project_name)
+
+        # check the project exists
+        if project_name not in api_client.get_root_directories(ignore_cache=True):
+            self.report({'ERROR'}, "Project '" + project_name + "' no longer exists.")
+            return {'FINISHED'}
+
+        # get the files for this project
         files = api_client.get_remote_project_files(context.scene.props.remote_project_container.project_name)
 
         def _do_file_paths_exist(project_attribute):
@@ -75,7 +68,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             # check file paths exist
             if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
                 if value not in files:
-                    self.report({'ERROR'}, "File path '" + str(value) + "' does not exist.")
+                    self.report({'ERROR'}, "File path '" + str(value) + "' does not exist under project '" +
+                                project_name + "'.")
                     return False
 
             return _do_file_paths_exist(project_attribute.transition(value))
@@ -100,79 +94,6 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             return {'FINISHED'}
         except RejectedTransitionInputError as e:
             return {'FINISHED'}
-
-    @staticmethod
-    def draw_project_attribute(layout, context, project_attribute):
-        from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
-
-        attribute = project_attribute.get_attribute()
-
-        # Null attributes represet a base case
-        if attribute.get_type() == AttributeType.NULL:
-            return
-
-        project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        value = get_project_attribute_value(project_attribute)
-
-        split = layout.split(factor=0.25)
-        col1 = split.column()
-        col1.label(text=attribute.get_display_name())
-
-        col2 = split.column()
-
-        try:
-            project_attribute.transition(value)
-        except RejectedTransitionInputError as e:
-            col2.alert = True
-
-        draw_attribute_input(types.SimpleNamespace(layout=col2), context, project_props, attribute,
-                             prop_id=project_attribute.get_id())
-
-        if len(attribute.get_description()):
-            #row = col2.row()
-            #row.label(text=attribute.get_description())
-            #row.enabled = False
-            pass
-
-        GRIDMARKETS_OT_add_remote_project.draw_project_attribute(layout, context, project_attribute.transition(value))
-
-    @staticmethod
-    def draw_project_attributes(layout, context, project_attribute):
-        try:
-            GRIDMARKETS_OT_add_remote_project.draw_project_attribute(layout, context, project_attribute)
-
-        except RejectedTransitionInputError as e:
-            layout.separator()
-            row = layout.row(align=True)
-            row.alignment = 'CENTER'
-            row.label(text="Warning: Project settings are invalid. " + e.user_message)
-            layout.separator()
-
-    def draw(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
-        root = api_schema.get_root_project_attribute()
-        layout = self.layout
-
-        layout.separator()
-
-        split = layout.split(factor=0.25)
-        col1 = split.column()
-        col1.label(text="Project name:")
-
-        col2 = split.column()
-        col2.prop(context.scene.props.remote_project_container, "project_name", text="")
-
-        #row = layout.row()
-        #row.label(text=root.get_attribute().get_description())
-        #row.enabled = False
-        #row.scale_y = 0.3
-        #layout.separator(factor=0)
-
-        product_project_attribute = root.transition(context.scene.props.remote_project_container.project_name)
-        GRIDMARKETS_OT_add_remote_project.draw_project_attributes(layout, context, product_project_attribute)
-
 
 
 classes = (

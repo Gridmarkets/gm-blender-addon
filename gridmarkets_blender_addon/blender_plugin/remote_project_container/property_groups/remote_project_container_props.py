@@ -27,7 +27,7 @@ def _get_remote_root_directories(self, context):
     plugin = PluginFetcher.get_plugin()
 
     api_client = plugin.get_api_client()
-    projects = api_client.get_root_directories()
+    projects = api_client.get_cached_root_directories()
 
     return list(map(lambda project: (project, project, ''), projects))
 

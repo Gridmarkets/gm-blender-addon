@@ -65,7 +65,6 @@ class LogHistoryContainer(MetaLogHistoryContainer):
                 log_history_items = bpy.context.scene.props.log_history_container.log_history_items
                 log_history_item_props = log_history_items.add()
                 log_history_item_props.id = utils.get_unique_id(log_history_items)
-
                 utils_blender.force_redraw_addon()
 
             MetaLogHistoryContainer.append(self, sub_item, focus_new_item=focus_new_item)

@@ -26,6 +26,7 @@ from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
+from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
@@ -38,20 +39,48 @@ from gridmarkets import EnvoyClient, Project as GMProject
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
 
 
+class CachedValue:
+    def __init__(self, value: any, is_cached: bool = False):
+        self._initial_value = value
+        self._value = value
+        self._is_cached = is_cached
+
+    def get_value(self) -> any:
+        return self._value
+
+    def set_value(self, value):
+        self._value = value
+        self._is_cached = True
+
+    def is_cached(self) -> bool:
+        return self._is_cached
+
+    def reset_and_clear_cache(self):
+        self._value = self._initial_value
+        self._is_cached = False
+
+
 class GridMarketsAPIClient(MetaAPIClient):
 
     http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
 
-    def __init__(self):
+    def __init__(self, logging_coordinator: LoggingCoordinator):
         MetaAPIClient.__init__(self)
         self._envoy_client: typing.Optional[EnvoyClient] = None
         self._api_schema = XMLAPISchemaParser.parse()
+        self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
 
         # used for caching projects
-        self._cache_projects = None
-        self._product_resolver = None
+        self._cache_projects: CachedValue  = CachedValue([])
+        self._product_resolver: CachedValue = CachedValue(None)
+
+    def clear_all_caches(self):
+        self._log.info("Clearing cached API data")
+        self._cache_projects.reset_and_clear_cache()
+        self._product_resolver.reset_and_clear_cache()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
+        self._log.info("Signing in as " + user.get_auth_email())
 
         try:
             MetaAPIClient.sign_in(self, user)
@@ -64,7 +93,15 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._envoy_client = EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
 
+        # refresh caches
+        self.clear_all_caches()
+        self.get_root_directories(ignore_cache=True)
+
     def sign_out(self) -> None:
+        if self.is_user_signed_in():
+            self._log.info("Signing out user " + self.get_signed_in_user().get_auth_email())
+            self.clear_all_caches()
+
         MetaAPIClient.sign_out(self)
 
     def is_user_signed_in(self) -> bool:
@@ -132,29 +169,40 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         return RemoteProject.convert_packed_project(packed_project)
 
-    def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
-        if ignore_cache or self._cache_projects is None:
-            import requests
-            r = requests.get(self._envoy_client.url + '/projects')
-            json = r.json()
-            projects = json.get("projects", [])
-            projects = list(map(lambda project: project.get('name', ''), projects))
-            projects = sorted(projects, key=lambda s: s.casefold())
-            self._cache_projects = projects
+    def get_cached_root_directories(self) -> typing.List[str]:
+        return self._cache_projects.get_value()
 
-        return self._cache_projects
+    def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
+        self._log.info("Getting root directories. ignore_cache=" + str(ignore_cache))
+
+        if ignore_cache or not self._cache_projects.is_cached():
+            try:
+                import requests
+                r = requests.get(self._envoy_client.url + '/projects')
+                json = r.json()
+                projects = json.get("projects", [])
+                projects = list(map(lambda project: project.get('name', ''), projects))
+                projects = sorted(projects, key=lambda s: s.casefold())
+            except Exception as e:
+                self._log.error("Could not make request to envoy API. " + str(e))
+                self.sign_out()
+                projects = []
+
+            self._cache_projects.set_value(projects)
+
+        return self._cache_projects.get_value()
 
     def get_product_versions(self, product: str, ignore_cache: bool = False) -> typing.List[str]:
-        if ignore_cache or self._product_resolver is None:
+        if ignore_cache or not self._product_resolver.is_cached():
             # get product resolver
             resolver = self._envoy_client.get_product_resolver()
 
             # cache all products
-            self._product_resolver = resolver.get_all_types()
+            self._product_resolver.set_value(resolver.get_all_types())
 
         # sorted by latest version to oldest version
-        return sorted(self._product_resolver.get(product, {}).get("versions", []), key=lambda s: s.casefold(),
-                      reverse=True)
+        return sorted(self._product_resolver.get_value().get(product, {}).get("versions", []),
+                      key=lambda s: s.casefold(),reverse=True)
 
     def get_remote_project_files(self, project_name: str):
         import requests

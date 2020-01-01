@@ -18,13 +18,16 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
+
 from gridmarkets_blender_addon import constants
 
 from gridmarkets_blender_addon.layouts.submission_settings import draw_submission_settings, draw_submission_summary
 from gridmarkets_blender_addon.layouts.preferences import draw_preferences
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_container import \
     draw_remote_project_container
-from gridmarkets_blender_addon.blender_plugin.job_preset_container.layouts.draw_job_preset_container import draw_job_preset_container
+from gridmarkets_blender_addon.blender_plugin.job_preset_container.layouts.draw_job_preset_container import \
+    draw_job_preset_container
 
 from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
     draw_logging_console
@@ -34,24 +37,59 @@ from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_su
 
 _CONSOLE_SEPARATOR_SPACING = 2
 
-
 # new imports
-from gridmarkets_blender_addon.menus import *
+from gridmarkets_blender_addon.layouts.draw_manually_add_remote_project import draw_manually_add_remote_project
+
+
+def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.Callable:
+    """ Matches a ui_layout tuple with it's draw method """
+
+    map = {
+        constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: None,
+        constants.UPLOAD_PROJECT_FILES_TUPLE[0]: None,
+        constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: None,
+        constants.PACK_CURRENT_SCENE_TUPLE[0]: None,
+        constants.PACK_BLEND_FILE_TUPLE[0]: None,
+        constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE[0]: draw_manually_add_remote_project,
+    }
+
+    return map[ui_layout[0]]
 
 
 def draw_body(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     api_client = plugin.get_api_client()
+    user_interface = plugin.get_user_interface()
 
     layout = self.layout
-    props = context.scene.props
 
     # only show the login screen if not logged in
     if not api_client.is_user_signed_in():
         layout.separator()
         draw_preferences(self, context)
         return
+
+    def get_ui_layout_tuple() -> (str, str, str, str, int):
+        ui_layout = user_interface.get_layout()
+        for tuple in constants.LAYOUTS:
+            if tuple[0] == ui_layout:
+                return tuple
+        raise RuntimeError("Could not find project action tuple")
+
+    ui_layout = get_ui_layout_tuple()
+
+    draw_method = _get_ui_layout_draw_method(ui_layout)
+    if draw_method is not None:
+        box = layout.box()
+        title = box.row()
+        title.alignment = 'CENTER'
+        title.label(text=ui_layout[1])
+        box.separator()
+
+        draw_method(box, context)
+
+    draw_logging_console(self, context)
 
     """
     box = layout.box()

@@ -21,6 +21,7 @@
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_client import GridMarketsAPIClient
 from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
+from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
@@ -30,8 +31,8 @@ import pathlib
 @attach_blender_plugin
 class APIClient(GridMarketsAPIClient):
 
-    def __init__(self):
-        GridMarketsAPIClient.__init__(self)
+    def __init__(self, logging_coordinator: LoggingCoordinator):
+        GridMarketsAPIClient.__init__(self, logging_coordinator)
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         GridMarketsAPIClient.sign_in(self, user)
