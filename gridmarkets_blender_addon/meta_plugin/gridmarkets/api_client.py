@@ -191,7 +191,9 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._envoy_client.upload_project_files(gm_project)
 
-        return RemoteProject.convert_packed_project(packed_project)
+        # Todo - remove imports from blender add-on module
+        from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
+        return convert_packed_project(packed_project)
 
     def get_cached_root_directories(self) -> typing.List[str]:
         return self._cache_projects.get_value()

@@ -19,7 +19,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon.meta_plugin.project import Project
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 import pathlib
 import typing
 
@@ -48,24 +47,3 @@ class RemoteProject(Project):
 
     def get_size(self) -> int:
         raise NotImplementedError
-
-    @staticmethod
-    def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
-
-        root_dir = pathlib.Path(packed_project.get_name())
-
-        # convert files from absolute local paths to absolute remote paths
-        files = set(map(lambda file: pathlib.Path('/') / root_dir / file, packed_project.get_relative_files()))
-        attributes = packed_project.get_attributes()
-
-        # convert all pathlib.Path attributes into a relative path
-        for key, attribute in attributes.items():
-            if isinstance(attribute, pathlib.Path):
-                attributes[key] = packed_project.get_relative_file_path(attribute)
-
-        # TODO update files into relative files
-
-        return RemoteProject(packed_project.get_name(),
-                             root_dir,
-                             files,
-                             attributes)
