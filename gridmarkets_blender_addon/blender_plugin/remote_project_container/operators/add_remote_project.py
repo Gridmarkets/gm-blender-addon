@@ -87,6 +87,10 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
                                            attributes)
 
             plugin.get_remote_project_container().append(remote_project)
+
+            # switch to the projects layout
+            plugin.get_user_interface().set_layout(constants.REMOTE_PROJECTS_LAYOUT_VALUE)
+
             utils_blender.force_redraw_addon()
             return {'FINISHED'}
 
