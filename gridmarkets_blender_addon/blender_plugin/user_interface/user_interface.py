@@ -29,6 +29,9 @@ class UserInterface(MetaUserInterface):
     def get_auth_email(self) -> str:
         return bpy.context.scene.props.user_interface.auth_email_input
 
+    def set_auth_email(self, email: str) -> None:
+        bpy.context.scene.props.user_interface.auth_email_input = email
+
     def get_auth_email_validity_flag(self) -> bool:
         return bpy.context.scene.props.user_interface.is_auth_email_valid
 
@@ -44,6 +47,9 @@ class UserInterface(MetaUserInterface):
     # access key
     def get_auth_access_key(self) -> str:
         return bpy.context.scene.props.user_interface.auth_access_key_input
+
+    def set_auth_access_key(self, auth_access_key) -> None:
+        bpy.context.scene.props.user_interface.auth_access_key_input = auth_access_key
 
     def get_auth_access_key_validity_flag(self) -> bool:
         return bpy.context.scene.props.user_interface.is_auth_access_key_valid

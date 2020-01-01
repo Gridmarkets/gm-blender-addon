@@ -30,6 +30,9 @@ class UserInterface(ABC, PluginAccessor):
     def get_auth_email(self) -> str:
         raise NotImplementedError
 
+    def set_auth_email(self, email: str) -> None:
+        raise NotImplementedError
+
     def get_auth_email_validity_flag(self) -> bool:
         raise NotImplementedError
 
@@ -44,6 +47,9 @@ class UserInterface(ABC, PluginAccessor):
 
     # access key
     def get_auth_access_key(self) -> str:
+        raise NotImplementedError
+
+    def set_auth_access_key(self, auth_access_key) -> None:
         raise NotImplementedError
 
     def get_auth_access_key_validity_flag(self) -> bool:

@@ -18,15 +18,19 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['GRIDMARKETS_MT_misc_options',
+__all__ = ['GRIDMARKETS_MT_auth_menu',
+           'GRIDMARKETS_MT_misc_options',
            'GRIDMARKETS_MT_project_packing_options',
+           'GRIDMARKETS_MT_switch_user_menu',
            'GRIDMARKETS_MT_project_upload_options',
            'GRIDMARKETS_MT_submit_options',
            'draw_header_menus']
 
 import bpy
+from .auth_menu import GRIDMARKETS_MT_auth_menu
 from .misc_options import GRIDMARKETS_MT_misc_options
 from .packing_options import GRIDMARKETS_MT_project_packing_options
+from .switch_user_menu import GRIDMARKETS_MT_switch_user_menu
 from .upload_options import GRIDMARKETS_MT_project_upload_options
 from .submission_options import GRIDMARKETS_MT_submit_options
 
@@ -53,8 +57,10 @@ def draw_header_menus(layout: bpy.types.UILayout, context: bpy.types.Context):
 
 
 classes = (
+    GRIDMARKETS_MT_auth_menu,
     GRIDMARKETS_MT_misc_options,
     GRIDMARKETS_MT_project_packing_options,
+    GRIDMARKETS_MT_switch_user_menu,
     GRIDMARKETS_MT_project_upload_options,
     GRIDMARKETS_MT_submit_options,
 )

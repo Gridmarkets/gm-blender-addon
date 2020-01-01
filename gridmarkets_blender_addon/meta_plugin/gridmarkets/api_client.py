@@ -40,6 +40,8 @@ from gridmarkets.errors import AuthenticationError, APIError as _APIError
 
 class GridMarketsAPIClient(MetaAPIClient):
 
+    http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
+
     def __init__(self):
         MetaAPIClient.__init__(self)
         self._envoy_client: typing.Optional[EnvoyClient] = None
@@ -160,6 +162,13 @@ class GridMarketsAPIClient(MetaAPIClient):
         json = r.json()
         all_files = json.get('project_files', {}).get('all_files', [])
         return sorted(map(lambda file: file.get('Name', ''), all_files), key=lambda s: s.casefold())
+
+    def get_available_credits(self) -> int:
+        import requests
+        r = requests.get(self._envoy_client.url + '/credits-info')
+        json = r.json()
+        available_credits = json.get('credits_available', 0)
+        return available_credits
 
     @staticmethod
     def get_closest_matching_product_version(product_version: str,

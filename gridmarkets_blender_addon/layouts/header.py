@@ -50,20 +50,10 @@ def draw_header(self, context):
     # right aligned content
     layout.separator_spacer()
 
-    row = layout.row()
-    #row.emboss = 'PULLDOWN_MENU'
+    row = layout.row(align=True)
     row.alignment = 'RIGHT'
     if signed_in_user:
-        text = "Signed in as: " + signed_in_user.get_auth_email()
-
-        row.menu(GRIDMARKETS_MT_misc_options.bl_idname, text="", icon_value=preview_collection[constants.USER_ICON_ID].icon_id)
+        row.label(text=signed_in_user.get_auth_email())
+        row.menu(GRIDMARKETS_MT_auth_menu.bl_idname, text="", icon_value=preview_collection[constants.USER_ICON_ID].icon_id)
     else:
         row.label(text="Not signed in", icon=constants.ICON_ERROR)
-
-
-    # version label
-    #sub = row.row(align=True)
-    #sub.enabled = False
-    #sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
-
-
