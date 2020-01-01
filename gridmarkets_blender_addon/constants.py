@@ -90,7 +90,11 @@ COST_CALCULATOR_URL = "https://www.gridmarkets.com/calculator"
 
 HELP_URL = "https://www.gridmarkets.com/blender"
 
+GRIDMARKETS_WEBSITE_URL = "https://www.gridmarkets.com/"
+
 GITHUB_REPO = "https://github.com/Gridmarkets/gm-blender-addon"
+LICENCE_URL = "https://github.com/Gridmarkets/gm-blender-addon/blob/master/LICENCE"
+RELEASE_NOTES_URL = "https://github.com/Gridmarkets/gm-blender-addon/releases"
 
 ENVOY_URL = "https://www.gridmarkets.com/envoy"
 

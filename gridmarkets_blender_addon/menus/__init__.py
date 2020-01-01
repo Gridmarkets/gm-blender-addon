@@ -18,7 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['GRIDMARKETS_MT_auth_menu',
+__all__ = ['GRIDMARKETS_MT_about_menu',
+           'GRIDMARKETS_MT_auth_menu',
+           'GRIDMARKETS_MT_gm_menu',
            'GRIDMARKETS_MT_misc_options',
            'GRIDMARKETS_MT_project_packing_options',
            'GRIDMARKETS_MT_switch_user_menu',
@@ -27,7 +29,9 @@ __all__ = ['GRIDMARKETS_MT_auth_menu',
            'draw_header_menus']
 
 import bpy
+from .about_menu import GRIDMARKETS_MT_about_menu
 from .auth_menu import GRIDMARKETS_MT_auth_menu
+from .gm_menu import GRIDMARKETS_MT_gm_menu
 from .misc_options import GRIDMARKETS_MT_misc_options
 from .packing_options import GRIDMARKETS_MT_project_packing_options
 from .switch_user_menu import GRIDMARKETS_MT_switch_user_menu
@@ -40,24 +44,25 @@ def draw_header_menus(layout: bpy.types.UILayout, context: bpy.types.Context):
     menu_row.alignment = 'LEFT'
 
     row = menu_row.row(align=True)
-    #row.ui_units_x = 3.0
-    row.menu(GRIDMARKETS_MT_submit_options.bl_idname)#, icon_value=GRIDMARKETS_MT_submit_options.get_icon())
+    row.menu(GRIDMARKETS_MT_gm_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
 
     row = menu_row.row(align=True)
-    #row.ui_units_x = 4.5
-    row.menu(GRIDMARKETS_MT_project_upload_options.bl_idname)#, icon_value=GRIDMARKETS_MT_project_upload_options.get_icon())
+    row.menu(GRIDMARKETS_MT_submit_options.bl_idname)
+
+    row = menu_row.row(align=True)
+    row.menu(GRIDMARKETS_MT_project_upload_options.bl_idname)
 
     column = menu_row.column()
-    #column.ui_units_x = 3.9
-    column.menu(GRIDMARKETS_MT_project_packing_options.bl_idname)#, icon_value=GRIDMARKETS_MT_project_packing_options.get_icon())
+    column.menu(GRIDMARKETS_MT_project_packing_options.bl_idname)
 
     row = menu_row.row(align=True)
-    #row.ui_units_x = 3.9
-    row.menu(GRIDMARKETS_MT_misc_options.bl_idname)#, icon=GRIDMARKETS_MT_misc_options.icon)
+    row.menu(GRIDMARKETS_MT_misc_options.bl_idname)
 
 
 classes = (
+    GRIDMARKETS_MT_about_menu,
     GRIDMARKETS_MT_auth_menu,
+    GRIDMARKETS_MT_gm_menu,
     GRIDMARKETS_MT_misc_options,
     GRIDMARKETS_MT_project_packing_options,
     GRIDMARKETS_MT_switch_user_menu,

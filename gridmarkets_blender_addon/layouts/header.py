@@ -18,9 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.icon_loader import IconLoader
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.menus import *
+
 
 def draw_header(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -29,14 +29,7 @@ def draw_header(self, context):
     user_interface = plugin.get_user_interface()
     signed_in_user = plugin.get_api_client().get_signed_in_user()
 
-    # get the company icon
-    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-    iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
-
-    # display company icon and version
     row = layout.row()
-    row.alignment = "CENTER"
-    row.label(text="", icon_value=iconGM.icon_id)
 
     draw_header_menus(row, context)
 
@@ -54,6 +47,6 @@ def draw_header(self, context):
     row.alignment = 'RIGHT'
     if signed_in_user:
         row.label(text=signed_in_user.get_auth_email())
-        row.menu(GRIDMARKETS_MT_auth_menu.bl_idname, text="", icon_value=preview_collection[constants.USER_ICON_ID].icon_id)
+        row.menu(GRIDMARKETS_MT_auth_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_auth_menu.get_icon())
     else:
         row.label(text="Not signed in", icon=constants.ICON_ERROR)
