@@ -22,7 +22,7 @@ __all__ = ['GRIDMARKETS_MT_misc_options']
 
 import bpy
 from gridmarkets_blender_addon import constants
-from .utils import draw_header, draw_operator_option
+from .utils import draw_header, draw_layout_option
 
 
 class GRIDMARKETS_MT_misc_options(bpy.types.Menu):
@@ -33,4 +33,4 @@ class GRIDMARKETS_MT_misc_options(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         draw_header(layout, "Miscellaneous:", icon=self.icon)
-        draw_operator_option(layout, constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE)
+        draw_layout_option(layout, constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE)

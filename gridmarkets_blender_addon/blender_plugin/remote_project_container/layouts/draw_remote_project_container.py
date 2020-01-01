@@ -34,8 +34,8 @@ def draw_remote_project_container(self, context):
     user_interface = plugin.get_user_interface()
 
     def get_upload_tuple():
-        method = user_interface.get_project_upload_method()
-        for tuple in constants.PROJECT_ACTION_OPERATORS:
+        method = user_interface.get_layout()
+        for tuple in constants.LAYOUTS:
             if tuple[0] == method:
                 return tuple
         raise RuntimeError("Could not find project action tuple")

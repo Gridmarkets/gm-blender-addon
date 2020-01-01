@@ -22,7 +22,7 @@ __all__ = ['GRIDMARKETS_MT_submit_options']
 
 import bpy
 from gridmarkets_blender_addon import constants
-from .utils import draw_header, draw_operator_option
+from .utils import draw_header, draw_layout_option
 
 
 class GRIDMARKETS_MT_submit_options(bpy.types.Menu):

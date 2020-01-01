@@ -22,14 +22,14 @@ import bpy
 from gridmarkets_blender_addon import constants
 
 
-class GRIDMARKETS_OT_set_project_upload_method(bpy.types.Operator):
-    bl_idname = "gridmarkets.set_project_upload_method"
-    bl_label = "Set upload method"
+class GRIDMARKETS_OT_set_layout(bpy.types.Operator):
+    bl_idname = "gridmarkets.set_layout"
+    bl_label = "Set Layout"
     bl_options = {'INTERNAL'}
 
-    method: bpy.props.EnumProperty(
-        name="Upload Method",
-        items=constants.PROJECT_ACTION_OPERATORS,
+    layout: bpy.props.EnumProperty(
+        name="layout",
+        items=constants.LAYOUTS,
     )
 
     def execute(self, context):
@@ -38,14 +38,14 @@ class GRIDMARKETS_OT_set_project_upload_method(bpy.types.Operator):
         plugin = PluginFetcher.get_plugin()
 
         user_interface = plugin.get_user_interface()
-        user_interface.set_project_upload_method(self.method)
+        user_interface.set_layout(self.layout)
 
         utils_blender.force_redraw_addon()
         return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_OT_set_project_upload_method,
+    GRIDMARKETS_OT_set_layout,
 )
 
 

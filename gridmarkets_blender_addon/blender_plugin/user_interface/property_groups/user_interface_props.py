@@ -151,9 +151,9 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
         options={'SKIP_SAVE'}
     )
 
-    # project upload method
-    project_upload_method: bpy.props.EnumProperty(
-        name='Project Upload Method',
-        items=constants.PROJECT_ACTION_OPERATORS,
+    # UI Layout
+    ui_layout: bpy.props.EnumProperty(
+        name='UI Layout',
+        items=constants.LAYOUTS,
         options={'SKIP_SAVE', 'HIDDEN'}
     )

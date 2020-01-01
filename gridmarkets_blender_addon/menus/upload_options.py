@@ -22,7 +22,7 @@ __all__ = ['GRIDMARKETS_MT_project_upload_options']
 
 import bpy
 from gridmarkets_blender_addon import constants
-from .utils import draw_header, draw_operator_option
+from .utils import draw_header, draw_layout_option
 
 
 class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
@@ -38,6 +38,6 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         draw_header(layout, "project Upload Actions:", icon_value=self.get_icon())
-        draw_operator_option(layout, constants.UPLOAD_CURRENT_SCENE_TUPLE)
-        draw_operator_option(layout, constants.UPLOAD_PROJECT_FILES_TUPLE)
-        draw_operator_option(layout, constants.UPLOAD_PACKED_PROJECT_TUPLE)
+        draw_layout_option(layout, constants.UPLOAD_CURRENT_SCENE_TUPLE)
+        draw_layout_option(layout, constants.UPLOAD_PROJECT_FILES_TUPLE)
+        draw_layout_option(layout, constants.UPLOAD_PACKED_PROJECT_TUPLE)

@@ -22,7 +22,7 @@ __all__ = ['GRIDMARKETS_MT_project_packing_options']
 
 import bpy
 from gridmarkets_blender_addon import constants
-from .utils import draw_header, draw_operator_option
+from .utils import draw_header, draw_layout_option
 
 
 class GRIDMARKETS_MT_project_packing_options(bpy.types.Menu):
@@ -38,5 +38,5 @@ class GRIDMARKETS_MT_project_packing_options(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         draw_header(layout, "Project Packing Actions:", icon_value=self.get_icon())
-        draw_operator_option(layout, constants.PACK_CURRENT_SCENE_TUPLE)
-        draw_operator_option(layout, constants.PACK_BLEND_FILE_TUPLE)
+        draw_layout_option(layout, constants.PACK_CURRENT_SCENE_TUPLE)
+        draw_layout_option(layout, constants.PACK_BLEND_FILE_TUPLE)
