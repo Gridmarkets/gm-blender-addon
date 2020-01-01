@@ -24,6 +24,7 @@ import addon_utils
 import inspect
 import pathlib
 import collections
+import typing
 import json
 
 from gridmarkets_blender_addon import constants
@@ -724,6 +725,30 @@ def get_project_attributes(project_attribute=None, attributes=None):
     project_attribute = root if project_attribute is None else project_attribute
 
     return get_project_attributes_rec(project_attribute, attributes)
+
+
+def get_project_files(files: typing.List[pathlib.Path], project_attribute = None) -> typing.List[pathlib.Path]:
+    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+
+    # if project attribute is none use the root attribute
+    project_attribute = root if project_attribute is None else project_attribute
+
+    attribute = project_attribute.get_attribute()
+
+    if attribute.get_type() == AttributeType.NULL:
+        return files
+
+    value = get_project_attribute_value(project_attribute)
+
+    if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+        # if the attribute is a file path add it's value to the files array
+        files.append(pathlib.Path(value))
+
+    return get_project_files(files, project_attribute.transition(value))
 
 
 def draw_render_engine_warning_popup(self, context):

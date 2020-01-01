@@ -38,6 +38,7 @@ from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_su
 _CONSOLE_SEPARATOR_SPACING = 2
 
 # new imports
+from gridmarkets_blender_addon.layouts.draw_upload_packed_project import draw_upload_packed_project
 from gridmarkets_blender_addon.layouts.draw_pack_current_scene import draw_pack_current_scene
 from gridmarkets_blender_addon.layouts.draw_pack_external_project import draw_pack_external_project
 from gridmarkets_blender_addon.layouts.draw_manually_add_remote_project import draw_manually_add_remote_project
@@ -47,9 +48,10 @@ def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.C
     """ Matches a ui_layout tuple with it's draw method """
 
     map = {
+        constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: draw_remote_project_container,
         constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: None,
         constants.UPLOAD_PROJECT_FILES_TUPLE[0]: None,
-        constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: None,
+        constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: draw_upload_packed_project,
         constants.PACK_CURRENT_SCENE_TUPLE[0]: draw_pack_current_scene,
         constants.PACK_BLEND_FILE_TUPLE[0]: draw_pack_external_project,
         constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE[0]: draw_manually_add_remote_project,
@@ -84,12 +86,14 @@ def draw_body(self, context):
     draw_method = _get_ui_layout_draw_method(ui_layout)
     if draw_method is not None:
         box = layout.box()
-        title = box.row()
-        title.alignment = 'CENTER'
-        title.label(text=ui_layout[1])
-        box.separator()
+        #title = box.row()
+        #title.alignment = 'CENTER'
+        #title.label(text=ui_layout[1])
+        #box.separator()
 
         draw_method(box, context)
+
+    layout.separator()
 
     draw_logging_console(self, context)
 

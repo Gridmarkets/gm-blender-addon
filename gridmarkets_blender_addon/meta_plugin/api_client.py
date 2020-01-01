@@ -86,6 +86,7 @@ class APIClient(ABC, PluginAccessor):
     @abstractmethod
     def upload_project(self,
                        packed_project: PackedProject,
+                       upload_root_dir: bool,
                        delete_local_files_after_upload: bool = False) -> RemoteProject:
         raise NotImplementedError
 

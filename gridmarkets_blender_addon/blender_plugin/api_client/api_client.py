@@ -45,6 +45,18 @@ class APIClient(GridMarketsAPIClient):
     def connected(self) -> bool:
         raise NotImplementedError
 
+    def upload_project(self,
+                       packed_project: PackedProject,
+                       upload_root_dir: bool,
+                       delete_local_files_after_upload: bool = False) -> RemoteProject:
+
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        remote_project = GridMarketsAPIClient.upload_project(self, packed_project, upload_root_dir, delete_local_files_after_upload)
+        plugin.get_remote_project_container().append(remote_project)
+        return remote_project
+
     def submit_new_vray_project(self, packed_project: PackedProject, job_name: str, frame_ranges: str, output_height,
                                 output_width,
                                 output_prefix, output_format, output_path: pathlib.Path):

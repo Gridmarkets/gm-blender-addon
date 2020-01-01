@@ -217,12 +217,30 @@ class UserInterface(MetaUserInterface):
         return bpy.context.scene.props.blend_file_path
 
     @staticmethod
+    def reset_root_directory() -> None:
+        bpy.context.scene.props.root_directory = ""
+
+    @staticmethod
+    def get_root_directory() -> str:
+        return bpy.context.scene.props.root_directory
+
+    @staticmethod
+    def reset_upload_all_files_in_root() -> None:
+        bpy.context.scene.props.upload_all_files_in_root = False
+
+    @staticmethod
+    def get_upload_all_files_in_root() -> bool:
+        return bpy.context.scene.props.upload_all_files_in_root
+
+    @staticmethod
     def reset_project_attribute_props() -> None:
         UserInterface.reset_project_value()
         UserInterface.reset_product_value()
         UserInterface.reset_product_version_value()
         UserInterface.reset_export_path()
         UserInterface.reset_blend_file_path()
+        UserInterface.reset_root_directory()
+        UserInterface.reset_upload_all_files_in_root()
 
     @staticmethod
     def is_render_engine_supported() -> bool:

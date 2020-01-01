@@ -45,10 +45,13 @@ def draw_remote_project(layout: bpy.types.UILayout, context: bpy.types.Context):
         col2.label(text=str(remote_project.get_root_dir()))
 
         col1.label(text="File Count:")
-        col2.label(text=str(len(remote_project.get_files())))
+        col2.label(text=str(len(list(remote_project.get_files()))))
 
-        #col1.label(text="Project Size (bytes):")
-        #col2.label(text=str(remote_project.get_size()))
+        col1.label(text="Files")
+        col2.label(text="")
+        for file in list(remote_project.get_files()):
+            col1.label(text="")
+            col2.label(text=str(file))
 
         row = box.row()
         split = row.split(factor=0.2)

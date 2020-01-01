@@ -27,6 +27,7 @@ from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
+from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory
 
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
@@ -158,16 +159,35 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def upload_project(self,
                        packed_project: PackedProject,
+                       upload_root_dir: bool,
                        delete_local_files_after_upload: bool = False) -> RemoteProject:
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to upload a project.")
 
+        self._log.info("Uploading packed project")
+
         project_dir = str(packed_project.get_root_dir())
         project_name = packed_project.get_name()
 
         gm_project = GMProject(project_dir, project_name)
-        gm_project.add_folders(project_dir)
+
+        if upload_root_dir:
+            # add all files to packed project files list
+            files = get_files_in_directory(packed_project.get_root_dir())
+            packed_project.add_files(files)
+
+            self._log.info("Marking directory \"" + project_dir + "\" for upload.")
+            gm_project.add_folders(project_dir)
+
+        else:
+            # get project files as strings
+            files = list(map(lambda file: str(file), packed_project.get_files().copy()))
+
+            for file in files:
+                self._log.info("Marking \"" + file + "\" for upload.")
+
+            gm_project.add_files(*files)
 
         self._envoy_client.upload_project_files(gm_project)
 

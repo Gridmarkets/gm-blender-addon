@@ -53,7 +53,9 @@ class RemoteProject(Project):
     def convert_packed_project(packed_project: PackedProject) -> 'RemoteProject':
 
         root_dir = pathlib.Path(packed_project.get_name())
-        files = packed_project.get_relative_files()
+
+        # convert files from absolute local paths to absolute remote paths
+        files = set(map(lambda file: pathlib.Path('/') / root_dir / file, packed_project.get_relative_files()))
         attributes = packed_project.get_attributes()
 
         # convert all pathlib.Path attributes into a relative path

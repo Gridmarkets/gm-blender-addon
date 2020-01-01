@@ -64,6 +64,9 @@ class Project(ABC):
     def get_files(self) -> typing.Set[pathlib.Path]:
         return self._files
 
+    def add_files(self, files: typing.Set[pathlib.Path]) -> None:
+        self._files = self._files | files
+
     @abstractmethod
     def get_size(self) -> int:
         """

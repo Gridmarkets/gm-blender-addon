@@ -237,6 +237,19 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         subtype='FILE_PATH'
     )
 
+    # used for uploading packed projects
+    root_directory: bpy.props.StringProperty(
+        name="Root Directory",
+        description="The path to the root of your project.",
+        subtype='DIR_PATH'
+    )
+
+    upload_all_files_in_root: bpy.props.BoolProperty(
+        name="Upload Everything",
+        description="Select to upload all files in the root directory. Otherwise only known files will be uploaded",
+        default=False
+    )
+
     # path to a directory that you want to pack the .blend file to
     export_path: bpy.props.StringProperty(
         name="Export Path",

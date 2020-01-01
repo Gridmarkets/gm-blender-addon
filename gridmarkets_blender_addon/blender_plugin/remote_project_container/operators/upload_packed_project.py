@@ -26,6 +26,7 @@ from queue import Empty
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 from gridmarkets_blender_addon import constants, utils_blender
 
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 
@@ -67,26 +68,40 @@ class GRIDMARKETS_OT_upload_packed_project(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
-    def invoke(self, context, event):
-        return GRIDMARKETS_OT_upload_project.boilerplate_invoke(self, context, event)
-
     def execute(self, context):
         from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
             RejectedTransitionInputError
-        
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
+
+        user_interface = plugin.get_user_interface()
+
         # validate the project attribute make up a valid project
         try:
             attributes = utils_blender.get_project_attributes()
-            print(attributes)
         except RejectedTransitionInputError as e:
             # if a transition failed then one of the attributes is invalid
             self.report({'ERROR'}, e.user_message)
             return {"FINISHED"}
 
+        root_dir = pathlib.Path(user_interface.get_root_directory())
+
+        if not root_dir.exists():
+            self.report({'ERROR_INVALID_INPUT'}, "Root Directory does not exist.")
+            return {"FINISHED"}
+
+        packed_project = PackedProject(attributes[api_constants.API_KEYS.PROJECT_NAME],
+                                       root_dir,
+                                       set(utils_blender.get_project_files([])),
+                                       attributes)
+
         args = (
-            attributes,
+            packed_project,
+            user_interface.get_upload_all_files_in_root()
         )
 
+        log.info("Uploading packed project...")
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
                                                                  context,
                                                                  GRIDMARKETS_OT_upload_packed_project._execute,
@@ -95,25 +110,11 @@ class GRIDMARKETS_OT_upload_packed_project(bpy.types.Operator):
                                                                  "Uploading packed project...")
 
     @staticmethod
-    def _execute(attributes):
+    def _execute(packed_project: PackedProject, upload_root_dir: bool):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
-
-        packed_project = PackedProject("", pathlib.Path("bob"), set(), attributes)
-        remote_project = RemoteProject.convert_packed_project(packed_project)
-
-        plugin.get_remote_project_container().append(remote_project)
-        utils_blender.force_redraw_addon()
-        return remote_project
-
-    def draw(self, context):
-        from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import \
-            GRIDMARKETS_OT_add_remote_project
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
-
-        GRIDMARKETS_OT_add_remote_project.draw_project_attributes(self.layout, context, root)
+        api_client = plugin.get_api_client()
+        return api_client.upload_project(packed_project, upload_root_dir, delete_local_files_after_upload=False)
 
 
 classes = (
