@@ -26,6 +26,7 @@ from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
+from gridmarkets_blender_addon import constants
 import pathlib
 
 
@@ -56,6 +57,7 @@ class APIClient(GridMarketsAPIClient):
 
         remote_project = GridMarketsAPIClient.upload_project(self, packed_project, upload_root_dir, delete_local_files_after_upload)
         plugin.get_remote_project_container().append(remote_project)
+        plugin.get_user_interface().set_layout(constants.REMOTE_PROJECTS_LAYOUT_VALUE)
         return remote_project
 
     def submit_new_vray_project(self, packed_project: PackedProject, job_name: str, frame_ranges: str, output_height,
