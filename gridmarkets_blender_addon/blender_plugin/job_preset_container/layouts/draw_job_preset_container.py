@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-def draw_job_preset_container(self, context):
+def draw_job_preset_container(layout, context):
     from gridmarkets_blender_addon.blender_plugin.job_preset_container.menus.create_new_job_preset import \
         GRIDMARKETS_MT_new_job_preset
     from gridmarkets_blender_addon.blender_plugin.job_preset_container.operators.remove_focused_job_preset import \
@@ -27,7 +27,6 @@ def draw_job_preset_container(self, context):
     from gridmarkets_blender_addon.blender_plugin.job_preset.list_items.job_preset_list import GRIDMARKETS_UL_job_preset
     from gridmarkets_blender_addon.blender_plugin.job_preset.layouts.draw_job_preset import draw_job_preset
 
-    layout = self.layout
     props = context.scene.props
     job_preset_container_props = props.job_preset_container
 
@@ -41,4 +40,4 @@ def draw_job_preset_container(self, context):
 
     layout.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname)
     layout.separator()
-    draw_job_preset(self, context)
+    draw_job_preset(layout, context)

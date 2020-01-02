@@ -18,15 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
+
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.menus import *
 from gridmarkets_blender_addon.operators.set_ui_layout import GRIDMARKETS_OT_set_layout
 
 
-def draw_header(self, context):
+def draw_header(self, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    layout = self.layout
+    layout: bpy.types.UILayout = self.layout
     user_interface = plugin.get_user_interface()
     signed_in_user = plugin.get_api_client().get_signed_in_user()
 
@@ -46,13 +48,14 @@ def draw_header(self, context):
 
     ui_layout = user_interface.get_layout()
 
-    # projects
-    t = constants.REMOTE_PROJECTS_LAYOUT_TUPLE
-    row = layout.row()
-    row.operator(GRIDMARKETS_OT_set_layout.bl_idname, text=t[1]).layout = t[0]
-    if ui_layout == constants.REMOTE_PROJECTS_LAYOUT_VALUE:
-        row.enabled = False
+    def draw_header_button(layout: bpy.types.UILayout, t):
+        row = layout.row()
+        row.operator(GRIDMARKETS_OT_set_layout.bl_idname, text=t[1]).layout = t[0]
+        if ui_layout == t[0]:
+            row.enabled = False
 
+    draw_header_button(layout, constants.REMOTE_PROJECTS_LAYOUT_TUPLE)
+    draw_header_button(layout, constants.JOB_PRESETS_LAYOUT_TUPLE)
 
     row = layout.row(align=True)
     row.alignment = 'RIGHT'

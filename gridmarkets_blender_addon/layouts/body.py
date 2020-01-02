@@ -49,6 +49,7 @@ def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.C
     """ Matches a ui_layout tuple with it's draw method """
 
     map = {
+        constants.JOB_PRESETS_LAYOUT_TUPLE[0]: draw_job_preset_container,
         constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: draw_remote_project_container,
         constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: draw_pack_and_upload_current_scene,
         constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: draw_upload_packed_project,

@@ -21,7 +21,7 @@
 from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute
 
 
-def draw_job_preset_attribute(self, context, job_preset_attribute: JobPresetAttribute, col1, key_column, col2, col3):
+def draw_job_preset_attribute(layout, context, job_preset_attribute: JobPresetAttribute, col1, key_column, col2, col3):
     from types import SimpleNamespace
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher

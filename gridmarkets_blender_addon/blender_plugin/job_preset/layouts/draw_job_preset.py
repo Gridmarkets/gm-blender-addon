@@ -72,14 +72,13 @@ def unregister():
         unregister_class(cls)
 
 
-def draw_job_preset(self, context):
+def draw_job_preset(layout, context):
     from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
     from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import draw_job_preset_attribute
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 
-    layout = self.layout
     scene = context.scene
 
     plugin = PluginFetcher.get_plugin()
@@ -164,7 +163,7 @@ def draw_job_preset(self, context):
                         continue
 
             columns = _get_columns(col)
-            draw_job_preset_attribute(self, context, job_preset_attribute, columns[0], columns[3], columns[1], columns[2])
+            draw_job_preset_attribute(layout, context, job_preset_attribute, columns[0], columns[3], columns[1], columns[2])
 
         col.separator()
 
