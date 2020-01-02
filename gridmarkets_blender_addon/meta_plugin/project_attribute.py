@@ -56,13 +56,16 @@ class ProjectAttribute:
     def get_compatible_job_definitions(self) -> typing.List[JobDefinition]:
         return self._compatible_job_definitions
 
-    def transition(self, input: any) -> 'ProjectAttribute':
+    def transition(self, input: any, force_transition: bool = False) -> 'ProjectAttribute':
         for transition in self._transitions:
             try:
                 project_attribute = transition.transition(input)
                 return project_attribute
             except RejectedTransitionInputError:
                 pass
+
+        if force_transition and len(self.get_transitions()) == 1:
+            return self.get_transitions()[0].get_project_attribute()
 
         raise RejectedTransitionInputError(message="Project attribute '" + self.get_attribute().get_display_name() +
                                                    " (" + self.get_id() + ")" +

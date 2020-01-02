@@ -23,6 +23,8 @@ import pathlib
 
 from gridmarkets_blender_addon.meta_plugin.file_packer import FilePacker
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin import utils
 
 class BlenderFilePacker(FilePacker):
     BAT_PACK_INFO_FILE_NAME = "pack-info.txt"
@@ -30,7 +32,6 @@ class BlenderFilePacker(FilePacker):
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
         from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon import utils_blender
         plugin = PluginFetcher.get_plugin()
         logging_coordinator = plugin.get_logging_coordinator()
         log = logging_coordinator.get_logger(__name__)
@@ -45,11 +46,15 @@ class BlenderFilePacker(FilePacker):
             pack_info_file.unlink()
 
         project_name = output_dir.stem
-        attributes = utils_blender.get_project_attributes()
+
+        files = utils.get_files_in_directory(output_dir)
+        attributes = {
+            api_constants.API_KEYS.PATH: str(output_dir / target_file.name),
+        }
 
         return PackedProject(project_name,
                              output_dir,
-                             set(),
+                             files,
                              attributes)
 
     @staticmethod

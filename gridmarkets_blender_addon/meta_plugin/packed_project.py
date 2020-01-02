@@ -42,10 +42,11 @@ class PackedProject(LocalProject):
         root_dir = self.get_root_dir()
 
         if not file.is_absolute():
-            raise ValueError("file must be absolute")
+            raise ValueError("file \"" + str(file) + "\" must be absolute")
 
         if file.anchor != root_dir.anchor:
-            raise ValueError("file must be on same drive as project directory")
+            raise ValueError("file \"" + str(file) + "\" must be on same drive as project directory (\"" +
+                             str(root_dir.anchor) + "\")")
 
         return file.relative_to(root_dir)
 

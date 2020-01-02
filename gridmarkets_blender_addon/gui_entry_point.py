@@ -33,4 +33,6 @@ def unregister():
     bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar)
 
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-    PluginFetcher.get_plugin().unregister_dynamic_props()
+    plugin = PluginFetcher.get_plugin_if_initialised()
+    if plugin:
+        plugin.unregister_dynamic_props()

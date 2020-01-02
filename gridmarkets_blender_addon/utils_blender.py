@@ -224,7 +224,7 @@ def get_project_name(default_name = constants.PROJECT_PREFIX):
 
 
 def get_blend_file_name():
-    return get_project_name(default_name='main_GM_blend_file_packed.blend')
+    return get_project_name(default_name='main_GM_blend_file_packed') + constants.BLEND_FILE_EXTENSION
 
 
 def get_blender_frame_range(context):
@@ -699,7 +699,7 @@ def get_selected_project_options(scene, context, id):
     return project_options
 
 
-def get_project_attributes_rec(project_attribute, attributes):
+def get_project_attributes_rec(project_attribute, attributes, force_transition=False):
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
     from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
 
@@ -712,11 +712,11 @@ def get_project_attributes_rec(project_attribute, attributes):
     value = get_project_attribute_value(project_attribute)
     attributes[attribute.get_key()] = value
 
-    next_project_attribute = project_attribute.transition(value)
+    next_project_attribute = project_attribute.transition(value, force_transition)
     return get_project_attributes(next_project_attribute, attributes)
 
 
-def get_project_attributes(project_attribute=None, attributes=None):
+def get_project_attributes(project_attribute=None, attributes=None, force_transition=False):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
@@ -724,7 +724,7 @@ def get_project_attributes(project_attribute=None, attributes=None):
     attributes = attributes if attributes is not None else {}
     project_attribute = root if project_attribute is None else project_attribute
 
-    return get_project_attributes_rec(project_attribute, attributes)
+    return get_project_attributes_rec(project_attribute, attributes, force_transition=force_transition)
 
 
 def get_project_files(files: typing.List[pathlib.Path], project_attribute = None) -> typing.List[pathlib.Path]:
@@ -749,6 +749,26 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
         files.append(pathlib.Path(value))
 
     return get_project_files(files, project_attribute.transition(value))
+
+
+def get_project_attributes_sequence(force_transition=False) -> typing.List['ProjectAttribute']:
+    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    project_attributes = []
+
+    project_attribute = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+
+    while True:
+        project_attributes.append(project_attribute)
+
+        if project_attribute.get_attribute().get_type() == AttributeType.NULL:
+            return project_attributes
+
+        value = get_project_attribute_value(project_attribute)
+        project_attribute = project_attribute.transition(value, force_transition=force_transition)
 
 
 def draw_render_engine_warning_popup(self, context):

@@ -612,39 +612,13 @@
                 <DisplayName>Version</DisplayName>
                 <Description>The version of V-Ray.</Description>
                 <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>3.60.03</Key>
-                        <DisplayName>3.60.03</DisplayName>
-                        <Description>V-Ray 3.60.03.</Description>
-                    </Item>
-                    <Item>
-                        <Key>3.60.04</Key>
-                        <DisplayName>3.60.04</DisplayName>
-                        <Description>V-Ray 3.60.04.</Description>
-                    </Item>
-                    <Item>
-                        <Key>3.60.05</Key>
-                        <DisplayName>3.60.05</DisplayName>
-                        <Description>V-Ray 3.60.05.</Description>
-                    </Item>
-                    <Item>
-                        <Key>4.02.05</Key>
-                        <DisplayName>4.02.05</DisplayName>
-                        <Description>V-Ray 4.02.05.</Description>
-                    </Item>
-                    <Item>
-                        <Key>4.10.01</Key>
-                        <DisplayName>4.10.01</DisplayName>
-                        <Description>V-Ray 4.10.01.</Description>
-                    </Item>
-                    <Item>
-                        <Key>4.10.02</Key>
-                        <DisplayName>4.10.02</DisplayName>
-                        <Description>V-Ray 4.10.02.</Description>
-                    </Item>
-                </Items>
-                <DefaultValue>4.10.02</DefaultValue>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>vray</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>

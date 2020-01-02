@@ -27,9 +27,6 @@ def get_default_value(attribute: Attribute) -> any:
 
     attribute_type: AttributeType = attribute.get_type()
 
-    if attribute_type == AttributeType.ENUM:
-        return attribute.get_default_value().get_key()
-
     if attribute_type == AttributeType.NULL:
         return None
 

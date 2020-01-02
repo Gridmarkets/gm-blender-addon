@@ -127,21 +127,21 @@ class EnumAttributeType(Attribute):
 
         if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
             # items and default value do not matter for PRODUCT_VERSIONS subtype
-            self._default_value = EnumItem(None, None, None)
+            self._default_value = None
         elif default_value is None:
             # by default use the first enum item as a default value if no default value was provided
-            self._default_value = items[0]
+            self._default_value = items[0].get_key()
         else:
-            # check the default enum value is a valid enum item
-            for item in self._items:
-                if item.get_key() == default_value:
-                    self._default_value = item
-                    break
-            else:
-                raise ValueError("Default enum value must be a valid enum option, not '" + str(default_value) + "'")
+            self._default_value = default_value
 
-    def get_default_value(self) -> EnumItem:
+    def get_default_value(self) -> str:
         return self._default_value
+
+    def get_default_enum_item(self) -> typing.Optional[EnumItem]:
+        for item in self._items:
+            if item.get_key() == self.get_default_value():
+                return item
+        return None
 
     def get_subtype(self) -> EnumSubtype:
         return self._subtype

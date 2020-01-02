@@ -156,7 +156,7 @@ class JobPreset(MetaJobPreset):
                     name=display_name,
                     description=description,
                     items=items,
-                    default=default_value.get_key(),
+                    default=default_value,
                     options={'SKIP_SAVE'}
                 )
 

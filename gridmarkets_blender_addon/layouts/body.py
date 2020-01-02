@@ -38,6 +38,7 @@ from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_su
 _CONSOLE_SEPARATOR_SPACING = 2
 
 # new imports
+from gridmarkets_blender_addon.layouts.draw_pack_and_upload_current_scene import draw_pack_and_upload_current_scene
 from gridmarkets_blender_addon.layouts.draw_upload_packed_project import draw_upload_packed_project
 from gridmarkets_blender_addon.layouts.draw_pack_current_scene import draw_pack_current_scene
 from gridmarkets_blender_addon.layouts.draw_pack_external_project import draw_pack_external_project
@@ -49,7 +50,7 @@ def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.C
 
     map = {
         constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: draw_remote_project_container,
-        constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: None,
+        constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: draw_pack_and_upload_current_scene,
         constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: draw_upload_packed_project,
         constants.PACK_CURRENT_SCENE_TUPLE[0]: draw_pack_current_scene,
         constants.PACK_BLEND_FILE_TUPLE[0]: draw_pack_external_project,

@@ -101,7 +101,7 @@ def register_schema(api_client):
                 name=display_name,
                 description=description,
                 items=items,
-                default=default.get_key(),
+                default=default,
                 options={'SKIP_SAVE'}
             )
 

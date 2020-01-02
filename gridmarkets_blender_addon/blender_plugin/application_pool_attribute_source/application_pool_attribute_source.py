@@ -21,7 +21,6 @@
 from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import \
     ApplicationPoolAttributeSource as MetaApplicationPoolAttributeSource
 
-
 class ApplicationPoolAttributeSource(MetaApplicationPoolAttributeSource):
 
     def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':

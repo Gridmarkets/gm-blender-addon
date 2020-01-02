@@ -21,7 +21,8 @@
 import bpy
 
 from queue import Queue, Empty
-
+import typing
+import traceback
 
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 from gridmarkets_blender_addon import constants, utils, utils_blender
@@ -75,11 +76,13 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                     elif isinstance(result, PluginError):
                         self.report({'ERROR'}, result.user_message)
 
-                    elif type(result) == RemoteProject:
-                        self.plugin.get_remote_project_container().append(result)
+                    elif isinstance(result, Exception):
+                        self.report({'ERROR'}, result)
+                        traceback.print_tb(result.__traceback__)
 
                     else:
-                        raise RuntimeError("Method returned unexpected result:", result)
+                        if type(result) != RemoteProject:
+                            raise RuntimeError("Method returned unexpected result:", result)
 
                 self.thread.join()
                 self.plugin.get_user_interface().set_is_running_operation_flag(False)
@@ -88,22 +91,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                 return {'FINISHED'}
 
         return {'PASS_THROUGH'}
-
-
-    @staticmethod
-    def boilerplate_invoke(operator, context, event):
-        if GRIDMARKETS_OT_upload_project.check_render_engine(context) == {'FINISHED'}:
-            return {'FINISHED'}
-
-        GRIDMARKETS_OT_upload_project.reset_project_value(context)
-        GRIDMARKETS_OT_upload_project.reset_product_value(context)
-        GRIDMARKETS_OT_upload_project.reset_product_version_value(context)
-
-        # create popup
-        return context.window_manager.invoke_props_dialog(operator, width=500)
-
-    def invoke(self, context, event):
-        return GRIDMARKETS_OT_upload_project.boilerplate_invoke(self, context, event)
 
     @staticmethod
     def boilerplate_execute(operator, context, method, args, kwargs, running_operation_message: str):
@@ -129,17 +116,48 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            get_project_attribute_value
+            get_project_attribute_value, set_project_attribute_value
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
+        user_interface = plugin.get_user_interface()
         api_schema = plugin.get_api_client().get_api_schema()
 
+        # check render engine
+        if not user_interface.is_render_engine_supported():
+            return {'FINISHED'}
+
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = get_project_attribute_value(project_name_attribute)
+
+        # set product (either blender or vray)
         product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
-        name_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product = api_constants.PRODUCTS.VRAY
+        else:
+            product = api_constants.PRODUCTS.BLENDER
+        set_project_attribute_value(product_attribute, product)
+
+        # get product version
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.VRAY_VERSION)
+        else:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
+        product_version = get_project_attribute_value(product_version_attribute)
+
+        # set the other attributes to their application inferred value
+        app_attribute_source = plugin.get_application_pool_attribute_source()
+        app_attribute_source.set_project_attribute_values(project_name, product, product_version)
+
+        attributes = utils_blender.get_project_attributes()
 
         args = (
-            get_project_attribute_value(product_attribute),
-            get_project_attribute_value(name_attribute)
+            project_name,
+            product,
+            product_version,
+            attributes
         )
 
         return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
@@ -150,58 +168,30 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
                                                                  "Uploading project...")
 
     @staticmethod
-    def _execute(project_type: str, project_name: str):
+    def _execute(project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
         temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
-        if project_type == api_constants.PRODUCTS.BLENDER:
+        if product == api_constants.PRODUCTS.BLENDER:
             packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
-
-        elif project_type == api_constants.PRODUCTS.VRAY:
+        elif product == api_constants.PRODUCTS.VRAY:
             packed_project = VRaySceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
         else:
             raise RuntimeError("Unknown project type")
 
+        packed_project.set_name(project_name)
+        for key, value in attributes.items():
+            # If the key is not already in the packed project's attribute list
+            if key not in packed_project.get_attributes():
+                # Then set the attribute
+                packed_project.set_attribute(key, value)
+
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
+
         api_client = plugin.get_api_client()
-        return api_client.upload_project(packed_project, delete_local_files_after_upload=False)
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-
-        layout.separator()
-
-        # project input
-        layout.prop(project_attributes, api_constants.ROOT_ATTRIBUTE_ID)
-        row = layout.row()
-        row.label(text="This is the name of the remote folder which your project will be uploaded to.")
-        row.enabled = False
-
-        layout.separator()
-
-        # we have already validated that the render engine is supported
-        render_engine = context.scene.render.engine
-        if render_engine == constants.RENDER_ENGINE_VRAY_RT:
-            layout.prop(project_attributes, "VRAY_VERSION")
-
-            row = layout.row()
-            row.label(text="This should be the same (or as close as possible) to the version of VRay your currently using.")
-            row.enabled = False
-        else:
-            layout.prop(project_attributes, "BLENDER_VERSION", text="Blender Version")
-
-            col = layout.column()
-            col.label(text="This should be the same (or as close as possible) to the version of Blender your currently using.")
-            col.label(text="For reference you are using: " + bpy.app.version_string)
-            col.enabled = False
-
-        layout.separator()
+        return api_client.upload_project(packed_project, True, delete_local_files_after_upload=False)
 
 
 classes = (
