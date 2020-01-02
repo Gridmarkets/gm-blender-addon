@@ -77,7 +77,7 @@ class GRIDMARKETS_OT_upload_packed_project(bpy.types.Operator):
 
         user_interface = plugin.get_user_interface()
 
-        # validate the project attribute make up a valid project
+        # validate that the project attributes make up a valid project
         try:
             attributes = utils_blender.get_project_attributes()
         except RejectedTransitionInputError as e:

@@ -32,7 +32,8 @@ from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_erro
 
 def draw_project_attribute(layout: bpy.types.UILayout,
                            context: bpy.types.Context,
-                           project_attribute: ProjectAttribute):
+                           project_attribute: ProjectAttribute,
+                           draw_linked_attributes=True):
 
     from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
 
@@ -65,4 +66,5 @@ def draw_project_attribute(layout: bpy.types.UILayout,
         row.label(text=attribute.get_description())
         row.enabled = False
 
-    draw_project_attribute(layout, context, project_attribute.transition(value))
+    if draw_linked_attributes:
+        draw_project_attribute(layout, context, project_attribute.transition(value))

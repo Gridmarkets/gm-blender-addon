@@ -50,7 +50,6 @@ def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.C
     map = {
         constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: draw_remote_project_container,
         constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: None,
-        constants.UPLOAD_PROJECT_FILES_TUPLE[0]: None,
         constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: draw_upload_packed_project,
         constants.PACK_CURRENT_SCENE_TUPLE[0]: draw_pack_current_scene,
         constants.PACK_BLEND_FILE_TUPLE[0]: draw_pack_external_project,

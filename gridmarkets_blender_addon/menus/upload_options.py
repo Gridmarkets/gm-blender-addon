@@ -39,5 +39,4 @@ class GRIDMARKETS_MT_project_upload_options(bpy.types.Menu):
         layout = self.layout
         draw_header(layout, "project Upload Actions:", icon_value=self.get_icon())
         draw_layout_option(layout, constants.UPLOAD_CURRENT_SCENE_TUPLE)
-        draw_layout_option(layout, constants.UPLOAD_PROJECT_FILES_TUPLE)
         draw_layout_option(layout, constants.UPLOAD_PACKED_PROJECT_TUPLE)

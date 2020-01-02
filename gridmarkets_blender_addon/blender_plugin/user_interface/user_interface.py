@@ -156,13 +156,12 @@ class UserInterface(MetaUserInterface):
         scene = bpy.context.scene
         project_attributes = getattr(scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
 
+        # get the name of all the remote projects in a SimpleNamespace object
         remote_projects = map(lambda remote_project: SimpleNamespace(name=remote_project.get_name()),
                               plugin.get_remote_project_container().get_all())
 
-        setattr(project_attributes,
-                api_constants.ROOT_ATTRIBUTE_ID,
-                utils.create_unique_object_name(remote_projects,
-                                                name_prefix=utils_blender.get_project_name()))
+        default_name =  utils.create_unique_object_name(remote_projects, name_prefix=utils_blender.get_project_name())
+        setattr(project_attributes, api_constants.ROOT_ATTRIBUTE_ID, default_name)
 
     @staticmethod
     def reset_product_value() -> None:
