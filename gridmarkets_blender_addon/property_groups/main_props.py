@@ -90,20 +90,45 @@ def _get_project_options(scene, context):
 def _get_job_options(scene, context):
     """ Returns a list of items representing project options """
 
-    props = context.scene.props
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    job_presets = plugin.get_preferences_container().get_job_preset_container().get_all()
 
     job_options = [
-        (constants.JOB_OPTIONS_BLENDERS_SETTINGS_VALUE,
-         constants.JOB_OPTIONS_BLENDERS_SETTINGS_LABEL,
-         constants.JOB_OPTIONS_BLENDERS_SETTINGS_DESCRIPTION,
-         'BLENDER', 0)
+
     ]
 
-    # iterate through uploaded projects and add them as options
-    for i, job in enumerate(props.jobs):
-        job_options.append((str(i + 1), job.name, '', constants.ICON_JOB, job.id))
+    # iterate through uploaded job presets and add them as options
+    for i, job_preset in enumerate(job_presets):
+        job_options.append((str(i + 1), job_preset.get_name(), '', constants.ICON_JOB, i))
 
     return job_options
+
+
+def _job_options_getter(self):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin is None:
+        return -1
+
+    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+    focused_item = job_preset_container.get_focused_item()
+
+    if focused_item is None:
+        return -1
+
+    return job_preset_container.get_index(focused_item)
+
+
+def _job_options_setter(self, value):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    if plugin:
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+        item = job_preset_container.get_at(value)
+        job_preset_container.focus_item(item, update_props=False)
 
 
 def _get_tab_items(scene, context):
@@ -204,7 +229,9 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
     job_options: bpy.props.EnumProperty(
         name="Job",
         description="The list of possible jobs to use on submit",
-        items=_get_job_options
+        items=_get_job_options,
+        get=_job_options_getter,
+        set=_job_options_setter
     )
 
     tab_options: bpy.props.EnumProperty(

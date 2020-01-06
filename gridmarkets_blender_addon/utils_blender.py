@@ -231,7 +231,7 @@ def get_blender_frame_range(context):
     scene = context.scene
     return str(scene.frame_start) + ' ' + str(scene.frame_end) + ' ' + str(scene.frame_step)
 
-
+"""
 def get_default_blender_job(context, render_file):
     scene = context.scene
 
@@ -246,10 +246,11 @@ def get_default_blender_job(context, render_file):
         output_format = scene.render.image_settings.file_format,    # OUTPUT_FORMAT
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
+"""
 
-
+"""
 def get_job_output_path(context, job=None):
-    """ Gets the output path for either the provided job or the currently selested job if no job provided
+    Gets the output path for either the provided job or the currently selested job if no job provided
 
     :param context: The context
     :type context: bpy.context
@@ -257,7 +258,7 @@ def get_job_output_path(context, job=None):
     :type job: properties.JobProps
     :return: The output path as it is entered in either the blender ui or custom output field
     :rtype: str
-    """
+
 
     scene = context.scene
     props = scene.props
@@ -274,8 +275,9 @@ def get_job_output_path(context, job=None):
         return job.output_path
 
     return context.scene.render.filepath
+"""
 
-
+"""
 def get_job_output_path_abs(context, job=None):
     path = get_job_output_path(context, job)
 
@@ -292,8 +294,9 @@ def get_job_output_path_abs(context, job=None):
             return constants.BLENDER_TEMP_DIRECTORY
 
     return path
+"""
 
-
+"""
 def get_job_frame_ranges(context, job=None):
     scene = context.scene
     props = scene.props
@@ -321,6 +324,7 @@ def get_job_frame_ranges(context, job=None):
 
     else:
         return get_blender_frame_range(context)
+"""
 
 
 def do_frame_ranges_overlap(frame_ranges) -> bool:
@@ -475,7 +479,7 @@ def get_supported_vray_versions(scene, context):
         (VRAY_VERSIONS.V_4_10_02, "4.10.02", ""),
     ]
 
-
+"""
 def get_job_output_format(context, job=None):
     scene = context.scene
     props = scene.props
@@ -494,8 +498,9 @@ def get_job_output_format(context, job=None):
 
     else:
         return scene.render.image_settings.file_format
+"""
 
-
+"""
 def get_job_output_prefix(context, job=None):
     scene = context.scene
     props = scene.props
@@ -518,8 +523,9 @@ def get_job_output_prefix(context, job=None):
         return job.output_prefix
 
     return None
+"""
 
-
+"""
 def get_job(context, render_file, enable_logging=True):
     scene = context.scene
     props = scene.props
@@ -560,7 +566,7 @@ def get_job(context, render_file, enable_logging=True):
         raise InvalidInputError(message="Invalid job option")
 
     return job
-
+"""
 
 def get_addon(module_name):
     """ Gets a blender add-on

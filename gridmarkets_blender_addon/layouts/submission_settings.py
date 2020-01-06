@@ -18,15 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
+
 from gridmarkets_blender_addon import constants, utils_blender
 
 
-def draw_submission_summary(self, context):
+def draw_submission_summary(layout, context):
     scene = context.scene
     props = scene.props
     open = props.submission_summary_open
 
-    box = self.layout.box()
+    box = layout.box()
 
     col = box.column()
     row = col.row(align=True)
@@ -91,11 +93,13 @@ def draw_submission_summary(self, context):
         values.label(text=str(scene.render.fps))
 
 
-def draw_submission_settings(self, context):
+def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Context):
+    from gridmarkets_blender_addon.operators.set_ui_layout import GRIDMARKETS_OT_set_layout
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
+    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+    has_job_presets = job_preset_container.size() >= 1
 
-    layout = self.layout
     layout.use_property_split = True
     layout.use_property_decorate = False  # No animating of properties
 
@@ -104,26 +108,38 @@ def draw_submission_settings(self, context):
     # submit box
     box = layout.box()
     box.use_property_split = False
-    row = box.row()
+    split = box.split()
 
     # project options
-    col = row.column(align=True)
+    col = split.column(align=True)
     col.label(text="Project")
     sub = col.row()
     sub.enabled = False
     sub.label(text="The project to run the selected job against.")
     col.separator(factor=1.0)
-    col.prop(props, "project_options", text="")
-
+    col.box().prop(props, "project_options", text="")
 
     # job options
-    col = row.column(align=True)
+    col = split.column(align=True)
     col.label(text="Job")
     sub = col.row()
     sub.enabled = False
     sub.label(text="The render settings and output settings to use.")
     col.separator(factor=1.0)
-    col.prop(props, "job_options", text="")
+    job_preset_box = col.box().row(align=True)
+
+    if has_job_presets:
+        row2 = job_preset_box.row()
+        row2.prop(props, "job_options", text="")
+        row3 = row2.row()
+        row3.alignment = 'RIGHT'
+        row3.operator(GRIDMARKETS_OT_set_layout.bl_idname, text="", icon=constants.ICON_HIDE_OFF).layout = constants.JOB_PRESETS_LAYOUT_VALUE
+    else:
+        row2 = job_preset_box.row(align=True)
+        row2.label(text="You have not created any Job Presets to choose from.", icon=constants.ICON_ERROR)
+        row3 = row2.row()
+        row3.alignment = 'RIGHT'
+        row3.operator(GRIDMARKETS_OT_set_layout.bl_idname, text="New Job Preset").layout = constants.JOB_PRESETS_LAYOUT_VALUE
 
     submit_text = "Submit"
     submit_icon = "NONE"
@@ -136,8 +152,12 @@ def draw_submission_settings(self, context):
     if plugin.get_user_interface().is_running_operation():
         row.enabled = False
 
+    # disable if there are no job presets to choose from
+    if not has_job_presets:
+        row.enabled = False
+
     # if the engine is not in the supported engines list disable and show a help message
-    render_engine = utils_blender.get_job_render_engine(context)
+    render_engine = "CYCLES"#utils_blender.get_job_render_engine(context)
     if render_engine not in utils_blender.get_supported_render_engines():
         row.enabled = False
         submit_text="Render engine '%s' is not currently supported" % utils_blender.get_user_friendly_name_for_engine(render_engine)

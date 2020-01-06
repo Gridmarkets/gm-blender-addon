@@ -37,4 +37,5 @@ class GRIDMARKETS_MT_submit_options(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="nothing here")
+        draw_header(layout, "Submit:", icon_value=self.get_icon())
+        draw_layout_option(layout, constants.SUBMISSION_SETTINGS_TUPLE)
