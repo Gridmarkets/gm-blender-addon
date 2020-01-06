@@ -62,7 +62,7 @@ class Attribute(ABC):
         return self._subtype_kwargs
 
     @abstractmethod
-    def get_default_value(self) -> any:
+    def get_default_value(self) -> typing.Optional[any]:
         raise NotImplementedError
 
     @abstractmethod

@@ -58,7 +58,7 @@ class StringAttributeType(Attribute):
         self._max_length = max_length
         self._min_length = min_length
 
-    def get_default_value(self) -> str:
+    def get_default_value(self) -> typing.Optional[str]:
         return self._default_value
 
     def get_subtype(self) -> StringSubtype:
@@ -134,7 +134,7 @@ class EnumAttributeType(Attribute):
         else:
             self._default_value = default_value
 
-    def get_default_value(self) -> str:
+    def get_default_value(self) -> typing.Optional[str]:
         return self._default_value
 
     def get_default_enum_item(self) -> typing.Optional[EnumItem]:
@@ -188,7 +188,7 @@ class BooleanAttributeType(Attribute):
                  display_name: str,
                  description: str,
                  subtype_kwargs: typing.Dict,
-                 default_value: typing.Optional[bool] = ""):
+                 default_value: typing.Optional[bool] = True):
 
         Attribute.__init__(self, key, display_name, description, AttributeType.BOOLEAN, subtype_kwargs)
 
@@ -197,7 +197,7 @@ class BooleanAttributeType(Attribute):
 
         self._default_value = default_value
 
-    def get_default_value(self) -> bool:
+    def get_default_value(self) -> typing.Optional[bool]:
         return self._default_value
 
     def validate_value(self, value: any) -> None:
@@ -224,7 +224,7 @@ class IntegerAttributeType(Attribute):
 
         self._default_value = default_value
 
-    def get_default_value(self) -> int:
+    def get_default_value(self) -> typing.Optional[int]:
         return self._default_value
 
     def validate_value(self, value: any) -> None:
