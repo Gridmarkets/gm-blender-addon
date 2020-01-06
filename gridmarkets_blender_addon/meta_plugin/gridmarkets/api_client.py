@@ -105,7 +105,6 @@ class GridMarketsAPIClient(MetaAPIClient):
     def sign_out(self) -> None:
         if self.is_user_signed_in():
             self._log.info("Signing out user " + self.get_signed_in_user().get_auth_email())
-            self.clear_all_caches()
 
         MetaAPIClient.sign_out(self)
 
