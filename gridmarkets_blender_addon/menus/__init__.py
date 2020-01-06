@@ -30,10 +30,12 @@ __all__ = ['GRIDMARKETS_MT_about_menu',
            'draw_header_menus']
 
 import bpy
+from gridmarkets_blender_addon import constants
+
 from .about_menu import GRIDMARKETS_MT_about_menu
 from .auth_menu import GRIDMARKETS_MT_auth_menu
 from .gm_menu import GRIDMARKETS_MT_gm_menu
-from.help_menu import GRIDMARKETS_MT_help_menu
+from .help_menu import GRIDMARKETS_MT_help_menu
 from .misc_options import GRIDMARKETS_MT_misc_options
 from .packing_options import GRIDMARKETS_MT_project_packing_options
 from .switch_user_menu import GRIDMARKETS_MT_switch_user_menu
@@ -42,6 +44,8 @@ from .submission_options import GRIDMARKETS_MT_submit_options
 
 
 def draw_header_menus(layout: bpy.types.UILayout, context: bpy.types.Context):
+    from gridmarkets_blender_addon.operators.set_ui_layout import GRIDMARKETS_OT_set_layout
+
     menu_row = layout.row(align=True)
     menu_row.alignment = 'LEFT'
 
@@ -49,7 +53,9 @@ def draw_header_menus(layout: bpy.types.UILayout, context: bpy.types.Context):
     row.menu(GRIDMARKETS_MT_gm_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
 
     row = menu_row.row(align=True)
-    row.menu(GRIDMARKETS_MT_submit_options.bl_idname)
+    row.emboss = 'PULLDOWN_MENU'
+    row.scale_x = 0.9
+    row.operator(GRIDMARKETS_OT_set_layout.bl_idname, text=GRIDMARKETS_MT_submit_options.bl_label).layout = constants.SUBMISSION_SETTINGS_VALUE
 
     row = menu_row.row(align=True)
     row.menu(GRIDMARKETS_MT_project_upload_options.bl_idname)
