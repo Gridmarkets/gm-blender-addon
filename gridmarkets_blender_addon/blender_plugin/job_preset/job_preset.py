@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import re
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
@@ -145,8 +146,16 @@ class JobPreset(MetaJobPreset):
                     product = enum_attribute.get_subtype_kwargs().get(
                         api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
 
+                    match = enum_attribute.get_subtype_kwargs().get(
+                        api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
+                    match = p = re.compile(match) if match is not None else None
+
                     def _get_product_versions(self, context):
                         versions = plugin.get_api_client().get_product_versions(product)
+
+                        if match is not None:
+                            versions = [s for s in versions if p.match(s)]
+
                         return list(map(lambda version: (version, version, ''), versions))
 
                     items = _get_product_versions

@@ -51,6 +51,10 @@ class SUBTYPE_KEYS:
         class FILE_PATH:
             PRODUCT = "PRODUCT"
 
+    class ENUM:
+        class PRODUCT_VERSIONS:
+            MATCH = "MATCH"
+
 
 class PRODUCTS:
     BLENDER = "blender"

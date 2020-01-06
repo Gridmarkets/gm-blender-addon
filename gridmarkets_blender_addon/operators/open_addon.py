@@ -19,6 +19,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
+import re
+
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
@@ -34,7 +37,8 @@ def register_schema(api_client):
     properties = {}
 
     def register_project_attribute_props(project_attribute: ProjectAttribute, indent):
-
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
         id = project_attribute.get_id()
 
         attribute = project_attribute.get_attribute()
@@ -85,10 +89,19 @@ def register_schema(api_client):
             items = []
 
             if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                product = enum_attribute.get_subtype_kwargs().get(api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
+                product = enum_attribute.get_subtype_kwargs().get(
+                    api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
+
+                match = enum_attribute.get_subtype_kwargs().get(
+                    api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
+                match = p = re.compile(match) if match is not None else None
 
                 def _get_product_versions(self, context):
-                    versions = api_client.get_product_versions(product)
+                    versions = plugin.get_api_client().get_product_versions(product)
+
+                    if match is not None:
+                        versions = [s for s in versions if p.match(s)]
+
                     return list(map(lambda version: (version, version, ''), versions))
 
                 items = _get_product_versions

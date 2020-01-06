@@ -39,12 +39,22 @@
                     <Key>app_version</Key>
                     <DisplayName>Product Version</DisplayName>
                     <Description>The version of the product / app to use.</Description>
-                    <Type>STRING</Type>
-                    <DefaultValue>2.80</DefaultValue>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>MATCH</Key>
+                            <Value>^([2]\.)([8]\d)</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
-                    <InferenceSource>CONSTANT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
