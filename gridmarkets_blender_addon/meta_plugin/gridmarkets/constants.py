@@ -45,6 +45,7 @@ class API_KEYS:
     OUTPUT_PREFIX = "output_prefix"
     OUTPUT_FORMAT = "output_format"
     RENDER_ENGINE = "engine"
+    PROJECT_TYPE_ID = "project_type_id"
 
 class SUBTYPE_KEYS:
     class STRING:

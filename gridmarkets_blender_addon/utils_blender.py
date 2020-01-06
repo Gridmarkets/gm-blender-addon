@@ -700,12 +700,14 @@ def get_selected_project_options(scene, context, id):
 
 
 def get_project_attributes_rec(project_attribute, attributes, force_transition=False):
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
     from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
 
     attribute = project_attribute.get_attribute()
 
     if attribute.get_type() == AttributeType.NULL:
+        attributes[api_constants.API_KEYS.PROJECT_TYPE_ID] = project_attribute.get_id()
         return attributes
 
     # add attribute value
