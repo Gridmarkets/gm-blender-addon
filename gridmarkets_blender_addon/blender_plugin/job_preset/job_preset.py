@@ -45,7 +45,6 @@ class JobPreset(MetaJobPreset):
         import bpy
         from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
         from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype, StringAttributeType
-        from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_default_value
 
         scene = bpy.context.scene
         job_preset_props = getattr(scene, self.get_id())
@@ -70,7 +69,10 @@ class JobPreset(MetaJobPreset):
                     frame_range.frame_end = 256
                     frame_range.frame_step = 1
                 else:
-                    setattr(job_preset_props, attribute.get_key(), get_default_value(job_attribute.get_attribute()))
+                    default_value = attribute.get_default_value()
+
+                    if default_value is not None:
+                        setattr(job_preset_props, attribute.get_key(), default_value)
 
                 # reset inference source to default
                 inference_sources = job_attribute.get_inference_sources()

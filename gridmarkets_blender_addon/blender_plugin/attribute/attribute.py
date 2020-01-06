@@ -22,17 +22,6 @@ import typing
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
-def get_default_value(attribute: Attribute) -> any:
-    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
-
-    attribute_type: AttributeType = attribute.get_type()
-
-    if attribute_type == AttributeType.NULL:
-        return None
-
-    return attribute.get_default_value()
-
-
 def get_value(property_group, attribute: Attribute, prop_id: str = None) -> any:
     from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
