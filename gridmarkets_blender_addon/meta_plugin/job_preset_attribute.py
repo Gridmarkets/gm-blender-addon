@@ -20,6 +20,7 @@
 
 __all__ = ['JobPresetAttribute']
 
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
@@ -81,10 +82,16 @@ class JobPresetAttribute:
 
         # application source
         if inference_source == InferenceSource.get_application_inference_source():
-            # app and app_version are two attributes which can not be application defined so there is no risk of
-            # infinite recursion.
-            app = self._parent_preset.get_job_preset_attribute_by_key('app').eval(plugin, source_project)
-            version = self._parent_preset.get_job_preset_attribute_by_key('app_version').eval(plugin, source_project)
+            # app and app version attributes must be either user defined or constants if also application defined
+            app = self._parent_preset.get_job_preset_attribute_by_key('app').get_value()
+            version = self._parent_preset.get_job_preset_attribute_by_key('app_version').get_value()
+
+            if self.get_key() == 'app':
+                return app
+
+            if self.get_key() == 'app_version':
+                return version
+
             application_pool_attribute_source = plugin.get_application_pool_attribute_source()
             return application_pool_attribute_source.get_attribute_value(app, version, self.get_key())
 
