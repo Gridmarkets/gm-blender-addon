@@ -142,7 +142,8 @@ class JobPreset(MetaJobPreset):
                 items = []
 
                 if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                    product = enum_attribute.get_subtype_kwargs().get(api_constants.API_KEYS.APP)
+                    product = enum_attribute.get_subtype_kwargs().get(
+                        api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
 
                     def _get_product_versions(self, context):
                         versions = plugin.get_api_client().get_product_versions(product)
