@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as meta_constants
 from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_attribute_source import \
     ApplicationAttributeSource
 from gridmarkets_blender_addon.meta_plugin.errors.application_attribute_not_found import ApplicationAttributeNotFound
@@ -32,7 +33,7 @@ class BlenderAttributeSource(ApplicationAttributeSource):
         if app != self.APP:
             raise ValueError
 
-        if app_version == '2.80':
+        if app_version == meta_constants.BLENDER_VERSIONS.V_2_80 or app_version == meta_constants.BLENDER_VERSIONS.V_2_81A:
             if key == 'output_format':
                 return bpy.context.scene.render.image_settings.file_format
             elif key == 'frames':
