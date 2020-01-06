@@ -46,7 +46,40 @@ def draw_header(self, context: bpy.types.Context):
 
     row = layout.row()
 
-    draw_header_menus(row, context)
+    menu_row = row.row(align=True)
+    menu_row.alignment = 'LEFT'
+
+    # only show layout menus if signed in
+    if plugin.get_api_client().is_user_signed_in():
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_gm_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
+
+        row = menu_row.row(align=True)
+        row.emboss = 'PULLDOWN_MENU'
+        row.scale_x = 0.9
+        row.operator(GRIDMARKETS_OT_set_layout.bl_idname,
+                     text=GRIDMARKETS_MT_submit_options.bl_label).layout = constants.SUBMISSION_SETTINGS_VALUE
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_project_upload_options.bl_idname)
+
+        column = menu_row.column()
+        column.menu(GRIDMARKETS_MT_project_packing_options.bl_idname)
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_misc_options.bl_idname)
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_help_menu.bl_idname)
+    else:
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_gm_menu.bl_idname,
+                 text='  ' + constants.ADDON_NAME,
+                 icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
+
+        row = menu_row.row(align=True)
+        row.label(text=plugin.get_version().to_string())
+        row.enabled = False
 
     # signed in indicator
     sub = row.row(align=True)
@@ -58,13 +91,12 @@ def draw_header(self, context: bpy.types.Context):
     # right aligned content
     layout.separator_spacer()
 
-    _draw_header_button(layout, constants.REMOTE_PROJECTS_LAYOUT_TUPLE)
-    _draw_header_button(layout, constants.JOB_PRESETS_LAYOUT_TUPLE)
-
-    row = layout.row(align=True)
-    row.alignment = 'RIGHT'
     if signed_in_user:
+        _draw_header_button(layout, constants.REMOTE_PROJECTS_LAYOUT_TUPLE)
+        _draw_header_button(layout, constants.JOB_PRESETS_LAYOUT_TUPLE)
+
+        row = layout.row(align=True)
+        row.alignment = 'RIGHT'
+
         row.label(text=signed_in_user.get_auth_email())
         row.menu(GRIDMARKETS_MT_auth_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_auth_menu.get_icon())
-    else:
-        row.label(text="Not signed in", icon=constants.ICON_ERROR)
