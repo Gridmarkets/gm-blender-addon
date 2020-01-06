@@ -275,8 +275,14 @@
                     <Key>app_version</Key>
                     <DisplayName>Product Version</DisplayName>
                     <Description>The version of the product / app to use.</Description>
-                    <Type>STRING</Type>
-                    <DefaultValue>4.10.02</DefaultValue>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>vray</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
@@ -580,6 +586,7 @@
                 <DisplayName>V-Ray re-map file</DisplayName>
                 <Description>The V-Ray re-map file for the project.</Description>
                 <Type>STRING</Type>
+                <Subtype>FILE_PATH</Subtype>
             </Attribute>
             <Transitions>
                 <Transition>
@@ -596,11 +603,12 @@
                 <DisplayName>V-Ray scene file</DisplayName>
                 <Description>The main .vrscene file for the project.</Description>
                 <Type>STRING</Type>
+                <Subtype>FILE_PATH</Subtype>
             </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_REMAP_FILE</ProjectAttributeId>
-                    <TransitionFormula>.*</TransitionFormula>
+                    <TransitionFormula>(.*)(.vrscene)$</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
