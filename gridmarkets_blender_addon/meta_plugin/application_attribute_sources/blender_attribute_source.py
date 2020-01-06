@@ -33,11 +33,16 @@ class BlenderAttributeSource(ApplicationAttributeSource):
         if app != self.APP:
             raise ValueError
 
+        if key == meta_constants.API_KEYS.APP_VERSION:
+            return app_version
+
         if app_version == meta_constants.BLENDER_VERSIONS.V_2_80 or app_version == meta_constants.BLENDER_VERSIONS.V_2_81A:
-            if key == 'output_format':
+            if key == meta_constants.API_KEYS.OUTPUT_FORMAT:
                 return bpy.context.scene.render.image_settings.file_format
-            elif key == 'frames':
+            elif key == meta_constants.API_KEYS.FRAMES:
                 from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
                 return get_blender_frame_range(bpy.context)
+            elif key == meta_constants.API_KEYS.GPU:
+                return bpy.context.scene.cycles.device == 'GPU'
 
         raise ApplicationAttributeNotFound(app, app_version, key)

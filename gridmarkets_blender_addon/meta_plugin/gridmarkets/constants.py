@@ -42,9 +42,11 @@ class API_KEYS:
     APP = "app"
     APP_VERSION = "app_version"
     PATH = "path"
+    FRAMES = "frames"
     OUTPUT_PREFIX = "output_prefix"
     OUTPUT_FORMAT = "output_format"
     RENDER_ENGINE = "engine"
+    GPU = "gpu"
     PROJECT_TYPE_ID = "project_type_id"
 
 class SUBTYPE_KEYS:

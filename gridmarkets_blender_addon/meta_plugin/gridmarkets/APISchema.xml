@@ -2,9 +2,9 @@
 <APISchema>
 
     <JobDefinitions>
-        <JobDefinition id="BLENDER_CYCLES">
+        <JobDefinition id="BLENDER_2_80_CYCLES">
 
-            <DisplayName>Blender Cycles (2.80)</DisplayName>
+            <DisplayName>Blender Cycles</DisplayName>
 
             <JobAttribute>
                 <Attribute>
@@ -54,6 +54,7 @@
                 </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
@@ -78,6 +79,7 @@
                     <DisplayName>Render File</DisplayName>
                     <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
                     <Type>STRING</Type>
+                    <Subtype>FILE_PATH</Subtype>
                     <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
@@ -109,7 +111,7 @@
                     <DisplayName>Output Prefix</DisplayName>
                     <Description>The prefix to add to render results.</Description>
                     <Type>STRING</Type>
-                    <DefaultValue>GM_</DefaultValue>
+                    <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -240,6 +242,7 @@
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
@@ -436,7 +439,7 @@
                 <Type>NULL</Type>
             </Attribute>
             <Transitions></Transitions>
-            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+            <CompatibleJobDefinitions>BLENDER_2_80_CYCLES</CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_EEVEE_PROJECT">
