@@ -42,6 +42,9 @@ class GRIDMARKETS_UL_job_preset(bpy.types.UIList):
         if job_preset_item.is_locked():
             row.label(text=job_preset_item.get_name(), translate=False, icon=icon[0], icon_value=icon[1])
             row.label(icon=constants.ICON_LOCKED)
+
+            # disable locked job preset list items for an extra visual cue
+            layout.enabled = False
         else:
             row.prop(item, 'name', text='', emboss=False, translate=False, icon=icon[0], icon_value=icon[1])
 
