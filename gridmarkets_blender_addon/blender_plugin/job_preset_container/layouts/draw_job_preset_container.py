@@ -20,12 +20,22 @@
 
 
 def draw_job_preset_container(layout, context):
+    from gridmarkets_blender_addon import constants
+
     from gridmarkets_blender_addon.blender_plugin.job_preset_container.menus.create_new_job_preset import \
         GRIDMARKETS_MT_new_job_preset
     from gridmarkets_blender_addon.blender_plugin.job_preset_container.operators.remove_focused_job_preset import \
         GRIDMARKETS_OT_remove_focused_job_preset
+    from gridmarkets_blender_addon.blender_plugin.job_preset_container.operators.toggle_job_preset_locked_state import \
+        GRIDMARKETS_OT_toggle_job_preset_locked_state
+
     from gridmarkets_blender_addon.blender_plugin.job_preset.list_items.job_preset_list import GRIDMARKETS_UL_job_preset
     from gridmarkets_blender_addon.blender_plugin.job_preset.layouts.draw_job_preset import draw_job_preset
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+    job_preset = job_preset_container.get_focused_item()
+    focued = job_preset is not None
 
     props = context.scene.props
     job_preset_container_props = props.job_preset_container
@@ -38,6 +48,20 @@ def draw_job_preset_container(layout, context):
                          job_preset_container_props, "focused_item",
                          rows=3)
 
-    layout.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname)
+    if focued:
+        locked_icon = constants.ICON_LOCKED if job_preset.is_locked() else constants.ICON_UNLOCKED
+        locked_text = "Unlock" if job_preset.is_locked() else "Lock"
+    else:
+        locked_icon = constants.ICON_NONE
+        locked_text = None
+
+    row = layout.row()
+    row.operator(GRIDMARKETS_OT_toggle_job_preset_locked_state.bl_idname, text=locked_text, icon=locked_icon)
+    row.enabled = focued
+
+    row = layout.row()
+    row.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname)
+    row.enabled = focued
+
     layout.separator()
     draw_job_preset(layout, context)

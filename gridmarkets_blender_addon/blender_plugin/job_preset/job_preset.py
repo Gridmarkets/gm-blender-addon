@@ -32,12 +32,15 @@ class JobPreset(MetaJobPreset):
     FRAME_RANGE_COLLECTION = "_collection"
     FRAME_RANGE_FOCUSED = "_focused"
 
-    def __init__(self, name: str, id: str, job_definition: JobDefinition):
+    def __init__(self, name: str, id: str, job_definition: JobDefinition, is_locked=False):
         self._name = name
         self._id = id
         self._job_definition = job_definition
+
         self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
                                                job_definition.get_attributes()))
+
+        self._is_locked = is_locked
 
         self.register_props()
         self._reset_properties_to_default()

@@ -72,8 +72,64 @@ def unregister():
         unregister_class(cls)
 
 
-def draw_job_preset(layout, context):
-    from gridmarkets_blender_addon import constants
+def _get_columns(layout: bpy.types.UILayout):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    split_factor = 0.3 if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else 0.2
+
+    job_attribute_row = layout.row()
+
+    split = job_attribute_row.split(factor=split_factor)
+
+    temp_col = split.column(align=True)
+    row = temp_col.row(align=True)
+
+    # attribute display name column
+    col1 = row.column(align=True)
+
+    # attribute key column
+    key_column = row.column() if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else None
+
+    temp_col = split.column()
+    row = temp_col.row(align=True)
+    split = row.split(factor=0.8)
+
+    # attribute input column
+    col2 = split.column()
+
+    # attribute inference source column
+    col3 = split.column()
+
+    return col1, col2, col3, key_column
+
+
+def _draw_job_preset_headers(layout: bpy.types.UILayout):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    columns = _get_columns(layout)
+    columns[0].label(text="Attribute Name")
+    columns[0].enabled = False
+
+    columns[1].label(text="Input Field")
+    columns[1].enabled = False
+
+    source_header_row = columns[2].row(align=True)
+    source_header_row_label = source_header_row.row()
+    source_header_row_label.enabled = False
+    source_header_row_label.label(text="Source")
+
+    source_header_row_operator = source_header_row.row()
+    source_header_row_operator.operator(GRIDMARKETS_OT_open_inference_source_help.bl_idname, text="",
+                                        icon=constants.ICON_INFO, emboss=False)
+
+    if plugin.get_user_interface().get_show_hidden_job_preset_attributes():
+        columns[3].label(text="Attribute Key")
+        columns[3].enabled = False
+
+
+def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
     from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import draw_job_preset_attribute
@@ -89,56 +145,19 @@ def draw_job_preset(layout, context):
         job_definition = job_preset.get_job_definition()
         icon = get_icon_for_job_definition(job_definition)
 
-        layout.label(text=job_preset.get_name(), icon=icon[0], icon_value=icon[1])
+        row = layout.row()
+        row.label(text=job_preset.get_name(), icon=icon[0], icon_value=icon[1])
+
+        if job_preset.is_locked():
+            row = row.row()
+            row.alignment = 'RIGHT'
+            row.enabled = False
+            row.label(text="locked", icon=constants.ICON_LOCKED)
 
         box = layout.box()
         col = box.column()
-        split1_factor = 0.3 if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else 0.2
 
-        def _get_columns(parent_layout):
-            job_attribute_row = parent_layout.row()
-
-            split = job_attribute_row.split(factor=split1_factor)
-
-            temp_col = split.column(align=True)
-            row = temp_col.row(align=True)
-
-            # attribute display name column
-            col1 = row.column(align=True)
-
-            # attribute key column
-            key_column = row.column() if plugin.get_user_interface().get_show_hidden_job_preset_attributes() else None
-
-            temp_col = split.column()
-            row = temp_col.row(align=True)
-            split = row.split(factor=0.8)
-
-            # attribute input column
-            col2 = split.column()
-
-            # attribute inference source column
-            col3 = split.column()
-
-            return col1, col2, col3, key_column
-
-        columns = _get_columns(col)
-        columns[0].label(text="Attribute Name")
-        columns[0].enabled = False
-
-        columns[1].label(text="Input Field")
-        columns[1].enabled = False
-
-        source_header_row = columns[2].row(align=True)
-        source_header_row_label = source_header_row.row()
-        source_header_row_label.enabled = False
-        source_header_row_label.label(text="Source")
-
-        source_header_row_operator = source_header_row.row()
-        source_header_row_operator.operator(GRIDMARKETS_OT_open_inference_source_help.bl_idname, text="", icon=constants.ICON_INFO, emboss=False)
-
-        if plugin.get_user_interface().get_show_hidden_job_preset_attributes():
-            columns[3].label(text="Attribute Key")
-            columns[3].enabled = False
+        _draw_job_preset_headers(col)
 
         col.separator()
 
@@ -163,6 +182,7 @@ def draw_job_preset(layout, context):
                         continue
 
             columns = _get_columns(col)
+
             draw_job_preset_attribute(layout, context, job_preset_attribute, columns[0], columns[3], columns[1], columns[2])
 
         col.separator()

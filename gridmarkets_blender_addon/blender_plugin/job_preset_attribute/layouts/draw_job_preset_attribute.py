@@ -34,6 +34,7 @@ def draw_job_preset_attribute(layout, context, job_preset_attribute: JobPresetAt
     props = scene.props
 
     job_preset = job_preset_attribute.get_parent_preset()
+    is_locked = job_preset.is_locked()
     job_attribute = job_preset_attribute.get_job_attribute()
 
     job_preset_props = getattr(scene, job_preset.get_id())
@@ -76,3 +77,8 @@ def draw_job_preset_attribute(layout, context, job_preset_attribute: JobPresetAt
     col3.alignment="EXPAND"
     col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_preset_attribute.get_key(), text="")
     col3.enabled = len(job_attribute.get_inference_sources()) > 1
+
+    # disable input and inference source drop down if job preset is locked
+    if is_locked:
+        input_row.enabled = False
+        col3.enabled = False

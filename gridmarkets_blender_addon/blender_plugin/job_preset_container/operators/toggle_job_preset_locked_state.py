@@ -19,33 +19,31 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-from gridmarkets_blender_addon.blender_plugin.log_item.property_groups.log_item_props import LogItemProps
-from gridmarkets_blender_addon import constants
 
-class GRIDMARKETS_UL_job_preset(bpy.types.UIList):
-    bl_idname = "GRIDMARKETS_UL_job_preset"
 
-    def draw_item(self, context, layout, data, item: LogItemProps, icon, active_data, active_property, index=0,
-                  flt_flag=0):
+class GRIDMARKETS_OT_toggle_job_preset_locked_state(bpy.types.Operator):
+    bl_idname = "gridmarkets.toggle_job_preset_locked_state"
+    bl_label = "Toggle job Preset locked state"
+    bl_description = "Toggles the lock on a job preset"
+    bl_options = {"REGISTER", "UNDO"}
 
-        from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
+    def execute(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        from gridmarkets_blender_addon import utils_blender
 
         plugin = PluginFetcher.get_plugin()
-        job_preset_item = plugin.get_preferences_container().get_job_preset_container().get_at(index)
-        job_definition = job_preset_item.get_job_definition()
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+        job_preset = job_preset_container.get_focused_item()
 
-        row = layout.row()
+        if job_preset is not None:
+            job_preset.toggle_locked_state()
+            utils_blender.force_redraw_addon()
 
-        icon = get_icon_for_job_definition(job_definition)
-        row.prop(item, 'name', text='', emboss=False, translate=False, icon=icon[0], icon_value=icon[1])
-
-        if job_preset_item.is_locked():
-            row.label(icon=constants.ICON_LOCKED)
+        return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_UL_job_preset,
+    GRIDMARKETS_OT_toggle_job_preset_locked_state,
 )
 
 

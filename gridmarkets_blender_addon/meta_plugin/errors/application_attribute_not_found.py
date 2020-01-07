@@ -24,4 +24,4 @@ from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginErro
 class ApplicationAttributeNotFound(PluginError):
 
     def __init__(self, app: str, app_version: str, key: str):
-        PluginError.__init__(self, "Could not find attribute '" + key + "' for app '" + app + " (" + app_version + ")'")
+        PluginError.__init__(self, "Could not find attribute '" + str(key) + "' for app '" + str(app) + " (" + str(app_version) + ")'")

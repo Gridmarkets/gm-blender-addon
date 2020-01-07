@@ -26,13 +26,15 @@ from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPreset
 
 class JobPreset:
 
-    def __init__(self, name: str, id: str, job_definition: JobDefinition):
+    def __init__(self, name: str, id: str, job_definition: JobDefinition, is_locked: bool = False):
         self._name = name
         self._id = id
         self._job_definition = job_definition
 
         self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
                                                job_definition.get_attributes()))
+
+        self._is_locked = is_locked
 
     def get_name(self) -> str:
         return self._name
@@ -63,6 +65,14 @@ class JobPreset:
 
         raise ValueError("No JobPresetAttribute with that id.")
 
+    def is_locked(self) -> bool:
+        return self._is_locked
+
+    def set_locked_state(self, is_locked: bool) -> None:
+        self._is_locked = is_locked
+
+    def toggle_locked_state(self) -> None:
+        self._is_locked = not self._is_locked
 
     """
     @abstractmethod
