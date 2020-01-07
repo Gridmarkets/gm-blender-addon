@@ -153,6 +153,34 @@ def register_schema(api_client):
             bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes))
 
 
+def add_default_job_preset():
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    def add_default_job_preset(job_definition_id, name, id):
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+        # do not add if already added
+        job_presets = job_preset_container.get_all()
+        for job_preset in job_presets:
+            if job_preset.get_id() == id:
+                return
+
+        job_definitions = plugin.get_api_client().get_api_schema().get_job_definitions()
+        for job_definition in job_definitions:
+            if job_definition.get_definition_id() == job_definition_id:
+                job_preset_container.append(JobPreset(name,
+                                                      id,
+                                                      job_definition,
+                                                      is_locked=True))
+
+    # add default job presets
+    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_80_CYCLES,
+                           "Use Blender's current Settings", 'default_01')
+
+
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_idname = constants.OPERATOR_OPEN_ADDON_ID_NAME
     bl_label = constants.OPERATOR_OPEN_ADDON_LABEL
@@ -244,6 +272,7 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
                 bpy.ops.gridmarkets.sign_in_new_user({"screen": screen, "window": window}, "INVOKE_DEFAULT")
 
         register_schema(api_client)
+        add_default_job_preset()
 
         return {"FINISHED"}
 
