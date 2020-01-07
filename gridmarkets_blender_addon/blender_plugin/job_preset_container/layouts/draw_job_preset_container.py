@@ -61,7 +61,7 @@ def draw_job_preset_container(layout, context):
 
     row = layout.row()
     row.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname)
-    row.enabled = focued
+    row.enabled = focued and not job_preset.is_locked()
 
     layout.separator()
     draw_job_preset(layout, context)
