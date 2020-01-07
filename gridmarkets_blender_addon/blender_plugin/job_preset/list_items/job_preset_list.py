@@ -38,10 +38,13 @@ class GRIDMARKETS_UL_job_preset(bpy.types.UIList):
         row = layout.row()
 
         icon = get_icon_for_job_definition(job_definition)
-        row.prop(item, 'name', text='', emboss=False, translate=False, icon=icon[0], icon_value=icon[1])
 
         if job_preset_item.is_locked():
+            row.label(text=job_preset_item.get_name(), translate=False, icon=icon[0], icon_value=icon[1])
             row.label(icon=constants.ICON_LOCKED)
+        else:
+            row.prop(item, 'name', text='', emboss=False, translate=False, icon=icon[0], icon_value=icon[1])
+
 
 
 classes = (
