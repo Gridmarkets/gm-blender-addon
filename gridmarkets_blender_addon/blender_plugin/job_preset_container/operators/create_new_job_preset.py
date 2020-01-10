@@ -49,13 +49,10 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
         for job_definition in job_definitions:
             if job_definition.get_definition_id() == self.job_definition_id:
                 job_preset_container = plugin.get_preferences_container().get_job_preset_container()
-
                 job_preset_items = bpy.context.scene.props.job_preset_container.items
-
-                job_preset_id = JobPreset.JOB_PRESET_ID_PREFIX + str(utils.get_unique_id(job_preset_items))
                 name = utils.create_unique_object_name(job_preset_items, name_prefix=(
                             job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_'))
-                job_preset = JobPreset(name, job_preset_id, job_definition)
+                job_preset = JobPreset(name, job_definition)
 
                 job_preset_container.append(job_preset)
                 return {'FINISHED'}

@@ -154,12 +154,11 @@ def register_schema(api_client):
 
 
 def add_default_job_preset():
-    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
 
-    def add_default_job_preset(job_definition_id, name, id):
+    def add_default_job_preset(job_definition_id: str, name: str):
         job_preset_container = plugin.get_preferences_container().get_job_preset_container()
 
         # do not add if already added
@@ -171,14 +170,11 @@ def add_default_job_preset():
         job_definitions = plugin.get_api_client().get_api_schema().get_job_definitions()
         for job_definition in job_definitions:
             if job_definition.get_definition_id() == job_definition_id:
-                job_preset_container.append(JobPreset(name,
-                                                      id,
-                                                      job_definition,
-                                                      is_locked=True))
+
+                job_preset_container.append(JobPreset(name, job_definition, is_locked=True))
 
     # add default job presets
-    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_80_CYCLES,
-                           "Use Blender's current Settings", 'default_01')
+    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_80_CYCLES, "Use Blender's current Settings")
 
 
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
