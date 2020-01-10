@@ -439,7 +439,9 @@
                 <Type>NULL</Type>
             </Attribute>
             <Transitions></Transitions>
-            <CompatibleJobDefinitions>BLENDER_2_80_CYCLES</CompatibleJobDefinitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>BLENDER_2_80_CYCLES</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_80_EEVEE_PROJECT">
@@ -590,7 +592,9 @@
                 <Type>NULL</Type>
             </Attribute>
             <Transitions></Transitions>
-            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>VRAY</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_REMAP_FILE">

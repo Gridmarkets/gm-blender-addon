@@ -137,6 +137,7 @@ TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
 ATTRIBUTE_ID = "id"
 TAG_TRANSITION_FORMULA = "TransitionFormula"
 TAG_COMPATIBLE_JOB_DEFINITIONS = "CompatibleJobDefinitions"
+TAG_COMPATIBLE_JOB_DEFINITION = "CompatibleJobDefinition"
 TAG_JOB_DEFINITION_ID = "JobDefinitionId"
 TAG_MAX_LENGTH = "MaxLength"
 TAG_MIN_LENGTH = "MinLength"
@@ -331,7 +332,7 @@ class XMLAPISchemaParser:
         # instantiate the output list
         compatible_job_definitions = []
 
-        job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element, TAG_JOB_DEFINITION_ID,
+        job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element, TAG_COMPATIBLE_JOB_DEFINITION,
                                                        False)
 
         for job_definition_id in job_definition_ids:
