@@ -19,6 +19,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
+import typing
+
 from bpy.app.handlers import persistent
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
@@ -96,16 +99,68 @@ def get_job_options(scene, context):
     job_presets = plugin.get_preferences_container().get_job_preset_container().get_all()
     job_preset_container = plugin.get_preferences_container().get_job_preset_container()
 
-    job_options = [
-
-    ]
+    job_options = []
 
     # iterate through uploaded job presets and add them as options
     for i, job_preset in enumerate(job_presets):
         index = job_preset_container.get_index(job_preset)
-        job_options.append((str(index), job_preset.get_name(), '', constants.ICON_JOB, i))
+        job_options.append((str(index),
+                            job_preset.get_name(),
+                            '',
+                            constants.ICON_JOB,
+                            job_preset.get_id_number()))
 
     return job_options
+
+
+def get_selected_job_option(context: bpy.types.Context) -> typing.Optional['JobPreset']:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+    job_preset_options = get_job_options(context.scene, context)
+    if job_preset_options:
+        job_preset_option = job_preset_container.get_at(int(context.scene.props.job_options))
+    else:
+        job_preset_option = None
+
+    return job_preset_option
+
+
+def _job_options_getter(self):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin_if_initialised()
+
+    # if the plugin is not initialised then return 0
+    if plugin is None:
+        return 0
+
+
+    # if there are no valid job preset options return 0
+    job_preset_options = get_job_options(bpy.context.scene, bpy.context)
+    if len(job_preset_options) == 0:
+        return 0
+
+    default_option = job_preset_options[0][4]
+
+    # if the value has not yet been set, return default_option
+    try:
+        index = self['job_option']
+    except KeyError:
+        return default_option
+
+    for job_preset_option in job_preset_options:
+        if job_preset_option[4] == index:
+            break
+    else:
+        print(job_preset_options[0])
+        return default_option
+
+    return index
+
+
+def _job_options_setter(self, value):
+    self['job_option'] = value
 
 
 def _get_tab_items(scene, context):
@@ -207,8 +262,8 @@ class GRIDMARKETS_PROPS_Addon_Properties(bpy.types.PropertyGroup):
         name="Job",
         description="The list of possible jobs to use on submit",
         items=get_job_options,
-        #get=_job_options_getter,
-        #set=_job_options_setter
+        get=_job_options_getter,
+        set=_job_options_setter
     )
 
     tab_options: bpy.props.EnumProperty(
