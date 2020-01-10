@@ -229,6 +229,22 @@ class GridMarketsAPIClient(MetaAPIClient):
         return sorted(self._product_resolver.get_value().get(product, {}).get("versions", []),
                       key=lambda s: s.casefold(),reverse=True)
 
+    def get_closest_matching_product_version(self, product: str, product_version: str, ignore_cache: bool = False) -> typing.Optional[str]:
+        product_versions = self.get_product_versions(product, ignore_cache=ignore_cache)
+
+        if not len(product_versions):
+            return None
+
+        # first check to see if the provided version exactly matches a version option
+        for version_option in product_versions:
+            if version_option == product_version:
+                return version_option
+
+        # if not then we are down to heuristics
+        import difflib
+        return difflib.get_close_matches(product_version, product_versions)[0]
+
+
     def get_remote_project_files(self, project_name: str):
         import requests
         r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
@@ -242,20 +258,3 @@ class GridMarketsAPIClient(MetaAPIClient):
         json = r.json()
         available_credits = json.get('credits_available', 0)
         return available_credits
-
-    @staticmethod
-    def get_closest_matching_product_version(product_version: str,
-                                             product: str,
-                                             product_versions: typing.List[str]) -> typing.Optional[str]:
-
-        if not len(product_versions):
-            return None
-
-        # first check to see if the provided version exactly matches a version option
-        for version_option in product_versions:
-            if version_option == product_version:
-                return version_option
-
-        # if not then we are down to heuristics
-        import difflib
-        return difflib.get_close_matches(product_version, product_versions)[0]

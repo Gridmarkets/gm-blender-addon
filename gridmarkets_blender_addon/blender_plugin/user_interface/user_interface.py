@@ -187,11 +187,9 @@ class UserInterface(MetaUserInterface):
         plugin = PluginFetcher.get_plugin()
         api_schema = plugin.get_api_client().get_api_schema()
 
-        product_versions = plugin.get_api_client().get_product_versions(api_constants.PRODUCTS.BLENDER)
-
         # attempt to reset the product version to the closest matching version
         # only do for blender versions
-        value = utils_blender.get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, product_versions)
+        value = utils_blender.get_closest_matching_product_version()
         if value is not None:
             blender_versions_attribute = api_schema.get_project_attribute_with_id(api_constants.BLENDER_VERSIONS_ENUM_ID)
             set_project_attribute_value(blender_versions_attribute, value)
