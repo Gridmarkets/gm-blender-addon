@@ -18,11 +18,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
+
 import re
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon import utils
 
 
 class JobPreset(MetaJobPreset):
@@ -226,55 +229,8 @@ class JobPreset(MetaJobPreset):
         import bpy
         return getattr(bpy.context.scene, self.get_id())
 
-    """
-    def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None):
-        from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
-
-        inference_source = self.get_attribute_active_inference_source(job_attribute)
-
-        attribute = job_attribute.get_attribute()
-        job_preset_properties = self.get_property_group()
-
-        if inference_source == InferenceSource.get_application_inference_source():
-            from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-
-            plugin = PluginFetcher.get_plugin()
-            application_pool_attribute_source = plugin.get_application_pool_attribute_source()
-
-            job_definition = self.get_job_definition()
-
-            # app and app_version are two attributes which can not be application defined so there is no risk of
-            # infinite recursion.
-            app = self.get_attribute_value(job_definition.get_attribute_with_key('app'), project_source = project_source)
-            version = self.get_attribute_value(job_definition.get_attribute_with_key('app_version'), project_source = project_source)
-            key = job_attribute.get_attribute().get_key()
-
-            return application_pool_attribute_source.get_attribute_value(app, version, key)
-        elif inference_source == InferenceSource.get_constant_inference_source():
-            return attribute.get_default_value()
-        elif inference_source == InferenceSource.get_project_inference_source():
-            if project_source is None:
-                raise ValueError("Must provide project source for attribute '" + attribute.get_display_name() + "'")
-
-            return project_source.get_attribute(attribute.get_key())
-        elif inference_source == InferenceSource.get_user_defined_inference_source():
-            return get_value(job_preset_properties, job_attribute.get_attribute())
-        else:
-            raise ValueError("Unknown inference source: " + str(inference_source))
-
-    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> InferenceSource:
-        job_preset_properties = self.get_property_group()
-        inference_source_id = getattr(job_preset_properties,
-                                      self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key())
-        return InferenceSource.get_inference_source(inference_source_id)
-
-    def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
-                                              inference_source: InferenceSource) -> None:
-        job_preset_properties = self.get_property_group()
-        setattr(job_preset_properties,
-                self.INFERENCE_SOURCE_KEY + job_attribute.get_attribute().get_key(),
-                inference_source.get_id())
-    """
+    def get_id_number(self) -> int:
+        return self._id_number
 
 
 from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.job_preset_attribute import JobPresetAttribute
