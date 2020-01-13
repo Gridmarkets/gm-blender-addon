@@ -104,7 +104,8 @@ def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Cont
 
     # get the selected job preset option
     if get_job_options(context.scene, context):
-        job_preset_option = job_preset_container.get_at(int(context.scene.props.job_options))
+        job_preset_id = context.scene.props.job_options
+        job_preset_option = job_preset_container.get_with_id(job_preset_id)
     else:
         job_preset_option = None
 
@@ -137,14 +138,12 @@ def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Cont
     job_preset_box = col.box().row(align=True)
 
     if job_preset_option:
-        job_preset_index = job_preset_container.get_index(job_preset_option)
-
         row2 = job_preset_box.row()
         row2.prop(props, "job_options", text="")
         row3 = row2.row()
         row3.alignment = 'RIGHT'
         row3.operator(GRIDMARKETS_OT_set_focused_job_preset.bl_idname, text="",
-                      icon=constants.ICON_HIDE_OFF).job_preset_index = job_preset_index
+                      icon=constants.ICON_HIDE_OFF).job_preset_index = job_preset_container.get_index(job_preset_option)
     else:
         row2 = job_preset_box.row(align=True)
         row2.label(text="You have not created any Job Presets to choose from.", icon=constants.ICON_ERROR)

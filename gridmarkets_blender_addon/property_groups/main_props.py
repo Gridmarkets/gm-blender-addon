@@ -75,20 +75,12 @@ def _get_project_options(scene, context):
             else:
                 icon = constants.ICON_PROJECT
 
-            # if render engine set to V-Ray only return VRay projects
-            if context.scene.render.engine == constants.VRAY_RENDER_RT and project_product == api_constants.PRODUCTS.VRAY:
-                append = True
-            elif context.scene.render.engine != constants.VRAY_RENDER_RT and project_product != api_constants.PRODUCTS.VRAY:
-                # otherwise only return blender projects
-                append = True
-            else:
-                append = False
-
-            if append:
-                project_options.append(
-                    (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
+            project_options.append(
+                (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
 
     return project_options
+
+
 
 
 def get_job_options(scene, context):
@@ -101,23 +93,22 @@ def get_job_options(scene, context):
     job_presets = job_preset_container.get_all()
 
     compatible_job_definitions = utils_blender.get_matching_job_definitions()
-    job_options = []
+    compatible_job_definitions_ids = list(map(lambda x: x.get_definition_id(), compatible_job_definitions))
+
+    _job_options = []
 
     # iterate through uploaded job presets and add them as options
     for i, job_preset in enumerate(job_presets):
 
         # only return job presets deriving from a compatible job definition
-        if job_preset.get_job_definition() not in compatible_job_definitions:
+        if job_preset.get_job_definition().get_definition_id() not in compatible_job_definitions_ids:
             continue
 
-        index = job_preset_container.get_index(job_preset)
-        job_options.append((str(index),
-                            job_preset.get_name(),
-                            '',
-                            constants.ICON_JOB,
-                            job_preset.get_id_number()))
+        value = job_preset.get_id()
+        job_preset_option_tuple = (value, job_preset.get_name(), '', constants.ICON_JOB, job_preset.get_id_number())
+        _job_options.append(job_preset_option_tuple)
 
-    return job_options
+    return _job_options
 
 
 def get_selected_job_option(context: bpy.types.Context) -> typing.Optional['JobPreset']:
@@ -127,7 +118,7 @@ def get_selected_job_option(context: bpy.types.Context) -> typing.Optional['JobP
 
     job_preset_options = get_job_options(context.scene, context)
     if job_preset_options:
-        job_preset_option = job_preset_container.get_at(int(context.scene.props.job_options))
+        job_preset_option = job_preset_container.get_with_id(context.scene.props.job_options)
     else:
         job_preset_option = None
 
@@ -142,9 +133,8 @@ def _job_options_getter(self):
     if plugin is None:
         return 0
 
-
     # if there are no valid job preset options return 0
-    job_preset_options = get_job_options(bpy.context.scene, bpy.context)
+    job_preset_options = get_job_options(None, None)
     if len(job_preset_options) == 0:
         return 0
 
@@ -156,11 +146,11 @@ def _job_options_getter(self):
     except KeyError:
         return default_option
 
+    # check that index refers to a job preset option
     for job_preset_option in job_preset_options:
         if job_preset_option[4] == index:
             break
     else:
-        print(job_preset_options[0])
         return default_option
 
     return index

@@ -832,7 +832,7 @@ def get_submission_project_type_id():
         return remote_project.get_attribute(api_constants.API_KEYS.PROJECT_TYPE_ID)
 
 
-def get_matching_job_definitions():
+def get_matching_job_definitions() -> typing.List['JobDefinition']:
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     api_schema = plugin.get_api_client().get_api_schema()

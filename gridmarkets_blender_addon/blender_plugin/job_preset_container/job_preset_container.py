@@ -74,3 +74,12 @@ class JobPresetContainer(MetaJobPresetContainer, ListContainer[JobPreset]):
             utils_blender.force_redraw_addon()
 
         MetaJobPresetContainer.remove(self, item)
+
+    def get_with_id(self, id: str):
+        job_presets = self.get_all()
+
+        for job_preset in job_presets:
+            if job_preset.get_id() == id:
+                return job_preset
+
+        raise ValueError("no job preset with id: " + id)
