@@ -44,7 +44,7 @@ def convert_packed_project(packed_project: PackedProject) -> RemoteProject:
 
         if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
             #update the file path attribute
-            value = str(pathlib.Path('/') / root_dir / packed_project.get_relative_file_path(pathlib.Path(value)))
+            value = (pathlib.Path('/') / root_dir / packed_project.get_relative_file_path(pathlib.Path(value))).as_posix()
             packed_project.set_attribute(attribute.get_key(), value)
 
         project_attribute = project_attribute.transition(value)

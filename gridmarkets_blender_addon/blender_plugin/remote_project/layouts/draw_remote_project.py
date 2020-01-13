@@ -51,7 +51,7 @@ def draw_remote_project(layout: bpy.types.UILayout, context: bpy.types.Context):
         col2.label(text="")
         for file in list(remote_project.get_files()):
             col1.label(text="")
-            col2.label(text=str(file))
+            col2.label(text=file.as_posix())
 
         row = box.row()
         split = row.split(factor=0.2)
