@@ -72,7 +72,9 @@ class APIClient(ABC, PluginAccessor):
         raise NotImplementedError
 
     def get_signed_in_user(self) -> typing.Optional[User]:
-        return self._signed_in_user
+        if self.is_user_signed_in():
+            return self._signed_in_user
+        return None
 
     @abstractmethod
     def get_api_schema(self) -> APISchema:
