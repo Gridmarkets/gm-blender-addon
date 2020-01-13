@@ -87,6 +87,7 @@ def get_job_options(scene, context):
     """ Returns a list of items representing project options """
 
     from gridmarkets_blender_addon import utils_blender
+    from gridmarkets_blender_addon.blender_plugin.job_definition import get_blender_icon_for_job_definition
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     job_preset_container = plugin.get_preferences_container().get_job_preset_container()
@@ -105,7 +106,14 @@ def get_job_options(scene, context):
             continue
 
         value = job_preset.get_id()
-        job_preset_option_tuple = (value, job_preset.get_name(), '', constants.ICON_JOB, job_preset.get_id_number())
+        icon = get_blender_icon_for_job_definition(job_preset.get_job_definition())
+
+        job_preset_option_tuple = (value,
+                                   job_preset.get_name(),
+                                   '',
+                                   icon,
+                                   job_preset.get_id_number())
+
         _job_options.append(job_preset_option_tuple)
 
     return _job_options

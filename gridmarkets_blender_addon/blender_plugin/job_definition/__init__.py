@@ -18,12 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'get_icon_for_job_definition'
+__all__ = 'get_blender_icon_tuple_for_job_definition', 'get_blender_icon_for_job_definition'
 
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 
 
-def get_icon_for_job_definition(job_definition: JobDefinition) -> (str, int):
+# todo add to job definition sub class
+def get_blender_icon_tuple_for_job_definition(job_definition: JobDefinition) -> (str, int):
     """ Gets the icon and icon_value values for a JobDefinition """
     from gridmarkets_blender_addon import constants, icon_loader
     from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
@@ -45,3 +46,14 @@ def get_icon_for_job_definition(job_definition: JobDefinition) -> (str, int):
             icon = constants.ICON_BLANK
 
     return icon ,icon_value
+
+
+def get_blender_icon_for_job_definition(job_definition: JobDefinition) -> str or int:
+    icon_tuple = get_blender_icon_tuple_for_job_definition(job_definition)
+
+    # if a custom icon has been returned use that
+    if icon_tuple[1] > 0:
+        return icon_tuple[1]
+
+    # otherwise use the native blender icon
+    return icon_tuple[0]

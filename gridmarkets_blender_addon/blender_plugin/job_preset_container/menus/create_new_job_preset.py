@@ -29,7 +29,7 @@ class GRIDMARKETS_MT_new_job_preset(bpy.types.Menu):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.blender_plugin.job_preset_container.operators.create_new_job_preset import \
             GRIDMARKETS_OT_create_new_job_preset
-        from gridmarkets_blender_addon.blender_plugin.job_definition import get_icon_for_job_definition
+        from gridmarkets_blender_addon.blender_plugin.job_definition import get_blender_icon_tuple_for_job_definition
 
         layout = self.layout
         plugin = PluginFetcher.get_plugin()
@@ -38,7 +38,7 @@ class GRIDMARKETS_MT_new_job_preset(bpy.types.Menu):
         job_definitions = api_schema.get_job_definitions()
 
         for job_definition in job_definitions:
-            icon = get_icon_for_job_definition(job_definition)
+            icon = get_blender_icon_tuple_for_job_definition(job_definition)
 
             op = layout.operator(GRIDMARKETS_OT_create_new_job_preset.bl_idname, text=job_definition.get_display_name(),
                                  icon=icon[0], icon_value=icon[1])
