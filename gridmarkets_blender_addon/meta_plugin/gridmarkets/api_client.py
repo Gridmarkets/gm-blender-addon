@@ -67,6 +67,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def __init__(self, logging_coordinator: LoggingCoordinator):
         MetaAPIClient.__init__(self)
+        self._signed_in: bool = False
         self._envoy_client: typing.Optional[EnvoyClient] = None
         self._api_schema = XMLAPISchemaParser.parse()
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
@@ -101,15 +102,17 @@ class GridMarketsAPIClient(MetaAPIClient):
         # refresh caches
         self.clear_all_caches()
         self.get_root_directories(ignore_cache=True)
+        self._signed_in = True
 
     def sign_out(self) -> None:
         if self.is_user_signed_in():
             self._log.info("Signing out user " + self.get_signed_in_user().get_auth_email())
 
         MetaAPIClient.sign_out(self)
+        self._signed_in = False
 
     def is_user_signed_in(self) -> bool:
-        return MetaAPIClient.is_user_signed_in(self)
+        return self._signed_in
 
     def connected(self) -> bool:
         raise NotImplementedError
