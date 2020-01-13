@@ -608,7 +608,7 @@
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_PROJECT</ProjectAttributeId>
-                    <TransitionFormula>.*</TransitionFormula>
+                    <TransitionFormula>(.*)(.remap)$</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
