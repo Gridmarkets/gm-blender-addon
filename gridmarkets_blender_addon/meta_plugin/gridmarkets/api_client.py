@@ -23,6 +23,7 @@ import typing
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAPIClient
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
+from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
@@ -36,7 +37,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.api_error import APIError
 from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
-from gridmarkets import EnvoyClient, Project as GMProject
+import gridmarkets
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
 
 
@@ -68,7 +69,7 @@ class GridMarketsAPIClient(MetaAPIClient):
     def __init__(self, logging_coordinator: LoggingCoordinator):
         MetaAPIClient.__init__(self)
         self._signed_in: bool = False
-        self._envoy_client: typing.Optional[EnvoyClient] = None
+        self._envoy_client: typing.Optional[gridmarkets.EnvoyClient] = None
         self._api_schema = XMLAPISchemaParser.parse()
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
 
@@ -97,7 +98,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         except InvalidUserError as e:
             raise e
 
-        self._envoy_client = EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
+        self._envoy_client = gridmarkets.EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
 
         # refresh caches
         self.clear_all_caches()
@@ -134,7 +135,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         if has_email and has_key:
             try:
-                client = EnvoyClient(email=auth_email, access_key=auth_access_key)
+                client = gridmarkets.EnvoyClient(email=auth_email, access_key=auth_access_key)
                 client.validate_auth()
             except AuthenticationError as e:
                 raise InvalidUserError(message=e.user_message)
@@ -172,7 +173,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         project_dir = str(packed_project.get_root_dir())
         project_name = packed_project.get_name()
 
-        gm_project = GMProject(project_dir, project_name)
+        gm_project = gridmarkets.Project(project_dir, project_name)
 
         if upload_root_dir:
             # add all files to packed project files list
@@ -196,6 +197,38 @@ class GridMarketsAPIClient(MetaAPIClient):
         # Todo - remove imports from blender add-on module
         from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
         return convert_packed_project(packed_project)
+
+    def submit_to_remote_project(self, remote_project: RemoteProject, job_preset: JobPreset) -> None:
+        # Todo - remove blender plugin imports
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        if not self.is_user_signed_in():
+            raise NotSignedInError("Must be signed-in to Submit a job.")
+
+        self._log.info("Preparing job " + job_preset.get_name() + " for submission to remote project " + remote_project.get_name())
+
+        client = self._envoy_client
+        project = gridmarkets.Project(str(remote_project.get_root_dir()), remote_project.get_name())
+
+        self._log.info("Calculating Job parameters...")
+        job_settings = {}
+        for job_preset_attribute in job_preset.get_job_preset_attributes():
+            key = job_preset_attribute.get_key()
+            value = job_preset_attribute.eval(plugin, remote_project)
+            job_settings[key] = value
+            self._log.info("Job Parameter '" + key + "': " + str(value))
+
+        job = gridmarkets.Job(**job_settings)
+
+        # add job to project
+        project.add_jobs(job)
+
+        # submit the job to the remote project
+        self._log.info("Submitting job " + job_preset.get_name() + " to existing remote project " + remote_project.get_name())
+        client.submit_project(project, skip_upload=True)
+
+        self._log.info("Job submitted - See Render Manager for details")
 
     def get_cached_root_directories(self) -> typing.List[str]:
         return self._cache_projects.get_value()

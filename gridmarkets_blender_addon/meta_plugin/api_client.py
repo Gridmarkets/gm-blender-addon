@@ -25,6 +25,7 @@ from gridmarkets_blender_addon.meta_plugin.user import User
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
+from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
@@ -99,10 +100,11 @@ class APIClient(ABC, PluginAccessor):
                            jobs: typing.List[JobPreset],
                            delete_local_files_after_upload: bool = False) -> RemoteProject:
         raise NotImplemented
+    """
     
     @abstractmethod
     def submit_to_remote_project(self,
-                                 project, RemoteProject
-                                 job: Job) -> RemoteProject:
+                                 remote_project: RemoteProject,
+                                 job_preset: JobPreset) -> None:
         raise NotImplemented
-    """
+

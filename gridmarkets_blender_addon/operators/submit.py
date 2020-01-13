@@ -24,6 +24,7 @@ from queue import Queue, Empty
 
 from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
 from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_project import GRIDMARKETS_OT_upload_project
 
 
 class GRIDMARKETS_OT_Submit(bpy.types.Operator):
@@ -116,50 +117,59 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         else:
             return self.execute(context)
 
+    def submit_new_project(self, context):
+        pass
+
+    def submit_to_existing_project(self, context):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
+        self.remote_project_container = plugin.get_remote_project_container()
+        self.user_interface = plugin.get_user_interface()
+
+        # get the remote project
+        props = context.scene.props
+        remote_project_container = plugin.get_remote_project_container()
+        remote_project = remote_project_container.get_project_with_id(props.project_options)
+
+        # get the job preset
+        from gridmarkets_blender_addon.property_groups.main_props import get_selected_job_option
+        job_preset = get_selected_job_option(context)
+
+        if job_preset is None:
+            raise ValueError("No Job Preset option selected for submission")
+
+        args = (
+            remote_project,
+            job_preset
+        )
+
+        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
+                                                                 context,
+                                                                 GRIDMARKETS_OT_Submit._submit_to_existing_project,
+                                                                 args,
+                                                                 {},
+                                                                 "Submitting project...")
+
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         props = context.scene.props
-        self.remote_project_container = plugin.get_remote_project_container()
-        self.user_interface = plugin.get_user_interface()
 
-        wm = context.window_manager
-        self.bucket = Queue()
-        self.thread = ExcThread(self.bucket, self._execute,
-                                args=(props.project_options, self.project_name), kwargs={})
-
-        # summary view can not be open when submitting otherwise crash (since submitting blender scenes still accesses
-        # the context)
-        props.submission_summary_open = False
-        self.thread.start()
-
-        self.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-
-        self.user_interface.set_is_running_operation_flag(True)
-        self.user_interface.set_running_operation_message("Submitting project...")
-        return {'RUNNING_MODAL'}
+        if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            return self.submit_new_project(context)
+        else:
+            return self.submit_to_existing_project(context)
 
     @staticmethod
-    def _execute(selected_project_option, project_name: str):
+    def _submit_to_existing_project(remote_project, job_preset):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-        from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
-
         plugin = PluginFetcher.get_plugin()
+
         api_client = plugin.get_api_client()
 
-        if selected_project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
-            temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
-
-            packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
-            return api_client.submit_new_blender_project(packed_project)
-        else:
-            remote_project_container = plugin.get_remote_project_container()
-            remote_project = remote_project_container.get_project_with_id(selected_project_option)
-            api_client.submit_existing_blender_project(remote_project)
-            return None
+        api_client.submit_to_remote_project(remote_project, job_preset)
+        return None
 
 
 
