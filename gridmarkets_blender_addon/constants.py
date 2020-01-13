@@ -107,7 +107,7 @@ SUPPORT_EMAIL = "support@gridmarkets.com"
 
 # relative paths in blender start with a double /
 DEFAULT_OUTPUT_PATH = "//gm_results\\"
-
+DEFAULT_JOB_PRESET_NAME = "Use Blender's current Settings"
 DEFAULT_WINDOW_WIDTH = 1000
 DEFAULT_WINDOW_HIEGHT = 550
 
