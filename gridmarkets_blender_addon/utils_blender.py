@@ -797,6 +797,24 @@ def draw_render_engine_warning_popup(self, context):
         self.layout.label(text='• ' + get_user_friendly_name_for_engine(engine))
 
 
+def get_current_scene_project_attributes(context):
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_client = plugin.get_api_client()
+    application_pool = plugin.get_application_pool_attribute_source()
+
+    project_name = ""
+    if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+        product = api_constants.PRODUCTS.VRAY
+        product_version = api_client.get_product_versions(product)[0]
+    else:
+        product = api_constants.PRODUCTS.BLENDER
+        product_version = get_closest_matching_product_version()
+
+    return application_pool.get_project_attribute_values(project_name, product, product_version)
+
+
 def get_submission_project_type_id():
     from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -806,7 +824,7 @@ def get_submission_project_type_id():
     project_option = context.scene.props.project_options
 
     if project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
-        project_attributes = get_project_attributes(force_transition=True)
+        project_attributes = get_current_scene_project_attributes(context)
         return project_attributes[api_constants.API_KEYS.PROJECT_TYPE_ID]
     else:
         remote_project_container = plugin.get_remote_project_container()

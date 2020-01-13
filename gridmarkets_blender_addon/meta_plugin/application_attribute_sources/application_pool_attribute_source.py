@@ -38,6 +38,46 @@ class ApplicationPoolAttributeSource(ABC):
         else:
             raise ValueError("Unrecognised application: " + str(app))
 
+    def get_project_attribute_values(self, project_name: str, app: str, version: str) -> typing.Dict:
+        from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_contstants
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
+
+        attributes = {}
+
+        # project name
+        root = api_schema.get_root_project_attribute()
+        attributes[api_contstants.API_KEYS.PROJECT_NAME] = project_name
+
+        # product
+        product_attribute = root.transition(project_name, force_transition=True)
+        attributes[api_contstants.API_KEYS.APP] = app
+
+        # product version
+        product_version_attribute = product_attribute.transition(app)
+        attributes[api_contstants.API_KEYS.APP_VERSION] = version
+
+        # other attributes
+        project_attribute = product_version_attribute.transition(app, force_transition=True)
+        while True:
+            attribute = project_attribute.get_attribute()
+
+            if attribute.get_type() == AttributeType.NULL:
+                attributes[api_contstants.API_KEYS.PROJECT_TYPE_ID] = project_attribute.get_id()
+                break
+
+            # attempt to get the application inferred value for the project attributes
+            try:
+                app_inferred_value = self.get_attribute_value(app, version, project_attribute.get_attribute().get_key())
+            except ApplicationAttributeNotFound as e:
+                # if the application source does not recognise this attribute key then use the default value
+                app_inferred_value = project_attribute.get_attribute().get_default_value()
+
+            project_attribute = project_attribute.transition(app_inferred_value, force_transition=True)
+
+        return attributes
+
     def set_project_attribute_values(self, project_name: str, app: str, version: str) -> None:
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -71,16 +111,9 @@ class ApplicationPoolAttributeSource(ABC):
 
             set_project_attribute_value(project_attribute, app_inferred_value)
 
-            try:
-                project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute))
-            except RejectedTransitionInputError as e:
-                # if the transition is rejected because the current input is not valid attempt to manually transition
-                # if there is only one transition path
-                transitions = project_attribute.get_transitions()
-                if len(transitions) == 1:
-                    project_attribute = transitions[0].get_project_attribute()
-                else:
-                    raise e
+            project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute),
+                                                             force_transition=True)
+
 
     @abstractmethod
     def get_blender_attribute_source(self) -> ApplicationAttributeSource:
