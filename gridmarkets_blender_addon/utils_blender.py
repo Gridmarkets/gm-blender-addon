@@ -795,3 +795,28 @@ def draw_render_engine_warning_popup(self, context):
 
     for engine in get_supported_render_engines():
         self.layout.label(text='• ' + get_user_friendly_name_for_engine(engine))
+
+
+def get_submission_project_type_id():
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    context = bpy.context
+    project_option = context.scene.props.project_options
+
+    if project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+        project_attributes = get_project_attributes(force_transition=True)
+        return project_attributes[api_constants.API_KEYS.PROJECT_TYPE_ID]
+    else:
+        remote_project_container = plugin.get_remote_project_container()
+        remote_project = remote_project_container.get_project_with_id(project_option)
+        return remote_project.get_attribute(api_constants.API_KEYS.PROJECT_TYPE_ID)
+
+
+def get_matching_job_definitions():
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_schema = plugin.get_api_client().get_api_schema()
+    project_attribute = api_schema.get_project_attribute_with_id(get_submission_project_type_id())
+    return project_attribute.get_compatible_job_definitions()

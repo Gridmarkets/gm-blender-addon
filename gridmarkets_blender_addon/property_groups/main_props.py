@@ -94,15 +94,22 @@ def _get_project_options(scene, context):
 def get_job_options(scene, context):
     """ Returns a list of items representing project options """
 
+    from gridmarkets_blender_addon import utils_blender
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    job_presets = plugin.get_preferences_container().get_job_preset_container().get_all()
     job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+    job_presets = job_preset_container.get_all()
 
+    compatible_job_definitions = utils_blender.get_matching_job_definitions()
     job_options = []
 
     # iterate through uploaded job presets and add them as options
     for i, job_preset in enumerate(job_presets):
+
+        # only return job presets deriving from a compatible job definition
+        if job_preset.get_job_definition() not in compatible_job_definitions:
+            continue
+
         index = job_preset_container.get_index(job_preset)
         job_options.append((str(index),
                             job_preset.get_name(),

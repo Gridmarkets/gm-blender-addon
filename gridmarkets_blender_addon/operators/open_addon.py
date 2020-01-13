@@ -170,7 +170,6 @@ def add_default_job_preset():
         job_definitions = plugin.get_api_client().get_api_schema().get_job_definitions()
         for job_definition in job_definitions:
             if job_definition.get_definition_id() == job_definition_id:
-
                 job_preset_container.append(JobPreset(name, job_definition, is_locked=True))
 
     # add default job presets
