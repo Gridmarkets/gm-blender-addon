@@ -17,27 +17,3 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-
-
-def get_icon_for_job_definition(job_definition: JobDefinition) -> (str, int):
-    """ Gets the icon and icon_value values for a JobDefinition """
-    from gridmarkets_blender_addon import constants, icon_loader
-    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-
-    product_attribute = job_definition.get_attribute_with_key(api_constants.ATTRIBUTE_NAMES.PRODUCT)
-
-    icon = constants.ICON_NONE
-    icon_value = 0
-
-    if product_attribute:
-        product = product_attribute.get_attribute().get_default_value()
-        preview_collection = icon_loader.IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-
-        if product == api_constants.PRODUCTS.BLENDER:
-            icon = constants.ICON_BLENDER
-        elif product == api_constants.PRODUCTS.VRAY:
-            icon_value = preview_collection[constants.VRAY_LOGO_ID].icon_id
-
-    return icon ,icon_value

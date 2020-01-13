@@ -131,7 +131,7 @@ def _draw_job_preset_headers(layout: bpy.types.UILayout):
 
 def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-    from gridmarkets_blender_addon.blender_plugin.api_schema.api_schema import get_icon_for_job_definition
+    from gridmarkets_blender_addon.blender_plugin.job_definition import get_icon_for_job_definition
     from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import draw_job_preset_attribute
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 
