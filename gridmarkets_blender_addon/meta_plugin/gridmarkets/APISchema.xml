@@ -405,6 +405,104 @@
 
         </JobDefinition>
 
+        <JobDefinition id="MOE">
+
+            <DisplayName>MOE</DisplayName>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>MOE Job</DefaultValue>
+                    <MinLength>3</MinLength>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>moe</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>moe</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>simulation</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Job File</DisplayName>
+                    <Description>The path to your .svl job script expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.svl'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>params</Key>
+                    <DisplayName>Run Options</DisplayName>
+                    <Description>Any run-specific options (e.g. -lig blah.mdb)</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+        </JobDefinition>
+
     </JobDefinitions>
 
     <ProjectAttributes>
@@ -654,6 +752,75 @@
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
+        <ProjectAttribute id="MOE_PROJECT">
+            <Attribute>
+                <Key>MOE_PROJECT</Key>
+                <DisplayName>MOE Project</DisplayName>
+                <Description>A MOE project.</Description>
+                <Type>NULL</Type>
+            </Attribute>
+            <Transitions></Transitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>MOE</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_RUN_OPTIONS">
+            <Attribute>
+                <Key>params</Key>
+                <DisplayName>Run Options</DisplayName>
+                <Description>Any run-specific options (e.g. -lig blah.mdb)</Description>
+                <Type>STRING</Type>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>MOE_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>.*$</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_SVL_FILE">
+            <Attribute>
+                <Key>path</Key>
+                <DisplayName>SVL script</DisplayName>
+                <Description>The primary SVL batch script to run.</Description>
+                <Type>STRING</Type>
+                <Subtype>FILE_PATH</Subtype>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>MOE_RUN_OPTIONS</ProjectAttributeId>
+                    <TransitionFormula>(.*)(.svl)$</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_VERSION">
+            <Attribute>
+                <Key>app_version</Key>
+                <DisplayName>Version</DisplayName>
+                <Description>The version of MOE.</Description>
+                <Type>ENUM</Type>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>moe</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>MOE_SVL_FILE</ProjectAttributeId>
+                    <TransitionFormula>.*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
         <ProjectAttribute id="PRODUCT">
             <Attribute>
                 <Key>app</Key>
@@ -671,6 +838,11 @@
                         <DisplayName>V-Ray</DisplayName>
                         <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997.</Description>
                     </Item>
+                    <Item>
+                        <Key>moe</Key>
+                        <DisplayName>MOE</DisplayName>
+                        <Description>Description: Molecular Operating Environment (MOE) is a drug discovery software platform that integrates visualization, modeling and simulations, as well as methodology development, in one package. MOE scientific applications are used by biologists, medicinal chemists and computational chemists in pharmaceutical, biotechnology and academic research.</Description>
+                    </Item>
                 </Items>
             </Attribute>
             <Transitions>
@@ -681,6 +853,10 @@
                 <Transition>
                     <ProjectAttributeId>VRAY_VERSION</ProjectAttributeId>
                     <TransitionFormula>vray</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>MOE_VERSION</ProjectAttributeId>
+                    <TransitionFormula>moe</TransitionFormula>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
