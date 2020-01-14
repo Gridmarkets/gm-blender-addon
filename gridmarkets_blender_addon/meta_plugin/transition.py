@@ -18,21 +18,33 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
+
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
 
 
 class Transition:
 
-    def __init__(self, transition_formula: str, project_attribute: 'ProjectAttribute'):
+    def __init__(self, transition_formula: str,
+                 project_attribute: 'ProjectAttribute',
+                 rejection_message: typing.Optional[str] = None):
 
         self._project_attribute = project_attribute
         self._transition_formula = transition_formula
+
+        if rejection_message is None:
+            self._rejection_message = "Transition input must satisfy " + self._transition_formula
+        else:
+            self._rejection_message = rejection_message
 
     def get_transition_formula(self) -> str:
         return self._transition_formula
 
     def get_project_attribute(self) -> 'ProjectAttribute':
         return self._project_attribute
+
+    def get_rejection_message(self) -> str:
+        return self._rejection_message
 
     def transition(self, input: any) -> 'ProjectAttribute':
         import re

@@ -136,6 +136,7 @@ TAG_TRANSITION = "Transition"
 TAG_PROJECT_ATTRIBUTE_ID = "ProjectAttributeId"
 ATTRIBUTE_ID = "id"
 TAG_TRANSITION_FORMULA = "TransitionFormula"
+TAG_REJECTION_MESSAGE = "RejectionMessage"
 TAG_COMPATIBLE_JOB_DEFINITIONS = "CompatibleJobDefinitions"
 TAG_COMPATIBLE_JOB_DEFINITION = "CompatibleJobDefinition"
 TAG_JOB_DEFINITION_ID = "JobDefinitionId"
@@ -310,8 +311,9 @@ class XMLAPISchemaParser:
             raise ValueError("No ProjectAttribute with id '" + transition_project_attribute_id + "' found.")
 
         transition_formula = get_text(transition_element, TAG_TRANSITION_FORMULA)
+        rejection_message = get_text_optional(transition_element, TAG_REJECTION_MESSAGE)
 
-        return Transition(transition_formula, transition_project_attribute)
+        return Transition(transition_formula, transition_project_attribute, rejection_message=rejection_message)
 
     @staticmethod
     def _parse_transitions(transitions_element: ET.Element,

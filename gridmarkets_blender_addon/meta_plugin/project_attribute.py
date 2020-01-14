@@ -72,7 +72,7 @@ class ProjectAttribute:
                 return transition.get_project_attribute()
 
             # or return a more specific error message if one exists
-            message = "Transition input must satisfy " + str(transition.get_transition_formula())
+            message = transition.get_rejection_message()
         else:
             message = "Project attribute '" + self.get_attribute().get_display_name() + " (" + self.get_id() + ")" +\
                       "' does not have a transition that accepts the input value '" + str(input) + "'"

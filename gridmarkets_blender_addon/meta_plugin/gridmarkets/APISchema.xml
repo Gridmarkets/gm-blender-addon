@@ -624,7 +624,7 @@
                 <Key>path</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
-                <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
+                <DefaultValue></DefaultValue>
                 <Type>STRING</Type>
                 <Subtype>FILE_PATH</Subtype>
             </Attribute>
@@ -632,6 +632,7 @@
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
                     <TransitionFormula>(.*)(.blend)$</TransitionFormula>
+                    <RejectionMessage>File must have ".blend" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -642,7 +643,7 @@
                 <Key>path</Key>
                 <DisplayName>Main project file</DisplayName>
                 <Description>The main .blend file for your project.</Description>
-                <DefaultValue>/&lt;project_path&gt;/&lt;project_name&gt;.blend</DefaultValue>
+                <DefaultValue></DefaultValue>
                 <Type>STRING</Type>
                 <Subtype>FILE_PATH</Subtype>
             </Attribute>
@@ -650,6 +651,7 @@
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
                     <TransitionFormula>(.*)(.blend)$</TransitionFormula>
+                    <RejectionMessage>File must have ".blend" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -707,6 +709,7 @@
                 <Transition>
                     <ProjectAttributeId>VRAY_PROJECT</ProjectAttributeId>
                     <TransitionFormula>(.*)(.remap)$</TransitionFormula>
+                    <RejectionMessage>File must have ".remap" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -724,6 +727,7 @@
                 <Transition>
                     <ProjectAttributeId>VRAY_REMAP_FILE</ProjectAttributeId>
                     <TransitionFormula>(.*)(.vrscene)$</TransitionFormula>
+                    <RejectionMessage>File must have ".vrscene" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
@@ -777,6 +781,7 @@
                 <Transition>
                     <ProjectAttributeId>MOE_PROJECT</ProjectAttributeId>
                     <TransitionFormula>(.*)(.svl)$</TransitionFormula>
+                    <RejectionMessage>File must have ".svl" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
