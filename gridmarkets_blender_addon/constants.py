@@ -118,6 +118,7 @@ BLENDER_TEMP_DIRECTORY = '/tmp\\'
 
 PROJECT_PREFIX = 'Project_'
 JOB_PREFIX = 'Job_'
+REMOTE_SOURCE_SUFFIX = "_remote"
 
 AUTHENTICATION_HELP_MESSAGE = "\nEnter your " + COMPANY_NAME + " credentials by going to: Edit -> Preferences -> " \
                               "Add-ons -> " + ADDON_NAME + " -> preferences"

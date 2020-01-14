@@ -64,7 +64,7 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
 
     product_project_attribute = root.transition(context.scene.props.remote_project_container.project_name)
 
-    enabled = not draw_project_attribute(layout, context, product_project_attribute)
+    enabled = not draw_project_attribute(layout, context, product_project_attribute, remote_source=True)
 
     layout.separator()
 

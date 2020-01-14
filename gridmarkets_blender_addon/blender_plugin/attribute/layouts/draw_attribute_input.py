@@ -18,14 +18,16 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
 
 
-def draw_attribute_input(self, context, prop_container, attribute: Attribute, prop_id: str = None):
+def draw_attribute_input(self, context, prop_container, attribute: Attribute, prop_id: str = None,
+                         remote_source: bool = False):
 
     from types import SimpleNamespace
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-    from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import StringAttributeType, StringSubtype
     from gridmarkets_blender_addon.layouts.draw_frame_range_container import draw_frame_range_container
     from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
     from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
@@ -42,6 +44,11 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
     # use the attribute key as the prop id by default unless one was provided
     prop_id = attribute.get_key() if prop_id is None else prop_id
 
+    # some attributes require a different input if using a remote source
+    if remote_source:
+        if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+            prop_id = prop_id + constants.REMOTE_SOURCE_SUFFIX
+
     # validate user input
     attribute_value = get_value(prop_container, attribute, prop_id)
 
@@ -55,6 +62,7 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
         col.alert = True
 
     if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
+
         draw_frame_range_container(SimpleNamespace(layout=col),
                                    context,
                                    prop_container,

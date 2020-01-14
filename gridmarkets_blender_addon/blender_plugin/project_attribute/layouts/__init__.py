@@ -35,6 +35,7 @@ def draw_project_attribute(layout: bpy.types.UILayout,
                            context: bpy.types.Context,
                            project_attribute: ProjectAttribute,
                            draw_linked_attributes=True,
+                           remote_source: bool = False,
                            encountered_transition_error=False) -> bool:
     """
     :return: Returns False if no transition error was encountered otherwise returns True
@@ -77,7 +78,8 @@ def draw_project_attribute(layout: bpy.types.UILayout,
                          context,
                          project_props,
                          attribute,
-                         prop_id=project_attribute.get_id())
+                         prop_id=project_attribute.get_id(),
+                         remote_source=remote_source)
 
     # draw attribute description
     if attribute.get_description():
@@ -90,7 +92,10 @@ def draw_project_attribute(layout: bpy.types.UILayout,
         col2.label(text=transition_error_message)
 
     if next_project_attribute and draw_linked_attributes:
-        return draw_project_attribute(layout, context, next_project_attribute,
-                                      encountered_transition_error=encountered_transition_error)
+        return draw_project_attribute(layout,
+                                      context,
+                                      next_project_attribute,
+                                      encountered_transition_error=encountered_transition_error,
+                                      remote_source=remote_source)
 
     return encountered_transition_error

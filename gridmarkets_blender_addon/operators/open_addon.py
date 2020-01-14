@@ -80,6 +80,46 @@ def register_schema(api_client):
                     maxlen=0 if max_length is None else max_length,
                     options={'SKIP_SAVE'}
                 )
+
+                def get_remote_project_files(self, context):
+                    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+                    plugin = PluginFetcher.get_plugin_if_initialised()
+
+                    if plugin is None:
+                        return []
+
+                    api_client = plugin.get_api_client()
+                    remote_project_name = bpy.context.scene.props.remote_project_container.project_name
+                    remote_project_files = api_client.get_remote_project_files(remote_project_name)
+                    return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
+
+                def getter(self):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+                    try:
+                        return files.index(self[id])
+                    except (KeyError, ValueError):
+                        try:
+                            self[id] = files[0]
+                        except IndexError:
+                            return 0
+
+                def setter(self, value):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+                    try:
+                        self[id] = files[value]
+                    except IndexError as e:
+                        self[id] = ""
+
+
+                properties[id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
+                    name=display_name,
+                    description=description,
+                    items=get_remote_project_files,
+                    get=getter,
+                    set=setter,
+                    options={'SKIP_SAVE'}
+                )
+
             else:
                 raise ValueError("Unrecognised String subtype '" + subtype + "'.")
 

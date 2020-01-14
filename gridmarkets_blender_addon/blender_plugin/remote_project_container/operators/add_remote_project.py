@@ -54,7 +54,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             return {'FINISHED'}
 
         # get the files for this project
-        files = api_client.get_remote_project_files(context.scene.props.remote_project_container.project_name)
+        envoy_files = api_client.get_remote_project_files(context.scene.props.remote_project_container.project_name)
+        files = list(map(lambda x: x.get_key(), envoy_files))
 
         def _do_file_paths_exist(project_attribute):
 

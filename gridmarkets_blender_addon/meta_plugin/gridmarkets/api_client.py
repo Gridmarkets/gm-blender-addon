@@ -41,16 +41,76 @@ import gridmarkets
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
 
 
-class CachedValue:
-    def __init__(self, value: any, is_cached: bool = False):
+class EnvoyProject:
+    def __init__(self, name: str, deleting: bool, num_files: int, total_size: int, auto_downloading: bool,
+                 watched_list: typing.List[str]):
+        self._name = name
+        self._deleting = deleting
+        self._num_files = num_files
+        self._total_size = total_size
+        self._auto_downloading = auto_downloading
+        self._watched_list = watched_list
+
+    def get_name(self) -> str:
+        return self._name
+
+    def is_deleting(self) -> bool:
+        return self._deleting
+
+    def get_file_count(self) -> int:
+        return self._num_files
+
+    def get_total_size(self) -> int:
+        return self._total_size
+
+    def is_auto_downloading(self) -> bool:
+        return self._auto_downloading
+
+    def get_watched_list(self) -> typing.List[str]:
+        return self._watched_list
+
+
+class EnvoyFile:
+    def __init__(self, check_sum:str, last_modified: str, name: str, key: str, size: int, fmt_name: str):
+        self._check_sum = check_sum
+        self._last_modified = last_modified
+        self._name = name
+        self._key = key
+        self._size = size
+        self._fmt_name = fmt_name
+
+    def get_check_sum(self) -> str:
+        return self._check_sum
+
+    def get_last_modified(self) -> str:
+        return self._last_modified
+
+    def get_name(self) -> str:
+        return self._name
+
+    def get_key(self) -> str:
+        return self._key
+
+    def get_size(self) -> int:
+        return self._size
+
+    def get_fmt_name(self) -> str:
+        return self._fmt_name
+
+
+T = typing.TypeVar('T')
+
+
+class CachedValue(typing.Generic[T]):
+    def __init__(self, value: T, is_cached: bool = False):
         self._initial_value = value
         self._value = value
         self._is_cached = is_cached
 
-    def get_value(self) -> any:
+    def get_value(self) -> T:
         return self._value
 
-    def set_value(self, value):
+    def set_value(self, value: T):
         self._value = value
         self._is_cached = True
 
@@ -63,7 +123,6 @@ class CachedValue:
 
 
 class GridMarketsAPIClient(MetaAPIClient):
-
     http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
 
     def __init__(self, logging_coordinator: LoggingCoordinator):
@@ -74,12 +133,14 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
 
         # used for caching projects
-        self._cache_projects: CachedValue  = CachedValue([])
+        self._remote_projects_cache: CachedValue = CachedValue([])
+        self._project_files_dictionary_cache = {}
         self._product_resolver: CachedValue = CachedValue(None)
 
     def clear_all_caches(self):
         self._log.info("Clearing cached API data")
-        self._cache_projects.reset_and_clear_cache()
+        self._remote_projects_cache.reset_and_clear_cache()
+        self._project_files_dictionary_cache.clear()
         self._product_resolver.reset_and_clear_cache()
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -206,7 +267,8 @@ class GridMarketsAPIClient(MetaAPIClient):
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")
 
-        self._log.info("Preparing job " + job_preset.get_name() + " for submission to remote project " + remote_project.get_name())
+        self._log.info(
+            "Preparing job " + job_preset.get_name() + " for submission to remote project " + remote_project.get_name())
 
         client = self._envoy_client
         project = gridmarkets.Project(str(remote_project.get_root_dir()), remote_project.get_name())
@@ -225,33 +287,52 @@ class GridMarketsAPIClient(MetaAPIClient):
         project.add_jobs(job)
 
         # submit the job to the remote project
-        self._log.info("Submitting job " + job_preset.get_name() + " to existing remote project " + remote_project.get_name())
+        self._log.info(
+            "Submitting job " + job_preset.get_name() + " to existing remote project " + remote_project.get_name())
         client.submit_project(project, skip_upload=True)
 
         self._log.info("Job submitted - See Render Manager for details")
 
     def get_cached_root_directories(self) -> typing.List[str]:
-        return self._cache_projects.get_value()
+        return list(map(lambda x: x.get_name(), self._remote_projects_cache.get_value()))
 
     def get_root_directories(self, ignore_cache: bool = False) -> typing.List[str]:
         self._log.info("Getting root directories. ignore_cache=" + str(ignore_cache))
 
-        if ignore_cache or not self._cache_projects.is_cached():
+        if ignore_cache or not self._remote_projects_cache.is_cached():
+            self.get_remote_projects(ignore_cache=True)
+
+        return self.get_cached_root_directories()
+
+    def get_remote_projects(self, ignore_cache=False) -> typing.List[EnvoyProject]:
+        self._log.info("Getting Envoy Projects. ignore_cache=" + str(ignore_cache))
+
+        if ignore_cache or not self._remote_projects_cache.is_cached():
             try:
                 import requests
                 r = requests.get(self._envoy_client.url + '/projects')
                 json = r.json()
                 projects = json.get("projects", [])
-                projects = list(map(lambda project: project.get('name', ''), projects))
-                projects = sorted(projects, key=lambda s: s.casefold())
+                envoy_projects = []
+
+                for project in projects:
+                    envoy_projects.append(EnvoyProject(project.get('name', ''),
+                                                       project.get('deleting', False),
+                                                       project.get('num_files', 0),
+                                                       project.get('total_size', 0),
+                                                       project.get('auto_downloading', False),
+                                                       project.get('watched_list', [])))
+
+                projects = sorted(envoy_projects, key=lambda s: s.get_name().casefold())
+
             except Exception as e:
                 self._log.error("Could not make request to envoy API. " + str(e))
                 self.sign_out()
                 projects = []
 
-            self._cache_projects.set_value(projects)
+            self._remote_projects_cache.set_value(projects)
 
-        return self._cache_projects.get_value()
+        return self._remote_projects_cache.get_value()
 
     def get_product_versions(self, product: str, ignore_cache: bool = False) -> typing.List[str]:
         if ignore_cache or not self._product_resolver.is_cached():
@@ -263,9 +344,10 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         # sorted by latest version to oldest version
         return sorted(self._product_resolver.get_value().get(product, {}).get("versions", []),
-                      key=lambda s: s.casefold(),reverse=True)
+                      key=lambda s: s.casefold(), reverse=True)
 
-    def get_closest_matching_product_version(self, product: str, product_version: str, ignore_cache: bool = False) -> typing.Optional[str]:
+    def get_closest_matching_product_version(self, product: str, product_version: str, ignore_cache: bool = False) -> \
+            typing.Optional[str]:
         product_versions = self.get_product_versions(product, ignore_cache=ignore_cache)
 
         if not len(product_versions):
@@ -280,13 +362,29 @@ class GridMarketsAPIClient(MetaAPIClient):
         import difflib
         return difflib.get_close_matches(product_version, product_versions)[0]
 
+    def get_remote_project_files(self, project_name: str, ignore_cache=False) -> typing.List[EnvoyFile]:
+        """ Returns a list of Envoy File objects, if project does not exist it returns an empty list. """
 
-    def get_remote_project_files(self, project_name: str):
-        import requests
-        r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
-        json = r.json()
-        all_files = json.get('project_files', {}).get('all_files', [])
-        return sorted(map(lambda file: file.get('Name', ''), all_files), key=lambda s: s.casefold())
+        if ignore_cache or project_name not in self._project_files_dictionary_cache:
+            import requests
+            r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
+            json = r.json()
+            all_files = json.get('project_files', {}).get('all_files', [])
+
+            envoy_files = []
+            for file in all_files:
+                envoy_files.append(EnvoyFile(
+                    file.get('CheckSum', ''),
+                    file.get('LastModified', ''),
+                    file.get('Name', ''),
+                    file.get('Key', ''),
+                    file.get('Size', 0),
+                    file.get('FmtName', ''),
+                ))
+
+            self._project_files_dictionary_cache[project_name] = envoy_files
+
+        return self._project_files_dictionary_cache[project_name]
 
     def get_available_credits(self) -> int:
         import requests
