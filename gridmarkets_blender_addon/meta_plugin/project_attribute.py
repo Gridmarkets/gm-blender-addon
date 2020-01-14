@@ -64,13 +64,20 @@ class ProjectAttribute:
             except RejectedTransitionInputError:
                 pass
 
-        if force_transition and len(self.get_transitions()) == 1:
-            return self.get_transitions()[0].get_project_attribute()
+        # if there is only one possible transition then we can either
+        if len(self.get_transitions()) == 1:
+            transition = self.get_transitions()[0]
+            # force the transition
+            if force_transition:
+                return transition.get_project_attribute()
 
-        raise RejectedTransitionInputError(message="Project attribute '" + self.get_attribute().get_display_name() +
-                                                   " (" + self.get_id() + ")" +
-                                                   "' does not have a transition that accepts the input value '" +
-                                                   str(input) + "'")
+            # or return a more specific error message if one exists
+            message = "Transition input must satisfy " + str(transition.get_transition_formula())
+        else:
+            message = "Project attribute '" + self.get_attribute().get_display_name() + " (" + self.get_id() + ")" +\
+                      "' does not have a transition that accepts the input value '" + str(input) + "'"
+
+        raise RejectedTransitionInputError(message)
 
     def get_children(self) -> typing.List['ProjectAttribute']:
         return list(map(lambda x: x.get_project_attribute(), self.get_transitions()))
