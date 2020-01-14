@@ -46,7 +46,7 @@ def draw_project_attribute(layout: bpy.types.UILayout,
     project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
     value = get_project_attribute_value(project_attribute)
 
-    split = layout.split(factor=0.2)
+    split = layout.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
 
     col1 = split.column(align=True)
     col1.label(text=attribute.get_display_name())
