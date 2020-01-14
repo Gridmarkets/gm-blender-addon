@@ -61,16 +61,7 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     plugin = PluginFetcher.get_plugin()
     root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
 
-    try:
-        draw_project_attribute(layout, context, root)
-        enabled = True
-
-    except RejectedTransitionInputError as e:
-        layout.separator()
-        row = layout.row(align=True)
-        row.alignment = 'CENTER'
-        row.label(text="Warning: Project settings are invalid. " + e.user_message)
-        enabled = False
+    enabled = not draw_project_attribute(layout, context, root)
 
     layout.separator()
 

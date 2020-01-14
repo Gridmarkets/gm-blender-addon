@@ -64,16 +64,7 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
 
     product_project_attribute = root.transition(context.scene.props.remote_project_container.project_name)
 
-    try:
-        draw_project_attribute(layout, context, product_project_attribute)
-        enabled = True
-
-    except RejectedTransitionInputError as e:
-        layout.separator()
-        row = layout.row(align=True)
-        row.alignment = 'CENTER'
-        row.label(text="Warning: Project settings are invalid. " + e.user_message)
-        enabled = False
+    enabled = not draw_project_attribute(layout, context, product_project_attribute)
 
     layout.separator()
 
@@ -81,5 +72,3 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
     row.operator(GRIDMARKETS_OT_add_remote_project.bl_idname, text="Add Project Details")
     row.scale_y = 2.5
     row.enabled = enabled
-
-

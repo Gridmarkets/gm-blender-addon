@@ -28,43 +28,69 @@ from ..project_attribute import get_project_attribute_value
 from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
 from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
+from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
 
 
 def draw_project_attribute(layout: bpy.types.UILayout,
                            context: bpy.types.Context,
                            project_attribute: ProjectAttribute,
-                           draw_linked_attributes=True):
-
-    from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
+                           draw_linked_attributes=True,
+                           encountered_transition_error=False) -> bool:
+    """
+    :return: Returns False if no transition error was encountered otherwise returns True
+    :rtype: bool
+    """
 
     attribute = project_attribute.get_attribute()
 
-    # Null attributes represet a base case
+    # Null attributes represent a base case
     if attribute.get_type() == AttributeType.NULL:
-        return
+        return encountered_transition_error
 
     project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
     value = get_project_attribute_value(project_attribute)
 
     split = layout.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
-
     col1 = split.column(align=True)
     col1.label(text=attribute.get_display_name())
-
     col2 = split.column(align=True)
 
     try:
-        project_attribute.transition(value)
-    except RejectedTransitionInputError as e:
-        col2.alert = True
+        # attempt to get the next project attribute
+        next_project_attribute = project_attribute.transition(value)
+        transition_error_message = None
 
-    draw_attribute_input(types.SimpleNamespace(layout=col2), context, project_props, attribute,
+    except RejectedTransitionInputError as e:
+        # if there is a transition error set alert to True so that blender renders the current input in red
+        col2.alert = True
+        transition_error_message = e.user_message
+
+        # if it is possible to force the transition, then do so and continue as normal
+        try:
+            next_project_attribute = project_attribute.transition(value, force_transition=True)
+            encountered_transition_error = True
+        except RejectedTransitionInputError as e:
+            # otherwise it is not possible to know which project attribute to render next so we must raise the error
+            return True
+
+    draw_attribute_input(types.SimpleNamespace(layout=col2),
+                         context,
+                         project_props,
+                         attribute,
                          prop_id=project_attribute.get_id())
 
-    if len(attribute.get_description()):
-        row = col2.row()
-        row.label(text=attribute.get_description())
-        row.enabled = False
+    # draw attribute description
+    if attribute.get_description():
+        description_layout = col2.row()
+        description_layout.label(text=attribute.get_description())
+        description_layout.enabled = False
 
-    if draw_linked_attributes:
-        draw_project_attribute(layout, context, project_attribute.transition(value))
+    # draw transition error message
+    if transition_error_message:
+        col2.label(text=transition_error_message)
+
+    if next_project_attribute and draw_linked_attributes:
+        return draw_project_attribute(layout, context, next_project_attribute,
+                                      encountered_transition_error=encountered_transition_error)
+
+    return encountered_transition_error
