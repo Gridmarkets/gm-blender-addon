@@ -20,11 +20,12 @@
 
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.refresh_project_file_list import \
+    GRIDMARKETS_OT_refresh_project_file_list
 
 
 def draw_attribute_input(self, context, prop_container, attribute: Attribute, prop_id: str = None,
                          remote_source: bool = False):
-
     from types import SimpleNamespace
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
     from gridmarkets_blender_addon.meta_plugin.attribute_types import StringAttributeType, StringSubtype
@@ -62,12 +63,18 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
         col.alert = True
 
     if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
-
         draw_frame_range_container(SimpleNamespace(layout=col),
                                    context,
                                    prop_container,
                                    prop_id + '_collection',
                                    prop_id + '_focused')
+
+    elif remote_source and attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+        row = col.row(align=True)
+        row.prop(prop_container, prop_id, text="")
+        sub = row.row(align=True)
+        sub.alignment = "RIGHT"
+        sub.operator(GRIDMARKETS_OT_refresh_project_file_list.bl_idname, text="refresh")
     else:
         col.prop(prop_container, prop_id, text="")
 

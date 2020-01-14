@@ -21,21 +21,30 @@
 import bpy
 
 
-class GRIDMARKETS_OT_refresh_project_list(bpy.types.Operator):
-    bl_idname = "gridmarkets.refresh_project_list"
-    bl_label = "Refresh Remote Project List"
+class GRIDMARKETS_OT_refresh_project_file_list(bpy.types.Operator):
+    bl_idname = "gridmarkets.refresh_project_file_list"
+    bl_label = "Refresh Remote Project file List"
     bl_options = set()
+
+    project_name: bpy.props.StringProperty(
+        name="Project name"
+    )
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_client.get_root_directories(ignore_cache=True)
+
+        if self.project_name:
+            api_client.get_remote_project_files(self.project_name, ignore_cache=True)
+        else:
+            api_client.clear_project_files_cache()
+
         return {'FINISHED'}
 
 
 classes = (
-    GRIDMARKETS_OT_refresh_project_list,
+    GRIDMARKETS_OT_refresh_project_file_list,
 )
 
 

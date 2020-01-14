@@ -386,6 +386,9 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         return self._project_files_dictionary_cache[project_name]
 
+    def clear_project_files_cache(self):
+        self._project_files_dictionary_cache.clear()
+
     def get_available_credits(self) -> int:
         import requests
         r = requests.get(self._envoy_client.url + '/credits-info')
