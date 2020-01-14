@@ -765,22 +765,6 @@
             </CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="MOE_RUN_OPTIONS">
-            <Attribute>
-                <Key>params</Key>
-                <DisplayName>Run Options</DisplayName>
-                <Description>Any run-specific options (e.g. -lig blah.mdb)</Description>
-                <Type>STRING</Type>
-            </Attribute>
-            <Transitions>
-                <Transition>
-                    <ProjectAttributeId>MOE_PROJECT</ProjectAttributeId>
-                    <TransitionFormula>.*$</TransitionFormula>
-                </Transition>
-            </Transitions>
-            <CompatibleJobDefinitions></CompatibleJobDefinitions>
-        </ProjectAttribute>
-
         <ProjectAttribute id="MOE_SVL_FILE">
             <Attribute>
                 <Key>path</Key>
@@ -791,7 +775,7 @@
             </Attribute>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>MOE_RUN_OPTIONS</ProjectAttributeId>
+                    <ProjectAttributeId>MOE_PROJECT</ProjectAttributeId>
                     <TransitionFormula>(.*)(.svl)$</TransitionFormula>
                 </Transition>
             </Transitions>
