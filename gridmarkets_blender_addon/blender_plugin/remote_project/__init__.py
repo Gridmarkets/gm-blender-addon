@@ -19,7 +19,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import pathlib
+import typing
 
+from gridmarkets_blender_addon import utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
@@ -54,3 +57,20 @@ def convert_packed_project(packed_project: PackedProject) -> RemoteProject:
                          root_dir,
                          files,
                          attributes)
+
+
+# todo create remote project subclass
+def get_blender_icon_tuple_for_remote_project(remote_project: RemoteProject) -> typing.Tuple[str, int]:
+    product = remote_project.get_attribute(api_constants.API_KEYS.APP)
+    return utils_blender.get_product_logo(product)
+
+
+def get_blender_icon_for_remote_project(remote_project: RemoteProject) -> str or int:
+    icon_tuple = get_blender_icon_tuple_for_remote_project(remote_project)
+
+    # if a custom icon has been returned use that
+    if icon_tuple[1] > 0:
+        return icon_tuple[1]
+
+    # otherwise use the native blender icon
+    return icon_tuple[0]

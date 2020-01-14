@@ -24,7 +24,6 @@ import typing
 
 from bpy.app.handlers import persistent
 from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 from gridmarkets_blender_addon.property_groups.job_props import JobProps
@@ -45,9 +44,8 @@ _BLEND_FILE = "*" + constants.BLEND_FILE_EXTENSION
 def _get_project_options(scene, context):
     """ Returns a list of items representing project options """
 
+    from gridmarkets_blender_addon.blender_plugin.remote_project import get_blender_icon_for_remote_project
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-    from gridmarkets_blender_addon.icon_loader import IconLoader
-    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
 
     project_options = [
         # it is always an option to upload as a new project
@@ -65,18 +63,13 @@ def _get_project_options(scene, context):
 
         # iterate through uploaded projects and add them as options
         for i, project in enumerate(remote_projects):
-            project_product = project.get_attribute(api_constants.API_KEYS.APP)
+            icon = get_blender_icon_for_remote_project(project)
 
-            # get the correct icon
-            if project_product == api_constants.PRODUCTS.VRAY:
-                icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            elif project_product == api_constants.PRODUCTS.BLENDER:
-                icon = constants.ICON_BLENDER
-            else:
-                icon = constants.ICON_PROJECT
-
-            project_options.append(
-                (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
+            project_options.append((str(i + 1),
+                                    project.get_name(),
+                                    '',
+                                    icon,
+                                    remote_project_container.get_project_id(project)))
 
     return project_options
 

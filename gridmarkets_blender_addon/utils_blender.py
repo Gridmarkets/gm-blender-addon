@@ -838,3 +838,24 @@ def get_matching_job_definitions() -> typing.List['JobDefinition']:
     api_schema = plugin.get_api_client().get_api_schema()
     project_attribute = api_schema.get_project_attribute_with_id(get_submission_project_type_id())
     return project_attribute.get_compatible_job_definitions()
+
+
+def get_product_logo(product: str) -> typing.Tuple[str, int]:
+    from gridmarkets_blender_addon import icon_loader
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+
+    preview_collection = icon_loader.IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
+
+    icon = constants.ICON_NONE
+    icon_value = 0
+
+    if product == api_constants.PRODUCTS.BLENDER:
+        icon = constants.ICON_BLENDER
+    elif product == api_constants.PRODUCTS.VRAY:
+        icon_value = preview_collection[constants.VRAY_LOGO_ID].icon_id
+    elif product == api_constants.PRODUCTS.MOE:
+        icon_value = preview_collection[constants.MOE_LOGO_ID].icon_id
+    else:
+        icon = constants.ICON_BLANK
+
+    return icon, icon_value
