@@ -67,6 +67,7 @@ class SUBTYPE_KEYS:
 class PRODUCTS:
     BLENDER = "blender"
     VRAY = "vray"
+    MOE = "moe"
 
 
 class BLENDER_VERSIONS:

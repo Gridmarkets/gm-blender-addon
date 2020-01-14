@@ -42,6 +42,8 @@ def get_blender_icon_tuple_for_job_definition(job_definition: JobDefinition) -> 
             icon = constants.ICON_BLENDER
         elif product == api_constants.PRODUCTS.VRAY:
             icon_value = preview_collection[constants.VRAY_LOGO_ID].icon_id
+        elif product == api_constants.PRODUCTS.MOE:
+            icon_value = preview_collection[constants.MOE_LOGO_ID].icon_id
         else:
             icon = constants.ICON_BLANK
 

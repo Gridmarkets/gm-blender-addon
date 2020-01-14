@@ -43,6 +43,9 @@ GM_GREYSCALE_LOGO = "logo_greyscale.png"
 GRIDMARKETS_LOGO_ID = "gridmarkets_logo"
 MAIN_COLLECTION_ID = "main"
 
+MOE_LOGO_ID = "moe_logo"
+MOE_LOGO = "moe_logo.png"
+
 VRAY_LOGO_ID = "vray_logo"
 VRAY_LOGO = "vray_logo.png"
 

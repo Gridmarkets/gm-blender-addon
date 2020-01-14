@@ -37,13 +37,18 @@ class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
 
         preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
         product = remote_project.get_attribute(api_constants.API_KEYS.APP)
+
+        icon = constants.ICON_NONE
+        icon_value = 0
+
         if product == api_constants.PRODUCTS.VRAY:
-            icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            layout.label(text=remote_project.get_name(), icon_value=icon)
+            icon_value = preview_collection[constants.VRAY_LOGO_ID].icon_id
         elif product == api_constants.PRODUCTS.BLENDER:
-            layout.label(text=remote_project.get_name(), icon=constants.ICON_BLENDER)
+            icon = constants.ICON_BLENDER
         else:
-            layout.label(text=remote_project.get_name())
+            icon = constants.ICON_BLANK
+
+        layout.label(text=remote_project.get_name(), icon=icon, icon_value=icon_value)
 
 
 

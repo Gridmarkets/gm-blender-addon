@@ -72,6 +72,10 @@ class IconLoader:
                                 os.path.join(my_icons_dir, constants.GM_GREYSCALE_LOGO),
                                 'IMAGE')
 
+        preview_collection.load(constants.MOE_LOGO_ID,
+                                os.path.join(my_icons_dir, constants.MOE_LOGO),
+                                'IMAGE')
+
         preview_collection.load(constants.VRAY_LOGO_ID,
                                 os.path.join(my_icons_dir, constants.VRAY_LOGO),
                                 'IMAGE')
