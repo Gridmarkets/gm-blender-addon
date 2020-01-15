@@ -35,6 +35,7 @@ class APIClient(GridMarketsAPIClient):
 
     def __init__(self, logging_coordinator: LoggingCoordinator):
         GridMarketsAPIClient.__init__(self, logging_coordinator)
+        self._signed_in_lock_extra = False
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         GridMarketsAPIClient.sign_in(self, user, skip_validation=skip_validation)
@@ -46,15 +47,20 @@ class APIClient(GridMarketsAPIClient):
         plugin = PluginFetcher.get_plugin()
         plugin.get_user_interface().reset_project_attribute_props()
 
+        self._signed_in_lock_extra = True
         utils_blender.force_redraw_addon()
 
     def sign_out(self) -> None:
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
 
+        self._signed_in_lock_extra = False
         GridMarketsAPIClient.sign_out(self)
         plugin.get_remote_project_container().reset()
         utils_blender.force_redraw_addon()
+
+    def is_user_signed_in(self) -> bool:
+        return GridMarketsAPIClient.is_user_signed_in(self) and self._signed_in_lock_extra
 
     def connected(self) -> bool:
         raise NotImplementedError
