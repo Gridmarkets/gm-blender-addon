@@ -725,7 +725,7 @@ def get_project_attributes_rec(project_attribute, attributes, force_transition=F
     attributes[attribute.get_key()] = value
 
     next_project_attribute = project_attribute.transition(value, force_transition)
-    return get_project_attributes(next_project_attribute, attributes)
+    return get_project_attributes(next_project_attribute, attributes, force_transition=force_transition)
 
 
 def get_project_attributes(project_attribute=None, attributes=None, force_transition=False):
