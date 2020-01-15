@@ -62,6 +62,48 @@ def register_schema(api_client):
                     maxlen=0 if max_length is None else max_length,
                     options={'SKIP_SAVE'}
                 )
+
+                if project_attribute.get_id() == api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME:
+
+                    def get_remote_root_directories(self, context):
+                        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+                        plugin = PluginFetcher.get_plugin_if_initialised()
+
+                        if plugin is None:
+                            return []
+
+                        api_client = plugin.get_api_client()
+                        projects = api_client.get_cached_root_directories()
+
+                        return list(map(lambda project: (project, project, ''), projects))
+
+                    def getter(self):
+                        root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
+                        try:
+                            return root_directories.index(self[id])
+                        except (KeyError, ValueError):
+                            try:
+                                self[id] = root_directories[0]
+                            except IndexError:
+                                pass
+                            return 0
+
+                    def setter(self, value):
+                        root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
+                        try:
+                            self[id] = root_directories[value]
+                        except IndexError as e:
+                            self[id] = ""
+
+                    properties[id+constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
+                        name=display_name,
+                        description=description,
+                        items=get_remote_root_directories,
+                        get=getter,
+                        set=setter,
+                        options={'SKIP_SAVE'}
+                    )
+
             elif subtype == StringSubtype.FRAME_RANGES.value:
                 properties[id + JobPreset.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
                     type=FrameRangeProps,
@@ -95,13 +137,15 @@ def register_schema(api_client):
 
                 def getter(self):
                     files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+
                     try:
                         return files.index(self[id])
                     except (KeyError, ValueError):
                         try:
                             self[id] = files[0]
                         except IndexError:
-                            return 0
+                            pass
+                        return 0
 
                 def setter(self, value):
                     files = list(map(lambda x: x[0], get_remote_project_files(self, None)))

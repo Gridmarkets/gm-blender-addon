@@ -19,7 +19,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
+
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.refresh_project_list import \
+    GRIDMARKETS_OT_refresh_project_list
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.refresh_project_file_list import \
     GRIDMARKETS_OT_refresh_project_file_list
 
@@ -47,7 +51,9 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
 
     # some attributes require a different input if using a remote source
     if remote_source:
-        if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+        if (attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value) or \
+                (attribute.get_key() == api_constants.API_KEYS.PROJECT_NAME and attribute_type == AttributeType.STRING):
+
             prop_id = prop_id + constants.REMOTE_SOURCE_SUFFIX
 
     # validate user input
@@ -75,6 +81,13 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
         sub = row.row(align=True)
         sub.alignment = "RIGHT"
         sub.operator(GRIDMARKETS_OT_refresh_project_file_list.bl_idname, text="refresh")
+
+    elif remote_source and attribute.get_key() == api_constants.API_KEYS.PROJECT_NAME and attribute_type == AttributeType.STRING:
+        row = col.row(align=True)
+        row.prop(prop_container, prop_id, text="")
+        sub = row.row(align=True)
+        sub.alignment = "RIGHT"
+        sub.operator(GRIDMARKETS_OT_refresh_project_list.bl_idname, text="refresh")
     else:
         col.prop(prop_container, prop_id, text="")
 
