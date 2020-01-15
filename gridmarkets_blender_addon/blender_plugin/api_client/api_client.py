@@ -37,7 +37,7 @@ class APIClient(GridMarketsAPIClient):
         GridMarketsAPIClient.__init__(self, logging_coordinator)
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
-        GridMarketsAPIClient.sign_in(self, user)
+        GridMarketsAPIClient.sign_in(self, user, skip_validation=skip_validation)
         utils_blender.force_redraw_addon()
 
     def sign_out(self) -> None:

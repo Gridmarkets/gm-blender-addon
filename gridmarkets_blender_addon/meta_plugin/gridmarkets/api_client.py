@@ -151,7 +151,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._log.info("Signing in as " + user.get_auth_email())
 
         try:
-            MetaAPIClient.sign_in(self, user)
+            MetaAPIClient.sign_in(self, user, skip_validation=skip_validation)
         except InvalidEmailError as e:
             raise e
         except InvalidAccessKeyError as e:
