@@ -20,12 +20,12 @@
 
 import bpy
 
-import re
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon import utils
+from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon import utils, utils_blender
 
 
 class JobPreset(MetaJobPreset):
@@ -48,6 +48,7 @@ class JobPreset(MetaJobPreset):
 
         self._is_locked = is_locked
 
+        self._property_group_class = None
         self.register_props()
         self._reset_properties_to_default()
 
@@ -88,129 +89,37 @@ class JobPreset(MetaJobPreset):
                 inference_sources = job_attribute.get_inference_sources()
                 setattr(job_preset_props, self.INFERENCE_SOURCE_KEY + attribute.get_key(), inference_sources[0].get_id())
 
+    def _register_job_attribute(self,
+                                job_attribute: JobAttribute,
+                                properties: typing.Dict[str, bpy.types.Property]):
+
+        prop_id = job_attribute.get_attribute().get_key()
+
+        # get blender properties for the base attribute
+        utils_blender.get_blender_props_for_attribute(job_attribute.get_attribute(), properties, prop_id)
+
+        # get blender properties for the inference source drop down
+        inference_source_items = []
+        for inference_source in job_attribute.get_inference_sources():
+            inference_source_items.append((inference_source.get_id(),
+                                           inference_source.get_display_name(),
+                                           inference_source.get_description()))
+
+        properties[self.INFERENCE_SOURCE_KEY + prop_id] = bpy.props.EnumProperty(
+            name=self.INFERENCE_SOURCE_KEY,
+            description="The source to read the attribute value from.",
+            items=inference_source_items,
+            default=str(job_attribute.get_default_inference_source().get_id()),
+            options={'SKIP_SAVE'}
+        )
+
     def register_props(self):
         import bpy
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import EnumAttributeType, EnumSubtype, \
-            StringAttributeType,StringSubtype
-        from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
-
-        plugin = PluginFetcher.get_plugin()
         job_definition = self.get_job_definition()
-
         properties = {}
 
         for job_attribute in job_definition.get_attributes():
-
-            attribute = job_attribute.get_attribute()
-            key = attribute.get_key()
-            display_name = attribute.get_display_name()
-            description = attribute.get_description().rstrip('.')  # Blender adds periods by default
-            attribute_type = attribute.get_type()
-            default_value = attribute.get_default_value()
-
-            if attribute_type == AttributeType.STRING:
-                string_attribute: StringAttributeType = attribute
-                subtype = string_attribute.get_subtype()
-
-                max_length = string_attribute.get_max_length()
-
-                if subtype == StringSubtype.NONE.value:
-                    properties[key] = bpy.props.StringProperty(
-                        name=display_name,
-                        description=description,
-                        default=default_value,
-                        maxlen=0 if max_length is None else max_length,
-                        options={'SKIP_SAVE'}
-                    )
-                elif subtype == StringSubtype.FRAME_RANGES.value:
-                    properties[key + self.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
-                        type=FrameRangeProps,
-                        options={'SKIP_SAVE'}
-                    )
-
-                    properties[key + self.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
-                        options={'SKIP_SAVE'}
-                    )
-                elif subtype == StringSubtype.FILE_PATH.value:
-                    properties[key] = bpy.props.StringProperty(
-                        name=display_name,
-                        description=description,
-                        default=default_value,
-                        subtype='FILE_PATH',
-                        maxlen=0 if max_length is None else max_length,
-                        options={'SKIP_SAVE'}
-                    )
-                else:
-                    raise ValueError("Unrecognised String subtype '" + subtype + "'.")
-
-            elif attribute_type == AttributeType.ENUM:
-
-                enum_attribute: EnumAttributeType = attribute
-                subtype = enum_attribute.get_subtype()
-                items = []
-
-                if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                    product = enum_attribute.get_subtype_kwargs().get(
-                        api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
-
-                    match = enum_attribute.get_subtype_kwargs().get(
-                        api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
-                    match = p = re.compile(match) if match is not None else None
-
-                    def _get_product_versions(self, context):
-                        versions = plugin.get_api_client().get_product_versions(product)
-
-                        if match is not None:
-                            versions = [s for s in versions if p.match(s)]
-
-                        return list(map(lambda version: (version, version, ''), versions))
-
-                    items = _get_product_versions
-                else:
-                    enum_items = enum_attribute.get_items()
-                    for enum_item in enum_items:
-                        items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
-
-                properties[key] = bpy.props.EnumProperty(
-                    name=display_name,
-                    description=description,
-                    items=items,
-                    default=default_value,
-                    options={'SKIP_SAVE'}
-                )
-
-            elif attribute_type == AttributeType.BOOLEAN:
-                properties[key] = bpy.props.BoolProperty(
-                    name=display_name,
-                    description=description,
-                    default=default_value,
-                    options={'SKIP_SAVE'}
-                )
-
-            elif attribute_type == AttributeType.INTEGER:
-                properties[key] = bpy.props.IntProperty(
-                    name=display_name,
-                    description=description,
-                    default=default_value,
-                    options={'SKIP_SAVE'}
-                )
-
-            # every job attribute has at least one possible inference source
-            inference_source_items = []
-            for inference_source in job_attribute.get_inference_sources():
-                inference_source_items.append((inference_source.get_id(),
-                                               inference_source.get_display_name(),
-                                               inference_source.get_description()))
-
-            properties[self.INFERENCE_SOURCE_KEY + key] = bpy.props.EnumProperty(
-                name=self.INFERENCE_SOURCE_KEY,
-                description="The source to read the attribute value from.",
-                items=inference_source_items,
-                default=str(job_attribute.get_default_inference_source().get_id()),
-                options={'SKIP_SAVE'}
-            )
+            self._register_job_attribute(job_attribute, properties)
 
         # register property group
         self._property_group_class = type("GRIDMARKETS_PROPS_job_preset_attributes",
@@ -225,7 +134,10 @@ class JobPreset(MetaJobPreset):
 
     def unregister_props(self):
         import bpy
-        bpy.utils.unregister_class(self._property_group_class)
+
+        if self._property_group_class is not None:
+            bpy.utils.unregister_class(self._property_group_class)
+
         delattr(bpy.types.Scene, self.get_id())
 
     def get_property_group(self):

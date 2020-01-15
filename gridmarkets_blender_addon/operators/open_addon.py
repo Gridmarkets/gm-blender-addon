@@ -20,215 +20,32 @@
 
 import bpy
 
-import re
+import typing
 
-from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
+
+
+def get_blender_props_for_project_attributes(project_attribute: ProjectAttribute,
+                                             properties: typing.Dict[str, bpy.types.Property],
+                                             indent: int):
+
+    utils_blender.get_blender_props_for_attribute(project_attribute.get_attribute(),
+                                                  properties,
+                                                  project_attribute.get_id())
+
+    for child_attribute in project_attribute.get_children():
+        get_blender_props_for_project_attributes(child_attribute, properties, indent + 4)
 
 
 def register_schema(api_client):
-    from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
-    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
-    from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
-    from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, EnumAttributeType, \
-        EnumSubtype, StringAttributeType, StringSubtype
-    import bpy
-
-    properties = {}
-
-    def register_project_attribute_props(project_attribute: ProjectAttribute, indent):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        id = project_attribute.get_id()
-
-        attribute = project_attribute.get_attribute()
-        display_name = attribute.get_display_name()
-        description = attribute.get_description()
-        attribute_type = attribute.get_type()
-        key = attribute.get_key()
-        default = attribute.get_default_value()
-
-        if attribute_type == AttributeType.STRING:
-            string_attribute: StringAttributeType = attribute
-            subtype = string_attribute.get_subtype()
-
-            max_length = string_attribute.get_max_length()
-
-            if subtype == StringSubtype.NONE.value:
-                properties[id] = bpy.props.StringProperty(
-                    name=display_name,
-                    description=description,
-                    default=default,
-                    maxlen=0 if max_length is None else max_length,
-                    options={'SKIP_SAVE'}
-                )
-
-                if project_attribute.get_id() == api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME:
-
-                    def get_remote_root_directories(self, context):
-                        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-                        plugin = PluginFetcher.get_plugin_if_initialised()
-
-                        if plugin is None:
-                            return []
-
-                        api_client = plugin.get_api_client()
-                        projects = api_client.get_cached_root_directories()
-
-                        return list(map(lambda project: (project, project, ''), projects))
-
-                    def getter(self):
-                        root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
-                        try:
-                            return root_directories.index(self[id])
-                        except (KeyError, ValueError):
-                            try:
-                                self[id] = root_directories[0]
-                            except IndexError:
-                                pass
-                            return 0
-
-                    def setter(self, value):
-                        root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
-                        try:
-                            self[id] = root_directories[value]
-                        except IndexError as e:
-                            self[id] = ""
-
-                    properties[id+constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
-                        name=display_name,
-                        description=description,
-                        items=get_remote_root_directories,
-                        get=getter,
-                        set=setter,
-                        options={'SKIP_SAVE'}
-                    )
-
-            elif subtype == StringSubtype.FRAME_RANGES.value:
-                properties[id + JobPreset.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
-                    type=FrameRangeProps,
-                    options={'SKIP_SAVE'}
-                )
-
-                properties[id + JobPreset.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
-                    options={'SKIP_SAVE'}
-                )
-            elif subtype == StringSubtype.FILE_PATH.value:
-                properties[id] = bpy.props.StringProperty(
-                    name=display_name,
-                    description=description,
-                    default=default,
-                    subtype='FILE_PATH',
-                    maxlen=0 if max_length is None else max_length,
-                    options={'SKIP_SAVE'}
-                )
-
-                def get_remote_project_files(self, context):
-                    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
-                    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-                    plugin = PluginFetcher.get_plugin_if_initialised()
-
-                    if plugin is None:
-                        return []
-
-                    api_client = plugin.get_api_client()
-                    api_schema = api_client.get_api_schema()
-
-                    remote_project_name = get_project_attribute_value(api_schema.get_root_project_attribute())
-                    remote_project_files = api_client.get_remote_project_files(remote_project_name)
-                    return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
-
-                def getter(self):
-                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
-
-                    try:
-                        return files.index(self[id])
-                    except (KeyError, ValueError):
-                        try:
-                            self[id] = files[0]
-                        except IndexError:
-                            pass
-                        return 0
-
-                def setter(self, value):
-                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
-                    try:
-                        self[id] = files[value]
-                    except IndexError as e:
-                        self[id] = ""
-
-
-                properties[id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
-                    name=display_name,
-                    description=description,
-                    items=get_remote_project_files,
-                    get=getter,
-                    set=setter,
-                    options={'SKIP_SAVE'}
-                )
-
-            else:
-                raise ValueError("Unrecognised String subtype '" + subtype + "'.")
-
-        elif attribute_type == AttributeType.ENUM:
-            enum_attribute: EnumAttributeType = attribute
-            subtype = enum_attribute.get_subtype()
-            items = []
-
-            if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-                product = enum_attribute.get_subtype_kwargs().get(
-                    api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
-
-                match = enum_attribute.get_subtype_kwargs().get(
-                    api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
-                match = p = re.compile(match) if match is not None else None
-
-                def _get_product_versions(self, context):
-                    versions = plugin.get_api_client().get_product_versions(product)
-
-                    if match is not None:
-                        versions = [s for s in versions if p.match(s)]
-
-                    return list(map(lambda version: (version, version, ''), versions))
-
-                items = _get_product_versions
-            else:
-                enum_items = enum_attribute.get_items()
-                for enum_item in enum_items:
-                    items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
-
-            properties[id] = bpy.props.EnumProperty(
-                name=display_name,
-                description=description,
-                items=items,
-                default=default,
-                options={'SKIP_SAVE'}
-            )
-
-        elif attribute_type == AttributeType.BOOLEAN:
-            properties[id] = bpy.props.BoolProperty(
-                name=display_name,
-                description=description,
-                default=default,
-                options={'SKIP_SAVE'}
-            )
-
-        elif attribute_type == AttributeType.INTEGER:
-            properties[id] = bpy.props.IntProperty(
-                name=display_name,
-                description=description,
-                default=default,
-                options={'SKIP_SAVE'}
-            )
-
-        for child_attribute in project_attribute.get_children():
-            register_project_attribute_props(child_attribute, indent + 4)
-
     # register Project Attribute props
     api_schema = api_client.get_api_schema()
     root_project_attribute = api_schema.get_root_project_attribute()
 
-    register_project_attribute_props(root_project_attribute, 0)
+    properties = {}
+    get_blender_props_for_project_attributes(root_project_attribute, properties, 0)
 
     # register property group
     GRIDMARKETS_PROPS_project_attributes = type("GRIDMARKETS_PROPS_project_attributes", (bpy.types.PropertyGroup,),
