@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import copy
 import typing
 
 from gridmarkets_blender_addon.meta_plugin import User
@@ -103,7 +104,7 @@ T = typing.TypeVar('T')
 
 class CachedValue(typing.Generic[T]):
     def __init__(self, value: T, is_cached: bool = False):
-        self._initial_value = value
+        self._initial_value = copy.copy(value)
         self._value = value
         self._is_cached = is_cached
 
@@ -118,7 +119,7 @@ class CachedValue(typing.Generic[T]):
         return self._is_cached
 
     def reset_and_clear_cache(self):
-        self._value = self._initial_value
+        self._value = copy.copy(self._initial_value)
         self._is_cached = False
 
 
@@ -308,6 +309,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._log.info("Getting Envoy Projects. ignore_cache=" + str(ignore_cache))
 
         if ignore_cache or not self._remote_projects_cache.is_cached():
+
             try:
                 import requests
                 r = requests.get(self._envoy_client.url + '/projects')
