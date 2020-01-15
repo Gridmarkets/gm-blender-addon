@@ -124,6 +124,7 @@ def register_schema(api_client):
                 )
 
                 def get_remote_project_files(self, context):
+                    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
                     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
                     plugin = PluginFetcher.get_plugin_if_initialised()
 
@@ -131,7 +132,9 @@ def register_schema(api_client):
                         return []
 
                     api_client = plugin.get_api_client()
-                    remote_project_name = bpy.context.scene.props.remote_project_container.project_name
+                    api_schema = api_client.get_api_schema()
+
+                    remote_project_name = get_project_attribute_value(api_schema.get_root_project_attribute())
                     remote_project_files = api_client.get_remote_project_files(remote_project_name)
                     return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
 
