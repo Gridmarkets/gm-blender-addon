@@ -130,10 +130,10 @@ class GridMarketsAPIClient(MetaAPIClient):
         MetaAPIClient.__init__(self)
         self._signed_in: bool = False
         self._envoy_client: typing.Optional[gridmarkets.EnvoyClient] = None
-        self._api_schema = XMLAPISchemaParser.parse()
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
 
         # used for caching projects
+        self._api_schema_cache = CachedValue(None)
         self._remote_projects_cache: CachedValue = CachedValue([])
         self._project_files_dictionary_cache = {}
         self._product_resolver: CachedValue = CachedValue(None)
@@ -143,10 +143,6 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._remote_projects_cache.reset_and_clear_cache()
         self._project_files_dictionary_cache.clear()
         self._product_resolver.reset_and_clear_cache()
-
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        plugin.get_user_interface().reset_project_attribute_props()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
@@ -165,6 +161,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         # refresh caches
         self.clear_all_caches()
         self.get_root_directories(ignore_cache=True)
+        self.get_api_schema(ignore_cache=True)
         self._signed_in = True
 
     def sign_out(self) -> None:
@@ -183,8 +180,12 @@ class GridMarketsAPIClient(MetaAPIClient):
     def get_signed_in_user(self) -> typing.Optional[User]:
         return MetaAPIClient.get_signed_in_user(self)
 
-    def get_api_schema(self) -> APISchema:
-        return self._api_schema
+    def get_api_schema(self, ignore_cache=False) -> APISchema:
+
+        if ignore_cache or not self._api_schema_cache.is_cached():
+            self._api_schema_cache.set_value(XMLAPISchemaParser.parse())
+
+        return self._api_schema_cache.get_value()
 
     @staticmethod
     def validate_credentials(auth_email: str, auth_access_key: str) -> bool:
@@ -309,12 +310,12 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._log.info("Getting Envoy Projects. ignore_cache=" + str(ignore_cache))
 
         if ignore_cache or not self._remote_projects_cache.is_cached():
-
             try:
                 import requests
                 r = requests.get(self._envoy_client.url + '/projects')
                 json = r.json()
                 projects = json.get("projects", [])
+
                 envoy_projects = []
 
                 for project in projects:

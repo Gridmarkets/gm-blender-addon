@@ -176,7 +176,8 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
                 user_container.load_focused_profile()
                 bpy.ops.gridmarkets.sign_in_new_user({"screen": screen, "window": window}, "INVOKE_DEFAULT")
 
-        register_schema(api_client)
+        #print("register schema")
+        #register_schema(api_client)
         add_default_job_preset()
 
         return {"FINISHED"}

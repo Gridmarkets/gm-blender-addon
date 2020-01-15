@@ -36,6 +36,11 @@ class Logger:
         self._logging_coordinator = logging_coordinator
 
     def _log(self, msg: str, level: str) -> None:
+
+        # fail fast if msg is not a string
+        if type(msg) is not str:
+            raise ValueError("Logging message must be a string type not a " + str(type(msg)) + " type.", msg)
+
         log_item = LogItem(self._name, level, datetime.datetime.now(), msg)
         self._logging_coordinator.queue(log_item)
 

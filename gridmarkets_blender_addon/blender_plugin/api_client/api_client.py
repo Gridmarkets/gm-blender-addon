@@ -38,6 +38,14 @@ class APIClient(GridMarketsAPIClient):
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         GridMarketsAPIClient.sign_in(self, user, skip_validation=skip_validation)
+
+        from gridmarkets_blender_addon.operators.open_addon import register_schema
+        register_schema(self)
+
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+        plugin.get_user_interface().reset_project_attribute_props()
+
         utils_blender.force_redraw_addon()
 
     def sign_out(self) -> None:

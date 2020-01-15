@@ -20,10 +20,14 @@
 
 import bpy
 
+import traceback
 from queue import Queue, Empty
 
 from gridmarkets_blender_addon import constants, utils_blender
 
+from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_project import \
+    GRIDMARKETS_OT_upload_project
+from gridmarkets_blender_addon.meta_plugin.user import User
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
@@ -40,12 +44,12 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
     bucket = None
     timer = None
     thread: ExcThread = None
-    user_interface = None
-    api_client = None
+    plugin = None
 
     def modal(self, context, event):
         if event.type == 'TIMER':
-            self.user_interface.increment_running_operation_spinner()
+            user_interface = self.plugin.get_user_interface()
+            user_interface.increment_running_operation_spinner()
             utils_blender.force_redraw_addon()
 
             if not self.thread.isAlive():
@@ -55,42 +59,55 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
                     raise RuntimeError("bucket is Empty")
                 else:
                     if type(result) == InvalidEmailError:
-                        self.user_interface.set_auth_email_validity_flag(False)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_auth_email_validity_message(result.user_message)
-                        self.user_interface.set_auth_access_key_validity_message("")
+                        user_interface.set_auth_email_validity_flag(False)
+                        user_interface.set_auth_access_key_validity_flag(True)
+                        user_interface.set_auth_email_validity_message(result.user_message)
+                        user_interface.set_auth_access_key_validity_message("")
 
                     elif type(result) == InvalidAccessKeyError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(False)
-                        self.user_interface.set_auth_email_validity_message("")
-                        self.user_interface.set_auth_access_key_validity_message(result.user_message)
+                        user_interface.set_auth_email_validity_flag(True)
+                        user_interface.set_auth_access_key_validity_flag(False)
+                        user_interface.set_auth_email_validity_message("")
+                        user_interface.set_auth_access_key_validity_message(result.user_message)
 
                     elif type(result) == InvalidUserError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_user_validity_flag(False)
-                        self.user_interface.set_user_validity_message(result.user_message)
+                        user_interface.set_auth_email_validity_flag(True)
+                        user_interface.set_auth_access_key_validity_flag(True)
+                        user_interface.set_user_validity_flag(False)
+                        user_interface.set_user_validity_message(result.user_message)
 
                     elif type(result) == APIError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_user_validity_flag(False)
-                        self.user_interface.set_user_validity_message(result.user_message)
+                        user_interface.set_auth_email_validity_flag(True)
+                        user_interface.set_auth_access_key_validity_flag(True)
+                        user_interface.set_user_validity_flag(False)
+                        user_interface.set_user_validity_message(result.user_message)
 
                     elif result is None:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_auth_email_validity_message("")
-                        self.user_interface.set_auth_access_key_validity_message("")
-                        self.user_interface.set_user_validity_flag(True)
-                        self.user_interface.set_user_validity_message("")
+                        user_interface.set_auth_email_validity_flag(True)
+                        user_interface.set_auth_access_key_validity_flag(True)
+                        user_interface.set_auth_email_validity_message("")
+                        user_interface.set_auth_access_key_validity_message("")
+                        user_interface.set_user_validity_flag(True)
+                        user_interface.set_user_validity_message("")
 
                     else:
-                        raise RuntimeError("Sign-in method returned unexpected result:", result)
+                        # todo move this into a super class method
+                        logging_coordinator = self.plugin.get_logging_coordinator()
+                        logger = logging_coordinator.get_logger(self.bl_label)
+
+                        error_message = "Sign-in method returned unexpected result of type \"" + str(type(result)) + \
+                                        "\". Return value is: " + str(result) + "."
+
+                        if isinstance(result, Exception) and hasattr(result, "__traceback__"):
+                            stack_trace = traceback.format_tb(result.__traceback__)
+                            for line in stack_trace:
+                                error_message = error_message + str(line)
+
+                        logger.error(error_message)
+                        self.report({"ERROR"}, error_message)
 
                 self.thread.join()
-                self.user_interface.set_is_running_operation_flag(False)
+                user_interface.set_is_running_operation_flag(False)
                 context.window_manager.event_timer_remove(self.timer)
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
@@ -99,27 +116,28 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.meta_plugin.user import User
-
-        wm = context.window_manager
         plugin = PluginFetcher.get_plugin()
-        self.api_client = plugin.get_api_client()
+        api_client = plugin.get_api_client()
 
-        self.user_interface = plugin.get_user_interface()
-        auth_email = self.user_interface.get_auth_email()
-        auth_access_key = self.user_interface.get_auth_access_key()
+        user_interface = plugin.get_user_interface()
+        auth_email = user_interface.get_auth_email()
+        auth_access_key = user_interface.get_auth_access_key()
         user = User(auth_email, auth_access_key)
 
-        self.bucket = Queue()
-        self.thread = ExcThread(self.bucket, self.api_client.sign_in, args=(user,), kwargs={"skip_validation": False})
-        self.thread.start()
+        args = (
+            user,
+        )
 
-        self.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
+        kwargs = {
+            "skip_validation": False,
+        }
 
-        self.user_interface.set_is_running_operation_flag(True)
-        self.user_interface.set_running_operation_message("Signing in...")
-        return {'RUNNING_MODAL'}
+        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
+                                                                 context,
+                                                                 api_client.sign_in,
+                                                                 args,
+                                                                 kwargs,
+                                                                 "Signing in...")
 
 
 classes = (

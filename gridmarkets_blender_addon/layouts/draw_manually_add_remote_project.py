@@ -21,11 +21,11 @@
 import bpy
 
 from gridmarkets_blender_addon.blender_plugin.project_attribute.layouts import *
-from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.add_remote_project import \
     GRIDMARKETS_OT_add_remote_project
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.refresh_project_list import \
     GRIDMARKETS_OT_refresh_project_list
+from gridmarkets_blender_addon import constants
 
 
 def _draw_remote_project_prop(layout: bpy.types.UILayout, context: bpy.types.Context):
@@ -57,7 +57,21 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
 
     # If the user has no projects display a warning message
     if len(projects) == 0:
-        layout.label(text="No existing projects detected. You must have already uploaded a project to use this option.")
+        col = layout.column()
+        col.alignment = 'CENTER'
+
+        # warn user that no projects have been found
+        row = col.row()
+        row.alignment = 'CENTER'
+        row.label(text="To use this option you must have already uploaded a project to Envoy. Check for existing " +
+                       "projects using the button below.")
+        col.separator()
+
+        # draw refresh projects list button
+        row = col.row()
+        row.alignment = 'CENTER'
+        row.operator(GRIDMARKETS_OT_refresh_project_list.bl_idname, text="Check for Existing Projects",
+                     icon=constants.ICON_RELOAD)
         return
 
     enabled = not draw_project_attribute(layout, context, root, remote_source=True)

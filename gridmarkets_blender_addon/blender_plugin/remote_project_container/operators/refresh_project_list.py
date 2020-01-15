@@ -29,8 +29,13 @@ class GRIDMARKETS_OT_refresh_project_list(bpy.types.Operator):
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
+        log.info("Refreshing project list...")
+
         api_client = plugin.get_api_client()
-        api_client.get_root_directories(ignore_cache=True)
+        root_dirs = api_client.get_root_directories(ignore_cache=True)
+
+        log.info("Found " + str(len(root_dirs)) + " existing projects.")
         return {'FINISHED'}
 
 
