@@ -20,14 +20,14 @@
 
 import bpy
 
-from queue import Queue, Empty
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants, utils
+from gridmarkets_blender_addon.meta_plugin.errors import *
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils, utils_blender
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_project import GRIDMARKETS_OT_upload_project
+from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProject
 
 
-class GRIDMARKETS_OT_Submit(bpy.types.Operator):
+class GRIDMARKETS_OT_Submit(BaseOperator):
     """Class to represent the 'Submit' operation."""
 
     bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
@@ -41,60 +41,35 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         maxlen=256
     )
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    user_interface = None
-    remote_project_container = None
+    def handle_expected_result(self, result: any) -> bool:
+        if type(result) == NotSignedInError:
+            self.report_and_log({'ERROR'}, result.user_message)
+            return True
 
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
-        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-        if event.type == 'TIMER':
-            self.user_interface.increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        elif type(result) == NotSignedInError:
+            msg = "Could not upload your current scene. You are not signed in."
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) == NotSignedInError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == APIClientError:
+            self.report_and_log({'ERROR'}, result.user_message)
+            return True
 
-                    elif type(result) == AuthenticationError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == RemoteProject: # a remote project is returned when submitting a new project
+            self.get_plugin().get_remote_project_container().append(result)
+            return True
 
-                    elif type(result) == InsufficientCreditsError:
-                        self.report({'ERROR'}, result.user_message)
+        elif result is None: # None is returned when submitting to an existing project
+            return True
 
-                    elif type(result) == InvalidRequestError:
-                        self.report({'ERROR'}, result.user_message)
+        return False
 
-                    elif type(result) == APIError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == RemoteProject:
-                        self.remote_project_container.append(result)
-
-                    elif result is None:
-                        pass
-
-                    else:
-                        raise RuntimeError("Method returned unexpected result:", result)
-
-                self.thread.join()
-                self.user_interface.set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
-
-    def invoke(self, context, event):
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
         props = context.scene.props
         remote_projects = props.remote_project_container.remote_projects
 
@@ -117,15 +92,11 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         else:
             return self.execute(context)
 
-    def submit_new_project(self, context):
+    def submit_new_project(self, context: bpy.types.Context):
         pass
 
-    def submit_to_existing_project(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-
-        self.remote_project_container = plugin.get_remote_project_container()
-        self.user_interface = plugin.get_user_interface()
+    def submit_to_existing_project(self, context: bpy.types.Context):
+        plugin = self.get_plugin()
 
         # get the remote project
         props = context.scene.props
@@ -137,40 +108,32 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         job_preset = get_selected_job_option(context)
 
         if job_preset is None:
-            raise ValueError("No Job Preset option selected for submission")
+            self.report_and_log({"ERROR"}, "No Job Preset option selected for submission")
+
+        ################################################################################################################
+
+        method = plugin.get_api_client().submit_to_remote_project
 
         args = (
             remote_project,
             job_preset
         )
 
-        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
-                                                                 context,
-                                                                 GRIDMARKETS_OT_Submit._submit_to_existing_project,
-                                                                 args,
-                                                                 {},
-                                                                 "Submitting project...")
+        kwargs = {}
 
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        running_operation_message = "Submitting project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
+
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
+
         props = context.scene.props
 
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             return self.submit_new_project(context)
         else:
             return self.submit_to_existing_project(context)
-
-    @staticmethod
-    def _submit_to_existing_project(remote_project, job_preset):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-
-        api_client = plugin.get_api_client()
-
-        api_client.submit_to_remote_project(remote_project, job_preset)
-        return None
-
 
 
 classes = (

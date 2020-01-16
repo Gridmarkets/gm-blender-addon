@@ -20,8 +20,14 @@
 
 import bpy
 
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
 
-class GRIDMARKETS_OT_refresh_project_file_list(bpy.types.Operator):
+from gridmarkets_blender_addon.meta_plugin.errors import *
+
+
+class GRIDMARKETS_OT_refresh_project_file_list(BaseOperator):
     bl_idname = "gridmarkets.refresh_project_file_list"
     bl_label = "Refresh Remote Project file List"
     bl_options = set()
@@ -30,17 +36,54 @@ class GRIDMARKETS_OT_refresh_project_file_list(bpy.types.Operator):
         name="Project name"
     )
 
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+    def handle_expected_result(self, result: any) -> bool:
+        if result is None:
+            return True
+
+        elif type(result) == list:
+            return True
+
+        elif type(result) == APIClientError:
+            return True
+
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
+        plugin = self.get_plugin()
+        logger = self.get_logger()
+
         api_client = plugin.get_api_client()
+        api_schema = api_client.get_api_schema()
 
         if self.project_name:
-            api_client.get_remote_project_files(self.project_name, ignore_cache=True)
+            project_name = self.project_name
         else:
-            api_client.clear_project_files_cache()
+            # get project name
+            project_name_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+            project_name = get_project_attribute_value(project_name_attribute)
 
-        return {'FINISHED'}
+            if not project_name:
+                logger.info("Clearing project files cache...")
+                api_client.clear_project_files_cache()
+                return {'FINISHED'}
+
+        ################################################################################################################
+
+        method = api_client.get_remote_project_files
+
+        args = (
+            project_name,
+        )
+
+        kwargs = {
+            "ignore_cache": True
+        }
+
+        running_operation_message = "Refreshing file list..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (

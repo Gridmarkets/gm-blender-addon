@@ -20,105 +20,52 @@
 
 import bpy
 
-from queue import Queue, Empty
 import typing
-import traceback
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
+from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
+    get_project_attribute_value, set_project_attribute_value
+
+from gridmarkets_blender_addon.meta_plugin.errors import *
 
 
-class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
+class GRIDMARKETS_OT_upload_project(BaseOperator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
     bl_description = "Upload the current scene as a new project"
     bl_options = {'REGISTER'}
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    plugin = None
+    def handle_expected_result(self, result: any) -> bool:
 
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
-        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
-        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+        if isinstance(result, RemoteProject):
+            return True
 
-        if event.type == 'TIMER':
-            self.plugin.get_user_interface().increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) == NotSignedInError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == NotSignedInError:
+            msg = "Could not upload your current scene. You are not signed in."
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-                    elif type(result) == AuthenticationError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == APIClientError:
+            msg = "Could not upload your current scene. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-                    elif type(result) == InsufficientCreditsError:
-                        self.report({'ERROR'}, result.user_message)
+        return False
 
-                    elif type(result) == InvalidRequestError:
-                        self.report({'ERROR'}, result.user_message)
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
 
-                    elif type(result) == APIError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif isinstance(result, PluginError):
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif isinstance(result, Exception):
-                        self.report({'ERROR'}, result)
-                        traceback.print_tb(result.__traceback__)
-
-                    else:
-                        if type(result) != RemoteProject:
-                            raise RuntimeError("Method returned unexpected result:", result)
-
-                self.thread.join()
-                self.plugin.get_user_interface().set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
-
-    @staticmethod
-    def boilerplate_execute(operator, context, method, args, kwargs, running_operation_message: str):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        operator.plugin = plugin
-
-        wm = context.window_manager
-        operator.bucket = Queue()
-        operator.thread = ExcThread(operator.bucket,
-                                    method,
-                                    args=args,
-                                    kwargs=kwargs)
-        operator.thread.start()
-
-        operator.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(operator)
-
-        user_interface = plugin.get_user_interface()
-        user_interface.set_is_running_operation_flag(True)
-        user_interface.set_running_operation_message(running_operation_message)
-        return {'RUNNING_MODAL'}
-
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            get_project_attribute_value, set_project_attribute_value
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        plugin = self.get_plugin()
         user_interface = plugin.get_user_interface()
         api_schema = plugin.get_api_client().get_api_schema()
 
@@ -127,7 +74,8 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             return {'FINISHED'}
 
         # get project name
-        project_name_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
         project_name = get_project_attribute_value(project_name_attribute)
 
         # set product (either blender or vray)
@@ -153,26 +101,31 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
         attributes = utils_blender.get_project_attributes(force_transition=True)
 
+        ################################################################################################################
+
+        method = self._execute
+
         args = (
+            plugin,
             project_name,
             product,
             product_version,
             attributes
         )
 
-        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
-                                                                 context,
-                                                                 GRIDMARKETS_OT_upload_project._execute,
-                                                                 args,
-                                                                 {},
-                                                                 "Uploading project...")
+        kwargs = {}
+
+        running_operation_message = "Uploading project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
     @staticmethod
-    def _execute(project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
+    def _execute(plugin: 'Plugin', project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
         temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
+        # todo reuse this in submit current scene operator
         if product == api_constants.PRODUCTS.BLENDER:
             packed_project = BlenderSceneExporter().export(temp_dir)
         elif product == api_constants.PRODUCTS.VRAY:
@@ -186,9 +139,6 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
             if key not in packed_project.get_attributes():
                 # Then set the attribute
                 packed_project.set_attribute(key, value)
-
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
 
         api_client = plugin.get_api_client()
         return api_client.upload_project(packed_project, True, delete_local_files_after_upload=False)

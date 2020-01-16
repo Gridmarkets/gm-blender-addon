@@ -21,91 +21,70 @@
 import bpy
 
 import pathlib
-from queue import Empty
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+from gridmarkets_blender_addon.meta_plugin.errors import FilePackingError
 
 from gridmarkets_blender_addon.file_packers.blender_file_packer import BlenderFilePacker
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants
 
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_project import \
-    GRIDMARKETS_OT_upload_project
 
-
-class GRIDMARKETS_OT_pack_blend_file(bpy.types.Operator):
+class GRIDMARKETS_OT_pack_blend_file(BaseOperator):
     bl_idname = constants.OPERATOR_PACK_BLEND_FILE_ID_NAME
     bl_label = constants.OPERATOR_PACK_BLEND_FILE_LABEL
     bl_description = constants.OPERATOR_PACK_BLEND_FILE_DESCRIPTION
     bl_options = {'REGISTER'}
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    plugin = None
+    def handle_expected_result(self, result: any) -> bool:
 
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+        if type(result) == PackedProject:
+            return True
 
-        if event.type == 'TIMER':
-            self.plugin.get_user_interface().increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) != PackedProject:
-                        raise RuntimeError("Method returned unexpected result:", result)
-
-                self.thread.join()
-                self.plugin.get_user_interface().set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
+        return False
 
     def execute(self, context: bpy.types.Context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
+        self.setup_operator()
+        plugin = self.get_plugin()
+        logger = self.get_logger()
 
         blend_file = pathlib.Path(plugin.get_user_interface().get_blend_file_path())
 
         if not blend_file.exists():
-            self.report({'ERROR'}, "File '" + str(blend_file) + "' does not exist")
+            self.report_and_log({'ERROR'}, "File '" + str(blend_file) + "' does not exist")
             return {"FINISHED"}
 
         if not blend_file.is_file():
-            self.report({'ERROR'}, "Selected .blend file path does not point to a file")
+            self.report_and_log({'ERROR'}, "Selected .blend file path does not point to a file")
             return {"FINISHED"}
 
         if blend_file.suffix != constants.BLEND_FILE_EXTENSION:
-            self.report({'ERROR'}, "File does not have a .blend extension")
+            self.report_and_log({'ERROR'}, "File does not have a .blend extension")
             return {"FINISHED"}
 
         export_path = pathlib.Path(plugin.get_user_interface().get_export_path())
 
-        log.info("Packing blend file '" + str(blend_file) + "' to directory '" + str(export_path) + "'")
+        logger.info("Packing blend file '" + str(blend_file) + "' to directory '" + str(export_path) + "'")
+
+        ################################################################################################################
+
+        method = BlenderFilePacker().pack
 
         args = (
             blend_file,
             export_path
         )
 
-        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
-                                                                 context,
-                                                                 GRIDMARKETS_OT_pack_blend_file._execute,
-                                                                 args,
-                                                                 {},
-                                                                 "Packing .blend file...")
+        kwargs = {}
 
-    @staticmethod
-    def _execute(target_file: pathlib.Path, output_dir: pathlib.Path):
-        packed_project = BlenderFilePacker().pack(target_file, output_dir)
-        return packed_project
+        running_operation_message = "Packing .blend file..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (

@@ -20,15 +20,20 @@
 
 __all__ = ['JobPresetAttribute']
 
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+import typing
+
 from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.meta_plugin.plugin import Plugin
+    from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
+    from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+    from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 
 
 class JobPresetAttribute:
 
-    def __init__(self, parent_preset: 'JobPreset', job_attribute: JobAttribute,
+    def __init__(self, parent_preset: 'JobPreset', job_attribute: 'JobAttribute',
                  inference_source: InferenceSource = None,
                  value: any = None):
 
@@ -50,7 +55,7 @@ class JobPresetAttribute:
     def get_parent_preset(self) -> 'JobPreset':
         return self._parent_preset
 
-    def get_job_attribute(self) -> JobAttribute:
+    def get_job_attribute(self) -> 'JobAttribute':
         return self._job_attribute
 
     def get_id(self) -> str:
@@ -75,7 +80,7 @@ class JobPresetAttribute:
     def set_value(self, value: any) -> None:
         self._value = value
 
-    def eval(self, plugin: 'Plugin', source_project: RemoteProject = None):
+    def eval(self, plugin: 'Plugin', source_project: 'RemoteProject' = None):
 
         inference_source = self.get_inference_source()
         attribute = self._job_attribute.get_attribute()
@@ -112,8 +117,3 @@ class JobPresetAttribute:
 
         else:
             raise ValueError("Unknown inference source: " + str(inference_source))
-
-
-# avoid circular imports by importing at end
-from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
-from gridmarkets_blender_addon.meta_plugin.plugin import Plugin

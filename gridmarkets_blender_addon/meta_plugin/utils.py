@@ -62,3 +62,17 @@ def get_deep_attribute(obj, attribute_path: str or typing.List[str]):
         current_object = getattr(current_object, attribute_name)
 
     return current_object
+
+
+def get_exception_with_traceback(exception: Exception) -> str:
+    import traceback
+
+    error_message = str(exception)
+
+    # if the return value is an exception, add it's stack trace to the error message
+    if hasattr(exception, "__traceback__"):
+        stack_trace = traceback.format_tb(exception.__traceback__)
+        for line in stack_trace:
+            error_message = error_message + str(line)
+
+    return error_message

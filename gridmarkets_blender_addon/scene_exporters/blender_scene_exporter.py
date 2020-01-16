@@ -40,7 +40,7 @@ class BlenderSceneExporter(SceneExporter):
         bpy.ops.wm.save_as_mainfile(copy=True, filepath=target, relative_remap=True,
                                     compress=True)
 
-    def export(self, output_dir: pathlib.Path, ) -> PackedProject:
+    def export(self, output_dir: pathlib.Path) -> PackedProject:
         # save a copy of blender scene to a temporary .blend file
         tmp_dir = tempfile.TemporaryDirectory(prefix='gm-temp-dir-')
         blend_file_name = utils_blender.get_blend_file_name()

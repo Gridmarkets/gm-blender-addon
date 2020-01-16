@@ -20,23 +20,48 @@
 
 import bpy
 
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon.meta_plugin.errors import *
 
-class GRIDMARKETS_OT_refresh_project_list(bpy.types.Operator):
+class GRIDMARKETS_OT_refresh_project_list(BaseOperator):
     bl_idname = "gridmarkets.refresh_project_list"
     bl_label = "Refresh Remote Project List"
     bl_options = set()
 
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
-        log.info("Refreshing project list...")
+    def handle_expected_result(self, result: any) -> bool:
+        if result is None:
+            return True
+
+        elif type(result) == list:
+            return True
+
+        elif type(result) == APIClientError:
+            return True
+
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
+        plugin = self.get_plugin()
+        logger = self.get_logger()
+
+        logger.info("Refreshing project list...")
 
         api_client = plugin.get_api_client()
-        root_dirs = api_client.get_root_directories(ignore_cache=True)
 
-        log.info("Found " + str(len(root_dirs)) + " existing projects.")
-        return {'FINISHED'}
+        ################################################################################################################
+
+        method = api_client.get_root_directories
+
+        args = ()
+
+        kwargs = {
+            "ignore_cache": True
+        }
+
+        running_operation_message = "Refreshing project list..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (

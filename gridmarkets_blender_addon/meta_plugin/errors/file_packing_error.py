@@ -21,7 +21,7 @@
 from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
 
 
-class APIError(PluginError):
+class FilePackingError(PluginError):
 
     def __init__(self, message=None):
         PluginError.__init__(self, message)

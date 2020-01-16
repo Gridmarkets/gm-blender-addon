@@ -21,84 +21,65 @@
 import bpy
 
 import pathlib
-from queue import Empty
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+from gridmarkets_blender_addon.meta_plugin.errors import FilePackingError
+
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
-
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_project import \
-    GRIDMARKETS_OT_upload_project
+from gridmarkets_blender_addon import constants
 
 
-class GRIDMARKETS_OT_pack_current_scene(bpy.types.Operator):
+class GRIDMARKETS_OT_pack_current_scene(BaseOperator):
     bl_idname = constants.OPERATOR_PACK_CURRENT_SCENE_ID_NAME
     bl_label = constants.OPERATOR_PACK_CURRENT_SCENE_LABEL
     bl_description = constants.OPERATOR_PACK_CURRENT_SCENE_DESCRIPTION
     bl_options = {'REGISTER'}
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    plugin = None
+    def handle_expected_result(self, result: any) -> bool:
 
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+        if type(result) == PackedProject:
+            return True
 
-        if event.type == 'TIMER':
-            self.plugin.get_user_interface().increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) != PackedProject:
-                        raise RuntimeError("Method returned unexpected result:", result)
+        return False
 
-                self.thread.join()
-                self.plugin.get_user_interface().set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
-
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
+        plugin = self.get_plugin()
         user_interface = plugin.get_user_interface()
-        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
+        logger = self.get_logger()
 
         if not user_interface.is_render_engine_supported():
             return {'FINISHED'}
 
         export_path = pathlib.Path(plugin.get_user_interface().get_export_path())
 
+        logger.info("Pack current scene to '" + str(export_path) + "'")
+
+        render_engine = context.scene.render.engine
+
+        ################################################################################################################
+
+        if render_engine == constants.RENDER_ENGINE_CYCLES:
+            method = BlenderSceneExporter().export
+        else:
+            method = VRaySceneExporter().export
+
         args = (
-            context.scene.render.engine,
-            export_path
+            export_path,
         )
 
-        log.info("Pack current scene to '" + str(export_path) + "'")
-        return GRIDMARKETS_OT_upload_project.boilerplate_execute(self,
-                                                                 context,
-                                                                 GRIDMARKETS_OT_pack_current_scene._execute,
-                                                                 args,
-                                                                 {},
-                                                                 "Packing project...")
+        kwargs = {}
 
-    @staticmethod
-    def _execute(render_engine: str, export_dir: pathlib.Path):
-        if render_engine == constants.RENDER_ENGINE_CYCLES:
-            packed_project = BlenderSceneExporter().export(export_dir)
-        else:
-            packed_project = VRaySceneExporter().export(export_dir)
+        running_operation_message = "Packing project..."
 
-        return packed_project
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (

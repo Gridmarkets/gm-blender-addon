@@ -34,7 +34,7 @@ from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
-from gridmarkets_blender_addon.meta_plugin.errors.api_error import APIError
+from gridmarkets_blender_addon.meta_plugin.errors.api_client_error import APIClientError
 from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
@@ -209,7 +209,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                 if e_msg.startswith("Unexpected error communicating with Envoy.Please start Envoy"):
                     e_msg = "Unable to connect to Envoy."
 
-                raise APIError(message=e_msg)
+                raise APIClientError(message=e_msg)
 
         elif not (has_email or has_key):
             message = "No " + api_constants.COMPANY_NAME + " email address or access key provided."
@@ -255,7 +255,12 @@ class GridMarketsAPIClient(MetaAPIClient):
 
             gm_project.add_files(*files)
 
-        self._envoy_client.upload_project_files(gm_project)
+        try:
+            self._envoy_client.upload_project_files(gm_project)
+        except _APIError as e:
+            raise APIClientError(e.user_message)
+
+        self._log.info("Uploaded project")
 
         # Todo - remove imports from blender add-on module
         from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
@@ -370,7 +375,12 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         if ignore_cache or project_name not in self._project_files_dictionary_cache:
             import requests
-            r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
+
+            try:
+                r = requests.get(self._envoy_client.url + '/project/' + project_name + '/Files')
+            except Exception as e:
+                raise APIClientError(str(e))
+
             json = r.json()
             all_files = json.get('project_files', {}).get('all_files', [])
 

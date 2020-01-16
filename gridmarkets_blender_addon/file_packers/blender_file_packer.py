@@ -18,13 +18,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import pathlib
 
 from gridmarkets_blender_addon.meta_plugin.file_packer import FilePacker
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.errors import FilePackingError
 from gridmarkets_blender_addon.meta_plugin import utils
+
 
 class BlenderFilePacker(FilePacker):
     BAT_PACK_INFO_FILE_NAME = "pack-info.txt"
@@ -52,6 +53,7 @@ class BlenderFilePacker(FilePacker):
             api_constants.API_KEYS.PATH: str(output_dir / target_file.name),
         }
 
+        log.info("Finished packing project \"" + str(target_file) + "\" to \"" + str(output_dir) + "\"")
         return PackedProject(project_name,
                              output_dir,
                              files,
@@ -103,11 +105,14 @@ class BlenderFilePacker(FilePacker):
 
             # attempt to pack the project
             try:
-                log.info("Plan packing operation...")
+                log.info("Execute packing operation...")
                 packer.execute()
             except pack.transfer.FileTransferError as ex:
                 log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
                             str(ex.files_remaining[0]))
                 raise SystemExit(1)
+            except Exception as e:
+                log.error(utils.get_exception_with_traceback(e))
+                raise FilePackingError("A Blender Asset Tracer (BAT) error occurred while packing the project.")
             finally:
                 log.info("Exiting packing operation...")
