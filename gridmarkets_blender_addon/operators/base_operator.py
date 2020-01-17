@@ -63,6 +63,10 @@ class BaseOperator(bpy.types.Operator):
         Should be called from operator.execute
         """
 
+        # add a lock on logging
+        plugin = self.get_plugin()
+        plugin.get_logging_coordinator().add_thread_safe_logging_lock()
+
         wm = context.window_manager
         self._bucket = Queue()
         self._thread = ExcThread(self._bucket,
@@ -81,8 +85,13 @@ class BaseOperator(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'TIMER':
-            user_interface = self.get_plugin().get_user_interface()
+            plugin = self.get_plugin()
+            user_interface = plugin.get_user_interface()
             user_interface.increment_running_operation_spinner()
+
+            logging_coordinator = plugin.get_logging_coordinator()
+            logging_coordinator.flush()
+
             utils_blender.force_redraw_addon()
 
             # if the thread has completed
@@ -105,6 +114,10 @@ class BaseOperator(bpy.types.Operator):
                 self.get_thread().join()
                 user_interface.set_is_running_operation_flag(False)
                 context.window_manager.event_timer_remove(self.get_timer())
+
+                logging_coordinator.remove_thread_safe_logging_lock()
+                logging_coordinator.flush()
+                
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
 

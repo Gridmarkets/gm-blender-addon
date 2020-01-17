@@ -47,6 +47,12 @@ class LoggingCoordinator:
             if self._multi_thread_counter < 0:
                 raise ValueError("Muti-thread counter should never be less than 1")
 
+    def add_thread_safe_logging_lock(self):
+        self.set_thread_safe_mode(True)
+
+    def remove_thread_safe_logging_lock(self):
+        self.set_thread_safe_mode(False)
+
     def get_logger(self, name: str = None) -> Logger:
         return Logger(name, self)
 
