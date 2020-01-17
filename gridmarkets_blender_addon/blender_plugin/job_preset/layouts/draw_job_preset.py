@@ -145,16 +145,22 @@ def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
         job_definition = job_preset.get_job_definition()
         icon = get_blender_icon_tuple_for_job_definition(job_definition)
 
-        row = layout.row()
-        row.label(text=job_preset.get_name(), icon=icon[0], icon_value=icon[1])
+        box = layout.box()
+
+        row = box.row(align=True)
+
+        row2 = row.row()
+        row2.alignment = 'LEFT'
+        row2.label(text=job_preset.get_name(), icon=icon[0], icon_value=icon[1])
+
+        row2 = row.row()
+        row2.alignment = 'RIGHT'
+        row2.enabled = False
+        row2.label(text="Based on job definition \"" + job_preset.get_job_definition().get_display_name() + "\"")
 
         if job_preset.is_locked():
-            row = row.row()
-            row.alignment = 'RIGHT'
-            row.enabled = False
-            row.label(text="locked", icon=constants.ICON_LOCKED)
+            row2.label(text="locked", icon=constants.ICON_LOCKED)
 
-        box = layout.box()
         col = box.column()
 
         _draw_job_preset_headers(col)
@@ -188,6 +194,8 @@ def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
         col.separator()
 
         row = col.row(align=True)
-        row.alignment = "RIGHT"
-        row.label(text="Show Hidden Job Preset Attributes")
-        row.prop(scene.props.user_interface, "show_hidden_job_preset_attributes", text="")
+
+        row2 = row.row()
+        row2.alignment = "RIGHT"
+        row2.label(text="Show Hidden Job Preset Attributes")
+        row2.prop(scene.props.user_interface, "show_hidden_job_preset_attributes", text="")
