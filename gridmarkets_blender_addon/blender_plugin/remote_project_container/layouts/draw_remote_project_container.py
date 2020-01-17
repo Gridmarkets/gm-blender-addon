@@ -21,8 +21,7 @@
 import bpy
 
 def draw_remote_project_container(layout: bpy.types.UILayout, context: bpy.types.Context):
-    from gridmarkets_blender_addon import constants, utils_blender
-    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
     from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
         GRIDMARKETS_OT_open_remote_project_definition_popup
@@ -30,15 +29,6 @@ def draw_remote_project_container(layout: bpy.types.UILayout, context: bpy.types
         GRIDMARKETS_UL_remote_project
 
     props = context.scene.props
-    plugin = PluginFetcher.get_plugin()
-    user_interface = plugin.get_user_interface()
-
-    def get_upload_tuple():
-        method = user_interface.get_layout()
-        for tuple in constants.LAYOUTS:
-            if tuple[0] == method:
-                return tuple
-        raise RuntimeError("Could not find project action tuple")
 
     remote_project_container_props = props.remote_project_container
 
