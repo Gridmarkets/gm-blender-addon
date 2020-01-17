@@ -32,6 +32,9 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import Inv
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
 
+if typing.TYPE_CHECKING:
+    from .product import Product
+
 
 class APIClient(ABC, PluginAccessor):
 
@@ -108,3 +111,6 @@ class APIClient(ABC, PluginAccessor):
                                  job_preset: JobPreset) -> None:
         raise NotImplemented
 
+    @abstractmethod
+    def get_products(self) -> typing.List['Product']:
+        raise NotImplementedError

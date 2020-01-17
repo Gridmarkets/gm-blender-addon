@@ -27,6 +27,7 @@ from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.product import Product
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory
@@ -408,3 +409,18 @@ class GridMarketsAPIClient(MetaAPIClient):
         json = r.json()
         available_credits = json.get('credits_available', 0)
         return available_credits
+
+    def get_products(self) -> typing.List[Product]:
+        import requests
+        r = requests.get(self._envoy_client.url + '/products')
+        json = r.json()
+
+        def parse_product(json) -> Product:
+            return Product(json.get('id', -1),
+                           json.get('name', ''),
+                           json.get('app_type', ''),
+                           json.get('version', ''))
+
+        products = list(map(parse_product, json))
+
+        return products
