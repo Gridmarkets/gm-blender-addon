@@ -41,7 +41,7 @@ def draw_job_preset_container(layout, context):
     job_preset_container_props = props.job_preset_container
 
     layout.label(text='Job Presets')
-    layout.menu(GRIDMARKETS_MT_new_job_preset.bl_idname)
+    layout.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
 
     layout.template_list(GRIDMARKETS_UL_job_preset.bl_idname, "",
                          job_preset_container_props, "items",
