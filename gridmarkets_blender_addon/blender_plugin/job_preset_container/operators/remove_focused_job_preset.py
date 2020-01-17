@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.property_groups.main_props import get_job_options
 class GRIDMARKETS_OT_remove_focused_job_preset(bpy.types.Operator):
     bl_idname = "gridmarkets.remove_focused_job_preset"
     bl_label = "Remove Focused Job Preset"
-    bl_description = "Removes the focuesed Job Preset from the Job Presets list"
+    bl_description = "Removes the focused Job Preset from the Job Presets list"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
