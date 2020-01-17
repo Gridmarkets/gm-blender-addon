@@ -60,6 +60,10 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
             self.report_and_log({'ERROR'}, result.user_message)
             return True
 
+        elif type(result) == UnsupportedApplicationError:
+            self.report({'ERROR'}, result.user_message)
+            return True
+
         elif type(result) == RemoteProject: # a remote project is returned when submitting a new project
             self.get_plugin().get_remote_project_container().append(result)
             return True

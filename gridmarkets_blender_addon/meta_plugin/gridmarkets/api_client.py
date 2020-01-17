@@ -32,11 +32,7 @@ from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser imp
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory, get_exception_with_traceback
 
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
-from gridmarkets_blender_addon.meta_plugin.errors.api_client_error import APIClientError
-from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
+from gridmarkets_blender_addon.meta_plugin.errors import *
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 import gridmarkets
@@ -73,7 +69,7 @@ class EnvoyProject:
 
 
 class EnvoyFile:
-    def __init__(self, check_sum:str, last_modified: str, name: str, key: str, size: int, fmt_name: str):
+    def __init__(self, check_sum: str, last_modified: str, name: str, key: str, size: int, fmt_name: str):
         self._check_sum = check_sum
         self._last_modified = last_modified
         self._name = name
@@ -293,6 +289,20 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         job = gridmarkets.Job(**job_settings)
 
+        # Check the app is supported
+        if job.app not in self.get_product_app_types():
+            msg = "App " + job.app + " is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
+        # Check the version is supported
+        if job.app_version not in self.get_product_versions(job.app):
+            msg = "Version " + job.version + " for app_type (" + job.app + ") is not supported for your account. " + \
+                  "Please contact " + api_constants.COMPANY_NAME + " support for details."
+
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
         # add job to project
         project.add_jobs(job)
 
@@ -452,3 +462,11 @@ class GridMarketsAPIClient(MetaAPIClient):
         cached_products = self._products_cache.get_value()
         self._log.info("Returning " + str(len(cached_products)) + " cached products...")
         return cached_products
+
+    def get_products_with_app_type(self, app_type: str, ignore_cache=False) -> typing.List['Product']:
+        products = self.get_products(ignore_cache=ignore_cache)
+        return list(filter(lambda x: x.get_app_type() == app_type, products))
+
+    def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
+        return sorted(list(set(map(lambda x: x.get_app_type(), self.get_products(ignore_cache=ignore_cache)))),
+                      key=lambda s: s.casefold(), reverse=True)

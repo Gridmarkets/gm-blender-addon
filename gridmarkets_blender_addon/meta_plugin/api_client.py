@@ -115,6 +115,12 @@ class APIClient(ABC, PluginAccessor):
     def get_products(self, ignore_cache=False) -> typing.List['Product']:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_products_with_app_type(self, app_type: str) -> typing.List['Product']:
+        raise NotImplementedError
+
+    @abstractmethod
     def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
-        return sorted(list(set(map(lambda x: x.get_app_type(), self.get_products(ignore_cache=ignore_cache)))),
-                      key=lambda s: s.casefold(), reverse=True)
+        raise NotImplementedError
+
+
