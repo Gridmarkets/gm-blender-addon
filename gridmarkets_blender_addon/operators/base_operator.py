@@ -117,7 +117,7 @@ class BaseOperator(bpy.types.Operator):
 
                 logging_coordinator.remove_thread_safe_logging_lock()
                 logging_coordinator.flush()
-                
+
                 utils_blender.force_redraw_addon()
                 return {'FINISHED'}
 

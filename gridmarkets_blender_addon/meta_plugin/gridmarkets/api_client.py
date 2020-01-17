@@ -30,7 +30,7 @@ from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.product import Product
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
-from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory
+from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory, get_exception_with_traceback
 
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
@@ -138,12 +138,14 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._remote_projects_cache: CachedValue = CachedValue([])
         self._project_files_dictionary_cache = {}
         self._product_resolver: CachedValue = CachedValue(None)
+        self._products_cache = CachedValue([])
 
     def clear_all_caches(self):
         self._log.info("Clearing cached API data")
         self._remote_projects_cache.reset_and_clear_cache()
         self._project_files_dictionary_cache.clear()
         self._product_resolver.reset_and_clear_cache()
+        self._products_cache.reset_and_clear_cache()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
@@ -410,17 +412,43 @@ class GridMarketsAPIClient(MetaAPIClient):
         available_credits = json.get('credits_available', 0)
         return available_credits
 
-    def get_products(self) -> typing.List[Product]:
-        import requests
-        r = requests.get(self._envoy_client.url + '/products')
-        json = r.json()
+    def get_products(self, ignore_cache=False) -> typing.List[Product]:
+        self._log.info("Getting products list...")
 
-        def parse_product(json) -> Product:
-            return Product(json.get('id', -1),
-                           json.get('name', ''),
-                           json.get('app_type', ''),
-                           json.get('version', ''))
+        if not self.is_user_signed_in():
+            msg = "Must be signed-in to get products list."
+            self._log.error(msg)
+            raise NotSignedInError(msg)
 
-        products = list(map(parse_product, json))
+        if ignore_cache or not self._products_cache.is_cached():
+            url = '{0}/products'.format(self._envoy_client.url)
 
-        return products
+            self._log.info("Fetching products list from " + url)
+
+            try:
+                resp = self._envoy_client.http_client.request('get', url)
+            except Exception as e:
+                msg = "Could not fetch products list: " + get_exception_with_traceback(e)
+                self._log.error(msg)
+                raise APIClientError(msg)
+            else:
+                if resp.status_code == 200:
+                    content = resp.json()
+
+                    def parse_product(json) -> Product:
+                        return Product(json.get('id', -1),
+                                       json.get('name', ''),
+                                       json.get('app_type', ''),
+                                       json.get('version', ''))
+
+                    self._log.info("Caching fetched products...")
+                    self._products_cache.set_value(list(map(lambda x: parse_product(x), content)))
+
+                if resp.status_code == 404:
+                    msg = "404: {0} not found".format(url)
+                    self._log.error(msg)
+                    raise APIClientError(msg)
+
+        cached_products = self._products_cache.get_value()
+        self._log.info("Returning " + str(len(cached_products)) + " cached products...")
+        return cached_products
