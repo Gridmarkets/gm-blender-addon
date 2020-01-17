@@ -28,7 +28,8 @@ __all__ = 'APIClientError', \
           'InvalidUserError', \
           'NotSignedInError', \
           'PluginError', \
-          'RejectedTransitionInputError'
+          'RejectedTransitionInputError', \
+          'UnsupportedApplicationError'
 
 from .api_client_error import APIClientError
 from .application_attribute_not_found import ApplicationAttributeNotFound
@@ -40,3 +41,4 @@ from .invalid_user_error import InvalidUserError
 from .not_signed_in_error import NotSignedInError
 from .plugin_error import PluginError
 from .rejected_transition_input_error import RejectedTransitionInputError
+from .unsupported_application_error import UnsupportedApplicationError
