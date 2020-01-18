@@ -18,19 +18,24 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'ProjectAttribute'
+__all__ = 'ProjectAttributeFactory'
 
-import bpy
-from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute as MetaProjectAttribute
+from abc import ABC, abstractmethod
+import typing
+
+if typing.TYPE_CHECKING:
+    from .attribute import Attribute
+    from .project_attribute import ProjectAttribute
+    from .transition import Transition
+    from .job_definition import JobDefinition
 
 
-class ProjectAttribute(MetaProjectAttribute):
+class ProjectAttributeFactory(ABC):
 
-    def get_value(self) -> any:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        return getattr(project_props, self.get_id())
-
-    def set_value(self, value: any) -> None:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        setattr(project_props, self.get_id(), value)
+    @abstractmethod
+    def get_project_attribute(self,
+                              id: str,
+                              attribute: 'Attribute',
+                              transitions: typing.List['Transition'],
+                              compatible_job_definitions: typing.List['JobDefinition']) -> 'ProjectAttribute':
+        raise NotImplementedError

@@ -32,17 +32,9 @@ class GRIDMARKETS_OT_test_operator(bpy.types.Operator):
         plugin = PluginFetcher.get_plugin()
         log = plugin.get_logging_coordinator().get_logger()
 
-        user = plugin.get_api_client().get_signed_in_user()
-
-        # create an instance of Envoy client
-        client = EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
-
-        # get product resolver
-        resolver = client.get_product_resolver()
-
-        # get all products
-        products = resolver.get_all_types()
-        log.info(str(products))
+        products = plugin.get_api_client().get_products_with_app_type("hou")
+        for product in products:
+            print(product.get_display_name())
 
         return {"FINISHED"}
 

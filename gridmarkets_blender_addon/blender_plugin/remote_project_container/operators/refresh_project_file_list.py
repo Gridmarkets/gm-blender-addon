@@ -22,7 +22,6 @@ import bpy
 
 from gridmarkets_blender_addon.operators.base_operator import BaseOperator
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
 
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
@@ -62,7 +61,7 @@ class GRIDMARKETS_OT_refresh_project_file_list(BaseOperator):
             # get project name
             project_name_attribute = api_schema.get_project_attribute_with_id(
                 api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
-            project_name = get_project_attribute_value(project_name_attribute)
+            project_name = project_name_attribute.get_value()
 
             if not project_name:
                 logger.info("Clearing project files cache...")

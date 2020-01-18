@@ -18,19 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'ProjectAttribute'
+__all__ = 'FactoryCollection'
 
-import bpy
-from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute as MetaProjectAttribute
+import typing
+
+if typing.TYPE_CHECKING:
+    from .project_attribute_factory import ProjectAttributeFactory
 
 
-class ProjectAttribute(MetaProjectAttribute):
+class FactoryCollection:
+    def __init__(self, project_attribute_factory: 'ProjectAttributeFactory'):
+        self._project_attribute_factory = project_attribute_factory
 
-    def get_value(self) -> any:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        return getattr(project_props, self.get_id())
-
-    def set_value(self, value: any) -> None:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        setattr(project_props, self.get_id(), value)
+    def get_project_attribute_factory(self) -> 'ProjectAttributeFactory':
+        return self._project_attribute_factory

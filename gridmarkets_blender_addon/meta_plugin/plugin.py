@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
 from abc import ABC, abstractmethod
 from gridmarkets_blender_addon.meta_plugin.plugin_version import PluginVersion
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
@@ -28,6 +29,9 @@ from gridmarkets_blender_addon.meta_plugin.remote_project_container import Remot
 from gridmarkets_blender_addon.meta_plugin.plugin_utils import PluginUtils
 from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import \
     ApplicationPoolAttributeSource
+
+if typing.TYPE_CHECKING:
+    from .factory_collection import FactoryCollection
 
 
 class Plugin(ABC):
@@ -62,6 +66,10 @@ class Plugin(ABC):
 
     @abstractmethod
     def get_application_pool_attribute_source(self) -> ApplicationPoolAttributeSource:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_factory_collection(self) -> 'FactoryCollection':
         raise NotImplementedError
 
     def get_plugin_utils(self) -> PluginUtils:

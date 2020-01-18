@@ -712,8 +712,6 @@ def get_selected_project_options(scene, context, id):
 
 
 def get_project_attributes_rec(project_attribute, attributes, force_transition=False):
-    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
-
     attribute = project_attribute.get_attribute()
 
     if attribute.get_type() == AttributeType.NULL:
@@ -721,7 +719,7 @@ def get_project_attributes_rec(project_attribute, attributes, force_transition=F
         return attributes
 
     # add attribute value
-    value = get_project_attribute_value(project_attribute)
+    value = project_attribute.get_value()
     attributes[attribute.get_key()] = value
 
     next_project_attribute = project_attribute.transition(value, force_transition)
@@ -740,7 +738,6 @@ def get_project_attributes(project_attribute=None, attributes=None, force_transi
 
 
 def get_project_files(files: typing.List[pathlib.Path], project_attribute = None) -> typing.List[pathlib.Path]:
-    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
@@ -753,7 +750,7 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
     if attribute.get_type() == AttributeType.NULL:
         return files
 
-    value = get_project_attribute_value(project_attribute)
+    value = project_attribute.get_value()
 
     if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
         # if the attribute is a file path add it's value to the files array
@@ -763,7 +760,6 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
 
 
 def get_project_attributes_sequence(force_transition=False) -> typing.List['ProjectAttribute']:
-    from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
 
@@ -777,7 +773,7 @@ def get_project_attributes_sequence(force_transition=False) -> typing.List['Proj
         if project_attribute.get_attribute().get_type() == AttributeType.NULL:
             return project_attributes
 
-        value = get_project_attribute_value(project_attribute)
+        value = project_attribute.get_value()
         project_attribute = project_attribute.transition(value, force_transition=force_transition)
 
 
@@ -944,8 +940,6 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
             )
 
             def get_remote_project_files(self, context):
-                from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-                    get_project_attribute_value
                 from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
                 plugin = PluginFetcher.get_plugin_if_initialised()
 
@@ -955,7 +949,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
                 api_client = plugin.get_api_client()
                 api_schema = api_client.get_api_schema()
 
-                remote_project_name = get_project_attribute_value(api_schema.get_root_project_attribute())
+                remote_project_name = api_schema.get_root_project_attribute().get_value()
                 remote_project_files = api_client.get_remote_project_files(remote_project_name)
                 return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
 

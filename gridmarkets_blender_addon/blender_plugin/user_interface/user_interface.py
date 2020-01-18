@@ -165,8 +165,6 @@ class UserInterface(MetaUserInterface):
 
     @staticmethod
     def reset_product_value() -> None:
-        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            set_project_attribute_value
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_schema = plugin.get_api_client().get_api_schema()
@@ -175,14 +173,12 @@ class UserInterface(MetaUserInterface):
 
         # set the product
         if bpy.context.scene.render.engine == constants.VRAY_RENDER_RT:
-            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.VRAY)
+            product_attribute.set_value(api_constants.PRODUCTS.VRAY)
         else:
-            set_project_attribute_value(product_attribute, api_constants.PRODUCTS.BLENDER)
+            product_attribute.set_value(api_constants.PRODUCTS.BLENDER)
 
     @staticmethod
     def reset_product_version_value() -> None:
-        from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-            set_project_attribute_value
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_schema = plugin.get_api_client().get_api_schema()
@@ -192,7 +188,7 @@ class UserInterface(MetaUserInterface):
         value = utils_blender.get_closest_matching_product_version()
         if value is not None:
             blender_versions_attribute = api_schema.get_project_attribute_with_id(api_constants.BLENDER_VERSIONS_ENUM_ID)
-            set_project_attribute_value(blender_versions_attribute, value)
+            blender_versions_attribute.set_value(value)
 
     @staticmethod
     def reset_export_path() -> None:

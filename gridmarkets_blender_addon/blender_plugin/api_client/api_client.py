@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
+
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_client import GridMarketsAPIClient
 from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
@@ -29,12 +31,17 @@ from gridmarkets_blender_addon.blender_plugin.remote_project import convert_pack
 from gridmarkets_blender_addon import constants
 import pathlib
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
+
 
 @attach_blender_plugin
 class APIClient(GridMarketsAPIClient):
 
-    def __init__(self, logging_coordinator: LoggingCoordinator):
+    def __init__(self, logging_coordinator: LoggingCoordinator, factory_collection: 'FactoryCollection'):
         GridMarketsAPIClient.__init__(self, logging_coordinator)
+        self._factory_collection = factory_collection
         self._signed_in_lock_extra = False
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
@@ -64,6 +71,15 @@ class APIClient(GridMarketsAPIClient):
 
     def connected(self) -> bool:
         raise NotImplementedError
+
+    def get_api_schema(self,
+                       factory_collection: typing.Optional['FactoryCollection'] = None,
+                       ignore_cache=False) -> 'APISchema':
+
+        if factory_collection is None:
+            factory_collection = self._factory_collection
+
+        return GridMarketsAPIClient.get_api_schema(self, factory_collection, ignore_cache)
 
     def upload_project(self,
                        packed_project: PackedProject,

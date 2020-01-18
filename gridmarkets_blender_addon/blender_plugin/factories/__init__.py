@@ -18,19 +18,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'ProjectAttribute'
+__all__ = 'ProjectAttributeFactory'
 
-import bpy
-from gridmarkets_blender_addon import constants
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute as MetaProjectAttribute
-
-
-class ProjectAttribute(MetaProjectAttribute):
-
-    def get_value(self) -> any:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        return getattr(project_props, self.get_id())
-
-    def set_value(self, value: any) -> None:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        setattr(project_props, self.get_id(), value)
+from .project_attribute_factory import ProjectAttributeFactory

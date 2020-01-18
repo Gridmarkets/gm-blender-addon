@@ -24,8 +24,6 @@ from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttri
 from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
 from gridmarkets_blender_addon.meta_plugin.errors.application_attribute_not_found import ApplicationAttributeNotFound
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
-from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import get_project_attribute_value, \
-    set_project_attribute_value
 from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_attribute_source import \
     ApplicationAttributeSource
 
@@ -85,16 +83,16 @@ class ApplicationPoolAttributeSource(ABC):
         project_attribute = plugin.get_api_client().get_api_schema().get_root_project_attribute()
 
         # set project name
-        set_project_attribute_value(project_attribute, project_name)
-        project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute))
+        project_attribute.set_value(project_name)
+        project_attribute = project_attribute.transition(project_attribute.get_value())
 
         # set product
-        set_project_attribute_value(project_attribute, app)
-        project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute))
+        project_attribute.set_value(app)
+        project_attribute = project_attribute.transition(project_attribute.get_value())
 
         # set product version
-        set_project_attribute_value(project_attribute, version)
-        project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute))
+        project_attribute.set_value(version)
+        project_attribute = project_attribute.transition(project_attribute.get_value())
 
         while True:
             attribute = project_attribute.get_attribute()
@@ -109,9 +107,9 @@ class ApplicationPoolAttributeSource(ABC):
                 # if the application source does not recognise this attribute key then use the default value
                 app_inferred_value = project_attribute.get_attribute().get_default_value()
 
-            set_project_attribute_value(project_attribute, app_inferred_value)
+            project_attribute.set_value(app_inferred_value)
 
-            project_attribute = project_attribute.transition(get_project_attribute_value(project_attribute),
+            project_attribute = project_attribute.transition(project_attribute.get_value(),
                                                              force_transition=True)
 
 

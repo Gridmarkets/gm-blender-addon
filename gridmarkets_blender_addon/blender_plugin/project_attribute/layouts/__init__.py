@@ -22,18 +22,21 @@ __all__ = ['draw_project_attribute']
 
 import bpy
 import types
+import typing
 
 from gridmarkets_blender_addon import constants
-from ..project_attribute import get_project_attribute_value
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
+
 from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
 from gridmarkets_blender_addon.blender_plugin.attribute.layouts.draw_attribute_input import draw_attribute_input
 
+if typing.TYPE_CHECKING:
+    from ..project_attribute import ProjectAttribute
+
 
 def draw_project_attribute(layout: bpy.types.UILayout,
                            context: bpy.types.Context,
-                           project_attribute: ProjectAttribute,
+                           project_attribute: 'ProjectAttribute',
                            draw_linked_attributes=True,
                            remote_source: bool = False,
                            encountered_transition_error=False) -> bool:
@@ -49,7 +52,7 @@ def draw_project_attribute(layout: bpy.types.UILayout,
         return encountered_transition_error
 
     project_props = getattr(context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-    value = get_project_attribute_value(project_attribute)
+    value = project_attribute.get_value()
 
     split = layout.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
     col1 = split.column(align=True)

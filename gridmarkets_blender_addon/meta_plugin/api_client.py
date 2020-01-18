@@ -34,6 +34,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import Inva
 
 if typing.TYPE_CHECKING:
     from .product import Product
+    from .factory_collection import FactoryCollection
 
 
 class APIClient(ABC, PluginAccessor):
@@ -81,7 +82,7 @@ class APIClient(ABC, PluginAccessor):
         return None
 
     @abstractmethod
-    def get_api_schema(self) -> APISchema:
+    def get_api_schema(self, factory_collection: 'FactoryCollection') -> APISchema:
         raise NotImplementedError
 
     @staticmethod

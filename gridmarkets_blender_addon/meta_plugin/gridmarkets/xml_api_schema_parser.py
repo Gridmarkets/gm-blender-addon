@@ -32,6 +32,9 @@ import xml.etree.ElementTree as ET
 import pathlib
 import typing
 
+if typing.TYPE_CHECKING:
+    from ..factory_collection import FactoryCollection
+
 
 def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one: bool = False) -> typing.List[
     ET.Element]:
@@ -47,7 +50,6 @@ def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one
 def get_sub_element(element: ET.Element,
                     tag_name: str,
                     expect_unique_tag: bool = True) -> typing.Optional[ET.Element]:
-
     elements = element.findall(tag_name)
     if len(elements) == 0:
         raise ValueError("The <" + element.tag + "> element must contain exactly one <" + tag_name + "> child element")
@@ -183,7 +185,6 @@ class XMLAPISchemaParser:
 
         return subtype_kwargs
 
-
     @staticmethod
     def _parse_attribute(attribute_element: ET.Element) -> Attribute:
         attribute_key = get_text(attribute_element, TAG_KEY, expect_unique_tag=True)
@@ -283,7 +284,8 @@ class XMLAPISchemaParser:
         return JobDefinition(job_definition_id, job_definition_display_name, attributes)
 
     @staticmethod
-    def _parse_job_definitions(api_schema_element: ET.Element) -> typing.List[JobDefinition]:
+    def _parse_job_definitions(api_schema_element: ET.Element, factory_collection: 'FactoryCollection') -> typing.List[
+        JobDefinition]:
 
         # instantiate the output list
         job_definitions: typing.List[JobDefinition] = []
@@ -334,7 +336,8 @@ class XMLAPISchemaParser:
         # instantiate the output list
         compatible_job_definitions = []
 
-        job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element, TAG_COMPATIBLE_JOB_DEFINITION,
+        job_definition_ids = get_all_sub_elements_text(compatible_job_definitions_element,
+                                                       TAG_COMPATIBLE_JOB_DEFINITION,
                                                        False)
 
         for job_definition_id in job_definition_ids:
@@ -347,7 +350,8 @@ class XMLAPISchemaParser:
     @staticmethod
     def _parse_project_attribute(project_attribute_element: ET.Element,
                                  project_attributes: typing.List[ProjectAttribute],
-                                 job_definitions: typing.List[JobDefinition]) -> ProjectAttribute:
+                                 job_definitions: typing.List[JobDefinition],
+                                 factory_collection: 'FactoryCollection') -> ProjectAttribute:
 
         project_attribute_id = get_attribute(project_attribute_element, ATTRIBUTE_ID)
 
@@ -364,12 +368,17 @@ class XMLAPISchemaParser:
         compatible_job_definitions = XMLAPISchemaParser._parse_compatible_job_definitions(
             compatible_job_definitions_element, job_definitions)
 
-        return ProjectAttribute(project_attribute_id, attribute, project_attribute_transitions,
-                                compatible_job_definitions)
+        factory = factory_collection.get_project_attribute_factory()
+
+        return factory.get_project_attribute(project_attribute_id,
+                                             attribute,
+                                             project_attribute_transitions,
+                                             compatible_job_definitions)
 
     @staticmethod
     def _parse_project_attributes(api_schema_element: ET.Element,
-                                  job_definitions: typing.List[JobDefinition]) -> typing.List[ProjectAttribute]:
+                                  job_definitions: typing.List[JobDefinition],
+                                  factory_collection: 'FactoryCollection') -> typing.List[ProjectAttribute]:
 
         # instantiate the output list
         project_attributes: typing.List[ProjectAttribute] = []
@@ -381,12 +390,13 @@ class XMLAPISchemaParser:
         for project_attribute_element in project_attribute_elements:
             project_attributes.append(XMLAPISchemaParser._parse_project_attribute(project_attribute_element,
                                                                                   project_attributes,
-                                                                                  job_definitions))
+                                                                                  job_definitions,
+                                                                                  factory_collection))
 
         return project_attributes
 
     @staticmethod
-    def parse() -> APISchema:
+    def parse(factory_collection: 'FactoryCollection') -> APISchema:
 
         # parse the xml file using xml.etree.ElementTree
         tree = ET.parse(SCHEMA_DEFINITION_FILE)
@@ -395,7 +405,8 @@ class XMLAPISchemaParser:
         if api_schema_element.tag != TAG_API_SCHEMA:
             raise ValueError("API schema file must have a <" + TAG_API_SCHEMA + "> tag as the root")
 
-        job_definitions = XMLAPISchemaParser._parse_job_definitions(api_schema_element)
-        project_attributes = XMLAPISchemaParser._parse_project_attributes(api_schema_element, job_definitions)
+        job_definitions = XMLAPISchemaParser._parse_job_definitions(api_schema_element, factory_collection)
+        project_attributes = XMLAPISchemaParser._parse_project_attributes(api_schema_element, job_definitions,
+                                                                          factory_collection)
 
         return APISchema(job_definitions, project_attributes)

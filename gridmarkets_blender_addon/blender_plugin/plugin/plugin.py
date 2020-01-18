@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
+
 from gridmarkets_blender_addon import bl_info
 
 from gridmarkets_blender_addon.meta_plugin.plugin import Plugin as MetaPlugin
@@ -35,6 +37,8 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_pr
 from gridmarkets_blender_addon.blender_plugin.application_pool_attribute_source.application_pool_attribute_source import \
     ApplicationPoolAttributeSource
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
+from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
+from ..factories import ProjectAttributeFactory
 
 
 class Plugin(MetaPlugin):
@@ -42,9 +46,13 @@ class Plugin(MetaPlugin):
     def __init__(self):
         version = bl_info['version']
         self._version = PluginVersion(version[0], version[1], version[2])
+
+        project_attribute_factory = ProjectAttributeFactory()
+        self._factory_collection = FactoryCollection(project_attribute_factory)
+
         self._logging_coordinator = LoggingCoordinator(LogHistoryContainer())
         self._preferences_container = PreferencesContainer(UserContainer(), JobPresetContainer())
-        self._api_client = APIClient(self._logging_coordinator)
+        self._api_client = APIClient(self._logging_coordinator, self._factory_collection)
         self._user_interface = UserInterface()
         self._remote_project_container = RemoteProjectContainer()
         self._plugin_utils = PluginUtils()
@@ -73,6 +81,9 @@ class Plugin(MetaPlugin):
 
     def get_application_pool_attribute_source(self) -> ApplicationPoolAttributeSource:
         return self._application_pool_attribute_source
+
+    def get_factory_collection(self) -> FactoryCollection:
+        return self._factory_collection
 
     def get_plugin_utils(self) -> PluginUtils:
         return self._plugin_utils

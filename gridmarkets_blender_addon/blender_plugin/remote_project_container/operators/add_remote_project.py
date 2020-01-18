@@ -27,8 +27,6 @@ from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_erro
     RejectedTransitionInputError
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-    get_project_attribute_value, set_project_attribute_value
 
 
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
@@ -43,7 +41,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         api_schema = api_client.get_api_schema()
         root = api_schema.get_root_project_attribute()
 
-        project_name = get_project_attribute_value(root)
+        project_name = root.get_value()
 
         # check the project exists
         if project_name not in api_client.get_root_directories(ignore_cache=True):
@@ -61,7 +59,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             if attribute.get_type() == AttributeType.NULL:
                 return True
 
-            value = get_project_attribute_value(project_attribute)
+            value = project_attribute.get_value()
 
             # check file paths exist
             if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
@@ -81,7 +79,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             print(attributes)
             remote_project = RemoteProject(attributes.get(api_constants.API_KEYS.PROJECT_NAME),
                                            attributes.get(api_constants.API_KEYS.APP),
-                                           [],
+                                           set(),
                                            attributes)
 
             plugin.get_remote_project_container().append(remote_project)

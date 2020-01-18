@@ -20,6 +20,7 @@
 
 __all__ = ['ProjectAttribute']
 
+from abc import ABC, abstractmethod
 import typing
 
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
@@ -29,7 +30,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_erro
     RejectedTransitionInputError
 
 
-class ProjectAttribute:
+class ProjectAttribute(ABC):
 
     def __init__(self, id: str, attribute: Attribute, transitions: typing.List[Transition],
                  compatible_job_definitions: typing.List[JobDefinition]):
@@ -43,6 +44,14 @@ class ProjectAttribute:
 
     def get_attribute(self) -> Attribute:
         return self._attribute
+
+    @abstractmethod
+    def get_value(self) -> any:
+        raise NotImplementedError
+
+    @abstractmethod
+    def set_value(self, value: any) -> None:
+        raise NotImplementedError
 
     def has_transitions(self) -> bool:
         return len(self._transitions) > 0

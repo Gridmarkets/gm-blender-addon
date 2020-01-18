@@ -38,6 +38,9 @@ from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_c
 import gridmarkets
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
 
+if typing.TYPE_CHECKING:
+    from ..factory_collection import FactoryCollection
+
 
 class EnvoyProject:
     def __init__(self, name: str, deleting: bool, num_files: int, total_size: int, auto_downloading: bool,
@@ -179,10 +182,10 @@ class GridMarketsAPIClient(MetaAPIClient):
     def get_signed_in_user(self) -> typing.Optional[User]:
         return MetaAPIClient.get_signed_in_user(self)
 
-    def get_api_schema(self, ignore_cache=False) -> APISchema:
+    def get_api_schema(self, factory_collection: 'FactoryCollection', ignore_cache=False) -> APISchema:
 
         if ignore_cache or not self._api_schema_cache.is_cached():
-            self._api_schema_cache.set_value(XMLAPISchemaParser.parse())
+            self._api_schema_cache.set_value(XMLAPISchemaParser.parse(factory_collection))
 
         return self._api_schema_cache.get_value()
 

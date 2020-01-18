@@ -28,8 +28,6 @@ from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProjec
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
-from gridmarkets_blender_addon.blender_plugin.project_attribute.project_attribute import \
-    get_project_attribute_value, set_project_attribute_value
 
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
@@ -76,7 +74,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
         # get project name
         project_name_attribute = api_schema.get_project_attribute_with_id(
             api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
-        project_name = get_project_attribute_value(project_name_attribute)
+        project_name = project_name_attribute.get_value()
 
         # set product (either blender or vray)
         product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
@@ -84,7 +82,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
             product = api_constants.PRODUCTS.VRAY
         else:
             product = api_constants.PRODUCTS.BLENDER
-        set_project_attribute_value(product_attribute, product)
+        product_attribute.set_value(product)
 
         # get product version
         if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
@@ -93,7 +91,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
         else:
             product_version_attribute = api_schema.get_project_attribute_with_id(
                 api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
-        product_version = get_project_attribute_value(product_version_attribute)
+        product_version = product_version_attribute.get_value()
 
         # set the other attributes to their application inferred value
         app_attribute_source = plugin.get_application_pool_attribute_source()
