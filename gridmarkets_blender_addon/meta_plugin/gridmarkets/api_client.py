@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAP
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon.meta_plugin.product import Product
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
@@ -264,14 +264,10 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._log.info("Uploaded project")
 
-        # Todo - remove imports from blender add-on module
-        from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
-        return convert_packed_project(packed_project)
+        return convert_packed_project(packed_project, self.get_plugin())
 
     def submit_to_remote_project(self, remote_project: RemoteProject, job_preset: JobPreset) -> None:
-        # Todo - remove blender plugin imports
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        plugin = self.get_plugin()
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")

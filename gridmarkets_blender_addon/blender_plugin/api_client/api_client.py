@@ -26,8 +26,7 @@ from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin i
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.blender_plugin.remote_project import convert_packed_project
+from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon import constants
 import pathlib
 
@@ -194,7 +193,7 @@ class APIClient(GridMarketsAPIClient):
             client.submit_project(project)
             log.info("Submitted V-Ray job")
 
-            return convert_packed_project(packed_project)
+            return convert_packed_project(packed_project, self.get_plugin())
 
         except InvalidInputError as e:
             log.warning("Invalid Input Error: " + e.user_message)
@@ -397,7 +396,7 @@ class APIClient(GridMarketsAPIClient):
         log.info("Job submitted")
         log.info("Finished submit operation - Job should appear in the Render Manager if submitted successfully")
 
-        return convert_packed_project(packed_project)
+        return convert_packed_project(packed_project, self.get_plugin())
 
     def submit_existing_blender_project(self, remote_project: RemoteProject):
         import bpy
