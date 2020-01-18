@@ -136,6 +136,8 @@ WINDOW_SPACE_TYPE = "PREFERENCES"
 
 PROJECT_ATTRIBUTE_SPLIT_FACTOR = 0.2
 
+SHOW_ALL_JOB_DEFINITIONS = "show_all_job_definitions"
+
 # operators
 OPERATOR_ADD_REMOTE_PROJECT_ID_NAME = "gridmarkets.add_remote_project"
 OPERATOR_ADD_REMOTE_PROJECT_LABEL = "Manually specify details for existing Remote Project"

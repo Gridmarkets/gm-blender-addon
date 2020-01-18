@@ -52,7 +52,12 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     row.operator(GRIDMARKETS_OT_open_job_preset_definition_popup.bl_idname, text="",
                  icon=constants.ICON_INFO, emboss=False)
 
-    layout.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
+    row = layout.row(align=True)
+    row.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
+
+    row2 = row.row(align=True)
+    row2.prop_menu_enum(job_preset_container_props, "show_presets_for_all_products", text="", icon=constants.ICON_COLLAPSEMENU)
+    row2.alignment = "RIGHT"
 
     row = layout.row()
     row.template_list(GRIDMARKETS_UL_job_preset.bl_idname, "",
@@ -69,7 +74,7 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
         locked_icon = constants.ICON_NONE
 
     row2 = col.row()
-    row2.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname, text="", icon=constants.ICON_REMOVE)
+    row2.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname, text="", icon=constants.ICON_TRASH)
     row2.enabled = focused and not job_preset.is_locked()
 
     row2 = col.row()

@@ -20,9 +20,10 @@
 
 import bpy
 from gridmarkets_blender_addon.blender_plugin.job_preset.property_groups.job_preset_props import JobPresetProps
+from gridmarkets_blender_addon import constants
 
 
-class JobPresetContainerprops(bpy.types.PropertyGroup):
+class JobPresetContainerProps(bpy.types.PropertyGroup):
 
     def _get_focused_item(self):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -48,6 +49,16 @@ class JobPresetContainerprops(bpy.types.PropertyGroup):
             item = job_preset_container.get_at(value)
             job_preset_container.focus_item(item, update_props=False)
 
+    show_presets_for_all_products: bpy.props.EnumProperty(
+        name="Show Job Presets for All Products",
+        description="Show all types of Job Presets, even ones for non-blender projects.",
+        items=[
+            ("0", "Show only Blender Job Types", ""),
+            (constants.SHOW_ALL_JOB_DEFINITIONS, "Show All Job Types", "")
+        ],
+        options={'SKIP_SAVE'}
+    )
+
     focused_item: bpy.props.IntProperty(
         options={'SKIP_SAVE', 'HIDDEN'},
         get=_get_focused_item,
@@ -57,3 +68,5 @@ class JobPresetContainerprops(bpy.types.PropertyGroup):
     items: bpy.props.CollectionProperty(
         type=JobPresetProps
     )
+
+
