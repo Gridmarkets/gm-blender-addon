@@ -44,6 +44,14 @@ class RemoteProject(Project, ABC):
                          attributes)
 
     @abstractmethod
+    def get_files(self, force_update=False) -> typing.Set[pathlib.Path]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def set_file_list(self, files: typing.Set[pathlib.Path]) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     def set_name(self, name: str) -> None:
         raise NotImplementedError
 

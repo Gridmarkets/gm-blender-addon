@@ -58,6 +58,15 @@ class RemoteProject(MetaRemoteProject):
     def get_api_client(self) -> 'APIClient':
         return self._api_client
 
+    def get_files(self, force_update=False) -> typing.Set[pathlib.Path]:
+        if force_update:
+            self.get_api_client().update_remote_project_status(self)
+
+        return Project.get_files(self)
+
+    def set_file_list(self, files: typing.Set[pathlib.Path]) -> None:
+        self._files = files
+
     def update_project_status(self):
         self.get_api_client().update_remote_project_status(self)
 

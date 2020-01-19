@@ -123,6 +123,7 @@ class BaseOperator(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
+    # Implemented by sub classes
     def handle_expected_result(self, result) -> bool:
         raise NotImplementedError
 
