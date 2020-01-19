@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import typing
+import pathlib
 
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAPIClient
@@ -314,6 +315,13 @@ class GridMarketsAPIClient(MetaAPIClient):
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")
 
+        # check the project exists
+        if len(remote_project.get_files(force_update=True)) <= 0:
+            msg = "Can not submit job to remote project \"" + remote_project.get_name() + \
+                  "\", project does not exist."
+            self._log.warning(msg)
+            raise APIClientError(msg)
+
         # check the project has finished uploading
         if remote_project.get_remaining_bytes_to_upload(force_update=True) != 0:
             msg = "Can not submit job to remote project \"" + remote_project.get_name() + \
@@ -386,16 +394,29 @@ class GridMarketsAPIClient(MetaAPIClient):
 
                 total_bytes = 0
                 total_bytes_done = 0
+                files = set()
 
-                for detail_key, detail in details.items():
-                    total_bytes_for_detail = detail.get('BytesTotal', 1)
-                    bytes_done_for_detail = detail.get('BytesDone', 0)
+                if len(details.items()) > 0:
+                    for detail_key, detail in details.items():
+                        total_bytes_for_detail = detail.get('BytesTotal', 1)
+                        bytes_done_for_detail = detail.get('BytesDone', 0)
 
-                    total_bytes += total_bytes_for_detail
-                    total_bytes_done += bytes_done_for_detail
+                        total_bytes += total_bytes_for_detail
+                        total_bytes_done += bytes_done_for_detail
+                        files.add(pathlib.Path(detail_key))
+                else:
+                    # It is possible that the project has already been uploaded and Envoy is not bothering to show the
+                    # project status for it any more.  Check to see if there are any files uploaded for this project.
+                    uploaded_files = self.get_remote_project_files(remote_project.get_name(), ignore_cache=True)
+                    if len(uploaded_files) >= 0:
+                        for file in uploaded_files:
+                            total_bytes += file.get_size()
+                            total_bytes_done += file.get_size()
+                            files.add(pathlib.Path(file.get_key()))
 
                 remote_project.set_size(total_bytes)
                 remote_project.set_total_bytes_done_uploading(total_bytes_done)
+                remote_project.set_file_list(files)
 
             if resp.status_code == 404:
                 msg = "404: {0} not found".format(url)
