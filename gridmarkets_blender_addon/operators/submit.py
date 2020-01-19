@@ -48,6 +48,8 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
         maxlen=256
     )
 
+    root_directories = []
+
     def handle_expected_result(self, result: any) -> bool:
         if type(result) == NotSignedInError:
             self.report_and_log({'ERROR'}, result.user_message)
@@ -81,14 +83,18 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
         return False
 
     def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        self.setup_operator()
+        plugin = self.get_plugin()
 
         props = context.scene.props
         remote_projects = props.remote_project_container.remote_projects
 
         # only show project name pop up dialog if submitting a new project
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+
+            # set root directories
+            api_client = plugin.get_api_client()
+            self.root_directories = api_client.get_root_directories()
 
             # if the file has been saved use the name of the file as the prefix
             if bpy.context.blend_data.is_saved:
@@ -103,7 +109,7 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
                                                                     name_prefix=constants.PROJECT_PREFIX)
 
             # create popup
-            return context.window_manager.invoke_props_dialog(self, width=400)
+            return context.window_manager.invoke_props_dialog(self, width=500)
         else:
             return self.execute(context)
 
@@ -234,8 +240,6 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
         return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
     def execute(self, context: bpy.types.Context):
-        self.setup_operator()
-
         plugin = self.get_plugin()
         api_schema = plugin.get_api_client().get_api_schema()
         props = context.scene.props
@@ -250,6 +254,13 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
             return self.submit_new_project(context)
         else:
             return self.submit_to_existing_project(context)
+
+    def draw(self, context: bpy.types.Context):
+        layout = self.layout
+        layout.prop(self, "project_name")
+
+        if self.project_name in self.root_directories:
+            layout.label(text="A remote project already exists with this name. Existing files will be overwritten.", icon=constants.ICON_ERROR)
 
 
 classes = (
