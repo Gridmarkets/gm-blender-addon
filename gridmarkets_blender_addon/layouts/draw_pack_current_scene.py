@@ -27,8 +27,10 @@ def draw_pack_current_scene(layout: bpy.types.UILayout, context: bpy.types.Conte
     scene = context.scene
     props = scene.props
 
+    box = layout.box()
+
     # export path
-    split = layout.split(factor=0.2)
+    split = box.split(factor=0.2)
     col1 = split.column()
     col1.label(text="Export Path:")
 
@@ -40,8 +42,8 @@ def draw_pack_current_scene(layout: bpy.types.UILayout, context: bpy.types.Conte
     row.label(text="The path to save your packed scene to.")
     row.enabled = False
 
-    layout.separator()
+    box.separator()
 
-    row = layout.row()
+    row = box.row()
     row.operator(GRIDMARKETS_OT_pack_current_scene.bl_idname)
     row.scale_y = 2.5

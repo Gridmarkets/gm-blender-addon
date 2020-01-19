@@ -23,8 +23,6 @@ import typing
 if typing.TYPE_CHECKING:
     import bpy
 
-from gridmarkets_blender_addon.blender_plugin.job_preset.operators.open_job_preset_definition_popup import GRIDMARKETS_OT_open_job_preset_definition_popup
-
 
 def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.Context'):
     from gridmarkets_blender_addon import constants
@@ -47,19 +45,14 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     props = context.scene.props
     job_preset_container_props = props.job_preset_container
 
-    row = layout.row(align=True)
-    row.label(text='Job Presets', icon=constants.ICON_JOB_PRESET)
-    row.operator(GRIDMARKETS_OT_open_job_preset_definition_popup.bl_idname, text="",
-                 icon=constants.ICON_INFO, emboss=False)
-
-    row = layout.row(align=True)
+    row = layout.box().row(align=True)
     row.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
 
     row2 = row.row(align=True)
     row2.prop_menu_enum(job_preset_container_props, "show_presets_for_all_products", text="", icon=constants.ICON_COLLAPSEMENU)
     row2.alignment = "RIGHT"
 
-    row = layout.row()
+    row = layout.box().row()
     row.template_list(GRIDMARKETS_UL_job_preset.bl_idname, "",
                          job_preset_container_props, "items",
                          job_preset_container_props, "focused_item",
@@ -80,7 +73,5 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     row2 = col.row()
     row2.operator(GRIDMARKETS_OT_toggle_job_preset_locked_state.bl_idname, text='', icon=locked_icon)
     row2.enabled = focused
-
-    layout.separator()
 
     draw_job_preset(layout, context)

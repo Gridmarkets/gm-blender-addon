@@ -35,7 +35,6 @@ class GRIDMARKETS_OT_open_remote_project_definition_popup(bpy.types.Operator):
             layout.label(text="Remote Projects:", icon=constants.ICON_REMOTE_PROJECT)
 
             col = layout.column(align=True)
-            col.enabled = False
             col.label(text="Remote Projects are projects that have been uploaded (or are uploading) to the " +
                            constants.COMPANY_NAME + " cloud.")
             col.label(text="There are many different sub-types of projects each with their own set of jobs that can " +

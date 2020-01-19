@@ -22,7 +22,6 @@ import bpy
 
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.blender_plugin.project_attribute.layouts import draw_project_attribute
-from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators.upload_packed_project import GRIDMARKETS_OT_upload_packed_project
 
 
@@ -30,8 +29,10 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     scene = context.scene
     props = scene.props
 
+    box = layout.box()
+
     # export path
-    split = layout.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
+    split = box.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
     col1 = split.column()
     col1.label(text="Root Directory:")
 
@@ -44,7 +45,7 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     row.enabled = False
 
     # upload_all_files_in_root
-    split = layout.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
+    split = box.split(factor=constants.PROJECT_ATTRIBUTE_SPLIT_FACTOR)
     col1 = split.column()
     col1.label(text="Upload Everything:")
 
@@ -61,11 +62,11 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     plugin = PluginFetcher.get_plugin()
     root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
 
-    enabled = not draw_project_attribute(layout, context, root)
+    enabled = not draw_project_attribute(box, context, root)
 
-    layout.separator()
+    box.separator()
 
-    row = layout.row()
+    row = box.row()
     row.operator(GRIDMARKETS_OT_upload_packed_project.bl_idname)
     row.scale_y = 2.5
     row.enabled = enabled

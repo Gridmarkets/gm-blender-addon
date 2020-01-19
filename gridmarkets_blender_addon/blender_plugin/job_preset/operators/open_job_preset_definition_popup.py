@@ -35,7 +35,6 @@ class GRIDMARKETS_OT_open_job_preset_definition_popup(bpy.types.Operator):
             layout.label(text="Job Presets:", icon=constants.ICON_JOB_PRESET)
 
             col = layout.column(align=True)
-            col.enabled = False
             col.label(text="Job Presets are a reusable way of defining the settings for your job submission.")
             col.label(text="When submitting a job to a Remote Project you select a Job Preset as the job's attribute souce.")
             col.separator()

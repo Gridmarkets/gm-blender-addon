@@ -31,8 +31,10 @@ def draw_pack_and_upload_current_scene(layout: bpy.types.UILayout, context: bpy.
     api_schema = plugin.get_api_client().get_api_schema()
     project_name_attribute =api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
 
+    box = layout.box()
+
     # project name
-    draw_project_attribute(layout, context, project_name_attribute, draw_linked_attributes=False)
+    draw_project_attribute(box, context, project_name_attribute, draw_linked_attributes=False)
 
     # product version
     render_engine = context.scene.render.engine
@@ -42,10 +44,10 @@ def draw_pack_and_upload_current_scene(layout: bpy.types.UILayout, context: bpy.
     else:
         product_version_attribute = api_schema.get_project_attribute_with_id(
             api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
-    draw_project_attribute(layout, context, product_version_attribute, draw_linked_attributes=False)
+    draw_project_attribute(box, context, product_version_attribute, draw_linked_attributes=False)
 
-    layout.separator()
+    box.separator()
 
-    row = layout.row()
+    row = box.row()
     row.operator(GRIDMARKETS_OT_upload_project.bl_idname)
     row.scale_y = 2.5

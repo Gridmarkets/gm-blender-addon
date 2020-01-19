@@ -143,7 +143,7 @@ def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Cont
         row3 = row2.row()
         row3.alignment = 'RIGHT'
         row3.operator(GRIDMARKETS_OT_set_focused_job_preset.bl_idname, text="",
-                      icon=constants.ICON_HIDE_OFF).job_preset_index = job_preset_container.get_index(job_preset_option)
+                      icon=constants.ICON_EDIT).job_preset_index = job_preset_container.get_index(job_preset_option)
     else:
         row2 = job_preset_box.row(align=True)
         row2.label(text="You have not created any Job Presets to choose from.", icon=constants.ICON_ERROR)

@@ -27,8 +27,10 @@ def draw_pack_external_project(layout: bpy.types.UILayout, context: bpy.types.Co
     scene = context.scene
     props = scene.props
 
+    box = layout.box()
+
     # blend file
-    split = layout.split(factor=0.2)
+    split = box.split(factor=0.2)
     col1 = split.column()
     col1.label(text="Blend File:")
 
@@ -41,7 +43,7 @@ def draw_pack_external_project(layout: bpy.types.UILayout, context: bpy.types.Co
     row.enabled = False
 
     # export path
-    split = layout.split(factor=0.2)
+    split = box.split(factor=0.2)
     col1 = split.column()
     col1.label(text="Export Path:")
 
@@ -53,8 +55,8 @@ def draw_pack_external_project(layout: bpy.types.UILayout, context: bpy.types.Co
     row.label(text="The path to save your packed scene to.")
     row.enabled = False
 
-    layout.separator()
+    box.separator()
 
-    row = layout.row()
+    row = box.row()
     row.operator(GRIDMARKETS_OT_pack_blend_file.bl_idname)
     row.scale_y = 2.5

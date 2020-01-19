@@ -20,23 +20,15 @@
 
 import bpy
 
+
 def draw_remote_project_container(layout: bpy.types.UILayout, context: bpy.types.Context):
-    from gridmarkets_blender_addon import constants
     from gridmarkets_blender_addon.blender_plugin.remote_project.layouts.draw_remote_project import draw_remote_project
-    from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
-        GRIDMARKETS_OT_open_remote_project_definition_popup
     from gridmarkets_blender_addon.blender_plugin.remote_project.list_items.remote_project_list import \
         GRIDMARKETS_UL_remote_project
 
     props = context.scene.props
 
     remote_project_container_props = props.remote_project_container
-
-    # draw header
-    row = layout.row(align=True)  #
-    row.label(text="Remote Projects", icon=constants.ICON_REMOTE_PROJECT)
-    row.operator(GRIDMARKETS_OT_open_remote_project_definition_popup.bl_idname, text="",
-                 icon=constants.ICON_INFO, emboss=False)
 
     row = layout.row()
     col = row.column()

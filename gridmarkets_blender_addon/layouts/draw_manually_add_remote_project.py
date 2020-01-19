@@ -55,9 +55,11 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
 
     projects = api_client.get_cached_root_directories()
 
+    box = layout.box()
+
     # If the user has no projects display a warning message
     if len(projects) == 0:
-        col = layout.column()
+        col = box.column()
         col.alignment = 'CENTER'
 
         # warn user that no projects have been found
@@ -74,11 +76,11 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
                      icon=constants.ICON_RELOAD)
         return
 
-    enabled = not draw_project_attribute(layout, context, root, remote_source=True)
+    enabled = not draw_project_attribute(box, context, root, remote_source=True)
 
-    layout.separator()
+    box.separator()
 
-    row = layout.row()
+    row = box.row()
     row.operator(GRIDMARKETS_OT_add_remote_project.bl_idname, text="Add Project Details")
     row.scale_y = 2.5
     row.enabled = enabled

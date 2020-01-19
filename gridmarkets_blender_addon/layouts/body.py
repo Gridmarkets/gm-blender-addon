@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 import typing
 
 from gridmarkets_blender_addon import constants
@@ -44,6 +45,15 @@ from gridmarkets_blender_addon.layouts.draw_pack_current_scene import draw_pack_
 from gridmarkets_blender_addon.layouts.draw_pack_external_project import draw_pack_external_project
 from gridmarkets_blender_addon.layouts.draw_manually_add_remote_project import draw_manually_add_remote_project
 
+from gridmarkets_blender_addon.blender_plugin.remote_project.operators.open_remote_project_definition_popup import \
+    GRIDMARKETS_OT_open_remote_project_definition_popup
+from gridmarkets_blender_addon.blender_plugin.job_preset.operators.open_job_preset_definition_popup import \
+    GRIDMARKETS_OT_open_job_preset_definition_popup
+from gridmarkets_blender_addon.operators.null_operator import GRIDMARKETS_OT_null_operator
+
+from gridmarkets_blender_addon.menus.submission_options import GRIDMARKETS_MT_submit_options
+from gridmarkets_blender_addon.menus.upload_options import GRIDMARKETS_MT_project_upload_options
+from gridmarkets_blender_addon.menus.packing_options import GRIDMARKETS_MT_project_packing_options
 
 def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.Callable:
     """ Matches a ui_layout tuple with it's draw method """
@@ -62,13 +72,43 @@ def _get_ui_layout_draw_method(ui_layout: (str, str, str, str, int)) -> typing.C
     return map[ui_layout[0]]
 
 
+def _get_ui_layout_icon(ui_layout: (str, str, str, str, int)) -> typing.Tuple[str, int]:
+    map = {
+        constants.JOB_PRESETS_LAYOUT_TUPLE[0]: (constants.ICON_JOB_PRESET, 0),
+        constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: (constants.ICON_REMOTE_PROJECT, 0),
+        constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: (constants.ICON_NONE, GRIDMARKETS_MT_project_upload_options.get_icon()),
+        constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: (constants.ICON_NONE, GRIDMARKETS_MT_project_upload_options.get_icon()),
+        constants.PACK_CURRENT_SCENE_TUPLE[0]: (constants.ICON_NONE, GRIDMARKETS_MT_project_packing_options.get_icon()),
+        constants.PACK_BLEND_FILE_TUPLE[0]: (constants.ICON_NONE, GRIDMARKETS_MT_project_packing_options.get_icon()),
+        constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE[0]: (constants.ICON_COLLAPSEMENU, 0),
+        constants.SUBMISSION_SETTINGS_TUPLE[0]: (constants.ICON_NONE, GRIDMARKETS_MT_submit_options.get_icon()),
+    }
+
+    return map[ui_layout[0]]
+
+
+def _get_ui_layout_definition_popup(ui_layout: (str, str, str, str, int)) -> typing.Optional[bpy.types.Operator]:
+    map = {
+        constants.JOB_PRESETS_LAYOUT_TUPLE[0]: GRIDMARKETS_OT_open_job_preset_definition_popup,
+        constants.REMOTE_PROJECTS_LAYOUT_TUPLE[0]: GRIDMARKETS_OT_open_remote_project_definition_popup,
+        constants.UPLOAD_CURRENT_SCENE_TUPLE[0]: None,
+        constants.UPLOAD_PACKED_PROJECT_TUPLE[0]: None,
+        constants.PACK_CURRENT_SCENE_TUPLE[0]: None,
+        constants.PACK_BLEND_FILE_TUPLE[0]: None,
+        constants.UPLOAD_BY_MANUALLY_SPECIFYING_DETAILS_TUPLE[0]: None,
+        constants.SUBMISSION_SETTINGS_TUPLE[0]: None,
+    }
+
+    return map[ui_layout[0]]
+
+
 def draw_body(self, context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     api_client = plugin.get_api_client()
     user_interface = plugin.get_user_interface()
 
-    layout = self.layout
+    layout: bpy.types.UILayout = self.layout
 
     # only show the login screen if not logged in
     if not api_client.is_user_signed_in():
@@ -88,10 +128,35 @@ def draw_body(self, context):
     draw_method = _get_ui_layout_draw_method(ui_layout)
     if draw_method is not None:
         box = layout.box()
-        #title = box.row()
-        #title.alignment = 'CENTER'
-        #title.label(text=ui_layout[1])
-        #box.separator()
+
+        icon = _get_ui_layout_icon(ui_layout)
+        definition_operator = _get_ui_layout_definition_popup(ui_layout)
+
+        row = box.row()
+
+        row2 = row.row()
+        row2.alignment = 'LEFT'
+        row2.ui_units_y = 0.45
+        row2.label(text=ui_layout[1], icon=icon[0], icon_value=icon[1])
+
+        if definition_operator:
+            row2 = row.row()
+            row2.alignment = 'RIGHT'
+            row2.emboss = "PULLDOWN_MENU"
+            row2.operator(definition_operator.bl_idname, text="", icon=constants.ICON_INFO)
+        else:
+            row2 = row.row()
+            row2.alignment = 'RIGHT'
+            row2.emboss = "NONE"
+            row2.operator(GRIDMARKETS_OT_null_operator.bl_idname, text="", icon=constants.ICON_NONE)
+
+        row = box.row()
+
+        row.scale_y = 0.2
+        row.label(text=ui_layout[2], icon=constants.ICON_BLANK)
+        row.enabled = False
+
+        box.separator(factor=0.1)
 
         draw_method(box, context)
 

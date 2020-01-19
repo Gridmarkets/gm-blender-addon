@@ -23,7 +23,7 @@ import bpy
 
 class GRIDMARKETS_OT_set_focused_job_preset(bpy.types.Operator):
     bl_idname = "gridmarkets.set_focused_job_preset"
-    bl_label = "Set Focused Job Preset"
+    bl_label = "Edit Job Preset"
     bl_description = "Focuses the provided job preset and optionally switches to the Job preset layout"
     bl_options = {"REGISTER", "UNDO"}
 

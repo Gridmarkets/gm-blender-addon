@@ -25,6 +25,7 @@ from gridmarkets_blender_addon import constants
 class GRIDMARKETS_OT_null_operator(bpy.types.Operator):
     bl_idname = constants.OPERATOR_NULL_ID_NAME
     bl_label = constants.OPERATOR_NULL_LABEL
+    bl_description = " "
     bl_options = {"INTERNAL"}
 
     def execute(self, context):
