@@ -54,7 +54,7 @@ class GRIDMARKETS_MT_new_job_preset(bpy.types.Menu):
             op.job_definition_id = job_definition.get_definition_id()
 
         layout.separator()
-        layout.label(text="Job Definitions")
+        layout.label(text="Job Preset types")
 
 
 classes = (
