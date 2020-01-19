@@ -19,12 +19,19 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 
 from gridmarkets_blender_addon.operators.base_operator import BaseOperator
-from gridmarkets_blender_addon import constants, utils
+from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
+from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
 from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProject
+
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 
 
 class GRIDMARKETS_OT_Submit(BaseOperator):
@@ -64,21 +71,25 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
             self.report({'ERROR'}, result.user_message)
             return True
 
-        elif type(result) == RemoteProject: # a remote project is returned when submitting a new project
+        elif type(result) == RemoteProject:  # a remote project is returned when submitting a new project
             self.get_plugin().get_remote_project_container().append(result)
             return True
 
-        elif result is None: # None is returned when submitting to an existing project
+        elif result is None:  # None is returned when submitting to an existing project
             return True
 
         return False
 
     def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
+        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+        plugin = PluginFetcher.get_plugin()
+
         props = context.scene.props
         remote_projects = props.remote_project_container.remote_projects
 
         # only show project name pop up dialog if submitting a new project
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+
             # if the file has been saved use the name of the file as the prefix
             if bpy.context.blend_data.is_saved:
                 blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
@@ -96,8 +107,101 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
         else:
             return self.execute(context)
 
+    def _execute_submit_new_project(self,
+                                    project_name: str,
+                                    product: str,
+                                    product_version: str,
+                                    attributes: typing.Dict[str, any],
+                                    job_preset: 'JobPreset'):
+        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
+
+        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+
+        if product == api_constants.PRODUCTS.BLENDER:
+            packed_project = BlenderSceneExporter().export(temp_dir)
+        elif product == api_constants.PRODUCTS.VRAY:
+            packed_project = VRaySceneExporter().export(temp_dir)
+        else:
+            raise RuntimeError("Unknown project type")
+
+        packed_project.set_name(project_name)
+        for key, value in attributes.items():
+            # If the key is not already in the packed project's attribute list
+            if key not in packed_project.get_attributes():
+                # Then set the attribute
+                packed_project.set_attribute(key, value)
+
+        api_client = self.get_plugin().get_api_client()
+        return api_client.submit_new_project(packed_project, job_preset, delete_local_files_after_upload=False)
+
     def submit_new_project(self, context: bpy.types.Context):
-        pass
+        plugin = self.get_plugin()
+        user_interface = plugin.get_user_interface()
+        api_client = plugin.get_api_client()
+        api_schema = api_client.get_api_schema()
+
+        # check render engine
+        if not user_interface.is_render_engine_supported():
+            return {'FINISHED'}
+
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = project_name_attribute.get_value()
+
+        # set product (either blender or vray)
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product = api_constants.PRODUCTS.VRAY
+        else:
+            product = api_constants.PRODUCTS.BLENDER
+        product_attribute.set_value(product)
+
+        # set and get product version
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.VRAY_VERSION)
+            product_version_attribute.set_value(api_client.get_product_versions(api_constants.PRODUCTS.VRAY)[0])
+        else:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
+
+            # set the product version to the closest matching version of blender supported
+            closest_blender_version = utils_blender.get_closest_matching_product_version()
+            if closest_blender_version is not None:
+                product_version_attribute.set_value(closest_blender_version)
+        product_version = product_version_attribute.get_value()
+
+        # set the other attributes to their application inferred value
+        app_attribute_source = plugin.get_application_pool_attribute_source()
+        app_attribute_source.set_project_attribute_values(project_name, product, product_version)
+
+        attributes = utils_blender.get_project_attributes(force_transition=True)
+
+        # get the job preset
+        from gridmarkets_blender_addon.property_groups.main_props import get_selected_job_option
+        job_preset = get_selected_job_option(context)
+
+        if job_preset is None:
+            self.report_and_log({"ERROR"}, "No Job Preset option selected for submission")
+
+        ################################################################################################################
+
+        method = self._execute_submit_new_project
+
+        args = (
+            project_name,
+            product,
+            product_version,
+            attributes,
+            job_preset
+        )
+
+        kwargs = {}
+
+        running_operation_message = "Submitting project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
     def submit_to_existing_project(self, context: bpy.types.Context):
         plugin = self.get_plugin()
@@ -132,7 +236,15 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
     def execute(self, context: bpy.types.Context):
         self.setup_operator()
 
+        plugin = self.get_plugin()
+        api_schema = plugin.get_api_client().get_api_schema()
         props = context.scene.props
+
+        # set the project name attribute
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+
+        project_name_attribute.set_value(self.project_name)
 
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
             return self.submit_new_project(context)

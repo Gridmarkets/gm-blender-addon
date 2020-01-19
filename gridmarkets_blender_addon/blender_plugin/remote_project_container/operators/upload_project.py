@@ -76,7 +76,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
             api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
         project_name = project_name_attribute.get_value()
 
-        # set product (either blender or vray)
+        # set and get product (either blender or vray)
         product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
         if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
             product = api_constants.PRODUCTS.VRAY
@@ -104,7 +104,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
         method = self._execute
 
         args = (
-            plugin,
+            self,
             project_name,
             product,
             product_version,
@@ -117,13 +117,11 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
 
         return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
-    @staticmethod
-    def _execute(plugin: 'Plugin', project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
+    def _execute(self, project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
         from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
 
         temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
 
-        # todo reuse this in submit current scene operator
         if product == api_constants.PRODUCTS.BLENDER:
             packed_project = BlenderSceneExporter().export(temp_dir)
         elif product == api_constants.PRODUCTS.VRAY:
@@ -138,7 +136,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
                 # Then set the attribute
                 packed_project.set_attribute(key, value)
 
-        api_client = plugin.get_api_client()
+        api_client = self.get_plugin().get_api_client()
         return api_client.upload_project(packed_project, True, delete_local_files_after_upload=False)
 
 

@@ -266,6 +266,71 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         return convert_packed_project(packed_project, self.get_plugin())
 
+    def submit_new_project(self,
+                           packed_project: PackedProject,
+                           job_preset: JobPreset,
+                           delete_local_files_after_upload: bool = False) -> RemoteProject:
+        plugin = self.get_plugin()
+
+        if not self.is_user_signed_in():
+            raise NotSignedInError("Must be signed-in to Submit a job.")
+
+        self._log.info("Preparing to submit current scene as project \"" + packed_project.get_name() +
+                       "\" with job \"" + job_preset.get_name() + "\".")
+
+        client = self._envoy_client
+        project_dir = str(packed_project.get_root_dir())
+        project_name = packed_project.get_name()
+
+        gm_project = gridmarkets.Project(project_dir, project_name)
+
+        # add all files to packed project files list
+        files = get_files_in_directory(packed_project.get_root_dir())
+        packed_project.add_files(files)
+
+        self._log.info("Marking directory \"" + project_dir + "\" for upload.")
+        gm_project.add_folders(project_dir)
+
+        remote_project = convert_packed_project(packed_project, self.get_plugin())
+
+        self._log.info("Calculating Job parameters...")
+        job_settings = {}
+        for job_preset_attribute in job_preset.get_job_preset_attributes():
+            key = job_preset_attribute.get_key()
+            value = job_preset_attribute.eval(plugin, remote_project)
+            job_settings[key] = value
+            self._log.info("Job Parameter '" + key + "': " + str(value))
+
+        job = gridmarkets.Job(**job_settings)
+
+        # Check the app is supported
+        if job.app not in self.get_product_app_types():
+            msg = "App \"" + job.app + "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
+        # Check the version is supported
+        if job.app_version not in self.get_product_versions(job.app):
+            msg = "Version \"" + job.app_version + "\" for app_type \"" + job.app + \
+                  "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + \
+                  " support for details."
+
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
+        # add job to project
+        gm_project.add_jobs(job)
+
+        # submit the job to the remote project
+        self._log.info("Submitting current scene with job \"" + job_preset.get_name() + "\" to project \"" + project_name + "\".")
+
+        try:
+            client.submit_project(gm_project, skip_upload=False)
+        except _APIError as e:
+            raise APIClientError(e.user_message)
+
+        self._log.info("Job submitted - See Render Manager for details")
+
     def submit_to_remote_project(self, remote_project: RemoteProject, job_preset: JobPreset) -> None:
         plugin = self.get_plugin()
 
@@ -290,14 +355,15 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         # Check the app is supported
         if job.app not in self.get_product_app_types():
-            msg = "App " + job.app + " is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
+            msg = "App \"" + job.app + "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
             self._log.error(msg)
             raise UnsupportedApplicationError(msg)
 
         # Check the version is supported
         if job.app_version not in self.get_product_versions(job.app):
-            msg = "Version " + job.version + " for app_type (" + job.app + ") is not supported for your account. " + \
-                  "Please contact " + api_constants.COMPANY_NAME + " support for details."
+            msg = "Version \"" + job.app_version + "\" for app_type \"" + job.app + \
+                  "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + \
+                  " support for details."
 
             self._log.error(msg)
             raise UnsupportedApplicationError(msg)
