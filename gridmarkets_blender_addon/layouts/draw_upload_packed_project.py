@@ -69,4 +69,4 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     row = box.row()
     row.operator(GRIDMARKETS_OT_upload_packed_project.bl_idname)
     row.scale_y = 2.5
-    row.enabled = enabled
+    row.enabled = enabled and not plugin.get_user_interface().is_running_operation()

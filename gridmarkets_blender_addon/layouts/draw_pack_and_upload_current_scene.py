@@ -28,6 +28,7 @@ from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_c
 def draw_pack_and_upload_current_scene(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
+
     api_schema = plugin.get_api_client().get_api_schema()
     project_name_attribute =api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
 
@@ -50,4 +51,5 @@ def draw_pack_and_upload_current_scene(layout: bpy.types.UILayout, context: bpy.
 
     row = box.row()
     row.operator(GRIDMARKETS_OT_upload_project.bl_idname)
+    row.enabled = not plugin.get_user_interface().is_running_operation()
     row.scale_y = 2.5

@@ -24,6 +24,9 @@ from gridmarkets_blender_addon.blender_plugin.remote_project_container.operators
 
 
 def draw_pack_current_scene(layout: bpy.types.UILayout, context: bpy.types.Context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
     scene = context.scene
     props = scene.props
 
@@ -46,4 +49,5 @@ def draw_pack_current_scene(layout: bpy.types.UILayout, context: bpy.types.Conte
 
     row = box.row()
     row.operator(GRIDMARKETS_OT_pack_current_scene.bl_idname)
+    row.enabled = not plugin.get_user_interface().is_running_operation()
     row.scale_y = 2.5
