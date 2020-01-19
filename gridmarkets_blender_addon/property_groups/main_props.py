@@ -345,6 +345,8 @@ def reset_to_defaults(pos):
     PluginFetcher.delete_cached_plugin()
 
     # options={'SKIP_SAVE'} doesnt work for global properties so we must reset manually
+    bpy.context.scene.props.project_options = constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE
+
     bpy.context.scene.props.vray.frame_ranges.clear()
     bpy.context.scene.props.vray.selected_frame_range = 0
 
