@@ -808,7 +808,7 @@ def get_current_scene_project_attributes(context):
     return application_pool.get_project_attribute_values(project_name, product, product_version)
 
 
-def get_submission_project_type_id():
+def get_submission_project_type_id() -> str:
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
 

@@ -340,7 +340,7 @@ classes = (
 
 @persistent
 def reset_to_defaults(pos):
-    from gridmarkets_blender_addon import utils
+    from gridmarkets_blender_addon import utils_blender
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     PluginFetcher.delete_cached_plugin()
 
@@ -360,6 +360,9 @@ def reset_to_defaults(pos):
     frame_range.frame_start = 1
     frame_range.frame_end = 256
     frame_range.frame_step = 1
+
+    if utils_blender.get_addon_window():
+        bpy.ops.gridmarkets.open_addon()
 
 
 def register():
