@@ -125,7 +125,7 @@ class GRIDMARKETS_OT_submit_vray_project(bpy.types.Operator):
                     elif type(result) == APIError:
                         self.report({'ERROR'}, result.user_message)
 
-                    elif type(result) == RemoteProject:
+                    elif isinstance(result, RemoteProject):
                         self.remote_project_container.append(result)
 
                     elif result is None:

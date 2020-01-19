@@ -18,25 +18,29 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+
+import copy
 import typing
 
-from gridmarkets_blender_addon import utils_blender
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
+T = typing.TypeVar('T')
 
 
-# todo create remote project subclass
-def get_blender_icon_tuple_for_remote_project(remote_project: RemoteProject) -> typing.Tuple[str, int]:
-    product = remote_project.get_attribute(api_constants.API_KEYS.APP)
-    return utils_blender.get_product_logo(product)
+class CachedValue(typing.Generic[T]):
+    def __init__(self, value: T, is_cached: bool = False):
+        self._initial_value = copy.copy(value)
+        self._value = value
+        self._is_cached = is_cached
 
+    def get_value(self) -> T:
+        return self._value
 
-def get_blender_icon_for_remote_project(remote_project: RemoteProject) -> str or int:
-    icon_tuple = get_blender_icon_tuple_for_remote_project(remote_project)
+    def set_value(self, value: T):
+        self._value = value
+        self._is_cached = True
 
-    # if a custom icon has been returned use that
-    if icon_tuple[1] > 0:
-        return icon_tuple[1]
+    def is_cached(self) -> bool:
+        return self._is_cached
 
-    # otherwise use the native blender icon
-    return icon_tuple[0]
+    def reset_and_clear_cache(self):
+        self._value = copy.copy(self._initial_value)
+        self._is_cached = False

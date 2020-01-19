@@ -25,7 +25,7 @@ from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
 from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
     RejectedTransitionInputError
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
@@ -80,7 +80,8 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             remote_project = RemoteProject(attributes.get(api_constants.API_KEYS.PROJECT_NAME),
                                            attributes.get(api_constants.API_KEYS.APP),
                                            set(),
-                                           attributes)
+                                           attributes,
+                                           api_client)
 
             plugin.get_remote_project_container().append(remote_project)
 

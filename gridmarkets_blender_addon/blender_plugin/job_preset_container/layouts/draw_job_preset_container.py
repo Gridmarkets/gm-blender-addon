@@ -38,9 +38,6 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     from gridmarkets_blender_addon.blender_plugin.job_preset.layouts.draw_job_preset import draw_job_preset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
-    job_preset = job_preset_container.get_focused_item()
-    focused = job_preset is not None
 
     props = context.scene.props
     job_preset_container_props = props.job_preset_container
@@ -61,10 +58,14 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     col = row.column()
     col.alignment = "RIGHT"
 
+    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+    job_preset = job_preset_container.get_focused_item()
+    focused = job_preset is not None
+
     if focused:
         locked_icon = constants.ICON_UNLOCKED if job_preset.is_locked() else constants.ICON_LOCKED
     else:
-        locked_icon = constants.ICON_NONE
+        locked_icon = constants.ICON_LOCKED
 
     row2 = col.row()
     row2.operator(GRIDMARKETS_OT_remove_focused_job_preset.bl_idname, text="", icon=constants.ICON_TRASH)

@@ -18,21 +18,19 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'RemoteProject', 'convert_packed_project'
+__all__ = 'RemoteProject'
 
-from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
+from abc import ABC, abstractmethod
 
 from gridmarkets_blender_addon.meta_plugin.project import Project
 import pathlib
 import typing
 
 if typing.TYPE_CHECKING:
-    from .plugin import Plugin
-    from .packed_project import PackedProject
+    pass
 
 
-class RemoteProject(Project):
+class RemoteProject(Project, ABC):
 
     def __init__(self,
                  name: str,
@@ -45,44 +43,34 @@ class RemoteProject(Project):
                          files,
                          attributes)
 
+    @abstractmethod
     def set_name(self, name: str) -> None:
         raise NotImplementedError
 
+    @abstractmethod
     def exists(self) -> bool:
         raise NotImplementedError
 
+    @abstractmethod
     def delete(self) -> None:
         raise NotImplementedError
 
+    @abstractmethod
     def get_size(self) -> int:
         raise NotImplementedError
 
+    @abstractmethod
+    def set_size(self, size: int) -> None:
+        raise NotImplementedError
 
-def convert_packed_project(packed_project: 'PackedProject', plugin: 'Plugin') -> RemoteProject:
-    root_dir = pathlib.Path(packed_project.get_name())
+    @abstractmethod
+    def get_total_bytes_done_uploading(self, force_update: bool = False) -> int:
+        raise NotImplementedError
 
-    # convert files from absolute local paths to absolute remote paths
-    files = set(map(lambda file: pathlib.Path('/') / root_dir / file, packed_project.get_relative_files()))
-    attributes = packed_project.get_attributes()
+    @abstractmethod
+    def set_total_bytes_done_uploading(self, bytes: int) -> None:
+        raise NotImplementedError
 
-    project_attribute = plugin.get_api_client().get_api_schema(
-        plugin.get_factory_collection()).get_root_project_attribute()
-    attribute = project_attribute.get_attribute()
-
-    # do the same to all file type project attributes
-    while attribute.get_type() != AttributeType.NULL:
-        value = packed_project.get_attribute(attribute.get_key())
-
-        if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
-            # update the file path attribute
-            value = (pathlib.Path('/') / root_dir / packed_project.get_relative_file_path(
-                pathlib.Path(value))).as_posix()
-            packed_project.set_attribute(attribute.get_key(), value)
-
-        project_attribute = project_attribute.transition(value)
-        attribute = project_attribute.get_attribute()
-
-    return RemoteProject(packed_project.get_name(),
-                         root_dir,
-                         files,
-                         attributes)
+    @abstractmethod
+    def get_remaining_bytes_to_upload(self, force_update: bool = False) -> int:
+        raise NotImplementedError

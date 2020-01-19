@@ -18,15 +18,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import copy
 import typing
 
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAPIClient
 from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
+from gridmarkets_blender_addon.meta_plugin.cached_value import CachedValue
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject, convert_packed_project
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon.meta_plugin.product import Product
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
@@ -97,30 +97,6 @@ class EnvoyFile:
 
     def get_fmt_name(self) -> str:
         return self._fmt_name
-
-
-T = typing.TypeVar('T')
-
-
-class CachedValue(typing.Generic[T]):
-    def __init__(self, value: T, is_cached: bool = False):
-        self._initial_value = copy.copy(value)
-        self._value = value
-        self._is_cached = is_cached
-
-    def get_value(self) -> T:
-        return self._value
-
-    def set_value(self, value: T):
-        self._value = value
-        self._is_cached = True
-
-    def is_cached(self) -> bool:
-        return self._is_cached
-
-    def reset_and_clear_cache(self):
-        self._value = copy.copy(self._initial_value)
-        self._is_cached = False
 
 
 class GridMarketsAPIClient(MetaAPIClient):
@@ -322,7 +298,8 @@ class GridMarketsAPIClient(MetaAPIClient):
         gm_project.add_jobs(job)
 
         # submit the job to the remote project
-        self._log.info("Submitting current scene with job \"" + job_preset.get_name() + "\" to project \"" + project_name + "\".")
+        self._log.info(
+            "Submitting current scene with job \"" + job_preset.get_name() + "\" to project \"" + project_name + "\".")
 
         try:
             client.submit_project(gm_project, skip_upload=False)
@@ -336,6 +313,13 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")
+
+        # check the project has finished uploading
+        if remote_project.get_remaining_bytes_to_upload(force_update=True) != 0:
+            msg = "Can not submit job to remote project \"" + remote_project.get_name() + \
+                  "\", project has not finished uploading."
+            self._log.warning(msg)
+            raise APIClientError(msg)
 
         self._log.info(
             "Preparing job " + job_preset.get_name() + " for submission to remote project " + remote_project.get_name())
@@ -377,6 +361,33 @@ class GridMarketsAPIClient(MetaAPIClient):
         client.submit_project(project, skip_upload=True)
 
         self._log.info("Job submitted - See Render Manager for details")
+
+    def update_remote_project_status(self, remote_project: RemoteProject) -> None:
+
+        self._log.info("Fetching project status for project \"" + remote_project.get_name() + "\"...")
+
+        http_client = self._envoy_client.http_client
+        url = self._envoy_client.url + "/project-status/" + remote_project.get_name()
+
+        try:
+            resp = http_client.request('get', url)
+        except Exception as e:
+            msg = "Could not fetch project status for project \"" + remote_project.get_name() + "\". " + \
+                  get_exception_with_traceback(e)
+            self._log.error(msg)
+            raise APIClientError(msg)
+        else:
+            if resp.status_code == 200:
+                self._log.info("Fetched project status for project \"" + remote_project.get_name() + "\".")
+
+                json = resp.json()
+                remote_project.set_size(json.get("BytesTotal", 0))
+                remote_project.set_total_bytes_done_uploading(json.get("BytesDone", 0))
+
+            if resp.status_code == 404:
+                msg = "404: {0} not found".format(url)
+                self._log.error(msg)
+                raise APIClientError(msg)
 
     def get_cached_root_directories(self) -> typing.List[str]:
         return list(map(lambda x: x.get_name(), self._remote_projects_cache.get_value()))

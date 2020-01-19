@@ -20,10 +20,11 @@
 
 
 import pathlib
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 
 
 class RemoteVRayProject(RemoteProject):
+
     ATTRIBUTE_REMAP_FILE_KEY = "REMAP_FILE"
 
     def __init__(self, root_dir: pathlib.Path, main_file: pathlib.Path, remap_file: pathlib.Path):
@@ -43,3 +44,27 @@ class RemoteVRayProject(RemoteProject):
 
     def get_remap_file(self) -> pathlib.Path:
         return self.get_attribute(self.ATTRIBUTE_REMAP_FILE_KEY)
+
+    def set_name(self, name: str) -> None:
+        pass
+
+    def exists(self) -> bool:
+        pass
+
+    def delete(self) -> None:
+        pass
+
+    def get_size(self) -> int:
+        pass
+
+    def set_size(self, size: int) -> None:
+        pass
+
+    def get_total_bytes_done_uploading(self, force_update: bool = False) -> int:
+        pass
+
+    def set_total_bytes_done_uploading(self, bytes: int) -> None:
+        pass
+
+    def get_remaining_bytes_to_upload(self, force_update: bool = False) -> int:
+        pass

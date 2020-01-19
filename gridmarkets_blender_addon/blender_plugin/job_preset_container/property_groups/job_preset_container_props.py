@@ -62,11 +62,12 @@ class JobPresetContainerProps(bpy.types.PropertyGroup):
     focused_item: bpy.props.IntProperty(
         options={'SKIP_SAVE', 'HIDDEN'},
         get=_get_focused_item,
-        set=_set_focused_item
+        set=_set_focused_item,
     )
 
     items: bpy.props.CollectionProperty(
-        type=JobPresetProps
+        type=JobPresetProps,
+        options = {'SKIP_SAVE'}
     )
 
 

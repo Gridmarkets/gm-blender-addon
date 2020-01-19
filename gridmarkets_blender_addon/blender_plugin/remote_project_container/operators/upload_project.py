@@ -104,7 +104,6 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
         method = self._execute
 
         args = (
-            self,
             project_name,
             product,
             product_version,

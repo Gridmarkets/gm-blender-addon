@@ -103,11 +103,15 @@ class APIClient(ABC, PluginAccessor):
                            job_preset: JobPreset,
                            delete_local_files_after_upload: bool = False) -> RemoteProject:
         raise NotImplemented
-    
+
     @abstractmethod
     def submit_to_remote_project(self,
                                  remote_project: RemoteProject,
                                  job_preset: JobPreset) -> None:
+        raise NotImplemented
+
+    @abstractmethod
+    def update_remote_project_status(self, remote_project: RemoteProject) -> None:
         raise NotImplemented
 
     @abstractmethod
@@ -121,5 +125,3 @@ class APIClient(ABC, PluginAccessor):
     @abstractmethod
     def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
         raise NotImplementedError
-
-

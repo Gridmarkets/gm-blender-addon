@@ -28,7 +28,7 @@ from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import Ble
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
-from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 
 if typing.TYPE_CHECKING:
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset

@@ -26,7 +26,7 @@ from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin i
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject, convert_packed_project
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon import constants
 import pathlib
 
