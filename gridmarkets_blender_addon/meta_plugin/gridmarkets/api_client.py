@@ -381,8 +381,21 @@ class GridMarketsAPIClient(MetaAPIClient):
                 self._log.info("Fetched project status for project \"" + remote_project.get_name() + "\".")
 
                 json = resp.json()
-                remote_project.set_size(json.get("BytesTotal", 0))
-                remote_project.set_total_bytes_done_uploading(json.get("BytesDone", 0))
+
+                details = json.get('Details')
+
+                total_bytes = 0
+                total_bytes_done = 0
+
+                for detail_key, detail in details.items():
+                    total_bytes_for_detail = detail.get('BytesTotal', 1)
+                    bytes_done_for_detail = detail.get('BytesDone', 0)
+
+                    total_bytes += total_bytes_for_detail
+                    total_bytes_done += bytes_done_for_detail
+
+                remote_project.set_size(total_bytes)
+                remote_project.set_total_bytes_done_uploading(total_bytes_done)
 
             if resp.status_code == 404:
                 msg = "404: {0} not found".format(url)
