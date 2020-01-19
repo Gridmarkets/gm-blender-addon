@@ -55,8 +55,29 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
 
         return False
 
-    def execute(self, context: bpy.types.Context):
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
         self.setup_operator()
+
+        plugin = self.get_plugin()
+        api_client = plugin.get_api_client()
+        api_schema = api_client.get_api_schema()
+
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = project_name_attribute.get_value()
+
+        root_directories = api_client.get_root_directories(ignore_cache=True)
+
+        print(project_name)
+        print(project_name in root_directories)
+
+        if project_name in root_directories:
+            return context.window_manager.invoke_props_dialog(self, width=500)
+
+        return self.execute(context)
+
+    def execute(self, context: bpy.types.Context):
         plugin = self.get_plugin()
         logger = self.get_logger()
 
@@ -100,6 +121,15 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
         running_operation_message = "Uploading packed project..."
 
         return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
+
+
+    def draw(self, context: bpy.types.Context):
+        layout = self.layout
+        layout.separator()
+        layout.label(text="A remote project already exists with this name. Existing files will be overwritten.",
+                     icon=constants.ICON_ERROR)
+        layout.separator()
+        layout.label(text="Press ok to continue.")
 
 
 classes = (

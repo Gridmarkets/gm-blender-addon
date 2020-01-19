@@ -94,7 +94,7 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
 
             # set root directories
             api_client = plugin.get_api_client()
-            self.root_directories = api_client.get_root_directories()
+            self.root_directories = api_client.get_root_directories(ignore_cache=True)
 
             # if the file has been saved use the name of the file as the prefix
             if bpy.context.blend_data.is_saved:
