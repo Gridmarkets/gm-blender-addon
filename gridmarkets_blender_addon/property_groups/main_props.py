@@ -354,6 +354,10 @@ def reset_to_defaults(pos):
     bpy.context.scene.props.remote_project_container.remote_projects.clear()
     bpy.context.scene.props.remote_project_container.focused_remote_project = 0
 
+    # todo job presets are nto saved right now
+    bpy.context.scene.props.job_preset_container.items.clear()
+    bpy.context.scene.props.job_preset_container.focused_item = 0
+
     frame_range = bpy.context.scene.props.vray.frame_ranges.add()
     frame_range.name = "Default frame range"
     frame_range.enabled = True
