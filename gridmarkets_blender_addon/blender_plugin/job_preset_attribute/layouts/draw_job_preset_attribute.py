@@ -18,10 +18,19 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
 from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute
 
 
-def draw_job_preset_attribute(layout, context, job_preset_attribute: JobPresetAttribute, col1, key_column, col2, col3):
+def draw_job_preset_attribute(layout,
+                              context,
+                              job_preset_attribute: JobPresetAttribute,
+                              col1,
+                              key_column,
+                              col2,
+                              col3,
+                              project_inferred_value: typing.Optional[str] = None):
+
     from types import SimpleNamespace
     from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -71,8 +80,13 @@ def draw_job_preset_attribute(layout, context, job_preset_attribute: JobPresetAt
                              attribute)
 
     elif inference_source == InferenceSource.get_project_inference_source():
-        input_row.prop(props, "project_defined", text="")
-        input_row.enabled = False
+        #input_row.prop(props, "project_defined", text="")
+
+        if project_inferred_value is None:
+            input_row.enabled = False
+            project_inferred_value = "Value inferred from project"
+
+        input_row.label(text=project_inferred_value)
 
     col3.alignment="EXPAND"
     col3.prop(job_preset_props, JobPreset.INFERENCE_SOURCE_KEY + job_preset_attribute.get_key(), text="")

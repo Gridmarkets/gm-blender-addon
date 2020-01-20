@@ -19,7 +19,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
+from gridmarkets_blender_addon.blender_plugin.job_preset_container.operators.toggle_job_preset_locked_state import \
+    GRIDMARKETS_OT_toggle_job_preset_locked_state
+
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 
 
 class GRIDMARKETS_OT_open_inference_source_help(bpy.types.Operator):
@@ -36,7 +44,8 @@ class GRIDMARKETS_OT_open_inference_source_help(bpy.types.Operator):
 
             layout.alignment = "EXPAND"
             layout.label(text="Inference Source Help", icon=constants.ICON_INFO)
-            layout.label(text="Some Job Preset attributes let you choose between different inference sources. The possible source types are:")
+            layout.label(
+                text="Some Job Preset attributes let you choose between different inference sources. The possible source types are:")
             layout.separator()
 
             inference_sources = InferenceSource.get_all_inference_source_types()
@@ -129,17 +138,24 @@ def _draw_job_preset_headers(layout: bpy.types.UILayout):
         columns[3].enabled = False
 
 
-def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
+def draw_job_preset(layout: bpy.types.UILayout,
+                    context: bpy.types.Context,
+                    job_preset: typing.Optional['JobPreset'] = None,
+                    remote_project: typing.Optional['RemoteProject'] = None):
+
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.blender_plugin.job_definition import get_blender_icon_tuple_for_job_definition
-    from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import draw_job_preset_attribute
+    from gridmarkets_blender_addon.blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute import \
+        draw_job_preset_attribute
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 
     scene = context.scene
 
     plugin = PluginFetcher.get_plugin()
-    job_preset_container = plugin.get_preferences_container().get_job_preset_container()
-    job_preset = job_preset_container.get_focused_item()
+
+    if job_preset is None:
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+        job_preset = job_preset_container.get_focused_item()
 
     if job_preset:
         job_definition = job_preset.get_job_definition()
@@ -155,11 +171,15 @@ def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
 
         row2 = row.row()
         row2.alignment = 'RIGHT'
-        row2.enabled = False
-        row2.label(text="Based on job definition \"" + job_preset.get_job_definition().get_display_name() + "\"")
+        row3 = row2.row()
+        row3.alignment = 'RIGHT'
+        row3.enabled = False
+        row3.label(text="Based on job definition \"" + job_preset.get_job_definition().get_display_name() + "\"")
 
-        if job_preset.is_locked():
-            row2.label(text="locked", icon=constants.ICON_LOCKED)
+        locked_icon = constants.ICON_LOCKED if job_preset.is_locked() else constants.ICON_UNLOCKED
+
+        row2.emboss = "PULLDOWN_MENU"
+        row2.operator(GRIDMARKETS_OT_toggle_job_preset_locked_state.bl_idname, icon=locked_icon, text="Toggle Lock")
 
         col = box.column()
 
@@ -179,8 +199,6 @@ def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
                 # Then hide attributes which only have one inference source and it is either constant or project defined
                 # We hide these since they are not modifiable by the user so they can be hidden.
                 if len(job_attribute.get_inference_sources()) == 1:
-                    from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
-
                     if job_preset_attribute.get_inference_source() == InferenceSource.get_constant_inference_source():
                         continue
 
@@ -189,7 +207,14 @@ def draw_job_preset(layout: bpy.types.UILayout, context: bpy.types.Context):
 
             columns = _get_columns(col)
 
-            draw_job_preset_attribute(layout, context, job_preset_attribute, columns[0], columns[3], columns[1], columns[2])
+            if remote_project is not None and \
+                    job_preset_attribute.get_inference_source() == InferenceSource.get_project_inference_source():
+                project_inferred_value = job_preset_attribute.eval(plugin, remote_project)
+            else:
+                project_inferred_value = None
+
+            draw_job_preset_attribute(layout, context, job_preset_attribute, columns[0], columns[3], columns[1],
+                                      columns[2], project_inferred_value=project_inferred_value)
 
         col.separator()
 

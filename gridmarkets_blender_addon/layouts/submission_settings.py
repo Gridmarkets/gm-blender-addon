@@ -21,6 +21,7 @@
 import bpy
 
 from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.blender_plugin.job_preset.layouts.draw_job_preset import draw_job_preset
 
 
 def draw_submission_summary(layout, context):
@@ -109,7 +110,6 @@ def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Cont
     else:
         job_preset_option = None
 
-    layout.use_property_split = True
     layout.use_property_decorate = False  # No animating of properties
 
     props = context.scene.props
@@ -176,3 +176,16 @@ def draw_submission_settings(layout: bpy.types.UILayout, context: bpy.types.Cont
         submit_icon = constants.ICON_ERROR
 
     row.operator(constants.OPERATOR_SUBMIT_ID_NAME, text=submit_text, icon=submit_icon)
+
+    # draw submission settings
+    if job_preset_option is not None:
+
+        remote_project_option = props.project_options
+        if remote_project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            remote_project = None
+        else:
+            # get the remote project
+            remote_project_container = plugin.get_remote_project_container()
+            remote_project = remote_project_container.get_project_with_id(remote_project_option)
+
+        draw_job_preset(layout, context, job_preset=job_preset_option, remote_project=remote_project)
