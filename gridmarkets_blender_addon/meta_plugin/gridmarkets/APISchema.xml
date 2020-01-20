@@ -247,6 +247,20 @@
                 </InferenceSources>
             </JobAttribute>
 
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
         </JobDefinition>
 
         <JobDefinition id="VRAY">

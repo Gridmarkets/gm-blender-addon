@@ -239,11 +239,15 @@ class XMLAPISchemaParser:
                                         default_value=to_bool(attribute_default_value))
 
         elif attribute_type == AttributeType.INTEGER.value:
+            if attribute_default_value is not None:
+                attribute_default_value = int(attribute_default_value)
+
             return IntegerAttributeType(attribute_key,
                                         attribute_display_name,
                                         attribute_description,
                                         attribute_subtype_kwargs,
-                                        default_value=int(attribute_default_value))
+                                        default_value=attribute_default_value,
+                                        subtype=attribute_subtype)
 
         else:
             raise ValueError("Unrecognised attribute type.")

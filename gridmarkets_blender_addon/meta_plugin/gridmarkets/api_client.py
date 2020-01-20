@@ -29,6 +29,7 @@ from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon.meta_plugin.product import Product
+from gridmarkets_blender_addon.meta_plugin.user_info import UserInfo
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory, get_exception_with_traceback
@@ -115,6 +116,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._project_files_dictionary_cache = {}
         self._product_resolver: CachedValue = CachedValue(None)
         self._products_cache = CachedValue([])
+        self.cached_user_info = CachedValue(UserInfo(9999, 60))
 
     def clear_all_caches(self):
         self._log.info("Clearing cached API data")
@@ -122,6 +124,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._project_files_dictionary_cache.clear()
         self._product_resolver.reset_and_clear_cache()
         self._products_cache.reset_and_clear_cache()
+        self.cached_user_info.reset_and_clear_cache()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
@@ -141,6 +144,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self.clear_all_caches()
         self.get_root_directories(ignore_cache=True)
         self.get_api_schema(ignore_cache=True)
+        self.get_user_info(ignore_cache=True)
         self._signed_in = True
 
     def sign_out(self) -> None:
@@ -580,3 +584,32 @@ class GridMarketsAPIClient(MetaAPIClient):
     def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
         return sorted(list(set(map(lambda x: x.get_app_type(), self.get_products(ignore_cache=ignore_cache)))),
                       key=lambda s: s.casefold(), reverse=True)
+
+    def get_user_info(self, ignore_cache=False) -> 'UserInfo':
+
+        if ignore_cache or not self.cached_user_info.is_cached():
+            url = '{0}/user-info'.format(self._envoy_client.url)
+
+            self._log.info("Fetching user info...")
+
+            try:
+                resp = self._envoy_client.http_client.request('get', url)
+            except Exception as e:
+                msg = "Could not fetch user info: " + get_exception_with_traceback(e)
+                self._log.error(msg)
+                raise APIClientError(msg)
+            else:
+                if resp.status_code == 200:
+                    content = resp.json().get('data')
+
+                    user_info = UserInfo(content.get('max_throughput', 9999), content.get('job_throughput_limit', 60))
+
+                    self._log.info("Caching user info...")
+                    self.cached_user_info.set_value(user_info)
+
+                if resp.status_code == 404:
+                    msg = "404: {0} not found".format(url)
+                    self._log.error(msg)
+                    raise APIClientError(msg)
+
+        return self.cached_user_info.get_value()

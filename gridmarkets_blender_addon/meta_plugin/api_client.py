@@ -35,6 +35,7 @@ from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import Inva
 if typing.TYPE_CHECKING:
     from .product import Product
     from .factory_collection import FactoryCollection
+    from .user_info import UserInfo
 
 
 class APIClient(ABC, PluginAccessor):
@@ -124,4 +125,8 @@ class APIClient(ABC, PluginAccessor):
 
     @abstractmethod
     def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_user_info(self, ignore_cache=False) -> 'UserInfo':
         raise NotImplementedError

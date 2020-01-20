@@ -1028,9 +1028,27 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
         )
 
     elif attribute_type == AttributeType.INTEGER:
-        properties[prop_id] = bpy.props.IntProperty(
-            name=display_name,
-            description=description,
-            default=default,
-            options={'SKIP_SAVE'}
-        )
+        integer_attribute: IntegerAttributeType = attribute
+
+        if integer_attribute.get_subtype() == IntegerSubtype.INSTANCES.value:
+            user_info = plugin.get_api_client().get_user_info()
+
+            integer_attribute._default_value = user_info.get_job_throughout_limit()
+            properties[prop_id] = bpy.props.IntProperty(
+                name=display_name,
+                description=description,
+                default=user_info.get_job_throughout_limit(),
+                max=user_info.get_max_throughout(),
+                min=1,
+                soft_max=user_info.get_max_throughout(),
+                soft_min=1,
+                step=1,
+                options={'SKIP_SAVE'}
+            )
+        else:
+            properties[prop_id] = bpy.props.IntProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                options={'SKIP_SAVE'}
+            )

@@ -22,12 +22,43 @@ import bpy
 
 from gridmarkets_blender_addon.operators.base_operator import BaseOperator
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 from gridmarkets_blender_addon.meta_plugin.user import User
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
 from gridmarkets_blender_addon.meta_plugin.errors.api_client_error import APIClientError
+
+
+def add_default_job_preset():
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    job_presets = plugin.get_preferences_container().get_job_preset_container().get_all()
+
+    # do not add if there is already a preset with that name
+    for job_preset in job_presets:
+        if job_preset.get_name() == constants.DEFAULT_JOB_PRESET_NAME:
+            return
+
+    def add_default_job_preset(job_definition_id: str, name: str):
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+        # do not add if already added
+        job_presets = job_preset_container.get_all()
+        for job_preset in job_presets:
+            if job_preset.get_id() == id:
+                return
+
+        job_definitions = plugin.get_api_client().get_api_schema().get_job_definitions()
+        for job_definition in job_definitions:
+            if job_definition.get_definition_id() == job_definition_id:
+                job_preset_container.append(JobPreset(name, job_definition, is_locked=True))
+
+    # add default job presets
+    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_80_CYCLES, constants.DEFAULT_JOB_PRESET_NAME)
+
 
 
 class GRIDMARKETS_OT_sign_in_new_user(BaseOperator):
@@ -89,9 +120,14 @@ class GRIDMARKETS_OT_sign_in_new_user(BaseOperator):
         auth_access_key = user_interface.get_auth_access_key()
         user = User(auth_email, auth_access_key)
 
+        def sign_in(user, skip_validation=False):
+            result = api_client.sign_in(user, skip_validation=skip_validation)
+            add_default_job_preset()
+            return result
+
         ################################################################################################################
 
-        method = api_client.sign_in
+        method = sign_in
 
         args = (
             user,

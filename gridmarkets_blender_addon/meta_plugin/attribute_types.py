@@ -18,8 +18,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['StringAttributeType', 'StringSubtype', 'EnumAttributeType', 'EnumItem', 'EnumSubtype', 'NullAttributeType',
-           'BooleanAttributeType', 'IntegerAttributeType']
+__all__ = ['StringAttributeType', 'StringSubtype',
+           'EnumAttributeType', 'EnumItem', 'EnumSubtype',
+           'NullAttributeType',
+           'BooleanAttributeType',
+           'IntegerAttributeType', 'IntegerSubtype']
 
 import typing
 import enum
@@ -208,6 +211,11 @@ class BooleanAttributeType(Attribute):
             raise InvalidAttributeError("value must be bool type")
 
 
+class IntegerSubtype(enum.Enum):
+    NONE = "NONE"
+    INSTANCES = "INSTANCES"
+
+
 class IntegerAttributeType(Attribute):
 
     def __init__(self,
@@ -215,7 +223,8 @@ class IntegerAttributeType(Attribute):
                  display_name: str,
                  description: str,
                  subtype_kwargs: typing.Dict,
-                 default_value: typing.Optional[int] = 0):
+                 default_value: typing.Optional[int] = 0,
+                 subtype: typing.Optional[IntegerSubtype] = IntegerSubtype.NONE.value):
 
         Attribute.__init__(self, key, display_name, description, AttributeType.INTEGER, subtype_kwargs)
 
@@ -223,9 +232,13 @@ class IntegerAttributeType(Attribute):
             default_value = 0
 
         self._default_value = default_value
+        self._subtype = subtype
 
     def get_default_value(self) -> typing.Optional[int]:
         return self._default_value
+
+    def get_subtype(self) -> IntegerSubtype:
+        return self._subtype
 
     def validate_value(self, value: any) -> None:
         if value is None:

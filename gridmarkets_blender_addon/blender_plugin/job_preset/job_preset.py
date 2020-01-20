@@ -19,12 +19,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-
 import typing
 
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon import utils, utils_blender
 
 
@@ -53,10 +54,6 @@ class JobPreset(MetaJobPreset):
         self._reset_properties_to_default()
 
     def _reset_properties_to_default(self):
-        import bpy
-        from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype, StringAttributeType
-
         scene = bpy.context.scene
         job_preset_props = getattr(scene, self.get_id())
 
