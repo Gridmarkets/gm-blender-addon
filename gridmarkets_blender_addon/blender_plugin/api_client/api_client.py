@@ -28,6 +28,7 @@ from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 import pathlib
 
 if typing.TYPE_CHECKING:
@@ -52,6 +53,9 @@ class APIClient(GridMarketsAPIClient):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         plugin.get_user_interface().reset_project_attribute_props()
+
+        # cache the machine options for blender
+        self.get_machines(api_constants.PRODUCTS.BLENDER, 'render')
 
         self._signed_in_lock_extra = True
         utils_blender.force_redraw_addon()
