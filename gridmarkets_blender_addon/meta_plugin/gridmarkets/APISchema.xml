@@ -430,6 +430,48 @@
                 </InferenceSources>
             </JobAttribute>
 
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>vray</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>False</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
         </JobDefinition>
 
         <JobDefinition id="MOE">
@@ -521,6 +563,48 @@
                     <Description>Any run-specific options (e.g. -lig blah.mdb)</Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>moe</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>simulation</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>False</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
