@@ -18,22 +18,23 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants
-from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
-from gridmarkets_blender_addon.meta_plugin.attribute_types import *
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
-from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
-from gridmarkets_blender_addon.meta_plugin.transition import Transition
+__all__ = 'XMLAPISchemaParser'
+
+from .api_schema import APISchema
+from . import constants
+from ..job_definition import JobDefinition
+from ..attribute import AttributeType
+from ..attribute_types import *
+from ..job_attribute import JobAttribute
+from ..inference_source import InferenceSource
+from ..transition import Transition
 
 import xml.etree.ElementTree as ET
 import pathlib
 import typing
 
 if typing.TYPE_CHECKING:
-    from ..factory_collection import FactoryCollection
+    from .. import Attribute, FactoryCollection, ProjectAttribute
 
 
 def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one: bool = False) -> typing.List[
@@ -186,7 +187,7 @@ class XMLAPISchemaParser:
         return subtype_kwargs
 
     @staticmethod
-    def _parse_attribute(attribute_element: ET.Element) -> Attribute:
+    def _parse_attribute(attribute_element: ET.Element) -> 'Attribute':
         attribute_key = get_text(attribute_element, TAG_KEY, expect_unique_tag=True)
         attribute_display_name = get_text(attribute_element, TAG_DISPLAY_NAME, expect_unique_tag=True)
         attribute_description = get_text(attribute_element, TAG_DESCRIPTION, expect_unique_tag=True)
@@ -255,7 +256,7 @@ class XMLAPISchemaParser:
             raise ValueError("Unrecognised attribute type.")
 
     @staticmethod
-    def _parse_job_inference_sources(inference_sources_element: ET.Element) -> typing.List[InferenceSource]:
+    def _parse_job_inference_sources(inference_sources_element: ET.Element) -> typing.List['InferenceSource']:
 
         attribute_inference_sources: typing.List[str] = get_all_sub_elements_text(
             inference_sources_element, TAG_INFERENCE_SOURCE)
@@ -263,7 +264,7 @@ class XMLAPISchemaParser:
         return list(map(lambda x: InferenceSource.get_inference_source(x), attribute_inference_sources))
 
     @staticmethod
-    def _parse_job_attribute(job_attribute_element: ET.Element) -> JobAttribute:
+    def _parse_job_attribute(job_attribute_element: ET.Element) -> 'JobAttribute':
         attribute_element = get_sub_element(job_attribute_element, TAG_ATTRIBUTE, expect_unique_tag=True)
         attribute = XMLAPISchemaParser._parse_attribute(attribute_element)
         attribute_is_optional = to_bool(get_text(job_attribute_element, TAG_OPTIONAL))
@@ -273,7 +274,7 @@ class XMLAPISchemaParser:
         return JobAttribute(attribute, attribute_inference_sources, attribute_is_optional)
 
     @staticmethod
-    def _parse_job_definition(job_definition_element: ET.Element) -> JobDefinition:
+    def _parse_job_definition(job_definition_element: ET.Element) -> 'JobDefinition':
 
         if ID_ATTRIBUTE not in job_definition_element.attrib:
             raise ValueError("All <" + TAG_JOB_DEFINITION + "> tags must contain an 'id' attribute")
@@ -291,10 +292,10 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_job_definitions(api_schema_element: ET.Element, factory_collection: 'FactoryCollection') -> typing.List[
-        JobDefinition]:
+        'JobDefinition']:
 
         # instantiate the output list
-        job_definitions: typing.List[JobDefinition] = []
+        job_definitions: typing.List['JobDefinition'] = []
 
         # parse job definitions
         job_definitions_element = get_sub_element(api_schema_element, TAG_JOB_DEFINITIONS)
@@ -307,7 +308,7 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_transition(transition_element: ET.Element,
-                          project_attributes: typing.List[ProjectAttribute]) -> Transition:
+                          project_attributes: typing.List['ProjectAttribute']) -> 'Transition':
 
         transition_project_attribute_id = get_text(transition_element, TAG_PROJECT_ATTRIBUTE_ID)
 
@@ -325,10 +326,10 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_transitions(transitions_element: ET.Element,
-                           project_attributes: typing.List[ProjectAttribute]) -> typing.List[Transition]:
+                           project_attributes: typing.List['ProjectAttribute']) -> typing.List['Transition']:
 
         # instantiate the output list
-        transitions: typing.List[Transition] = []
+        transitions: typing.List['Transition'] = []
 
         transition_elements = get_all_sub_elements(transitions_element, TAG_TRANSITION)
         for transition_element in transition_elements:
@@ -338,7 +339,7 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_compatible_job_definitions(compatible_job_definitions_element: ET.Element,
-                                          job_definitions: typing.List[JobDefinition]) -> typing.List[JobDefinition]:
+                                          job_definitions: typing.List['JobDefinition']) -> typing.List['JobDefinition']:
         # instantiate the output list
         compatible_job_definitions = []
 
@@ -355,9 +356,9 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_project_attribute(project_attribute_element: ET.Element,
-                                 project_attributes: typing.List[ProjectAttribute],
-                                 job_definitions: typing.List[JobDefinition],
-                                 factory_collection: 'FactoryCollection') -> ProjectAttribute:
+                                 project_attributes: typing.List['ProjectAttribute'],
+                                 job_definitions: typing.List['JobDefinition'],
+                                 factory_collection: 'FactoryCollection') -> 'ProjectAttribute':
 
         project_attribute_id = get_attribute(project_attribute_element, ATTRIBUTE_ID)
 
@@ -383,11 +384,11 @@ class XMLAPISchemaParser:
 
     @staticmethod
     def _parse_project_attributes(api_schema_element: ET.Element,
-                                  job_definitions: typing.List[JobDefinition],
-                                  factory_collection: 'FactoryCollection') -> typing.List[ProjectAttribute]:
+                                  job_definitions: typing.List['JobDefinition'],
+                                  factory_collection: 'FactoryCollection') -> typing.List['ProjectAttribute']:
 
         # instantiate the output list
-        project_attributes: typing.List[ProjectAttribute] = []
+        project_attributes: typing.List['ProjectAttribute'] = []
 
         # parse project attributes
         project_attributes_element = get_sub_element(api_schema_element, TAG_PROJECT_ATTRIBUTES)
@@ -402,7 +403,7 @@ class XMLAPISchemaParser:
         return project_attributes
 
     @staticmethod
-    def parse(factory_collection: 'FactoryCollection') -> APISchema:
+    def parse(factory_collection: 'FactoryCollection') -> 'APISchema':
 
         # parse the xml file using xml.etree.ElementTree
         tree = ET.parse(SCHEMA_DEFINITION_FILE)

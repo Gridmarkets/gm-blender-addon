@@ -18,7 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
+__all__ = 'InvalidAttributeError'
+
+from .plugin_error import PluginError
 
 
 class InvalidAttributeError(PluginError):

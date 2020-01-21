@@ -18,13 +18,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'JobPresetContainer'
+
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
-from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
+from .job_preset import JobPreset
+from .list_container import ListContainer
 
 
 class JobPresetContainer(ListContainer[JobPreset]):
 
-    def __init__(self, log_item: typing.List[JobPreset]):
+    def __init__(self, log_item: typing.List['JobPreset']):
         ListContainer.__init__(self, log_item)

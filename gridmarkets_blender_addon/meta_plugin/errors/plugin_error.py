@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginError'
+
 import sys
 import traceback
 import typing

@@ -18,22 +18,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = ['ProjectAttribute']
+__all__ = 'ProjectAttribute'
 
 from abc import ABC, abstractmethod
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.transition import Transition
-from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
-    RejectedTransitionInputError
+from .errors import RejectedTransitionInputError
+
+if typing.TYPE_CHECKING:
+    from . import Attribute, JobDefinition, Transition
 
 
 class ProjectAttribute(ABC):
 
-    def __init__(self, id: str, attribute: Attribute, transitions: typing.List[Transition],
-                 compatible_job_definitions: typing.List[JobDefinition]):
+    def __init__(self, id: str, attribute: 'Attribute', transitions: typing.List['Transition'],
+                 compatible_job_definitions: typing.List['JobDefinition']):
         self._id = id
         self._attribute = attribute
         self._transitions = transitions
@@ -42,7 +41,7 @@ class ProjectAttribute(ABC):
     def get_id(self) -> str:
         return self._id
 
-    def get_attribute(self) -> Attribute:
+    def get_attribute(self) -> 'Attribute':
         return self._attribute
 
     @abstractmethod
@@ -56,13 +55,13 @@ class ProjectAttribute(ABC):
     def has_transitions(self) -> bool:
         return len(self._transitions) > 0
 
-    def get_transitions(self) -> typing.List[Transition]:
+    def get_transitions(self) -> typing.List['Transition']:
         return self._transitions
 
     def has_compatible_job_definitions(self) -> bool:
         return len(self._compatible_job_definitions) > 0
 
-    def get_compatible_job_definitions(self) -> typing.List[JobDefinition]:
+    def get_compatible_job_definitions(self) -> typing.List['JobDefinition']:
         return self._compatible_job_definitions
 
     def transition(self, input: any, force_transition: bool = False) -> 'ProjectAttribute':

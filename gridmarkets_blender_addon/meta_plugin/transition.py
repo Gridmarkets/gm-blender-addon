@@ -18,9 +18,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'Transition'
+
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
+from .errors import RejectedTransitionInputError
+
+if typing.TYPE_CHECKING:
+    from . import ProjectAttribute
 
 
 class Transition:

@@ -24,10 +24,7 @@ from abc import ABC, abstractmethod
 import typing
 
 if typing.TYPE_CHECKING:
-    from .attribute import Attribute
-    from .project_attribute import ProjectAttribute
-    from .transition import Transition
-    from .job_definition import JobDefinition
+    from . import Attribute, ProjectAttribute, Transition, JobDefinition
 
 
 class ProjectAttributeFactory(ABC):

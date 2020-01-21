@@ -18,7 +18,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-
 __all__ = 'APIClientError', \
           'ApplicationAttributeNotFound', \
           'FilePackingError', \

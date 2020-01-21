@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'ApplicationAttributeSource'
+
 from abc import ABC, abstractmethod
 
 

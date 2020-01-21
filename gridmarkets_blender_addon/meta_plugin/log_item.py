@@ -18,8 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'LogItem'
+
 import datetime
-import time
 
 
 class LogItem:

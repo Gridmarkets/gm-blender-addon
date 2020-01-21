@@ -26,8 +26,8 @@ __all__ = ['StringAttributeType', 'StringSubtype',
 
 import typing
 import enum
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute, AttributeType
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
+from .attribute import Attribute, AttributeType
+from .errors import InvalidAttributeError
 
 
 class StringSubtype(enum.Enum):

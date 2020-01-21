@@ -31,6 +31,7 @@ BLENDER_2_79_MAIN_PROJECT_FILE = "BLENDER_2_79_MAIN_PROJECT_FILE"
 BLENDER_2_79_RENDER_ENGINE = "BLENDER_2_79_RENDER_ENGINE"
 """
 
+
 class PROJECT_ATTRIBUTE_IDS:
     PROJECT_NAME = ROOT_ATTRIBUTE_ID
     PRODUCT = "PRODUCT"
@@ -56,6 +57,7 @@ class API_KEYS:
     INSTANCES = "instances"
     PROJECT_TYPE_ID = "project_type_id"
 
+
 class SUBTYPE_KEYS:
     class STRING:
         class FILE_PATH:
@@ -64,6 +66,7 @@ class SUBTYPE_KEYS:
     class ENUM:
         class PRODUCT_VERSIONS:
             MATCH = "MATCH"
+
         class MACHINE_TYPE:
             PRODUCT = "PRODUCT"
             OPERATION = "OPERATION"

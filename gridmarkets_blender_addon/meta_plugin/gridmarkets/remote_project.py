@@ -25,8 +25,8 @@ __all__ = 'RemoteProject', 'convert_packed_project'
 import pathlib
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject as MetaRemoteProject, RemoteProject
-from gridmarkets_blender_addon.meta_plugin.project import Project
+from ..remote_project import RemoteProject as MetaRemoteProject
+from ..project import Project
 from ..cached_value import CachedValue
 
 if typing.TYPE_CHECKING:

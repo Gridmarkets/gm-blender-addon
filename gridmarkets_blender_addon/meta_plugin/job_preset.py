@@ -18,15 +18,19 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'JobPreset'
 
 import typing
-from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute
+
+from .job_preset_attribute import JobPresetAttribute
+
+if typing.TYPE_CHECKING:
+    from . import JobDefinition
 
 
 class JobPreset:
 
-    def __init__(self, name: str, id: str, job_definition: JobDefinition, is_locked: bool = False):
+    def __init__(self, name: str, id: str, job_definition: 'JobDefinition', is_locked: bool = False):
         self._name = name
         self._id = id
         self._job_definition = job_definition
@@ -45,7 +49,7 @@ class JobPreset:
     def get_id(self) -> str:
         return self._id
 
-    def get_job_definition(self) -> JobDefinition:
+    def get_job_definition(self) -> 'JobDefinition':
         return self._job_definition
 
     def get_job_preset_attributes(self) -> typing.List[JobPresetAttribute]:
@@ -73,18 +77,3 @@ class JobPreset:
 
     def toggle_locked_state(self) -> None:
         self._is_locked = not self._is_locked
-
-    """
-    @abstractmethod
-    def get_attribute_value(self, job_attribute: JobAttribute, project_source: RemoteProject = None) -> any:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_attribute_active_inference_source(self, job_attribute: JobAttribute) -> InferenceSource:
-        raise NotImplementedError
-
-    @abstractmethod
-    def set_attribute_active_inference_source(self, job_attribute: JobAttribute,
-                                              inference_source: InferenceSource) -> None:
-        raise NotImplementedError
-    """

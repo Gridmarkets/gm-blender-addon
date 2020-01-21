@@ -18,10 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'UserContainer'
+
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
-from gridmarkets_blender_addon.meta_plugin.user import User
+from .list_container import ListContainer
+from .user import User
 
 
 class UserContainer(ListContainer[User]):

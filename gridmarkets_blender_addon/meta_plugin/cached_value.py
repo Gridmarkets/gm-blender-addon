@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'CachedValue'
 
 import copy
 import typing

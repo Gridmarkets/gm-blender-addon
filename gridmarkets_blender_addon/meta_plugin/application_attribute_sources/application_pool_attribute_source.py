@@ -17,15 +17,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+
+__all__ = 'ApplicationPoolAttributeSource'
+
 from abc import ABC, abstractmethod
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
-from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType
-from gridmarkets_blender_addon.meta_plugin.errors.application_attribute_not_found import ApplicationAttributeNotFound
-from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import RejectedTransitionInputError
-from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_attribute_source import \
-    ApplicationAttributeSource
+from ..attribute import AttributeType
+from ..errors import ApplicationAttributeNotFound
+
+if typing.TYPE_CHECKING:
+    from .application_attribute_source import ApplicationAttributeSource
 
 
 class ApplicationPoolAttributeSource(ABC):
@@ -114,9 +116,9 @@ class ApplicationPoolAttributeSource(ABC):
 
 
     @abstractmethod
-    def get_blender_attribute_source(self) -> ApplicationAttributeSource:
+    def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':
         raise NotImplementedError
 
     @abstractmethod
-    def get_vray_attribute_source(self) -> ApplicationAttributeSource:
+    def get_vray_attribute_source(self) -> 'ApplicationAttributeSource':
         raise NotImplementedError

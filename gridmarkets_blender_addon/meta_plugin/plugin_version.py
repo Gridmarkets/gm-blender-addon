@@ -18,6 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginVersion'
+
+
 class PluginVersion:
 
     def __init__(self, major: int, minor: int, build: int):

@@ -18,7 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.errors.plugin_error import PluginError
+__all__ = 'NotSignedInError'
+
+from .plugin_error import PluginError
 
 
 class NotSignedInError(PluginError):

@@ -18,10 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as meta_constants
-from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_attribute_source import \
-    ApplicationAttributeSource
-from gridmarkets_blender_addon.meta_plugin.errors.application_attribute_not_found import ApplicationAttributeNotFound
+__all__ = 'BlenderAttributeSource'
+
+
+from ..gridmarkets import constants as meta_constants
+from .application_attribute_source import ApplicationAttributeSource
+from ..errors import ApplicationAttributeNotFound
 
 
 class BlenderAttributeSource(ApplicationAttributeSource):

@@ -18,9 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'ListContainer'
+
 from abc import ABC
 import typing
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
+
+from .plugin_accessor import PluginAccessor
 
 
 T = typing.TypeVar('T')

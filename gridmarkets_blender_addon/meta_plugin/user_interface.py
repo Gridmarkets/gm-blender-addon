@@ -18,10 +18,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
+__all__ = 'UserInterface'
 
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
-from gridmarkets_blender_addon.meta_plugin.user import User
+from abc import ABC
+import typing
+
+from .plugin_accessor import PluginAccessor
+
+if typing.TYPE_CHECKING:
+    from . import User
 
 
 class UserInterface(ABC, PluginAccessor):
@@ -91,7 +96,7 @@ class UserInterface(ABC, PluginAccessor):
         raise NotImplementedError
 
     # load profile
-    def load_profile(self, user_profile: User):
+    def load_profile(self, user_profile: 'User'):
         raise NotImplementedError
 
     # logging

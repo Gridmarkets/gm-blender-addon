@@ -18,8 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginFetcher'
+
 from abc import ABC, abstractmethod
 import typing
+
+if typing.TYPE_CHECKING:
+    from . import Plugin
 
 
 class PluginFetcher(ABC):

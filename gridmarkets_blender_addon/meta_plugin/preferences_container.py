@@ -18,18 +18,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
+__all__ = 'PreferencesContainer'
 
-from gridmarkets_blender_addon.meta_plugin.user_container import UserContainer
-from gridmarkets_blender_addon.meta_plugin.job_preset_container import JobPresetContainer
+from abc import ABC, abstractmethod
+import typing
+
+if typing.TYPE_CHECKING:
+    from . import UserContainer, JobPresetContainer
 
 
 class PreferencesContainer(ABC):
 
     @abstractmethod
-    def get_user_container(self) -> UserContainer:
+    def get_user_container(self) -> 'UserContainer':
         raise NotImplementedError
 
     @abstractmethod
-    def get_job_preset_container(self) -> JobPresetContainer:
+    def get_job_preset_container(self) -> 'JobPresetContainer':
         raise NotImplementedError

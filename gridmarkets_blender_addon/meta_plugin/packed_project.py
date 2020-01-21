@@ -18,10 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PackedProject'
+
 import pathlib
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.local_project import LocalProject
+from .local_project import LocalProject
 
 
 class PackedProject(LocalProject):

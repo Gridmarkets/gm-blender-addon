@@ -23,7 +23,7 @@ __all__ = 'FactoryCollection'
 import typing
 
 if typing.TYPE_CHECKING:
-    from .project_attribute_factory import ProjectAttributeFactory
+    from . import ProjectAttributeFactory
 
 
 class FactoryCollection:

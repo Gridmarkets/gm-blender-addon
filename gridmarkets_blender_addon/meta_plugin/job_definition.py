@@ -18,13 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'JobDefinition'
+
 import typing
-from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+
+if typing.TYPE_CHECKING:
+    from . import JobAttribute
 
 
 class JobDefinition:
 
-    def __init__(self, id: str, display_name: str, attributes: typing.List[JobAttribute]):
+    def __init__(self, id: str, display_name: str, attributes: typing.List['JobAttribute']):
         self._id = id
         self._display_name = display_name
         self._attributes = attributes
@@ -35,10 +39,10 @@ class JobDefinition:
     def get_display_name(self) -> str:
         return self._display_name
 
-    def get_attributes(self) -> typing.List[JobAttribute]:
+    def get_attributes(self) -> typing.List['JobAttribute']:
         return self._attributes
 
-    def get_attribute_with_key(self, key: str) -> JobAttribute:
+    def get_attribute_with_key(self, key: str) -> 'JobAttribute':
         for job_attribute in self.get_attributes():
             if job_attribute.get_attribute().get_key() == key:
                 return job_attribute

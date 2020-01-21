@@ -18,25 +18,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'APIClient'
+
 from abc import ABC, abstractmethod
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.user import User
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
-from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
-from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
-
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
+from .plugin_accessor import PluginAccessor
+from .errors import InvalidEmailError, InvalidAccessKeyError, InvalidUserError
 
 if typing.TYPE_CHECKING:
-    from .product import Product
-    from .factory_collection import FactoryCollection
-    from .user_info import UserInfo
-    from .machine_option import MachineOption
+    import Product, User, FactoryCollection, APISchema, PackedProject, RemoteProject, JobPreset, UserInfo, \
+        MachineOption
 
 
 class APIClient(ABC, PluginAccessor):
@@ -44,7 +36,7 @@ class APIClient(ABC, PluginAccessor):
     def __init__(self):
         self._signed_in_user = None
 
-    def sign_in(self, user: User, skip_validation: bool = False) -> None:
+    def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
 
         if not skip_validation:
             try:
@@ -78,13 +70,13 @@ class APIClient(ABC, PluginAccessor):
     def connected(self) -> bool:
         raise NotImplementedError
 
-    def get_signed_in_user(self) -> typing.Optional[User]:
+    def get_signed_in_user(self) -> typing.Optional['User']:
         if self.is_user_signed_in():
             return self._signed_in_user
         return None
 
     @abstractmethod
-    def get_api_schema(self, factory_collection: 'FactoryCollection') -> APISchema:
+    def get_api_schema(self, factory_collection: 'FactoryCollection') -> 'APISchema':
         raise NotImplementedError
 
     @staticmethod
@@ -94,26 +86,26 @@ class APIClient(ABC, PluginAccessor):
 
     @abstractmethod
     def upload_project(self,
-                       packed_project: PackedProject,
+                       packed_project: 'PackedProject',
                        upload_root_dir: bool,
-                       delete_local_files_after_upload: bool = False) -> RemoteProject:
+                       delete_local_files_after_upload: bool = False) -> 'RemoteProject':
         raise NotImplementedError
 
     @abstractmethod
     def submit_new_project(self,
-                           packed_project: PackedProject,
-                           job_preset: JobPreset,
-                           delete_local_files_after_upload: bool = False) -> RemoteProject:
+                           packed_project: 'PackedProject',
+                           job_preset: 'JobPreset',
+                           delete_local_files_after_upload: bool = False) -> 'RemoteProject':
         raise NotImplemented
 
     @abstractmethod
     def submit_to_remote_project(self,
-                                 remote_project: RemoteProject,
-                                 job_preset: JobPreset) -> None:
+                                 remote_project: 'RemoteProject',
+                                 job_preset: 'JobPreset') -> None:
         raise NotImplemented
 
     @abstractmethod
-    def update_remote_project_status(self, remote_project: RemoteProject) -> None:
+    def update_remote_project_status(self, remote_project: 'RemoteProject') -> None:
         raise NotImplemented
 
     @abstractmethod
@@ -138,4 +130,3 @@ class APIClient(ABC, PluginAccessor):
                      operation: str,
                      ignore_cache: bool = False) -> typing.List['MachineOption']:
         raise NotImplementedError
-

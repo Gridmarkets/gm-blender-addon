@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'AttributeType', 'Attribute'
+
 import enum
 import typing
 from abc import ABC, abstractmethod

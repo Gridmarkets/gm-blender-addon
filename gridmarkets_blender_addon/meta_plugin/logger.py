@@ -18,10 +18,16 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import logging
-import datetime
+__all__ = 'Logger'
 
-from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
+import datetime
+import logging
+import typing
+
+from .log_item import LogItem
+
+if typing.TYPE_CHECKING:
+    from . import LoggingCoordinator
 
 
 class Logger:

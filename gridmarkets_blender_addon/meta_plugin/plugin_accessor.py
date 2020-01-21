@@ -18,9 +18,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginAccessor'
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from gridmarkets_blender_addon.meta_plugin.plugin import Plugin
+    from . import Plugin
 
 
 class PluginAccessor():

@@ -18,16 +18,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'APISchema'
+
 import typing
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants
-from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
-from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
-from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema as MetaAPISchema
+from . import constants
+from ..api_schema import APISchema as MetaAPISchema
+
+if typing.TYPE_CHECKING:
+    from .. import JobDefinition, ProjectAttribute
+
 
 class APISchema(MetaAPISchema):
 
-    def __init__(self, job_definitions: typing.List[JobDefinition], project_attributes: typing.List[ProjectAttribute]):
+    def __init__(self, job_definitions: typing.List['JobDefinition'],
+                 project_attributes: typing.List['ProjectAttribute']):
         MetaAPISchema.__init__(self, job_definitions, project_attributes)
 
-    def get_root_project_attribute(self) -> ProjectAttribute:
+    def get_root_project_attribute(self) -> 'ProjectAttribute':
         return self.get_project_attribute_with_id(constants.ROOT_ATTRIBUTE_ID)

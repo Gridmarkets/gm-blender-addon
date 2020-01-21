@@ -18,11 +18,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import queue
+__all__ = 'LoggingCoordinator'
 
-from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
-from gridmarkets_blender_addon.meta_plugin.logger import Logger
-from gridmarkets_blender_addon.meta_plugin.log_history_container import LogHistoryContainer
+import queue
+import typing
+
+from .logger import Logger
+
+if typing.TYPE_CHECKING:
+    from . import LogHistoryContainer, LogItem
 
 
 class LoggingCoordinator:
@@ -30,7 +34,7 @@ class LoggingCoordinator:
     A class for creating loggers and storing their messages in a list that the ui can draw in a thread safe manner.
     """
 
-    def __init__(self, log_history_container: LogHistoryContainer):
+    def __init__(self, log_history_container: 'LogHistoryContainer'):
         self._log_history_container = log_history_container
         self._multi_thread_counter: int = 0
         self._queue: queue.Queue = queue.Queue()
@@ -53,10 +57,10 @@ class LoggingCoordinator:
     def remove_thread_safe_logging_lock(self):
         self.set_thread_safe_mode(False)
 
-    def get_logger(self, name: str = None) -> Logger:
+    def get_logger(self, name: str = None) -> 'Logger':
         return Logger(name, self)
 
-    def get_log_history_container(self) -> LogHistoryContainer:
+    def get_log_history_container(self) -> 'LogHistoryContainer':
         return self._log_history_container
 
     def serialize_logs(self) -> str:
@@ -88,7 +92,7 @@ class LoggingCoordinator:
             f.write(self.serialize_logs())
             f.close()
 
-    def queue(self, log_item: LogItem) -> None:
+    def queue(self, log_item: 'LogItem') -> None:
         """
         Add the log_item to the queue if operating in multi-threaded mode, otherwise append straight to the log history
         container.

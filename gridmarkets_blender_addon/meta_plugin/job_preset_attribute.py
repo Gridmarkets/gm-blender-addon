@@ -22,19 +22,16 @@ __all__ = ['JobPresetAttribute']
 
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
+from .inference_source import InferenceSource
 
 if typing.TYPE_CHECKING:
-    from gridmarkets_blender_addon.meta_plugin.plugin import Plugin
-    from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
-    from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-    from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
+    from . import Plugin, JobPreset, RemoteProject, JobAttribute
 
 
 class JobPresetAttribute:
 
     def __init__(self, parent_preset: 'JobPreset', job_attribute: 'JobAttribute',
-                 inference_source: InferenceSource = None,
+                 inference_source: 'InferenceSource' = None,
                  value: any = None):
 
         self._parent_preset = parent_preset
@@ -64,7 +61,7 @@ class JobPresetAttribute:
     def get_key(self) -> str:
         return self.get_job_attribute().get_attribute().get_key()
 
-    def get_inference_source(self) -> InferenceSource:
+    def get_inference_source(self) -> 'InferenceSource':
         return self._inference_source
 
     def set_inference_source(self, inference_source) -> None:

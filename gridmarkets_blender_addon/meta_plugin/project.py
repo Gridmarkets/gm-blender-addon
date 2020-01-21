@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'Project'
+
 from abc import ABC, abstractmethod
 import typing
 import pathlib

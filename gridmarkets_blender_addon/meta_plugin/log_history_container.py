@@ -18,13 +18,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'LogHistoryContainer'
+
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
-from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
+from .log_item import LogItem
+from .list_container import ListContainer
 
 
 class LogHistoryContainer(ListContainer[LogItem]):
 
-    def __init__(self, log_items: typing.List[LogItem]):
+    def __init__(self, log_items: typing.List['LogItem']):
         ListContainer.__init__(self, log_items)

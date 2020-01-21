@@ -22,15 +22,15 @@ __all__ = ['JobAttribute']
 
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
+if typing.TYPE_CHECKING:
+    from . import Attribute, InferenceSource
 
 
 class JobAttribute:
 
     def __init__(self,
-                 attribute: Attribute,
-                 inference_sources: typing.List[InferenceSource],
+                 attribute: 'Attribute',
+                 inference_sources: typing.List['InferenceSource'],
                  is_optional: bool):
 
         if inference_sources is None or len(inference_sources) < 1:
@@ -40,14 +40,14 @@ class JobAttribute:
         self._inference_sources = inference_sources
         self._is_optional = is_optional
 
-    def get_attribute(self) -> Attribute:
+    def get_attribute(self) -> 'Attribute':
         return self._attribute
 
     def is_optional(self) -> bool:
         return self._is_optional
 
-    def get_inference_sources(self) -> typing.List[InferenceSource]:
+    def get_inference_sources(self) -> typing.List['InferenceSource']:
         return self._inference_sources
 
-    def get_default_inference_source(self) -> InferenceSource:
+    def get_default_inference_source(self) -> 'InferenceSource':
         return self.get_inference_sources()[0]

@@ -18,32 +18,28 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'EnvoyProject', 'EnvoyFile', 'GridMarketsAPIClient'
+
 import typing
 import pathlib
 
-from gridmarkets_blender_addon.meta_plugin import User
-from gridmarkets_blender_addon.meta_plugin.api_client import APIClient as MetaAPIClient
-from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
-from gridmarkets_blender_addon.meta_plugin.cached_value import CachedValue
-from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
-from gridmarkets_blender_addon.meta_plugin.product import Product
-from gridmarkets_blender_addon.meta_plugin.user_info import UserInfo
-from gridmarkets_blender_addon.meta_plugin.machine_option import MachineOption
-from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
-from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
-from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory, get_exception_with_traceback
-
-from gridmarkets_blender_addon.meta_plugin.errors import *
-from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.meta_plugin import attribute_types
+from .remote_project import convert_packed_project
+from .xml_api_schema_parser import XMLAPISchemaParser
+from . import constants as api_constants
+from ..api_client import APIClient as MetaAPIClient
+from ..cached_value import CachedValue
+from ..user_info import UserInfo
+from ..machine_option import MachineOption
+from ..utils import get_files_in_directory, get_exception_with_traceback
+from ..errors import *
+from .. import attribute_types
 
 import gridmarkets
-from gridmarkets.errors import AuthenticationError, APIError as _APIError
+from gridmarkets.errors import AuthenticationError, APIError
 
 if typing.TYPE_CHECKING:
-    from ..factory_collection import FactoryCollection
+    from . import RemoteProject
+    from .. import FactoryCollection, User, APISchema, JobPreset, PackedProject, Product, LoggingCoordinator
 
 
 class EnvoyProject:
@@ -106,7 +102,7 @@ class EnvoyFile:
 class GridMarketsAPIClient(MetaAPIClient):
     http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
 
-    def __init__(self, logging_coordinator: LoggingCoordinator):
+    def __init__(self, logging_coordinator: 'LoggingCoordinator'):
         MetaAPIClient.__init__(self)
         self._signed_in: bool = False
         self._envoy_client: typing.Optional[gridmarkets.EnvoyClient] = None
@@ -130,7 +126,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._cached_machine_options.reset_and_clear_cache()
         self._cached_user_info.reset_and_clear_cache()
 
-    def sign_in(self, user: User, skip_validation: bool = False) -> None:
+    def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
 
         try:
@@ -164,10 +160,10 @@ class GridMarketsAPIClient(MetaAPIClient):
     def connected(self) -> bool:
         raise NotImplementedError
 
-    def get_signed_in_user(self) -> typing.Optional[User]:
+    def get_signed_in_user(self) -> typing.Optional['User']:
         return MetaAPIClient.get_signed_in_user(self)
 
-    def get_api_schema(self, factory_collection: 'FactoryCollection', ignore_cache=False) -> APISchema:
+    def get_api_schema(self, factory_collection: 'FactoryCollection', ignore_cache=False) -> 'APISchema':
 
         if ignore_cache or not self._api_schema_cache.is_cached():
             self._api_schema_cache.set_value(XMLAPISchemaParser.parse(factory_collection))
@@ -189,7 +185,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                 client.validate_auth()
             except AuthenticationError as e:
                 raise InvalidUserError(message=e.user_message)
-            except _APIError as e:
+            except APIError as e:
                 e_msg = str(e.user_message)
 
                 # pretty error message for common errors
@@ -211,9 +207,9 @@ class GridMarketsAPIClient(MetaAPIClient):
         return True
 
     def upload_project(self,
-                       packed_project: PackedProject,
+                       packed_project: 'PackedProject',
                        upload_root_dir: bool,
-                       delete_local_files_after_upload: bool = False) -> RemoteProject:
+                       delete_local_files_after_upload: bool = False) -> 'RemoteProject':
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to upload a project.")
@@ -244,14 +240,14 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         try:
             self._envoy_client.upload_project_files(gm_project)
-        except _APIError as e:
+        except APIError as e:
             raise APIClientError(e.user_message)
 
         self._log.info("Uploaded project")
 
         return convert_packed_project(packed_project, self.get_plugin())
 
-    def _get_gm_job(self, job_preset: JobPreset, remote_project: RemoteProject) -> gridmarkets.Job:
+    def _get_gm_job(self, job_preset: 'JobPreset', remote_project: 'RemoteProject') -> gridmarkets.Job:
         self._log.info("Calculating Job parameters...")
         job_settings = {}
         for job_preset_attribute in job_preset.get_job_preset_attributes():
@@ -307,9 +303,9 @@ class GridMarketsAPIClient(MetaAPIClient):
         return job
 
     def submit_new_project(self,
-                           packed_project: PackedProject,
-                           job_preset: JobPreset,
-                           delete_local_files_after_upload: bool = False) -> RemoteProject:
+                           packed_project: 'PackedProject',
+                           job_preset: 'JobPreset',
+                           delete_local_files_after_upload: bool = False) -> 'RemoteProject':
         plugin = self.get_plugin()
 
         if not self.is_user_signed_in():
@@ -344,12 +340,12 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         try:
             client.submit_project(gm_project, skip_upload=False)
-        except _APIError as e:
+        except APIError as e:
             raise APIClientError(e.user_message)
 
         self._log.info("Job submitted - See Render Manager for details")
 
-    def submit_to_remote_project(self, remote_project: RemoteProject, job_preset: JobPreset) -> None:
+    def submit_to_remote_project(self, remote_project: 'RemoteProject', job_preset: 'JobPreset') -> None:
         plugin = self.get_plugin()
 
         if not self.is_user_signed_in():
@@ -387,7 +383,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._log.info("Job submitted - See Render Manager for details")
 
-    def update_remote_project_status(self, remote_project: RemoteProject) -> None:
+    def update_remote_project_status(self, remote_project: 'RemoteProject') -> None:
 
         self._log.info("Fetching project status for project \"" + remote_project.get_name() + "\"...")
 
@@ -549,7 +545,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         available_credits = json.get('credits_available', 0)
         return available_credits
 
-    def get_products(self, ignore_cache=False) -> typing.List[Product]:
+    def get_products(self, ignore_cache=False) -> typing.List['Product']:
         self._log.info("Getting products list...")
 
         if not self.is_user_signed_in():
@@ -629,7 +625,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def get_machines(self, app: str,
                      operation: str,
-                     ignore_cache: bool = False) -> typing.List[MachineOption]:
+                     ignore_cache: bool = False) -> typing.List['MachineOption']:
 
         cached_machine_options = self._cached_machine_options.get_value()
 
@@ -645,7 +641,7 @@ class GridMarketsAPIClient(MetaAPIClient):
             self._log.info("Fetching machine types for product \"" + app + "\" (operation=\"" + operation + "\")")
             cpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=False)
             gpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=True)
-        except _APIError as e:
+        except APIError as e:
             msg = str(e.user_message)
             self._log.error(msg)
             raise APIClientError(message=msg)

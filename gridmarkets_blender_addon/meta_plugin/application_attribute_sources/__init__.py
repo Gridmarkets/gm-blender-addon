@@ -17,3 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
+
+__all__ = 'ApplicationAttributeSource', \
+          'ApplicationPoolAttributeSource', \
+          'BlenderAttributeSource'
+
+from .application_attribute_source import ApplicationAttributeSource
+from .application_pool_attribute_source import ApplicationPoolAttributeSource
+from .blender_attribute_source import BlenderAttributeSource

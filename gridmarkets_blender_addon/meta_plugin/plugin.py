@@ -18,20 +18,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'Plugin'
+
 import typing
 from abc import ABC, abstractmethod
-from gridmarkets_blender_addon.meta_plugin.plugin_version import PluginVersion
-from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
-from gridmarkets_blender_addon.meta_plugin.preferences_container import PreferencesContainer
-from gridmarkets_blender_addon.meta_plugin.api_client import APIClient
-from gridmarkets_blender_addon.meta_plugin.user_interface import UserInterface
-from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer
-from gridmarkets_blender_addon.meta_plugin.plugin_utils import PluginUtils
-from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import \
-    ApplicationPoolAttributeSource
 
 if typing.TYPE_CHECKING:
-    from .factory_collection import FactoryCollection
+    from . import PluginVersion, LoggingCoordinator, PreferencesContainer, APIClient, UserInterface, \
+        RemoteProjectContainer, ApplicationPoolAttributeSource, FactoryCollection, PluginUtils
 
 
 class Plugin(ABC):
@@ -41,36 +35,36 @@ class Plugin(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_version(self) -> PluginVersion:
+    def get_version(self) -> 'PluginVersion':
         raise NotImplementedError
 
     @abstractmethod
-    def get_logging_coordinator(self) -> LoggingCoordinator:
+    def get_logging_coordinator(self) -> 'LoggingCoordinator':
         raise NotImplementedError
 
     @abstractmethod
-    def get_preferences_container(self) -> PreferencesContainer:
+    def get_preferences_container(self) -> 'PreferencesContainer':
         raise NotImplementedError
 
     @abstractmethod
-    def get_api_client(self) -> APIClient:
+    def get_api_client(self) -> 'APIClient':
         raise NotImplementedError
 
     @abstractmethod
-    def get_user_interface(self) -> UserInterface:
+    def get_user_interface(self) -> 'UserInterface':
         raise NotImplementedError
 
     @abstractmethod
-    def get_remote_project_container(self) -> RemoteProjectContainer:
+    def get_remote_project_container(self) -> 'RemoteProjectContainer':
         raise NotImplementedError
 
     @abstractmethod
-    def get_application_pool_attribute_source(self) -> ApplicationPoolAttributeSource:
+    def get_application_pool_attribute_source(self) -> 'ApplicationPoolAttributeSource':
         raise NotImplementedError
 
     @abstractmethod
     def get_factory_collection(self) -> 'FactoryCollection':
         raise NotImplementedError
 
-    def get_plugin_utils(self) -> PluginUtils:
+    def get_plugin_utils(self) -> 'PluginUtils':
         raise NotImplementedError

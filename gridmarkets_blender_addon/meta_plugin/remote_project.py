@@ -22,12 +22,10 @@ __all__ = 'RemoteProject'
 
 from abc import ABC, abstractmethod
 
-from gridmarkets_blender_addon.meta_plugin.project import Project
 import pathlib
 import typing
 
-if typing.TYPE_CHECKING:
-    pass
+from .project import Project
 
 
 class RemoteProject(Project, ABC):
