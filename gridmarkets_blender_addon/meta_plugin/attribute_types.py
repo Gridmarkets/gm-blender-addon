@@ -107,6 +107,7 @@ class EnumItem:
 class EnumSubtype(enum.Enum):
     NONE = "NONE"
     PRODUCT_VERSIONS = "PRODUCT_VERSIONS"
+    MACHINE_TYPE = "MACHINE_TYPE"
 
 
 class EnumAttributeType(Attribute):
@@ -122,13 +123,13 @@ class EnumAttributeType(Attribute):
 
         Attribute.__init__(self, key, display_name, description, AttributeType.ENUM, subtype_kwargs)
 
-        if len(items) <= 0 and subtype != EnumSubtype.PRODUCT_VERSIONS.value:
+        if len(items) <= 0 and (subtype != EnumSubtype.PRODUCT_VERSIONS.value and subtype != EnumSubtype.MACHINE_TYPE.value):
             raise ValueError("Enum '" + key + "' must have at least one possible value")
 
         self._items = items
         self._subtype = subtype
 
-        if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
+        if subtype == EnumSubtype.PRODUCT_VERSIONS.value or subtype == EnumSubtype.MACHINE_TYPE.value:
             # items and default value do not matter for PRODUCT_VERSIONS subtype
             self._default_value = None
         elif default_value is None:
@@ -159,8 +160,8 @@ class EnumAttributeType(Attribute):
         if type(value) != str:
             raise InvalidAttributeError("value must be string type")
 
-        # don't compare items for product version enums because they are dynamic
-        if self.get_subtype() == EnumSubtype.PRODUCT_VERSIONS.value:
+        # don't compare items for dynamic enums
+        if self.get_subtype() == EnumSubtype.PRODUCT_VERSIONS.value or self.get_subtype() == EnumSubtype.MACHINE_TYPE.value:
             return
 
         for item in self.get_items():

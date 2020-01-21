@@ -52,6 +52,8 @@ class API_KEYS:
     OUTPUT_FORMAT = "output_format"
     RENDER_ENGINE = "engine"
     GPU = "gpu"
+    MACHINE_TYPE = "machine_type"
+    INSTANCES = "instances"
     PROJECT_TYPE_ID = "project_type_id"
 
 class SUBTYPE_KEYS:
@@ -62,6 +64,10 @@ class SUBTYPE_KEYS:
     class ENUM:
         class PRODUCT_VERSIONS:
             MATCH = "MATCH"
+        class MACHINE_TYPE:
+            PRODUCT = "PRODUCT"
+            OPERATION = "OPERATION"
+            USE_GPU_DEFAULT = "USE_GPU_DEFAULT"
 
 
 class PRODUCTS:

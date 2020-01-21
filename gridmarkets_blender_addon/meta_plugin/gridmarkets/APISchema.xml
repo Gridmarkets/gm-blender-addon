@@ -234,15 +234,28 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>gpu</Key>
-                    <DisplayName>Use GPU Machine</DisplayName>
-                    <Description>Defines if a GPU is required for running the job. If false the job will be rendered on a CPU machine. If true a GPU machine will be used.</Description>
-                    <Type>BOOLEAN</Type>
-                    <DefaultValue>False</DefaultValue>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>True</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
-                    <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>

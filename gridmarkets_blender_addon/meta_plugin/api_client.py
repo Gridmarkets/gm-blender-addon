@@ -36,6 +36,7 @@ if typing.TYPE_CHECKING:
     from .product import Product
     from .factory_collection import FactoryCollection
     from .user_info import UserInfo
+    from .machine_option import MachineOption
 
 
 class APIClient(ABC, PluginAccessor):
@@ -130,3 +131,11 @@ class APIClient(ABC, PluginAccessor):
     @abstractmethod
     def get_user_info(self, ignore_cache=False) -> 'UserInfo':
         raise NotImplementedError
+
+    @abstractmethod
+    def get_machines(self,
+                     app: str,
+                     operation: str,
+                     ignore_cache: bool = False) -> typing.List['MachineOption']:
+        raise NotImplementedError
+

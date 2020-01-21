@@ -213,6 +213,8 @@ class XMLAPISchemaParser:
 
             if attribute_subtype == constants.ENUM_SUBTYPE_PRODUCT_VERSIONS:
                 enum_items = []
+            elif attribute_subtype == EnumSubtype.MACHINE_TYPE.value:
+                enum_items = []
             else:
                 enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
                 enum_items = XMLAPISchemaParser._parse_enum_items(enum_items_element)

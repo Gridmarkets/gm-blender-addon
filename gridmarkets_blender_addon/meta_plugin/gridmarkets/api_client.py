@@ -30,12 +30,14 @@ from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject, convert_packed_project
 from gridmarkets_blender_addon.meta_plugin.product import Product
 from gridmarkets_blender_addon.meta_plugin.user_info import UserInfo
+from gridmarkets_blender_addon.meta_plugin.machine_option import MachineOption
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.xml_api_schema_parser import XMLAPISchemaParser
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon.meta_plugin.utils import get_files_in_directory, get_exception_with_traceback
 
 from gridmarkets_blender_addon.meta_plugin.errors import *
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin import attribute_types
 
 import gridmarkets
 from gridmarkets.errors import AuthenticationError, APIError as _APIError
@@ -116,7 +118,8 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._project_files_dictionary_cache = {}
         self._product_resolver: CachedValue = CachedValue(None)
         self._products_cache = CachedValue([])
-        self.cached_user_info = CachedValue(UserInfo(9999, 60))
+        self._cached_machine_options = CachedValue({})
+        self._cached_user_info = CachedValue(UserInfo(9999, 60))
 
     def clear_all_caches(self):
         self._log.info("Clearing cached API data")
@@ -124,7 +127,8 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._project_files_dictionary_cache.clear()
         self._product_resolver.reset_and_clear_cache()
         self._products_cache.reset_and_clear_cache()
-        self.cached_user_info.reset_and_clear_cache()
+        self._cached_machine_options.reset_and_clear_cache()
+        self._cached_user_info.reset_and_clear_cache()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
@@ -247,6 +251,61 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         return convert_packed_project(packed_project, self.get_plugin())
 
+    def _get_gm_job(self, job_preset: JobPreset, remote_project: RemoteProject) -> gridmarkets.Job:
+        self._log.info("Calculating Job parameters...")
+        job_settings = {}
+        for job_preset_attribute in job_preset.get_job_preset_attributes():
+            key = job_preset_attribute.get_key()
+            value = job_preset_attribute.eval(self.get_plugin(), remote_project)
+            job_settings[key] = value
+            self._log.info("Job Parameter '" + key + "': " + str(value))
+
+            # machine type attributes implicitly contain a gpu attribute
+            if key == api_constants.API_KEYS.MACHINE_TYPE:
+                attribute = job_preset_attribute.get_job_attribute().get_attribute()
+                if attribute.get_type() != attribute_types.AttributeType.ENUM:
+                    continue
+
+                enum_attribute: attribute_types.EnumAttributeType = attribute
+                if enum_attribute.get_subtype() != attribute_types.EnumSubtype.MACHINE_TYPE.value:
+                    continue
+
+                # we need to find the machine type with this id and work out if it is a gpu machine or not
+                machine_id = value
+
+                subtype_kwargs = attribute.get_subtype_kwargs()
+                app = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.PRODUCT)
+                operation = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.OPERATION)
+
+                machines = self.get_machines(app, operation)
+
+                for machine in machines:
+                    if machine.get_id() == machine_id:
+                        if machine.is_gpu_machine():
+                            key = api_constants.API_KEYS.GPU
+                            value = True
+                            job_settings[key] = value
+                            self._log.info("Job Parameter '" + key + "': " + str(value))
+
+        job = gridmarkets.Job(**job_settings)
+
+        # Check the app is supported
+        if job.app not in self.get_product_app_types():
+            msg = "App \"" + job.app + "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
+        # Check the version is supported
+        if job.app_version not in self.get_product_versions(job.app):
+            msg = "Version \"" + job.app_version + "\" for app_type \"" + job.app + \
+                  "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + \
+                  " support for details."
+
+            self._log.error(msg)
+            raise UnsupportedApplicationError(msg)
+
+        return job
+
     def submit_new_project(self,
                            packed_project: PackedProject,
                            job_preset: JobPreset,
@@ -274,30 +333,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         remote_project = convert_packed_project(packed_project, self.get_plugin())
 
-        self._log.info("Calculating Job parameters...")
-        job_settings = {}
-        for job_preset_attribute in job_preset.get_job_preset_attributes():
-            key = job_preset_attribute.get_key()
-            value = job_preset_attribute.eval(plugin, remote_project)
-            job_settings[key] = value
-            self._log.info("Job Parameter '" + key + "': " + str(value))
-
-        job = gridmarkets.Job(**job_settings)
-
-        # Check the app is supported
-        if job.app not in self.get_product_app_types():
-            msg = "App \"" + job.app + "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
-            self._log.error(msg)
-            raise UnsupportedApplicationError(msg)
-
-        # Check the version is supported
-        if job.app_version not in self.get_product_versions(job.app):
-            msg = "Version \"" + job.app_version + "\" for app_type \"" + job.app + \
-                  "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + \
-                  " support for details."
-
-            self._log.error(msg)
-            raise UnsupportedApplicationError(msg)
+        job = self._get_gm_job(job_preset, remote_project)
 
         # add job to project
         gm_project.add_jobs(job)
@@ -339,30 +375,7 @@ class GridMarketsAPIClient(MetaAPIClient):
         client = self._envoy_client
         project = gridmarkets.Project(str(remote_project.get_root_dir()), remote_project.get_name())
 
-        self._log.info("Calculating Job parameters...")
-        job_settings = {}
-        for job_preset_attribute in job_preset.get_job_preset_attributes():
-            key = job_preset_attribute.get_key()
-            value = job_preset_attribute.eval(plugin, remote_project)
-            job_settings[key] = value
-            self._log.info("Job Parameter '" + key + "': " + str(value))
-
-        job = gridmarkets.Job(**job_settings)
-
-        # Check the app is supported
-        if job.app not in self.get_product_app_types():
-            msg = "App \"" + job.app + "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + " support for details."
-            self._log.error(msg)
-            raise UnsupportedApplicationError(msg)
-
-        # Check the version is supported
-        if job.app_version not in self.get_product_versions(job.app):
-            msg = "Version \"" + job.app_version + "\" for app_type \"" + job.app + \
-                  "\" is not supported for your account. Please contact " + api_constants.COMPANY_NAME + \
-                  " support for details."
-
-            self._log.error(msg)
-            raise UnsupportedApplicationError(msg)
+        job = self._get_gm_job(job_preset, remote_project)
 
         # add job to project
         project.add_jobs(job)
@@ -587,7 +600,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def get_user_info(self, ignore_cache=False) -> 'UserInfo':
 
-        if ignore_cache or not self.cached_user_info.is_cached():
+        if ignore_cache or not self._cached_user_info.is_cached():
             url = '{0}/user-info'.format(self._envoy_client.url)
 
             self._log.info("Fetching user info...")
@@ -605,11 +618,47 @@ class GridMarketsAPIClient(MetaAPIClient):
                     user_info = UserInfo(content.get('max_throughput', 9999), content.get('job_throughput_limit', 60))
 
                     self._log.info("Caching user info...")
-                    self.cached_user_info.set_value(user_info)
+                    self._cached_user_info.set_value(user_info)
 
                 if resp.status_code == 404:
                     msg = "404: {0} not found".format(url)
                     self._log.error(msg)
                     raise APIClientError(msg)
 
-        return self.cached_user_info.get_value()
+        return self._cached_user_info.get_value()
+
+    def get_machines(self, app: str,
+                     operation: str,
+                     ignore_cache: bool = False) -> typing.List[MachineOption]:
+
+        cached_machine_options = self._cached_machine_options.get_value()
+
+        if app in cached_machine_options:
+            app_machine_options = cached_machine_options[app]
+            if operation in app_machine_options:
+                operation_machine_options = app_machine_options[operation]
+
+                if not ignore_cache:
+                    return operation_machine_options
+
+        try:
+            cpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=False)
+            gpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=True)
+        except _APIError as e:
+            msg = str(e.user_message)
+            raise APIClientError(message=msg)
+
+        def parse_machine_option(machine_option, is_gpu):
+            return MachineOption(machine_option['id'], machine_option['name'], machine_option['is_default'], is_gpu)
+
+        cpu_machine_options_list = list(map(lambda x: parse_machine_option(x, False), cpu_machine_options))
+        gpu_machine_options_list = list(map(lambda x: parse_machine_option(x, True), gpu_machine_options))
+        combined_machine_options = cpu_machine_options_list + gpu_machine_options_list
+
+        app_machine_options = cached_machine_options.get(app, {})
+        app_machine_options[operation] = combined_machine_options
+        cached_machine_options[app] = app_machine_options
+
+        self._cached_machine_options.set_value(cached_machine_options)
+
+        return combined_machine_options

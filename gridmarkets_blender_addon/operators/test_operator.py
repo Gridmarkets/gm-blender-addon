@@ -32,9 +32,9 @@ class GRIDMARKETS_OT_test_operator(bpy.types.Operator):
         plugin = PluginFetcher.get_plugin()
         log = plugin.get_logging_coordinator().get_logger()
 
-        products = plugin.get_api_client().get_products_with_app_type("hou")
-        for product in products:
-            print(product.get_display_name())
+        machines = plugin.get_api_client().get_machines("blender", "render", False)
+        for machine in machines:
+            print(machine.get_name())
 
         return {"FINISHED"}
 

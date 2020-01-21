@@ -863,6 +863,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
     description = attribute.get_description()
     attribute_type = attribute.get_type()
     default = attribute.get_default_value()
+    subtype_kwargs = attribute.get_subtype_kwargs()
 
     if attribute_type == AttributeType.STRING:
         string_attribute: StringAttributeType = attribute
@@ -990,11 +991,9 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
         items = []
 
         if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-            product = enum_attribute.get_subtype_kwargs().get(
-                api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
+            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
 
-            match = enum_attribute.get_subtype_kwargs().get(
-                api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
+            match = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
             match = p = re.compile(match) if match is not None else None
 
             def _get_product_versions(self, context):
@@ -1006,6 +1005,30 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
                 return list(map(lambda version: (version, version, ''), versions))
 
             items = _get_product_versions
+
+        elif subtype == EnumSubtype.MACHINE_TYPE.value:
+
+            app = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.PRODUCT)
+            operation = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.OPERATION)
+            use_gpu_default = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.USE_GPU_DEFAULT) == "True"
+
+            def _get_machine_type(self, context):
+                machine_options = plugin.get_api_client().get_machines(app, operation)
+
+                machine_option_items = []
+                for i, machine_option in enumerate(machine_options):
+
+                    # give the default machine id 0 so it starts selected
+                    if machine_option.is_default() and machine_option.is_gpu_machine() == use_gpu_default:
+                        n = 0
+                    else:
+                        n = i + 1
+
+                    machine_option_items.append((machine_option.get_id(), machine_option.get_name(), "", n))
+
+                return machine_option_items
+
+            items = _get_machine_type
         else:
             enum_items = enum_attribute.get_items()
             for enum_item in enum_items:
