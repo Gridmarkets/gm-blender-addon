@@ -642,10 +642,12 @@ class GridMarketsAPIClient(MetaAPIClient):
                     return operation_machine_options
 
         try:
+            self._log.info("Fetching machine types for product \"" + app + "\" (operation=\"" + operation + "\")")
             cpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=False)
             gpu_machine_options = self._envoy_client.get_machines(app, operation, is_gpu=True)
         except _APIError as e:
             msg = str(e.user_message)
+            self._log.error(msg)
             raise APIClientError(message=msg)
 
         def parse_machine_option(machine_option, is_gpu):
@@ -654,6 +656,14 @@ class GridMarketsAPIClient(MetaAPIClient):
         cpu_machine_options_list = list(map(lambda x: parse_machine_option(x, False), cpu_machine_options))
         gpu_machine_options_list = list(map(lambda x: parse_machine_option(x, True), gpu_machine_options))
         combined_machine_options = cpu_machine_options_list + gpu_machine_options_list
+
+        # It is possible no machine options were returned, in that case we can still let users choose between their
+        # default machine options (cpu vs gpu)
+        if len(combined_machine_options) <= 0:
+            combined_machine_options.append(("default_machine_cpu", "Defualt Machine_cpu",
+                                             "Use your default cpu machine (As defined on your profile page in the portal)"))
+            combined_machine_options.append(("default_machine_gpu", "Defualt Machine_cpu",
+                                             "Use your default gpu machine (As defined on your profile page in the portal)"))
 
         app_machine_options = cached_machine_options.get(app, {})
         app_machine_options[operation] = combined_machine_options
