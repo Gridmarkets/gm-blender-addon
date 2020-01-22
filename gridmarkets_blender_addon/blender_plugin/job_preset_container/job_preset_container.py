@@ -25,15 +25,16 @@ import typing
 from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
 from gridmarkets_blender_addon.meta_plugin.job_preset_container import JobPresetContainer as MetaJobPresetContainer
 from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon import utils_blender
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
-@attach_blender_plugin
+
 class JobPresetContainer(MetaJobPresetContainer, ListContainer[JobPreset]):
 
-    def __init__(self):
-        MetaJobPresetContainer.__init__(self, [])
+    def __init__(self, plugin: 'Plugin'):
+        MetaJobPresetContainer.__init__(self, plugin, [])
 
     def focus_item(self, item: JobPreset, clear_selection=True, update_props: bool = True) -> None:
 

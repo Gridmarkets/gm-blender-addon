@@ -22,7 +22,6 @@ import typing
 
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_client import GridMarketsAPIClient
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon.meta_plugin.logging_coordinator import LoggingCoordinator
 from gridmarkets_blender_addon import utils_blender
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
@@ -34,13 +33,13 @@ import pathlib
 if typing.TYPE_CHECKING:
     from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
     from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
 
-@attach_blender_plugin
 class APIClient(GridMarketsAPIClient):
 
-    def __init__(self, logging_coordinator: LoggingCoordinator, factory_collection: 'FactoryCollection'):
-        GridMarketsAPIClient.__init__(self, logging_coordinator)
+    def __init__(self, plugin: 'Plugin', logging_coordinator: 'LoggingCoordinator', factory_collection: 'FactoryCollection'):
+        GridMarketsAPIClient.__init__(self, plugin, logging_coordinator)
         self._factory_collection = factory_collection
         self._signed_in_lock_extra = False
 

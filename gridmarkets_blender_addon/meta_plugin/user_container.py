@@ -25,11 +25,14 @@ import typing
 from .list_container import ListContainer
 from .user import User
 
+if typing.TYPE_CHECKING:
+    from . import Plugin
+
 
 class UserContainer(ListContainer[User]):
 
-    def __init__(self, users: typing.List[User], default_user: typing.Optional[User] = None):
-        ListContainer.__init__(self, users)
+    def __init__(self, plugin: 'Plugin', users: typing.List[User], default_user: typing.Optional[User] = None):
+        ListContainer.__init__(self, plugin, users)
 
         self._default_user = None
         self.set_default_user(default_user)

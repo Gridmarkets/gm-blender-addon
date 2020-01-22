@@ -23,17 +23,21 @@ __all__ = 'ListContainer'
 from abc import ABC
 import typing
 
-from .plugin_accessor import PluginAccessor
-
-
 T = typing.TypeVar('T')
 
+if typing.TYPE_CHECKING:
+    from . import Plugin
 
-class ListContainer(ABC, typing.Generic[T], PluginAccessor):
 
-    def __init__(self, items: typing.List[T]):
+class ListContainer(ABC, typing.Generic[T]):
+
+    def __init__(self, plugin: 'Plugin', items: typing.List[T]):
+        self._plugin = plugin
         self._items = items
         self._selected = []
+
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
 
     def get_focused_item(self) -> typing.Optional[T]:
         if len(self._selected) == 0:
@@ -41,7 +45,7 @@ class ListContainer(ABC, typing.Generic[T], PluginAccessor):
 
         return self._selected[-1]
 
-    def focus_item(self, item: T, clear_selection=True) -> None:
+    def focus_item(self, item: T, clear_selection: bool = True) -> None:
         if not self.contains(item):
             raise ValueError("Can not focus an item not in the list")
 

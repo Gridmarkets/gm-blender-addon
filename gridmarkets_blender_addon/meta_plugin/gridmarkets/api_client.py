@@ -39,7 +39,7 @@ from gridmarkets.errors import AuthenticationError, APIError
 
 if typing.TYPE_CHECKING:
     from . import RemoteProject
-    from .. import FactoryCollection, User, APISchema, JobPreset, PackedProject, Product, LoggingCoordinator
+    from .. import FactoryCollection, User, APISchema, JobPreset, PackedProject, Product, LoggingCoordinator, Plugin
 
 
 class EnvoyProject:
@@ -102,8 +102,8 @@ class EnvoyFile:
 class GridMarketsAPIClient(MetaAPIClient):
     http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
 
-    def __init__(self, logging_coordinator: 'LoggingCoordinator'):
-        MetaAPIClient.__init__(self)
+    def __init__(self, plugin: 'Plugin', logging_coordinator: 'LoggingCoordinator'):
+        MetaAPIClient.__init__(self, plugin)
         self._signed_in: bool = False
         self._envoy_client: typing.Optional[gridmarkets.EnvoyClient] = None
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")

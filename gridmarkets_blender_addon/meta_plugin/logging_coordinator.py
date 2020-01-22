@@ -20,13 +20,14 @@
 
 __all__ = 'LoggingCoordinator'
 
+import os
 import queue
 import typing
 
 from .logger import Logger
 
 if typing.TYPE_CHECKING:
-    from . import LogHistoryContainer, LogItem
+    from . import LogHistoryContainer, LogItem, Plugin
 
 
 class LoggingCoordinator:
@@ -34,10 +35,14 @@ class LoggingCoordinator:
     A class for creating loggers and storing their messages in a list that the ui can draw in a thread safe manner.
     """
 
-    def __init__(self, log_history_container: 'LogHistoryContainer'):
+    def __init__(self, plugin: 'Plugin', log_history_container: 'LogHistoryContainer'):
         self._log_history_container = log_history_container
         self._multi_thread_counter: int = 0
         self._queue: queue.Queue = queue.Queue()
+        self._plugin = plugin
+
+    def get_plugin(self) -> 'Plugin':
+        return self._plugin
 
     def is_thread_safe_mode_enabled(self) -> bool:
         return self._multi_thread_counter > 0
@@ -64,11 +69,7 @@ class LoggingCoordinator:
         return self._log_history_container
 
     def serialize_logs(self) -> str:
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        import os
-
-        plugin = PluginFetcher.get_plugin()
-        sys_info = plugin.get_plugin_utils().get_sys_info()
+        sys_info = self.get_plugin().get_plugin_utils().get_sys_info()
 
         output = ''
 
@@ -82,9 +83,7 @@ class LoggingCoordinator:
         return sys_info + os.linesep + output
 
     def copy_logs_to_clipboard(self) -> None:
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        plugin_utils = plugin.get_plugin_utils()
+        plugin_utils = self.get_plugin().get_plugin_utils()
         plugin_utils.copy_to_clipboard(self.serialize_logs())
 
     def save_logs_to_file(self, file_path: str) -> None:

@@ -40,7 +40,6 @@ __all__ = 'APIClient', \
           'MachineOption', \
           'PackedProject', \
           'Plugin', \
-          'PluginAccessor', \
           'PluginFetcher', \
           'Product', \
           'Project', \
@@ -79,7 +78,6 @@ from .logging_coordinator import LoggingCoordinator
 from .machine_option import MachineOption
 from .packed_project import PackedProject
 from .plugin import Plugin
-from .plugin_accessor import PluginAccessor
 from .plugin_fetcher import PluginFetcher
 from .plugin_utils import PluginUtils
 from .plugin_version import PluginVersion

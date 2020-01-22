@@ -23,13 +23,17 @@ __all__ = 'UserInterface'
 from abc import ABC
 import typing
 
-from .plugin_accessor import PluginAccessor
-
 if typing.TYPE_CHECKING:
-    from . import User
+    from . import User, Plugin
 
 
-class UserInterface(ABC, PluginAccessor):
+class UserInterface(ABC):
+
+    def __init__(self, plugin: 'Plugin'):
+        self._plugin = plugin
+
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
 
     # email
     def get_auth_email(self) -> str:

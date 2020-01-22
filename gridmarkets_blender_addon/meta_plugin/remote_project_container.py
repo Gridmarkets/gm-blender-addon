@@ -24,8 +24,11 @@ import typing
 
 from . import ListContainer, RemoteProject
 
+if typing.TYPE_CHECKING:
+    from . import Plugin
+
 
 class RemoteProjectContainer(ListContainer[RemoteProject]):
 
-    def __init__(self, remote_projects: typing.List['RemoteProject']):
-        ListContainer.__init__(self, remote_projects)
+    def __init__(self, plugin: 'Plugin', remote_projects: typing.List['RemoteProject']):
+        ListContainer.__init__(self, plugin, remote_projects)

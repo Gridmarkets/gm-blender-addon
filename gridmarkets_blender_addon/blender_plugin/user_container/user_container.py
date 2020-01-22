@@ -23,16 +23,17 @@ import bpy
 import typing
 
 from gridmarkets_blender_addon.meta_plugin.user_container import UserContainer as MetaUserContainer
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon.blender_plugin.user.user import User
 
 from gridmarkets_blender_addon import constants
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
-@attach_blender_plugin
+
 class UserContainer(MetaUserContainer):
 
-    def __init__(self):
+    def __init__(self, plugin: 'Plugin'):
         preferences = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # get users
@@ -54,7 +55,7 @@ class UserContainer(MetaUserContainer):
             except IndexError:
                 default_user = None
 
-        MetaUserContainer.__init__(self, users, default_user)
+        MetaUserContainer.__init__(self, plugin, users, default_user)
 
         # get focused user
         focused_user_index =  preferences.saved_profiles.focused_user

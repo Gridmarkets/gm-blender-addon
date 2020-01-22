@@ -19,18 +19,20 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.log_history_container import LogHistoryContainer as MetaLogHistoryContainer
 from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon import utils_blender
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
-@attach_blender_plugin
+
 class LogHistoryContainer(MetaLogHistoryContainer):
 
-    def __init__(self):
-        MetaLogHistoryContainer.__init__(self, [])
+    def __init__(self, plugin: 'Plugin'):
+        MetaLogHistoryContainer.__init__(self, plugin, [])
 
     def focus_item(self, log_item: LogItem, clear_selection=True, update_props: bool = True) -> None:
 

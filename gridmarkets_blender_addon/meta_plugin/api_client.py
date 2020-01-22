@@ -23,18 +23,21 @@ __all__ = 'APIClient'
 from abc import ABC, abstractmethod
 import typing
 
-from .plugin_accessor import PluginAccessor
 from .errors import InvalidEmailError, InvalidAccessKeyError, InvalidUserError
 
 if typing.TYPE_CHECKING:
-    import Product, User, FactoryCollection, APISchema, PackedProject, RemoteProject, JobPreset, UserInfo, \
-        MachineOption
+    from . import Product, User, FactoryCollection, APISchema, PackedProject, RemoteProject, JobPreset, UserInfo, \
+        MachineOption, Plugin
 
 
-class APIClient(ABC, PluginAccessor):
+class APIClient(ABC):
 
-    def __init__(self):
+    def __init__(self, plugin: 'Plugin'):
+        self._plugin = plugin
         self._signed_in_user = None
+
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
 
     def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
 

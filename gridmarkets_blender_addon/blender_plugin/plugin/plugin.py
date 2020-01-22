@@ -50,11 +50,11 @@ class Plugin(MetaPlugin):
         project_attribute_factory = ProjectAttributeFactory()
         self._factory_collection = FactoryCollection(project_attribute_factory)
 
-        self._logging_coordinator = LoggingCoordinator(LogHistoryContainer())
-        self._preferences_container = PreferencesContainer(UserContainer(), JobPresetContainer())
-        self._api_client = APIClient(self._logging_coordinator, self._factory_collection)
-        self._user_interface = UserInterface()
-        self._remote_project_container = RemoteProjectContainer()
+        self._logging_coordinator = LoggingCoordinator(self, LogHistoryContainer(self))
+        self._preferences_container = PreferencesContainer(UserContainer(self), JobPresetContainer(self))
+        self._api_client = APIClient(self, self._logging_coordinator, self._factory_collection)
+        self._user_interface = UserInterface(self)
+        self._remote_project_container = RemoteProjectContainer(self)
         self._plugin_utils = PluginUtils()
         self._application_pool_attribute_source = ApplicationPoolAttributeSource()
 

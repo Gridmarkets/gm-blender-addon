@@ -19,18 +19,20 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer as \
     MetaRemoteProjectContainer
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
-@attach_blender_plugin
+
 class RemoteProjectContainer(MetaRemoteProjectContainer):
 
-    def __init__(self):
-        MetaRemoteProjectContainer.__init__(self, [])
+    def __init__(self, plugin: 'Plugin'):
+        MetaRemoteProjectContainer.__init__(self, plugin, [])
 
     def focus_item(self, item: RemoteProject, clear_selection=True, update_props: bool = True) -> None:
 

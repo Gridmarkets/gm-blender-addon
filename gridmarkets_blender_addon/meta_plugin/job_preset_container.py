@@ -25,8 +25,11 @@ import typing
 from .job_preset import JobPreset
 from .list_container import ListContainer
 
+if typing.TYPE_CHECKING:
+    from . import Plugin
+
 
 class JobPresetContainer(ListContainer[JobPreset]):
 
-    def __init__(self, log_item: typing.List['JobPreset']):
-        ListContainer.__init__(self, log_item)
+    def __init__(self, plugin: 'Plugin', log_item: typing.List['JobPreset']):
+        ListContainer.__init__(self, plugin, log_item)

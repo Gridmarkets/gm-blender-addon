@@ -25,8 +25,11 @@ import typing
 from .log_item import LogItem
 from .list_container import ListContainer
 
+if typing.TYPE_CHECKING:
+    from . import Plugin
+
 
 class LogHistoryContainer(ListContainer[LogItem]):
 
-    def __init__(self, log_items: typing.List['LogItem']):
-        ListContainer.__init__(self, log_items)
+    def __init__(self, plugin: 'Plugin', log_items: typing.List['LogItem']):
+        ListContainer.__init__(self, plugin, log_items)
