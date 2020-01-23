@@ -17,14 +17,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
 
 __all__ = 'RemoteProject', 'convert_packed_project'
 
 import pathlib
 import typing
 
+from ..attribute import AttributeType
+from ..attribute_types import StringSubtype
 from ..remote_project import RemoteProject as MetaRemoteProject
 from ..project import Project
 from ..cached_value import CachedValue

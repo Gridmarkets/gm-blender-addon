@@ -32,6 +32,7 @@ __all__ = 'APIClient', \
           'JobPreset', \
           'JobPresetAttribute', \
           'JobPresetContainer', \
+          'ListContainer', \
           'LocalProject', \
           'LogHistoryContainer', \
           'LogItem', \
@@ -41,6 +42,9 @@ __all__ = 'APIClient', \
           'PackedProject', \
           'Plugin', \
           'PluginFetcher', \
+          'PluginUtils', \
+          'PluginVersion', \
+          'PreferencesContainer', \
           'Product', \
           'Project', \
           'ProjectAttribute', \
@@ -54,6 +58,8 @@ __all__ = 'APIClient', \
           'UserContainer', \
           'UserInfo', \
           'UserInterface'
+
+__version__ = '1.0.0'
 
 from .api_client import APIClient
 from .api_schema import APISchema
