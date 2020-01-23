@@ -24,6 +24,7 @@ import pathlib
 import typing
 
 from .local_project import LocalProject
+from .utils import remove_directory
 
 
 class PackedProject(LocalProject):
@@ -61,7 +62,5 @@ class PackedProject(LocalProject):
             return True
 
     def delete(self) -> None:
-        from gridmarkets_blender_addon.meta_plugin.utils import remove_directory
-
         if self.exists():
             remove_directory(self.get_root_dir())
