@@ -30,6 +30,7 @@ from ..api_client import APIClient as MetaAPIClient
 from ..cached_value import CachedValue
 from ..user_info import UserInfo
 from ..machine_option import MachineOption
+from ..product import Product
 from ..utils import get_files_in_directory, get_exception_with_traceback
 from ..errors import *
 from .. import attribute_types
@@ -39,7 +40,7 @@ from gridmarkets.errors import AuthenticationError, APIError
 
 if typing.TYPE_CHECKING:
     from . import RemoteProject
-    from .. import FactoryCollection, User, APISchema, JobPreset, PackedProject, Product, LoggingCoordinator, Plugin
+    from .. import FactoryCollection, User, APISchema, JobPreset, PackedProject, LoggingCoordinator, Plugin
 
 
 class EnvoyProject:
@@ -102,8 +103,13 @@ class EnvoyFile:
 class GridMarketsAPIClient(MetaAPIClient):
     http_api_endpoint = "https://api.gridmarkets.com:8003/api/render/1.0/"
 
-    def __init__(self, plugin: 'Plugin', logging_coordinator: 'LoggingCoordinator'):
+    def __init__(self,
+                 plugin: 'Plugin',
+                 logging_coordinator: 'LoggingCoordinator',
+                 factory_collection: 'FactoryCollection'):
+
         MetaAPIClient.__init__(self, plugin)
+        self._factory_collection = factory_collection
         self._signed_in: bool = False
         self._envoy_client: typing.Optional[gridmarkets.EnvoyClient] = None
         self._log = logging_coordinator.get_logger("GridMarketsAPIClient")
@@ -163,7 +169,10 @@ class GridMarketsAPIClient(MetaAPIClient):
     def get_signed_in_user(self) -> typing.Optional['User']:
         return MetaAPIClient.get_signed_in_user(self)
 
-    def get_api_schema(self, factory_collection: 'FactoryCollection', ignore_cache=False) -> 'APISchema':
+    def get_api_schema(self, factory_collection: 'FactoryCollection' = None, ignore_cache=False) -> 'APISchema':
+
+        if factory_collection is None:
+            factory_collection = self._factory_collection
 
         if ignore_cache or not self._api_schema_cache.is_cached():
             self._api_schema_cache.set_value(XMLAPISchemaParser.parse(factory_collection))
@@ -568,7 +577,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                 if resp.status_code == 200:
                     content = resp.json()
 
-                    def parse_product(json) -> Product:
+                    def parse_product(json) -> 'Product':
                         return Product(json.get('id', -1),
                                        json.get('name', ''),
                                        json.get('app_type', ''),

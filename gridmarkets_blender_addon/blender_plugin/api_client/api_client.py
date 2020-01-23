@@ -39,8 +39,7 @@ if typing.TYPE_CHECKING:
 class APIClient(GridMarketsAPIClient):
 
     def __init__(self, plugin: 'Plugin', logging_coordinator: 'LoggingCoordinator', factory_collection: 'FactoryCollection'):
-        GridMarketsAPIClient.__init__(self, plugin, logging_coordinator)
-        self._factory_collection = factory_collection
+        GridMarketsAPIClient.__init__(self, plugin, logging_coordinator, factory_collection)
         self._signed_in_lock_extra = False
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:
@@ -73,15 +72,6 @@ class APIClient(GridMarketsAPIClient):
 
     def connected(self) -> bool:
         raise NotImplementedError
-
-    def get_api_schema(self,
-                       factory_collection: typing.Optional['FactoryCollection'] = None,
-                       ignore_cache=False) -> 'APISchema':
-
-        if factory_collection is None:
-            factory_collection = self._factory_collection
-
-        return GridMarketsAPIClient.get_api_schema(self, factory_collection, ignore_cache)
 
     def upload_project(self,
                        packed_project: PackedProject,
