@@ -18,10 +18,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import typing
 from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import \
     ApplicationPoolAttributeSource as MetaApplicationPoolAttributeSource
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
+
+
 class ApplicationPoolAttributeSource(MetaApplicationPoolAttributeSource):
+
+    def __init__(self, plugin: 'Plugin'):
+        MetaApplicationPoolAttributeSource.__init__(self, plugin)
 
     def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':
         from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.blender_attribute_source import \

@@ -56,7 +56,7 @@ class Plugin(MetaPlugin):
         self._user_interface = UserInterface(self)
         self._remote_project_container = RemoteProjectContainer(self)
         self._plugin_utils = PluginUtils()
-        self._application_pool_attribute_source = ApplicationPoolAttributeSource()
+        self._application_pool_attribute_source = ApplicationPoolAttributeSource(self)
 
     def get_name(self) -> str:
         return bl_info['name']

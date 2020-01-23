@@ -29,9 +29,16 @@ from ..gridmarkets import constants as api_constants
 
 if typing.TYPE_CHECKING:
     from .application_attribute_source import ApplicationAttributeSource
+    from .. import Plugin
 
 
 class ApplicationPoolAttributeSource(ABC):
+
+    def __init__(self, plugin: 'Plugin'):
+        self._plugin = plugin
+
+    def get_plugin(self) -> 'Plugin':
+        return self._plugin
 
     def get_attribute_value(self, app: str, version: str, key: str):
         if app == 'blender':
