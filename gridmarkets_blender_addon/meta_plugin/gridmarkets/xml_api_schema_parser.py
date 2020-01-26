@@ -51,7 +51,9 @@ def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one
 def get_sub_element(element: ET.Element,
                     tag_name: str,
                     expect_unique_tag: bool = True) -> typing.Optional[ET.Element]:
+
     elements = element.findall(tag_name)
+
     if len(elements) == 0:
         raise ValueError("The <" + element.tag + "> element must contain exactly one <" + tag_name + "> child element")
 
@@ -62,6 +64,7 @@ def get_sub_element(element: ET.Element,
 
 
 def get_attribute(element: ET.Element, attribute_key: str) -> str:
+
     if attribute_key not in element.attrib:
         raise ValueError("All <" + element.tag + "> tags must contain an '" + attribute_key + "' attribute")
 
