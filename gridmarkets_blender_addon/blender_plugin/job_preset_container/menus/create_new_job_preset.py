@@ -37,7 +37,7 @@ class GRIDMARKETS_MT_new_job_preset(bpy.types.Menu):
         layout = self.layout
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
         job_definitions = api_schema.get_job_definitions()
         show_all_presets = props.job_preset_container.show_presets_for_all_products == constants.SHOW_ALL_JOB_DEFINITIONS
 

@@ -948,7 +948,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
                     return []
 
                 api_client = plugin.get_api_client()
-                api_schema = api_client.get_api_schema()
+                api_schema = api_client.get_cached_api_schema()
 
                 remote_project_name = api_schema.get_root_project_attribute().get_value()
                 remote_project_files = api_client.get_remote_project_files(remote_project_name)
