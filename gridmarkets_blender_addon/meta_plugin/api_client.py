@@ -42,14 +42,7 @@ class APIClient(ABC):
     def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
 
         if not skip_validation:
-            try:
-                self.validate_credentials(user.get_auth_email(), user.get_auth_key())
-            except InvalidEmailError as e:
-                raise e
-            except InvalidAccessKeyError as e:
-                raise e
-            except InvalidUserError as e:
-                raise e
+            self.validate_credentials(user.get_auth_email(), user.get_auth_key())
 
         self._signed_in_user = user
 

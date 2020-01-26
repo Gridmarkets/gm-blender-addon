@@ -135,14 +135,7 @@ class GridMarketsAPIClient(MetaAPIClient):
     def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
         self._log.info("Signing in as " + user.get_auth_email())
 
-        try:
-            MetaAPIClient.sign_in(self, user, skip_validation=skip_validation)
-        except InvalidEmailError as e:
-            raise e
-        except InvalidAccessKeyError as e:
-            raise e
-        except InvalidUserError as e:
-            raise e
+        MetaAPIClient.sign_in(self, user, skip_validation=skip_validation)
 
         self._envoy_client = gridmarkets.EnvoyClient(email=user.get_auth_email(), access_key=user.get_auth_key())
 
@@ -169,14 +162,26 @@ class GridMarketsAPIClient(MetaAPIClient):
     def get_signed_in_user(self) -> typing.Optional['User']:
         return MetaAPIClient.get_signed_in_user(self)
 
+    def get_cached_api_schema(self) -> typing.Optional['APISchema']:
+        return self._api_schema_cache.get_value()
+
     def get_api_schema(self, factory_collection: 'FactoryCollection' = None, ignore_cache=False) -> 'APISchema':
+        self._log.info("Getting api schema. ignore_cache=" + str(ignore_cache))
 
         if factory_collection is None:
             factory_collection = self._factory_collection
 
         if ignore_cache or not self._api_schema_cache.is_cached():
-            self._api_schema_cache.set_value(XMLAPISchemaParser.parse(factory_collection))
+            self._log.info("Fetching api schema from XML source.")
 
+            try:
+                self._api_schema_cache.set_value(XMLAPISchemaParser.parse(factory_collection))
+            except Exception as e:
+                msg = "Could not fetch api schema: " + get_exception_with_traceback(e)
+                self._log.error(msg, exc_info=True)
+                raise APIClientError(msg)
+
+        self._log.info("Returning api schema")
         return self._api_schema_cache.get_value()
 
     @staticmethod
@@ -460,9 +465,12 @@ class GridMarketsAPIClient(MetaAPIClient):
         self._log.info("Getting Envoy Projects. ignore_cache=" + str(ignore_cache))
 
         if ignore_cache or not self._remote_projects_cache.is_cached():
+            url = self._envoy_client.url + '/projects'
+            self._log.info("Fetching existing remote project directories from \"" + url + "\"")
+
             try:
                 import requests
-                r = requests.get(self._envoy_client.url + '/projects')
+                r = requests.get(url)
                 json = r.json()
                 projects = json.get("projects", [])
 
@@ -485,7 +493,9 @@ class GridMarketsAPIClient(MetaAPIClient):
 
             self._remote_projects_cache.set_value(projects)
 
-        return self._remote_projects_cache.get_value()
+        remote_projects = self._remote_projects_cache.get_value()
+        self._log.info("Returning " + str(len(remote_projects)) + " Envoy Project(s).")
+        return remote_projects
 
     def get_product_versions(self, product: str, ignore_cache: bool = False) -> typing.List[str]:
         if ignore_cache or not self._product_resolver.is_cached():
@@ -604,11 +614,11 @@ class GridMarketsAPIClient(MetaAPIClient):
                       key=lambda s: s.casefold(), reverse=True)
 
     def get_user_info(self, ignore_cache=False) -> 'UserInfo':
+        self._log.info("Getting User info. ignore_cache=" + str(ignore_cache))
 
         if ignore_cache or not self._cached_user_info.is_cached():
             url = '{0}/user-info'.format(self._envoy_client.url)
-
-            self._log.info("Fetching user info...")
+            self._log.info("Fetching user info from url \"" + url + "\"")
 
             try:
                 resp = self._envoy_client.http_client.request('get', url)
@@ -630,6 +640,7 @@ class GridMarketsAPIClient(MetaAPIClient):
                     self._log.error(msg)
                     raise APIClientError(msg)
 
+        self._log.info("Returning User info.")
         return self._cached_user_info.get_value()
 
     def get_machines(self, app: str,
