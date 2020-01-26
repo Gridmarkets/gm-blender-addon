@@ -83,6 +83,9 @@ def get_job_options(scene, context):
     from gridmarkets_blender_addon.blender_plugin.job_definition import get_blender_icon_for_job_definition
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
+    logging_coordinator = plugin.get_logging_coordinator()
+    logging_coordinator.add_thread_safe_logging_lock()
+
     job_preset_container = plugin.get_preferences_container().get_job_preset_container()
     job_presets = job_preset_container.get_all()
 
@@ -109,6 +112,7 @@ def get_job_options(scene, context):
 
         _job_options.append(job_preset_option_tuple)
 
+    logging_coordinator.remove_thread_safe_logging_lock()
     return _job_options
 
 
