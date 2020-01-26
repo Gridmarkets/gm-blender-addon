@@ -21,6 +21,7 @@
 import bpy
 import typing
 
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer as \
     MetaRemoteProjectContainer
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
@@ -47,8 +48,6 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
     def append(self, item: RemoteProject, focus_new_item: bool = True, update_props: bool = True) -> None:
 
         if update_props:
-            from gridmarkets_blender_addon import utils
-
             remote_projects = bpy.context.scene.props.remote_project_container.remote_projects
             remote_project_props = remote_projects.add()
             remote_project_props.id = utils.get_unique_id(remote_projects)

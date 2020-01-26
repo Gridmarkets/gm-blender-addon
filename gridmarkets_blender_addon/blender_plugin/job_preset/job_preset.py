@@ -21,12 +21,13 @@
 import bpy
 import typing
 
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin.job_preset import JobPreset as MetaJobPreset
 from gridmarkets_blender_addon.meta_plugin.job_definition import JobDefinition
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
 from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
 from gridmarkets_blender_addon.meta_plugin.attribute_types import *
-from gridmarkets_blender_addon import utils, utils_blender
+from gridmarkets_blender_addon import utils_blender
 
 
 class JobPreset(MetaJobPreset):

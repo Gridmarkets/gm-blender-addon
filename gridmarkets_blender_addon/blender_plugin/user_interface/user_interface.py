@@ -17,11 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin import User
 from gridmarkets_blender_addon.meta_plugin.user_interface import UserInterface as MetaUserInterface
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
 
 import bpy
 

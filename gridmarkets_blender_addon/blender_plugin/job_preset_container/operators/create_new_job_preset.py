@@ -19,6 +19,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+from gridmarkets_blender_addon.meta_plugin import utils
+from gridmarkets_blender_addon import constants
 
 
 class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
@@ -35,7 +37,6 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
-        from gridmarkets_blender_addon import utils, constants
 
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
@@ -50,8 +51,9 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
             if job_definition.get_definition_id() == self.job_definition_id:
                 job_preset_container = plugin.get_preferences_container().get_job_preset_container()
                 job_preset_items = bpy.context.scene.props.job_preset_container.items
-                name = utils.create_unique_object_name(job_preset_items, name_prefix=(
-                            job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_'))
+
+                name_prefix = (job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_')
+                name = utils.create_unique_object_name(job_preset_items, name_prefix=name_prefix)
                 job_preset = JobPreset(name, job_definition)
 
                 job_preset_container.append(job_preset)

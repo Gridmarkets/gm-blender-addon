@@ -21,8 +21,9 @@
 import bpy
 import typing
 
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.operators.base_operator import BaseOperator
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
 from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter

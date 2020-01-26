@@ -21,6 +21,7 @@
 import bpy
 import typing
 
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin.log_history_container import LogHistoryContainer as MetaLogHistoryContainer
 from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
 from gridmarkets_blender_addon import utils_blender
@@ -62,8 +63,6 @@ class LogHistoryContainer(MetaLogHistoryContainer):
                                message_line)
 
             if update_props:
-                from gridmarkets_blender_addon import utils
-
                 log_history_items = bpy.context.scene.props.log_history_container.log_history_items
                 log_history_item_props = log_history_items.add()
                 log_history_item_props.id = utils.get_unique_id(log_history_items)

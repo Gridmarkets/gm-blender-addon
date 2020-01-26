@@ -22,6 +22,7 @@ import bpy
 
 import typing
 
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
 from gridmarkets_blender_addon.meta_plugin.job_preset_container import JobPresetContainer as MetaJobPresetContainer
 from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
@@ -51,8 +52,6 @@ class JobPresetContainer(MetaJobPresetContainer, ListContainer[JobPreset]):
     def append(self, item: JobPreset, focus_new_item: bool = True, update_props: bool = True) -> None:
 
         if update_props:
-            from gridmarkets_blender_addon import utils
-
             job_preset_items = bpy.context.scene.props.job_preset_container.items
             list_id = utils.get_unique_id(job_preset_items)
 

@@ -19,7 +19,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants, utils
+from gridmarkets_blender_addon.meta_plugin import utils
+from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
 
 
