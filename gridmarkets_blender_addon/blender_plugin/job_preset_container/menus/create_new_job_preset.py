@@ -44,7 +44,10 @@ class GRIDMARKETS_MT_new_job_preset(bpy.types.Menu):
         for job_definition in job_definitions:
 
             if not show_all_presets:  # show only job definitions pertaining to blender
-                if job_definition.get_attribute_with_key('app').get_attribute().get_default_value() != api_constants.PRODUCTS.BLENDER:
+
+                job_definition_app_attribute = job_definition.get_attribute_with_key(api_constants.API_KEYS.APP)
+                job_definition_app = job_definition_app_attribute.get_attribute().get_default_value()
+                if job_definition_app != api_constants.PRODUCTS.BLENDER:
                     continue
 
             icon = get_blender_icon_tuple_for_job_definition(job_definition)
