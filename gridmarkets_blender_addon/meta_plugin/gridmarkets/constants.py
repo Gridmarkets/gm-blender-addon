@@ -37,6 +37,7 @@ class PROJECT_ATTRIBUTE_IDS:
     PRODUCT = "PRODUCT"
     BLENDER_VERSION = "BLENDER_VERSION"
     VRAY_VERSION = "VRAY_VERSION"
+    MAYA_VERSION = "MAYA_VERSION"
 
 
 class JOB_DEFINITION_IDS:
@@ -77,6 +78,7 @@ class PRODUCTS:
     BLENDER = "blender"
     VRAY = "vray"
     MOE = "moe"
+    MAYA = "maya"
 
 
 class BLENDER_VERSIONS:
