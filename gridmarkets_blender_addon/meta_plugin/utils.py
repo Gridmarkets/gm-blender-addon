@@ -83,7 +83,7 @@ def get_unique_id(objects, attribute_name='id'):
 
     :param objects: a list of existing objects that may or may not have an id attribute
     :type objects: list
-    :param attribute_name: the attribute containing the id
+    :param attribute_name: The name of the attribute or getter method containing the id
     :type attribute_name: str
     :return: the new unique id
     :rtype: int
@@ -92,7 +92,13 @@ def get_unique_id(objects, attribute_name='id'):
     used_ids = []
 
     for object in objects:
-        id = object.id
+
+        if not hasattr(object, attribute_name):
+            continue
+
+        id = getattr(object, attribute_name)
+        if callable(id):
+            id = id()
 
         if not isinstance(id, int):
             continue
@@ -114,7 +120,7 @@ def create_unique_object_name(objects, attribute_name='name', name_prefix = ""):
     :param objects: the existing list of objects that this new name must not collide with. Objects in said list may or
                     may not have .name attributes or follow the provided naming scheme
     :type objects: list
-    :param attribute_name: The name of the attribute which contains the objects name
+    :param attribute_name: The name of the attribute or getter method which contains the objects name
     :type attribute_name: str
     :param name_prefix: a optional prefix to append before the unique number
     :type name_prefix: str
@@ -132,6 +138,9 @@ def create_unique_object_name(objects, attribute_name='name', name_prefix = ""):
             continue
 
         name = getattr(element, attribute_name)
+
+        if callable(name):
+            name = name()
 
         if not isinstance(name, str):
             continue
