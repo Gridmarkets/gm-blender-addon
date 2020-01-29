@@ -49,5 +49,8 @@ class JobAttribute:
     def get_inference_sources(self) -> typing.List['InferenceSource']:
         return self._inference_sources
 
+    def set_inference_sources(self, inference_sources):
+        self._inference_sources = inference_sources
+
     def get_default_inference_source(self) -> 'InferenceSource':
         return self.get_inference_sources()[0]

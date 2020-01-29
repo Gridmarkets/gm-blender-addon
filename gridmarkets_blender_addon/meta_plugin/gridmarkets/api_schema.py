@@ -21,11 +21,12 @@
 __all__ = 'APISchema'
 
 import typing
-from . import constants
+from . import constants as api_constants
 from ..api_schema import APISchema as MetaAPISchema
+from ..inference_source import InferenceSource
 
 if typing.TYPE_CHECKING:
-    from .. import JobDefinition, ProjectAttribute
+    from .. import JobDefinition, ProjectAttribute, Plugin
 
 
 class APISchema(MetaAPISchema):
@@ -35,4 +36,22 @@ class APISchema(MetaAPISchema):
         MetaAPISchema.__init__(self, job_definitions, project_attributes)
 
     def get_root_project_attribute(self) -> 'ProjectAttribute':
-        return self.get_project_attribute_with_id(constants.ROOT_ATTRIBUTE_ID)
+        return self.get_project_attribute_with_id(api_constants.ROOT_ATTRIBUTE_ID)
+
+    def trim_unsupported_applications(self, plugin: 'Plugin'):
+
+        for job_definition in self.get_job_definitions():
+            app_attribute = job_definition.get_attribute_with_key(api_constants.API_KEYS.APP)
+
+            if app_attribute:
+                default_value = app_attribute.get_attribute().get_default_value()
+
+                if default_value not in plugin.get_supported_applications():
+                    # remove application inference sources from all job attributes
+                    for job_attribute in job_definition.get_attributes():
+                        inference_sources = job_attribute.get_inference_sources()
+
+                        if InferenceSource.get_application_inference_source() in inference_sources:
+                            inference_sources.remove(InferenceSource.get_application_inference_source())
+
+                        job_attribute.set_inference_sources(inference_sources)
