@@ -76,4 +76,4 @@ class JobPreset:
         self._is_locked = is_locked
 
     def toggle_locked_state(self) -> None:
-        self._is_locked = not self._is_locked
+        self.set_locked_state(not self._is_locked)
