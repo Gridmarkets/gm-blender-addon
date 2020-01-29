@@ -68,3 +68,7 @@ class Plugin(ABC):
 
     def get_plugin_utils(self) -> 'PluginUtils':
         raise NotImplementedError
+
+    @abstractmethod
+    def get_supported_applications(self) -> typing.List[str]:
+        raise NotImplementedError

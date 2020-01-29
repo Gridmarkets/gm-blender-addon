@@ -39,6 +39,7 @@ from gridmarkets_blender_addon.blender_plugin.application_pool_attribute_source.
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
 from ..factories import ProjectAttributeFactory
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
 class Plugin(MetaPlugin):
@@ -97,3 +98,6 @@ class Plugin(MetaPlugin):
         job_presets = self._preferences_container.get_job_preset_container().get_all()
         for job_preset in job_presets:
             job_preset.unregister_props()
+
+    def get_supported_applications(self) -> typing.List[str]:
+        return [api_constants.PRODUCTS.BLENDER]
