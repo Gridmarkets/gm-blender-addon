@@ -50,7 +50,7 @@ def draw_manually_add_remote_project(layout: bpy.types.UILayout, context: bpy.ty
     plugin = PluginFetcher.get_plugin()
 
     api_client = plugin.get_api_client()
-    api_schema = api_client.get_api_schema()
+    api_schema = api_client.get_cached_api_schema()
     root = api_schema.get_root_project_attribute()
 
     projects = api_client.get_cached_root_directories()

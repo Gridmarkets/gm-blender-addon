@@ -23,12 +23,19 @@ __all__ = 'FactoryCollection'
 import typing
 
 if typing.TYPE_CHECKING:
-    from . import ProjectAttributeFactory
+    from . import APISchemaFactory, ProjectAttributeFactory
 
 
 class FactoryCollection:
-    def __init__(self, project_attribute_factory: 'ProjectAttributeFactory'):
+    def __init__(self,
+                 api_schema_factory: 'APISchemaFactory',
+                 project_attribute_factory: 'ProjectAttributeFactory'):
+
+        self._api_schema_factory = api_schema_factory
         self._project_attribute_factory = project_attribute_factory
+
+    def get_api_schema_factory(self) -> 'APISchemaFactory':
+        return self._api_schema_factory
 
     def get_project_attribute_factory(self) -> 'ProjectAttributeFactory':
         return self._project_attribute_factory

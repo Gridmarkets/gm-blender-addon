@@ -60,7 +60,7 @@ def draw_upload_packed_project(layout: bpy.types.UILayout, context: bpy.types.Co
     #####################
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+    root = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
     enabled = not draw_project_attribute(box, context, root)
 

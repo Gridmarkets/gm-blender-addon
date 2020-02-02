@@ -40,7 +40,7 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
 
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
         job_definitions = api_schema.get_job_definitions()
 
         if self.job_definition_id is None:

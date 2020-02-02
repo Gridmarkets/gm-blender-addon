@@ -65,7 +65,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
 
         plugin = self.get_plugin()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
 
         # get project name
         project_name_attribute = api_schema.get_project_attribute_with_id(
@@ -82,7 +82,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
     def execute(self, context: bpy.types.Context):
         plugin = self.get_plugin()
         user_interface = plugin.get_user_interface()
-        api_schema = plugin.get_api_client().get_api_schema()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
 
         # check render engine
         if not user_interface.is_render_engine_supported():

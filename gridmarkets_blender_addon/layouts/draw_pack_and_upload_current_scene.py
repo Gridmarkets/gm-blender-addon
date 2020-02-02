@@ -29,8 +29,8 @@ def draw_pack_and_upload_current_scene(layout: bpy.types.UILayout, context: bpy.
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
 
-    api_schema = plugin.get_api_client().get_api_schema()
-    project_name_attribute =api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+    api_schema = plugin.get_api_client().get_cached_api_schema()
+    project_name_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
 
     box = layout.box()
 

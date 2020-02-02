@@ -145,7 +145,7 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
         plugin = self.get_plugin()
         user_interface = plugin.get_user_interface()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
 
         # check render engine
         if not user_interface.is_render_engine_supported():
@@ -242,7 +242,7 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
 
     def execute(self, context: bpy.types.Context):
         plugin = self.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
         props = context.scene.props
 
         # set the project name attribute

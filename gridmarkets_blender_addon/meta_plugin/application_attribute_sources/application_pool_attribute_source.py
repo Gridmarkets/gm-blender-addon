@@ -49,7 +49,7 @@ class ApplicationPoolAttributeSource(ABC):
     def get_project_attribute_values(self, project_name: str, app: str, version: str) -> typing.Dict:
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
 
         attributes = {}
 
@@ -89,7 +89,7 @@ class ApplicationPoolAttributeSource(ABC):
 
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
-        project_attribute = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+        project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
         # set project name
         project_attribute.set_value(project_name)

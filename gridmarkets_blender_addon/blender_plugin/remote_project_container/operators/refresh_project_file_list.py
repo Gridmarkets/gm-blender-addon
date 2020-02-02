@@ -53,7 +53,7 @@ class GRIDMARKETS_OT_refresh_project_file_list(BaseOperator):
         logger = self.get_logger()
 
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
 
         if self.project_name:
             project_name = self.project_name

@@ -31,9 +31,12 @@ if typing.TYPE_CHECKING:
 
 class APISchema(MetaAPISchema):
 
-    def __init__(self, job_definitions: typing.List['JobDefinition'],
+    def __init__(self,
+                 plugin: 'Plugin',
+                 job_definitions: typing.List['JobDefinition'],
                  project_attributes: typing.List['ProjectAttribute']):
-        MetaAPISchema.__init__(self, job_definitions, project_attributes)
+
+        MetaAPISchema.__init__(self, plugin, job_definitions, project_attributes)
 
     def get_root_project_attribute(self) -> 'ProjectAttribute':
         return self.get_project_attribute_with_id(api_constants.ROOT_ATTRIBUTE_ID)

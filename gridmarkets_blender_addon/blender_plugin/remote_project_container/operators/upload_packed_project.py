@@ -60,7 +60,7 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
 
         plugin = self.get_plugin()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
 
         # get project name
         project_name_attribute = api_schema.get_project_attribute_with_id(

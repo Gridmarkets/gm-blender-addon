@@ -24,14 +24,22 @@ from abc import ABC, abstractmethod
 import typing
 
 if typing.TYPE_CHECKING:
-    from . import JobDefinition, ProjectAttribute
+    from . import JobDefinition, Plugin, ProjectAttribute
 
 
 class APISchema(ABC):
 
-    def __init__(self, job_definitions: typing.List['JobDefinition'], project_attributes: typing.List['ProjectAttribute']):
+    def __init__(self,
+                 plugin: 'Plugin',
+                 job_definitions: typing.List['JobDefinition'],
+                 project_attributes: typing.List['ProjectAttribute']):
+
+        self._plugin = plugin
         self._job_definitions = job_definitions
         self._project_attributes = project_attributes
+
+    def get_plugin(self) -> 'Plugin':
+        return self._plugin
 
     @abstractmethod
     def get_root_project_attribute(self) -> 'ProjectAttribute':

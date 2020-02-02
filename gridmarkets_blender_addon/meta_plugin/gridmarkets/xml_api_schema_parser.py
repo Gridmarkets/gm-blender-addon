@@ -34,7 +34,7 @@ import pathlib
 import typing
 
 if typing.TYPE_CHECKING:
-    from .. import Attribute, FactoryCollection, ProjectAttribute
+    from .. import Attribute, FactoryCollection, ProjectAttribute, Plugin
 
 
 def get_all_sub_elements(element: ET.Element, tag_name: str, expect_at_least_one: bool = False) -> typing.List[
@@ -406,7 +406,7 @@ class XMLAPISchemaParser:
         return project_attributes
 
     @staticmethod
-    def parse(factory_collection: 'FactoryCollection') -> 'APISchema':
+    def parse(plugin: 'Plugin', factory_collection: 'FactoryCollection') -> 'APISchema':
 
         # parse the xml file using xml.etree.ElementTree
         tree = ET.parse(SCHEMA_DEFINITION_FILE)
@@ -419,4 +419,4 @@ class XMLAPISchemaParser:
         project_attributes = XMLAPISchemaParser._parse_project_attributes(api_schema_element, job_definitions,
                                                                           factory_collection)
 
-        return APISchema(job_definitions, project_attributes)
+        return factory_collection.get_api_schema_factory().get_api_schema(plugin, job_definitions, project_attributes)

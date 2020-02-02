@@ -18,35 +18,20 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.plugin_fetcher import PluginFetcher as MetaPluginFetcher
+__all__ = 'APISchemaFactory'
+
+from abc import ABC, abstractmethod
 import typing
 
 if typing.TYPE_CHECKING:
-    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
+    from . import APISchema, ProjectAttribute, Plugin, JobDefinition
 
 
-class PluginFetcher(MetaPluginFetcher):
+class APISchemaFactory(ABC):
 
-    _plugin = None
-
-    @staticmethod
-    def get_plugin() -> 'Plugin':
-        from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
-
-        if PluginFetcher._plugin is None:
-            PluginFetcher._plugin = Plugin()
-
-        return PluginFetcher._plugin
-
-    @staticmethod
-    def get_plugin_if_initialised() -> typing.Optional['Plugin']:
-
-        if PluginFetcher._plugin is None:
-            return None
-
-        return PluginFetcher._plugin
-
-    @staticmethod
-    def delete_cached_plugin() -> None:
-        if PluginFetcher._plugin:
-            PluginFetcher._plugin = None
+    @abstractmethod
+    def get_api_schema(self,
+                       plugin: 'Plugin',
+                       job_definitions: typing.List['JobDefinition'],
+                       project_attributes: typing.List['ProjectAttribute']) -> 'APISchema':
+        raise NotImplementedError

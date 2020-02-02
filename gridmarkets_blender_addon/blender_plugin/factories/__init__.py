@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'ProjectAttributeFactory'
+__all__ = 'APISchemaFactory', 'ProjectAttributeFactory'
 
+from.api_schema_factory import APISchemaFactory
 from .project_attribute_factory import ProjectAttributeFactory

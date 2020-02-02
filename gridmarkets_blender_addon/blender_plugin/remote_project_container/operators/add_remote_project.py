@@ -38,7 +38,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
         api_client = plugin.get_api_client()
-        api_schema = api_client.get_api_schema()
+        api_schema = api_client.get_cached_api_schema()
         root = api_schema.get_root_project_attribute()
 
         project_name = root.get_value()

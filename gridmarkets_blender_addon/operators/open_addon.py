@@ -41,7 +41,7 @@ def get_blender_props_for_project_attributes(project_attribute: ProjectAttribute
 
 def register_schema(api_client):
     # register Project Attribute props
-    api_schema = api_client.get_api_schema()
+    api_schema = api_client.get_cached_api_schema()
     root_project_attribute = api_schema.get_root_project_attribute()
 
     properties = {}

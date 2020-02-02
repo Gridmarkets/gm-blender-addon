@@ -167,7 +167,7 @@ class UserInterface(MetaUserInterface):
     def reset_product_value() -> None:
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
 
         product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
 
@@ -181,7 +181,7 @@ class UserInterface(MetaUserInterface):
     def reset_product_version_value() -> None:
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         plugin = PluginFetcher.get_plugin()
-        api_schema = plugin.get_api_client().get_api_schema()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
 
         # attempt to reset the product version to the closest matching version
         # only do for blender versions

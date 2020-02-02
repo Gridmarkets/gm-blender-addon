@@ -175,7 +175,7 @@ class GridMarketsAPIClient(MetaAPIClient):
             self._log.info("Fetching api schema from XML source.")
 
             try:
-                api_schema = XMLAPISchemaParser.parse(factory_collection)
+                api_schema = XMLAPISchemaParser.parse(self.get_plugin(), factory_collection)
                 api_schema.trim_unsupported_applications(self.get_plugin())
                 self._api_schema_cache.set_value(api_schema)
             except Exception as e:

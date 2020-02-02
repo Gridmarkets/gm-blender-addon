@@ -38,7 +38,7 @@ from gridmarkets_blender_addon.blender_plugin.application_pool_attribute_source.
     ApplicationPoolAttributeSource
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
-from ..factories import ProjectAttributeFactory
+from ..factories import APISchemaFactory, ProjectAttributeFactory
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
@@ -48,8 +48,9 @@ class Plugin(MetaPlugin):
         version = bl_info['version']
         self._version = PluginVersion(version[0], version[1], version[2])
 
+        api_schema_factory = APISchemaFactory()
         project_attribute_factory = ProjectAttributeFactory()
-        self._factory_collection = FactoryCollection(project_attribute_factory)
+        self._factory_collection = FactoryCollection(api_schema_factory, project_attribute_factory)
 
         self._logging_coordinator = LoggingCoordinator(self, LogHistoryContainer(self))
         self._preferences_container = PreferencesContainer(UserContainer(self), JobPresetContainer(self))

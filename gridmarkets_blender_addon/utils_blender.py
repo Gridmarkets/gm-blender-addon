@@ -729,7 +729,7 @@ def get_project_attributes_rec(project_attribute, attributes, force_transition=F
 def get_project_attributes(project_attribute=None, attributes=None, force_transition=False):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+    root = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
     attributes = attributes if attributes is not None else {}
     project_attribute = root if project_attribute is None else project_attribute
@@ -740,7 +740,7 @@ def get_project_attributes(project_attribute=None, attributes=None, force_transi
 def get_project_files(files: typing.List[pathlib.Path], project_attribute = None) -> typing.List[pathlib.Path]:
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    root = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+    root = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
     # if project attribute is none use the root attribute
     project_attribute = root if project_attribute is None else project_attribute
@@ -765,7 +765,7 @@ def get_project_attributes_sequence(force_transition=False) -> typing.List['Proj
 
     project_attributes = []
 
-    project_attribute = plugin.get_api_client().get_api_schema().get_root_project_attribute()
+    project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
     while True:
         project_attributes.append(project_attribute)
@@ -827,7 +827,7 @@ def get_submission_project_type_id() -> str:
 def get_matching_job_definitions() -> typing.List['JobDefinition']:
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    api_schema = plugin.get_api_client().get_api_schema()
+    api_schema = plugin.get_api_client().get_cached_api_schema()
     project_attribute = api_schema.get_project_attribute_with_id(get_submission_project_type_id())
     return project_attribute.get_compatible_job_definitions()
 
