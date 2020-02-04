@@ -865,7 +865,9 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
     default = attribute.get_default_value()
     subtype_kwargs = attribute.get_subtype_kwargs()
 
-    if attribute_type == AttributeType.STRING:
+    if attribute_type == AttributeType.NULL:
+        return
+    elif attribute_type == AttributeType.STRING:
         string_attribute: StringAttributeType = attribute
         subtype = string_attribute.get_subtype()
 
