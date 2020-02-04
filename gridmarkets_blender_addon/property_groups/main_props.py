@@ -74,8 +74,6 @@ def _get_project_options(scene, context):
     return project_options
 
 
-
-
 def get_job_options(scene, context):
     """ Returns a list of items representing project options """
 

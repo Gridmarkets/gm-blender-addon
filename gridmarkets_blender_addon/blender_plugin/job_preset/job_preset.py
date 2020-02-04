@@ -37,18 +37,22 @@ class JobPreset(MetaJobPreset):
     FRAME_RANGE_COLLECTION = "_collection"
     FRAME_RANGE_FOCUSED = "_focused"
 
-    def __init__(self, name: str, job_definition: JobDefinition, is_locked=False):
-        self._name = name
+    def __init__(self,
+                 name: str,
+                 job_definition: JobDefinition,
+                 is_locked=False):
+
 
         job_preset_items = bpy.context.scene.props.job_preset_container.items
         self._id_number = utils.get_unique_id(job_preset_items)
+
+        # must set id before creating job preset attributes as they it
         self._id = JobPreset.JOB_PRESET_ID_PREFIX + str(self._id_number)
-        self._job_definition = job_definition
 
-        self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
-                                               job_definition.get_attributes()))
+        job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
+                                         job_definition.get_attributes()))
 
-        self._is_locked = is_locked
+        MetaJobPreset.__init__(self, name, self._id, job_definition, job_preset_attributes, is_locked=is_locked)
 
         self._property_group_class = None
         self.register_props()

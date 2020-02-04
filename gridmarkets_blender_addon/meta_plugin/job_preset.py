@@ -30,13 +30,18 @@ if typing.TYPE_CHECKING:
 
 class JobPreset:
 
-    def __init__(self, name: str, id: str, job_definition: 'JobDefinition', is_locked: bool = False):
+    def __init__(self,
+                 name: str,
+                 id: str,
+                 job_definition: 'JobDefinition',
+                 job_preset_attributes: typing.List['JobPresetAttribute'],
+                 is_locked: bool = False):
+
         self._name = name
         self._id = id
         self._job_definition = job_definition
 
-        self._job_preset_attributes = list(map(lambda job_attribute: JobPresetAttribute(self, job_attribute),
-                                               job_definition.get_attributes()))
+        self._job_preset_attributes = job_preset_attributes
 
         self._is_locked = is_locked
 
