@@ -31,5 +31,5 @@ if typing.TYPE_CHECKING:
 
 class JobPresetContainer(ListContainer[JobPreset]):
 
-    def __init__(self, plugin: 'Plugin', log_item: typing.List['JobPreset']):
-        ListContainer.__init__(self, plugin, log_item)
+    def __init__(self, plugin: 'Plugin', log_items: typing.List['JobPreset']):
+        ListContainer.__init__(self, plugin, log_items)
