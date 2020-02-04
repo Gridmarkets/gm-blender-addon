@@ -117,8 +117,7 @@ def convert_packed_project(packed_project: 'PackedProject', plugin: 'Plugin') ->
     files = set(map(lambda file: pathlib.Path('/') / root_dir / file, packed_project.get_relative_files()))
     attributes = packed_project.get_attributes()
 
-    project_attribute = plugin.get_api_client().get_cached_api_schema(
-        plugin.get_factory_collection()).get_root_project_attribute()
+    project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
     attribute = project_attribute.get_attribute()
 
     # do the same to all file type project attributes
