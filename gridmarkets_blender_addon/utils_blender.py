@@ -1014,7 +1014,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
             operation = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.OPERATION)
             use_gpu_default = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.USE_GPU_DEFAULT) == "True"
 
-            def _get_machine_type(self, context):
+            def _get_machine_types(self, context):
                 machine_options = plugin.get_api_client().get_machines(app, operation)
 
                 machine_option_items = []
@@ -1024,13 +1024,13 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
                     if machine_option.is_default() and machine_option.is_gpu_machine() == use_gpu_default:
                         n = 0
                     else:
+                        # otherwise give a higher id
                         n = i + 1
 
                     machine_option_items.append((machine_option.get_id(), machine_option.get_name(), "", n))
-
                 return machine_option_items
 
-            items = _get_machine_type
+            items = _get_machine_types
         else:
             enum_items = enum_attribute.get_items()
             for enum_item in enum_items:
