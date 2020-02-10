@@ -58,6 +58,10 @@ class JobPreset(MetaJobPreset):
         self.register_props()
         self._reset_properties_to_default()
 
+        # get the value of each job preset attribute. This way attributes which require a api request will be cached
+        for job_preset_attribute in self.get_job_preset_attributes():
+            job_preset_attribute.get_value()
+
     def _reset_properties_to_default(self):
         scene = bpy.context.scene
         job_preset_props = getattr(scene, self.get_id())

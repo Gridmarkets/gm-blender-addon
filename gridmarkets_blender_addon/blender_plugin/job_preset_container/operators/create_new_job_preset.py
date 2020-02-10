@@ -20,10 +20,12 @@
 
 import bpy
 from gridmarkets_blender_addon.meta_plugin import utils
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 from gridmarkets_blender_addon import constants
 
 
-class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
+class GRIDMARKETS_OT_create_new_job_preset(BaseOperator):
     bl_idname = "gridmarkets.create_new_job_preset"
     bl_label = "Create new job Preset"
     bl_description = "Creates a new Job Preset and adds it to the Job Presets list"
@@ -34,11 +36,19 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
         description="The unique identifier for the job definition that is being used to create a job preset from"
     )
 
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    def handle_expected_result(self, result: any) -> bool:
 
-        plugin = PluginFetcher.get_plugin()
+        if isinstance(result, JobPreset):
+            job_preset_container = self.get_plugin().get_preferences_container().get_job_preset_container()
+            job_preset_container.append(result)
+            return True
+
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
+
+        plugin = self.get_plugin()
         api_client = plugin.get_api_client()
         api_schema = api_client.get_cached_api_schema()
         job_definitions = api_schema.get_job_definitions()
@@ -47,22 +57,35 @@ class GRIDMARKETS_OT_create_new_job_preset(bpy.types.Operator):
             self.report({'ERROR_INVALID_INPUT'}, "Job Definition ID must not be 'None'.")
             return {'FINISHED'}
 
+        # find the matching job definition
         for job_definition in job_definitions:
             if job_definition.get_definition_id() == self.job_definition_id:
-                job_preset_container = plugin.get_preferences_container().get_job_preset_container()
-                job_preset_items = bpy.context.scene.props.job_preset_container.items
-
-                name_prefix = (job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_')
-                name = utils.create_unique_object_name(job_preset_items, name_prefix=name_prefix)
-                job_preset = JobPreset(name, job_definition)
-
-                job_preset_container.append(job_preset)
-                return {'FINISHED'}
+                break
         else:
             self.report({'ERROR_INVALID_INPUT'},
                         "Job Definition ID must match a know Job Definition. It was '" + str(
                             self.job_definition_id) + "'.")
             return {'FINISHED'}
+
+        # get unique name for new job preset
+        job_preset_items = bpy.context.scene.props.job_preset_container.items
+        name_prefix = (job_definition.get_display_name() + "_Job_Preset_").replace(' ', '_')
+        name = utils.create_unique_object_name(job_preset_items, name_prefix=name_prefix)
+
+        ################################################################################################################
+
+        method = JobPreset
+
+        args = (
+            name,
+            job_definition
+        )
+
+        kwargs = {}
+
+        running_operation_message = "Creating job preset..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (
