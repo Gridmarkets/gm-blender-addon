@@ -678,10 +678,14 @@ class GridMarketsAPIClient(MetaAPIClient):
         # It is possible no machine options were returned, in that case we can still let users choose between their
         # default machine options (cpu vs gpu)
         if len(combined_machine_options) <= 0:
-            combined_machine_options.append(("default_machine_cpu", "Defualt Machine_cpu",
-                                             "Use your default cpu machine (As defined on your profile page in the portal)"))
-            combined_machine_options.append(("default_machine_gpu", "Defualt Machine_cpu",
-                                             "Use your default gpu machine (As defined on your profile page in the portal)"))
+            combined_machine_options.append(MachineOption("default_machine_cpu",
+                                                          "Default CPU Machine (If Supported)",
+                                                          "Use your default cpu machine (As defined on your profile page in the portal)",
+                                                          False))
+            combined_machine_options.append(MachineOption("default_machine_gpu",
+                                                          "Default GPU Machine (If Supported)",
+                                                          "Use your default gpu machine (As defined on your profile page in the portal)",
+                                                          True))
 
         app_machine_options = cached_machine_options.get(app, {})
         app_machine_options[operation] = combined_machine_options
