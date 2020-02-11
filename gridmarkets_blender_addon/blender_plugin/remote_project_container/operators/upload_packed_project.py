@@ -67,11 +67,8 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
             api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
         project_name = project_name_attribute.get_value()
 
+        # ask for confirmation if uploading to existing project
         root_directories = api_client.get_root_directories(ignore_cache=True)
-
-        print(project_name)
-        print(project_name in root_directories)
-
         if project_name in root_directories:
             return context.window_manager.invoke_props_dialog(self, width=500)
 
@@ -92,15 +89,30 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
             self.report_and_log({'ERROR'}, e.user_message)
             return {"FINISHED"}
 
+        # validate that the selected root directory exists
         root_dir = pathlib.Path(user_interface.get_root_directory())
-
         if not root_dir.exists():
             self.report_and_log({'ERROR_INVALID_INPUT'}, "Root Directory does not exist.")
             return {"FINISHED"}
 
+        # collect the files included in the packed project
+        upload_everything = user_interface.get_upload_all_files_in_root()
+        project_files = set(utils_blender.get_project_files([]))
+
+        # check that all the files are under the root directory
+        for file in project_files:
+
+            # make the file path absolute / resolve symlinks
+            file.resolve()
+
+            if root_dir not in file.parents:
+                self.report_and_log({'ERROR_INVALID_INPUT'}, "Project file \"" + str(file) +
+                                    "\" is outside of the root directory.")
+                return {"FINISHED"}
+
         packed_project = PackedProject(attributes[api_constants.API_KEYS.PROJECT_NAME],
                                        root_dir,
-                                       set(utils_blender.get_project_files([])),
+                                       project_files,
                                        attributes)
 
         logger.info("Uploading packed project...")
@@ -111,7 +123,7 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
 
         args = (
             packed_project,
-            user_interface.get_upload_all_files_in_root()
+            upload_everything
         )
 
         kwargs = {
