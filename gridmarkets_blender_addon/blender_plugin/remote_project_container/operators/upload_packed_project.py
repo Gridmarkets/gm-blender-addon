@@ -28,6 +28,7 @@ from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
 from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin import utils
 
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
@@ -98,6 +99,8 @@ class GRIDMARKETS_OT_upload_packed_project(BaseOperator):
         # collect the files included in the packed project
         upload_everything = user_interface.get_upload_all_files_in_root()
         project_files = set(utils_blender.get_project_files([]))
+        if upload_everything:
+            project_files |= utils.get_files_in_directory(root_dir)
 
         # check that all the files are under the root directory
         for file in project_files:
