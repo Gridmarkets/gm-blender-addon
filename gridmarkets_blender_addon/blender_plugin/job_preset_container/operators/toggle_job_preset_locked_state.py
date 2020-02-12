@@ -27,13 +27,21 @@ class GRIDMARKETS_OT_toggle_job_preset_locked_state(bpy.types.Operator):
     bl_description = "Toggles the lock on a job preset"
     bl_options = {"REGISTER", "UNDO"}
 
+    job_preset_id: bpy.props.StringProperty()
+
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
         from gridmarkets_blender_addon import utils_blender
 
         plugin = PluginFetcher.get_plugin()
         job_preset_container = plugin.get_preferences_container().get_job_preset_container()
-        job_preset = job_preset_container.get_focused_item()
+
+        # if a specific job preset id has been provided use that job preset
+        if self.job_preset_id:
+            job_preset = job_preset_container.get_with_id(self.job_preset_id)
+        else:
+            # otherwise use the current focused job preset
+            job_preset = job_preset_container.get_focused_item()
 
         if job_preset is not None:
             job_preset.toggle_locked_state()

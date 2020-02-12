@@ -179,7 +179,10 @@ def draw_job_preset(layout: bpy.types.UILayout,
         locked_icon = constants.ICON_LOCKED if job_preset.is_locked() else constants.ICON_UNLOCKED
 
         row2.emboss = "PULLDOWN_MENU"
-        row2.operator(GRIDMARKETS_OT_toggle_job_preset_locked_state.bl_idname, icon=locked_icon, text="Toggle Lock")
+        toggle_locked_state_btn = row2.operator(GRIDMARKETS_OT_toggle_job_preset_locked_state.bl_idname,
+                                                icon=locked_icon,
+                                                text="Toggle Lock")
+        toggle_locked_state_btn.job_preset_id = job_preset.get_id()
 
         col = box.column()
 
