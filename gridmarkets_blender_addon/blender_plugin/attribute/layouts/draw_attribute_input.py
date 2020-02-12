@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
+
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
@@ -32,7 +34,7 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
                          remote_source: bool = False):
     from types import SimpleNamespace
     from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
-    from gridmarkets_blender_addon.meta_plugin.attribute_types import StringAttributeType, StringSubtype
+    from gridmarkets_blender_addon.meta_plugin.attribute_types import StringAttributeType, StringSubtype, IntegerSubtype
     from gridmarkets_blender_addon.layouts.draw_frame_range_container import draw_frame_range_container
     from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
     from gridmarkets_blender_addon.meta_plugin.errors.invalid_attribute_error import InvalidAttributeError
@@ -43,7 +45,7 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
     if attribute_type == AttributeType.NULL:
         return
 
-    layout = self.layout
+    layout: bpy.types.UILayout = self.layout
     col = layout.column()
 
     # use the attribute key as the prop id by default unless one was provided
@@ -74,6 +76,20 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
                                    prop_container,
                                    prop_id + '_collection',
                                    prop_id + '_focused')
+
+    elif attribute_type == AttributeType.INTEGER and attribute.get_subtype() == IntegerSubtype.INSTANCES.value:
+        row = col.row(align=True)
+
+        # only show the value input prop if not using the default value
+        use_default_machine_count = getattr(prop_container, prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT)
+        if use_default_machine_count:
+            row2 = row.row(align=True)
+            row2.label(text="Use default machine count")
+            row2.enabled = False
+            row.prop(prop_container, prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT, text="")
+        else:
+            row.prop(prop_container, prop_id, text="")
+            row.prop(prop_container, prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT, text="")
 
     elif remote_source and attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
         row = col.row(align=True)

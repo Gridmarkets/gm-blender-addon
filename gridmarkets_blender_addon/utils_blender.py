@@ -1059,14 +1059,20 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
             user_info = plugin.get_api_client().get_user_info()
 
             integer_attribute._default_value = user_info.get_job_throughout_limit()
+
+            properties[prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT] = bpy.props.BoolProperty(
+                name="Use default machine instance count",
+                description="Use the default number of machine instances as defined by your service level",
+                default=True,
+                options={'SKIP_SAVE'}
+            )
+
             properties[prop_id] = bpy.props.IntProperty(
                 name=display_name,
                 description=description,
                 default=user_info.get_job_throughout_limit(),
-                max=user_info.get_max_throughout(),
-                min=1,
-                soft_max=user_info.get_max_throughout(),
-                soft_min=1,
+                min=0,
+                soft_min=0,
                 step=1,
                 options={'SKIP_SAVE'}
             )

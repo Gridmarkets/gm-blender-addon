@@ -368,6 +368,8 @@ VRAY_RENDER_RT = "VRAY_RENDER_RT"
 
 PROJECT_ATTRIBUTES_POINTER_KEY = "project_attributes"
 
+INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT = "_default"
+
 # register module
 def register():
     pass
