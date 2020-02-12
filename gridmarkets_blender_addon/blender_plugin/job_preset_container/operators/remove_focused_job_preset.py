@@ -37,9 +37,6 @@ class GRIDMARKETS_OT_remove_focused_job_preset(bpy.types.Operator):
         focused_job_preset = job_preset_container.get_focused_item()
 
         if focused_job_preset:
-            # get selected job preset option
-            selected_job_preset_option = get_selected_job_option(context)
-
             index = job_preset_container.get_index(focused_job_preset)
 
             if index == 0:
@@ -54,12 +51,16 @@ class GRIDMARKETS_OT_remove_focused_job_preset(bpy.types.Operator):
             job_preset_container.remove(focused_job_preset)
             focused_job_preset.unregister_props()
 
-            # If we just deleted the selected job preset option
-            if selected_job_preset_option.get_id_number() == focused_job_preset.get_id_number():
-                # then reset the selected job preset option to another value
-                job_preset_options = get_job_options(context.scene, context)
-                if job_preset_options:
-                    context.scene.props.job_options = job_preset_options[0][0]
+            # get selected job preset option
+            selected_job_preset_option = get_selected_job_option(context)
+
+            if selected_job_preset_option:
+                # If we just deleted the selected job preset option
+                if selected_job_preset_option.get_id_number() == focused_job_preset.get_id_number():
+                    # then reset the selected job preset option to another value
+                    job_preset_options = get_job_options(context.scene, context)
+                    if job_preset_options:
+                        context.scene.props.job_options = job_preset_options[0][0]
 
         return {'FINISHED'}
 
