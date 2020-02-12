@@ -23,7 +23,7 @@ import typing
 from gridmarkets_blender_addon.meta_plugin.job_preset_attribute import JobPresetAttribute as MetaJobPresetAttribute
 from gridmarkets_blender_addon.meta_plugin.inference_source import InferenceSource
 from gridmarkets_blender_addon.meta_plugin.job_attribute import JobAttribute
-
+from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
 
 class JobPresetAttribute(MetaJobPresetAttribute):
 
@@ -38,32 +38,11 @@ class JobPresetAttribute(MetaJobPresetAttribute):
         return MetaJobPresetAttribute.get_parent_preset(self)
 
     def get_value(self):
-
-        from gridmarkets_blender_addon.meta_plugin.attribute_types import AttributeType, StringSubtype
-        from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
-        from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
-
-        attribute = self.get_job_attribute().get_attribute()
-        attribute_type = attribute.get_type()
-
         job_preset = self.get_parent_preset()
-
-        # handle frame ranges as a special case
-        if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FRAME_RANGES.value:
-            frame_ranges: typing.List[FrameRangeProps] = getattr(job_preset.get_property_group(),
-                                                                 self.get_key() + JobPreset.FRAME_RANGE_COLLECTION)
-
-            def serialise_frame_range(frame_range: FrameRangeProps):
-                start = str(frame_range.frame_start)
-                end = str(frame_range.frame_end)
-                step = str(frame_range.frame_step)
-
-                return start + ' ' + end + ' ' + step
-
-            serialised_ranges = map(serialise_frame_range, frame_ranges)
-            return ','.join(serialised_ranges)
-
-        return getattr(job_preset.get_property_group(), self.get_key())
+        property_group = job_preset.get_property_group()
+        attribute = self.get_job_attribute().get_attribute()
+        prop_id = self.get_key()
+        return get_value(property_group, attribute, prop_id)
 
     def set_value(self, value: any) -> None:
         raise NotImplementedError

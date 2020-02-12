@@ -23,13 +23,16 @@ __all__ = 'ProjectAttribute'
 import bpy
 from gridmarkets_blender_addon import constants
 from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute as MetaProjectAttribute
+from gridmarkets_blender_addon.blender_plugin.attribute.attribute import get_value
 
 
 class ProjectAttribute(MetaProjectAttribute):
 
     def get_value(self) -> any:
-        project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
-        return getattr(project_props, self.get_id())
+        property_group = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
+        attribute = self.get_attribute()
+        prop_id = self.get_id()
+        return get_value(property_group, attribute, prop_id)
 
     def set_value(self, value: any) -> None:
         project_props = getattr(bpy.context.scene, constants.PROJECT_ATTRIBUTES_POINTER_KEY)
