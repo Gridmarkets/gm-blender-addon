@@ -38,12 +38,15 @@ def draw_job_preset_container(layout: 'bpy.types.UILayout', context: 'bpy.types.
     from gridmarkets_blender_addon.blender_plugin.job_preset.layouts.draw_job_preset import draw_job_preset
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
+    user_interface = plugin.get_user_interface()
 
     props = context.scene.props
     job_preset_container_props = props.job_preset_container
 
     row = layout.box().row(align=True)
-    row.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
+    row2 = row.row(align=True)
+    row2.menu(GRIDMARKETS_MT_new_job_preset.bl_idname, icon=constants.ICON_NEW_JOB_PRESET)
+    row2.enabled = not user_interface.is_running_operation()
 
     row2 = row.row(align=True)
     row2.prop_menu_enum(job_preset_container_props, "show_presets_for_all_products", text="", icon=constants.ICON_COLLAPSEMENU)
