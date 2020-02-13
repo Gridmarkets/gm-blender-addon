@@ -76,7 +76,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
 
         try:
             attributes = utils_blender.get_project_attributes()
-            print(attributes)
+
             remote_project = RemoteProject(attributes.get(api_constants.API_KEYS.PROJECT_NAME),
                                            attributes.get(api_constants.API_KEYS.APP),
                                            set(),
