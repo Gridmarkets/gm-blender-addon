@@ -56,6 +56,7 @@
                 <InferenceSources>
                     <InferenceSource>APPLICATION</InferenceSource>
                     <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>PROJECT</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
