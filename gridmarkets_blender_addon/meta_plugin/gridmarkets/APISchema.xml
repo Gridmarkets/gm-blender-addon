@@ -287,7 +287,6 @@
                     <Description>The name of the job.</Description>
                     <Type>STRING</Type>
                     <DefaultValue>V-Ray Job</DefaultValue>
-                    <MaxLength>5</MaxLength>
                     <MinLength>1</MinLength>
                 </Attribute>
                 <Optional>False</Optional>
