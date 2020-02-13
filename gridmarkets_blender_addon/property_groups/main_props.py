@@ -358,7 +358,7 @@ def reset_to_defaults(pos):
     bpy.context.scene.props.remote_project_container.remote_projects.clear()
     bpy.context.scene.props.remote_project_container.focused_remote_project = 0
 
-    # todo job presets are nto saved right now
+    # todo job presets are not saved right now
     bpy.context.scene.props.job_preset_container.items.clear()
     bpy.context.scene.props.job_preset_container.focused_item = 0
 
