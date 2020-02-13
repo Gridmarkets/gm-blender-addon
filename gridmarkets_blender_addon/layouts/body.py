@@ -33,9 +33,6 @@ from gridmarkets_blender_addon.blender_plugin.job_preset_container.layouts.draw_
 from gridmarkets_blender_addon.blender_plugin.log_history_container.layouts.draw_logging_console import \
     draw_logging_console
 
-from gridmarkets_blender_addon.layouts.sidebar import draw_sidebar
-from gridmarkets_blender_addon.layouts.vray_submission_form import draw_v_ray_submission_form
-
 _CONSOLE_SEPARATOR_SPACING = 2
 
 # new imports
