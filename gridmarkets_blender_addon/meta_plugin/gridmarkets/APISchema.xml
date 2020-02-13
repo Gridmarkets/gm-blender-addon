@@ -2,9 +2,9 @@
 <APISchema>
 
     <JobDefinitions>
-        <JobDefinition id="BLENDER_2_80_CYCLES">
+        <JobDefinition id="BLENDER_2_8X_CYCLES">
 
-            <DisplayName>Blender Cycles</DisplayName>
+            <DisplayName>Blender 2.8x Cycles</DisplayName>
 
             <JobAttribute>
                 <Attribute>
@@ -640,24 +640,24 @@
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_CYCLES_PROJECT">
+        <ProjectAttribute id="BLENDER_2_8X_CYCLES_PROJECT">
             <Attribute>
-                <Key>BLENDER_2_80_CYCLES_PROJECT</Key>
-                <DisplayName>Blender 2.80 (Cycles) Project</DisplayName>
-                <Description>A blender 2.80 project setup to use the Blender Cycles render engine.</Description>
+                <Key>BLENDER_2_8X_CYCLES_PROJECT</Key>
+                <DisplayName>Blender 2.8X (Cycles) Project</DisplayName>
+                <Description>A blender 2.8X project setup to use the Blender Cycles render engine.</Description>
                 <Type>NULL</Type>
             </Attribute>
             <Transitions></Transitions>
             <CompatibleJobDefinitions>
-                <CompatibleJobDefinition>BLENDER_2_80_CYCLES</CompatibleJobDefinition>
+                <CompatibleJobDefinition>BLENDER_2_8X_CYCLES</CompatibleJobDefinition>
             </CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_EEVEE_PROJECT">
+        <ProjectAttribute id="BLENDER_2_8X_EEVEE_PROJECT">
             <Attribute>
-                <Key>BLENDER_2_80_EEVEE_PROJECT</Key>
-                <DisplayName>Blender 2.80 (Eevee) Project</DisplayName>
-                <Description>A blender 2.80 project setup to use the Blender Eevee render engine.</Description>
+                <Key>BLENDER_2_8X_EEVEE_PROJECT</Key>
+                <DisplayName>Blender 2.8X (Eevee) Project</DisplayName>
+                <Description>A blender 2.8X project setup to use the Blender Eevee render engine.</Description>
                 <Type>NULL</Type>
             </Attribute>
             <Transitions></Transitions>
@@ -697,7 +697,7 @@
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
+        <ProjectAttribute id="BLENDER_2_8X_RENDER_ENGINE">
             <Attribute>
                 <Key>engine</Key>
                 <DisplayName>Render Engine</DisplayName>
@@ -719,11 +719,11 @@
             </Attribute>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_CYCLES_PROJECT</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_8X_CYCLES_PROJECT</ProjectAttributeId>
                     <TransitionFormula>CYCLES</TransitionFormula>
                 </Transition>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_EEVEE_PROJECT</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_8X_EEVEE_PROJECT</ProjectAttributeId>
                     <TransitionFormula>EEVEE</TransitionFormula>
                 </Transition>
             </Transitions>
@@ -749,7 +749,7 @@
             <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_MAIN_PROJECT_FILE">
+        <ProjectAttribute id="BLENDER_2_8X_MAIN_PROJECT_FILE">
             <Attribute>
                 <Key>path</Key>
                 <DisplayName>Main project file</DisplayName>
@@ -760,7 +760,7 @@
             </Attribute>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_8X_RENDER_ENGINE</ProjectAttributeId>
                     <TransitionFormula>(.*)(.blend)$</TransitionFormula>
                     <RejectionMessage>File must have ".blend" file extension.</RejectionMessage>
                 </Transition>
@@ -788,7 +788,7 @@
                     <TransitionFormula>^([2]\.)([1-7]\d)</TransitionFormula>
                 </Transition>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_MAIN_PROJECT_FILE</ProjectAttributeId>
+                    <ProjectAttributeId>BLENDER_2_8X_MAIN_PROJECT_FILE</ProjectAttributeId>
                     <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>

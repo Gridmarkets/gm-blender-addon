@@ -57,7 +57,7 @@ def add_default_job_preset():
                 job_preset_container.append(JobPreset(name, job_definition, is_locked=True))
 
     # add default job presets
-    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_80_CYCLES, constants.DEFAULT_JOB_PRESET_NAME)
+    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_8X_CYCLES, constants.DEFAULT_JOB_PRESET_NAME)
 
 
 
