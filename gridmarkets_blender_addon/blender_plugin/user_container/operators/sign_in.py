@@ -77,6 +77,7 @@ class GRIDMARKETS_OT_sign_in_new_user(BaseOperator):
             user_interface.set_auth_access_key_validity_message("")
             user_interface.set_user_validity_flag(True)
             user_interface.set_user_validity_message("")
+            user_interface.set_layout(constants.SUBMISSION_SETTINGS_VALUE)
             return True
 
         elif type(result) == InvalidEmailError:
