@@ -201,7 +201,7 @@ class UserInterface(MetaUserInterface):
     @staticmethod
     def reset_blend_file_path() -> None:
         if bpy.context.blend_data.is_saved:
-            bpy.context.scene.props.blend_file_path = bpy.context.blend_data.filepath
+            bpy.context.scene.props.blend_file_path = bpy.path.abspath(bpy.context.blend_data.filepath)
         else:
             bpy.context.scene.props.blend_file_path = ""
 
@@ -215,7 +215,7 @@ class UserInterface(MetaUserInterface):
 
     @staticmethod
     def get_root_directory() -> str:
-        return bpy.context.scene.props.root_directory
+        return bpy.path.abspath(bpy.context.scene.props.root_directory)
 
     @staticmethod
     def reset_upload_all_files_in_root() -> None:

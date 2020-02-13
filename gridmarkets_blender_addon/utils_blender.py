@@ -754,7 +754,7 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
 
     if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
         # if the attribute is a file path add it's value to the files array
-        files.append(pathlib.Path(value))
+        files.append(pathlib.Path(bpy.path.abspath(value)))
 
     return get_project_files(files, project_attribute.transition(value))
 
