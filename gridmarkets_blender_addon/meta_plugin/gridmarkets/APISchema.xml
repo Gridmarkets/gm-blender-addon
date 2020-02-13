@@ -361,6 +361,21 @@
 
             <JobAttribute>
                 <Attribute>
+                    <Key>remap_file</Key>
+                    <DisplayName>Remap File</DisplayName>
+                    <Description>The path to your .remap file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The remap file path would then be '/sample project/sample.remap'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
                     <Key>frames</Key>
                     <DisplayName>Frame Ranges</DisplayName>
                     <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
