@@ -115,7 +115,8 @@ def convert_packed_project(packed_project: 'PackedProject', plugin: 'Plugin') ->
 
     # convert files from absolute local paths to absolute remote paths
     files = set(map(lambda file: pathlib.Path('/') / root_dir / file, packed_project.get_relative_files()))
-    attributes = packed_project.get_attributes()
+    attributes = {}
+    attributes.update(packed_project.get_attributes())
 
     project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
     attribute = project_attribute.get_attribute()
@@ -128,7 +129,7 @@ def convert_packed_project(packed_project: 'PackedProject', plugin: 'Plugin') ->
             # update the file path attribute
             value = (pathlib.Path('/') / root_dir / packed_project.get_relative_file_path(
                 pathlib.Path(value))).as_posix()
-            packed_project.set_attribute(attribute.get_key(), value)
+            attributes[attribute.get_key()] = value
 
         project_attribute = project_attribute.transition(value)
         attribute = project_attribute.get_attribute()
