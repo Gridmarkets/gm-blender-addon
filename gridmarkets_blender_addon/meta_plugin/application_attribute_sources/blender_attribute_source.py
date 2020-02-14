@@ -20,10 +20,13 @@
 
 __all__ = 'BlenderAttributeSource'
 
-
+import re
 from ..gridmarkets import constants as meta_constants
 from .application_attribute_source import ApplicationAttributeSource
 from ..errors import ApplicationAttributeNotFound
+
+import re
+
 
 
 class BlenderAttributeSource(ApplicationAttributeSource):
@@ -38,7 +41,16 @@ class BlenderAttributeSource(ApplicationAttributeSource):
         if key == meta_constants.API_KEYS.APP_VERSION:
             return app_version
 
-        if app_version == meta_constants.BLENDER_VERSIONS.V_2_80 or app_version == meta_constants.BLENDER_VERSIONS.V_2_81A:
+        if re.match(meta_constants.BLENDER_VERSIONS.SERIES_2_8X, app_version):
+            if key == meta_constants.API_KEYS.OUTPUT_FORMAT:
+                return bpy.context.scene.render.image_settings.file_format
+            elif key == meta_constants.API_KEYS.FRAMES:
+                from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
+                return get_blender_frame_range(bpy.context)
+            elif key == meta_constants.API_KEYS.GPU:
+                return bpy.context.scene.cycles.device == 'GPU'
+
+        if re.match(meta_constants.BLENDER_VERSIONS.SERIES_2_7X, app_version):
             if key == meta_constants.API_KEYS.OUTPUT_FORMAT:
                 return bpy.context.scene.render.image_settings.file_format
             elif key == meta_constants.API_KEYS.FRAMES:

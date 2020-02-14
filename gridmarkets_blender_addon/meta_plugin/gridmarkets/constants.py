@@ -88,6 +88,8 @@ class BLENDER_VERSIONS:
     V_2_81A = "2.81a"
     V_2_80 = "2.80"
     V_2_79B = "2.79b"
+    SERIES_2_8X = "^([2]\\.)([1-7]\\d)"
+    SERIES_2_7X = "^([2]\\.)([8]\\d)"
 
 
 class BLENDER_ENGINES:
