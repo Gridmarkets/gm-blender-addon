@@ -108,6 +108,27 @@
 
             <JobAttribute>
                 <Attribute>
+                    <Key>render_engine</Key>
+                    <DisplayName>Render Engine</DisplayName>
+                    <Description>The render engine to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>CYCLES</Key>
+                            <DisplayName>Cycles</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>CYCLES</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
                     <Key>output_prefix</Key>
                     <DisplayName>Output Prefix</DisplayName>
                     <Description>The prefix to add to render results.</Description>
@@ -214,22 +235,45 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>render_engine</Key>
-                    <DisplayName>Render Engine</DisplayName>
-                    <Description>The render engine to use when rendering the scene.</Description>
-                    <Type>ENUM</Type>
-                    <Items>
-                        <Item>
-                            <Key>CYCLES</Key>
-                            <DisplayName>Cycles</DisplayName>
-                            <Description></Description>
-                        </Item>
-                    </Items>
-                    <DefaultValue>CYCLES</DefaultValue>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
-                    <InferenceSource>CONSTANT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>FILE_PATH</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>
 
@@ -447,6 +491,50 @@
 
             <JobAttribute>
                 <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>FILE_PATH</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
                     <Key>machine_type</Key>
                     <DisplayName>Machine Type</DisplayName>
                     <Description>The type of machine to use for the job.</Description>
@@ -567,6 +655,50 @@
                 <Optional>False</Optional>
                 <InferenceSources>
                     <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>FILE_PATH</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
             </JobAttribute>

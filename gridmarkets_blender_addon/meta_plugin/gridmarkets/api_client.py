@@ -31,7 +31,7 @@ from ..cached_value import CachedValue
 from ..user_info import UserInfo
 from ..machine_option import MachineOption
 from ..product import Product
-from ..utils import get_files_in_directory, get_exception_with_traceback
+from ..utils import get_files_in_directory, get_exception_with_traceback, get_desktop_path
 from ..errors import *
 from .. import attribute_types
 
@@ -268,11 +268,20 @@ class GridMarketsAPIClient(MetaAPIClient):
         job_settings = {}
         for job_preset_attribute in job_preset.get_job_preset_attributes():
             key = job_preset_attribute.get_key()
+
+            # The python envoy client treats these attributes as something other than job parameters so we skip them
+            # here and deal with them elsewhere.
+            if key in [api_constants.API_KEYS.AUTO_DOWNLOAD,
+                       api_constants.API_KEYS.REMOTE_OUTPUT_FOLDER_NAME,
+                       api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH]:
+                continue
+
             value = job_preset_attribute.eval(self.get_plugin(), remote_project)
             job_settings[key] = value
             self._log.info("Job Parameter '" + key + "': " + str(value))
 
-            # machine type attributes implicitly contain a gpu attribute
+            # The python envoy client treats machine type and gpu as two different attributes so we must infer
+            # the gpu attribute from the machine type here.
             if key == api_constants.API_KEYS.MACHINE_TYPE:
                 attribute = job_preset_attribute.get_job_attribute().get_attribute()
                 if attribute.get_type() != attribute_types.AttributeType.ENUM:
@@ -318,11 +327,60 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         return job
 
+    def _get_remote_output_folder_name(self, job_preset: 'JobPreset', remote_project: 'RemoteProject'):
+        attribute = job_preset.get_job_preset_attribute_by_key(api_constants.API_KEYS.REMOTE_OUTPUT_FOLDER_NAME)
+        remote_output_folder_name = attribute.eval(self.get_plugin(), remote_project)
+        return remote_output_folder_name
+
+    def _get_local_download_path(self, job_preset: 'JobPreset', remote_project: 'RemoteProject'):
+        attribute = job_preset.get_job_preset_attribute_by_key(api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH)
+        local_download_path = attribute.eval(self.get_plugin(), remote_project)
+        return local_download_path
+
+    def _get_skip_auto_download(self, job_preset: 'JobPreset', remote_project: 'RemoteProject'):
+        attribute = job_preset.get_job_preset_attribute_by_key(api_constants.API_KEYS.AUTO_DOWNLOAD)
+        auto_download = attribute.eval(self.get_plugin(), remote_project)
+        return not auto_download
+
+    def _set_watch_files(self,
+                         gm_project: 'gridmarkets.Project',
+                         job_preset: 'JobPreset',
+                         remote_project: 'RemoteProject'):
+
+        timestamp = str(gm_project.timestamp).replace(' ', '_').replace(':', '-').replace('.', '_')
+
+        # setup the download path
+        download_path = self._get_local_download_path(job_preset, remote_project)
+        if not download_path:
+            download_path = "{0}/{1}/render_results/{2}".format(get_desktop_path(),
+                                                                remote_project.get_name(),
+                                                                timestamp)
+
+        # setup the remote output folder pattern
+        remote_output_folder_name = self._get_remote_output_folder_name(job_preset, remote_project)
+        if not remote_output_folder_name:
+            remote_output_folder_name = timestamp
+
+        remote_output_folder = "{0}/render_results/{1}".format(gm_project.remote_root, remote_output_folder_name)
+        download_pattern = "{0}/.+".format(remote_output_folder)
+
+        # create the default watch file
+        default_watch_file = gridmarkets.WatchFile(download_pattern, download_path)
+
+        # add the watch files
+        gm_project.add_watch_files(default_watch_file)
+
+        gm_project.remote_output_folder_name = remote_output_folder_name
+        gm_project.remote_output_folder = remote_output_folder
+
+        for watch_file in gm_project.watch_files:
+            self._log.info("Watch File \"" + str(watch_file.output_pattern) + "\" : \"" +
+                           str(watch_file.download_path) + "\"")
+
     def submit_new_project(self,
                            packed_project: 'PackedProject',
                            job_preset: 'JobPreset',
                            delete_local_files_after_upload: bool = False) -> 'RemoteProject':
-        plugin = self.get_plugin()
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")
@@ -350,12 +408,18 @@ class GridMarketsAPIClient(MetaAPIClient):
         # add job to project
         gm_project.add_jobs(job)
 
+        # set the watch files
+        self._set_watch_files(gm_project, job_preset, remote_project)
+
+        # get the skip auto download flag
+        skip_auto_download = self._get_skip_auto_download(job_preset, remote_project)
+
         # submit the job to the remote project
-        self._log.info(
-            "Submitting current scene with job \"" + job_preset.get_name() + "\" to project \"" + project_name + "\".")
+        self._log.info("Submitting current scene with job \"" + job_preset.get_name() + "\" to project \"" +
+                       project_name + "\".")
 
         try:
-            client.submit_project(gm_project, skip_upload=False)
+            client.submit_project(gm_project, skip_upload=False, skip_auto_download=skip_auto_download)
         except APIError as e:
             raise APIClientError(e.user_message)
 
@@ -364,7 +428,6 @@ class GridMarketsAPIClient(MetaAPIClient):
         return remote_project
 
     def submit_to_remote_project(self, remote_project: 'RemoteProject', job_preset: 'JobPreset') -> None:
-        plugin = self.get_plugin()
 
         if not self.is_user_signed_in():
             raise NotSignedInError("Must be signed-in to Submit a job.")
@@ -383,21 +446,28 @@ class GridMarketsAPIClient(MetaAPIClient):
             self._log.warning(msg)
             raise APIClientError(msg)
 
-        self._log.info(
-            "Preparing job " + job_preset.get_name() + " for submission to remote project " + remote_project.get_name())
+        self._log.info("Preparing job " + job_preset.get_name() + " for submission to remote project " +
+                       remote_project.get_name())
 
         client = self._envoy_client
-        project = gridmarkets.Project(str(remote_project.get_root_dir()), remote_project.get_name())
+        gm_project = gridmarkets.Project(str(remote_project.get_root_dir()), remote_project.get_name())
 
         job = self._get_gm_job(job_preset, remote_project)
 
         # add job to project
-        project.add_jobs(job)
+        gm_project.add_jobs(job)
+
+        # set the watch files
+        self._set_watch_files(gm_project, job_preset, remote_project)
+
+        # get the skip auto download flag
+        skip_auto_download = self._get_skip_auto_download(job_preset, remote_project)
 
         # submit the job to the remote project
-        self._log.info(
-            "Submitting job " + job_preset.get_name() + " to existing remote project " + remote_project.get_name())
-        client.submit_project(project, skip_upload=True)
+        self._log.info("Submitting job " + job_preset.get_name() + " to existing remote project " +
+                       remote_project.get_name())
+
+        client.submit_project(gm_project, skip_upload=True, skip_auto_download=skip_auto_download)
 
         self._log.info("Job submitted - See Render Manager for details")
 
