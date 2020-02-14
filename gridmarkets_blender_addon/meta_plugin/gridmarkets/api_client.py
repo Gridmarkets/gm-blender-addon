@@ -361,6 +361,8 @@ class GridMarketsAPIClient(MetaAPIClient):
 
         self._log.info("Job submitted - See Render Manager for details")
 
+        return remote_project
+
     def submit_to_remote_project(self, remote_project: 'RemoteProject', job_preset: 'JobPreset') -> None:
         plugin = self.get_plugin()
 

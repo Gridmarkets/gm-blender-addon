@@ -75,7 +75,6 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
             return True
 
         elif type(result) == RemoteProject:  # a remote project is returned when submitting a new project
-            self.get_plugin().get_remote_project_container().append(result)
             return True
 
         elif result is None:  # None is returned when submitting to an existing project

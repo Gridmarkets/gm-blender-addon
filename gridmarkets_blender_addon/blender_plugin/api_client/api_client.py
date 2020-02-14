@@ -32,7 +32,7 @@ import pathlib
 
 if typing.TYPE_CHECKING:
     from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
-    from gridmarkets_blender_addon.meta_plugin.gridmarkets.api_schema import APISchema
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
     from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
 
@@ -78,10 +78,27 @@ class APIClient(GridMarketsAPIClient):
                        upload_root_dir: bool,
                        delete_local_files_after_upload: bool = False) -> RemoteProject:
 
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        remote_project = GridMarketsAPIClient.upload_project(self,
+                                                             packed_project,
+                                                             upload_root_dir,
+                                                             delete_local_files_after_upload)
 
-        remote_project = GridMarketsAPIClient.upload_project(self, packed_project, upload_root_dir, delete_local_files_after_upload)
+        plugin = self.get_plugin()
+        plugin.get_remote_project_container().append(remote_project)
+        plugin.get_user_interface().set_layout(constants.REMOTE_PROJECTS_LAYOUT_VALUE)
+        return remote_project
+
+    def submit_new_project(self,
+                           packed_project: 'PackedProject',
+                           job_preset: 'JobPreset',
+                           delete_local_files_after_upload: bool = False) -> 'RemoteProject':
+
+        remote_project = GridMarketsAPIClient.submit_new_project(self,
+                                                                 packed_project,
+                                                                 job_preset,
+                                                                 delete_local_files_after_upload)
+
+        plugin = self.get_plugin()
         plugin.get_remote_project_container().append(remote_project)
         plugin.get_user_interface().set_layout(constants.REMOTE_PROJECTS_LAYOUT_VALUE)
         return remote_project
