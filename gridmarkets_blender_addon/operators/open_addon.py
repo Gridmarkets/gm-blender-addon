@@ -130,6 +130,16 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
             screen.name = constants.INJECTED_SCREEN_NAME
 
+            # flip the header region to the top if on the bottom
+            for region in area.regions:
+                if region.alignment == "BOTTOM":
+                    override = bpy.context.copy()
+                    override['window'] = window
+                    override['screen'] = screen
+                    override['area'] = area
+                    override['region'] = region
+                    bpy.ops.screen.region_flip(override)
+
         finally:
             # reset render settings
             render.resolution_x = old_settings['x']
