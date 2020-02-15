@@ -752,9 +752,12 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
 
     value = project_attribute.get_value()
 
-    if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
-        # if the attribute is a file path add it's value to the files array
-        files.append(pathlib.Path(bpy.path.abspath(value)))
+    # if the attribute is a file path
+    if attribute.get_type() == AttributeType.STRING and \
+            attribute.get_subtype() == StringSubtype.PATH.value and \
+            attribute.get_subtype_kwargs().get(api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_MODE) == api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_PATH:
+        # add it's value to the files array
+        files.append(pathlib.Path(value))
 
     return get_project_files(files, project_attribute.transition(value))
 
@@ -934,57 +937,60 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
             )
         elif subtype == StringSubtype.PATH.value:
 
+            file_mode = subtype_kwargs[api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_MODE]
 
             properties[prop_id] = bpy.props.StringProperty(
                 name=display_name,
                 description=description,
                 default=default,
-                subtype='FILE_PATH',
+                subtype=file_mode,
                 maxlen=0 if max_length is None else max_length,
                 options={'SKIP_SAVE'}
             )
 
-            def get_remote_project_files(self, context):
-                from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-                plugin = PluginFetcher.get_plugin_if_initialised()
+            if file_mode == api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_PATH:
 
-                if plugin is None:
-                    return []
+                def get_remote_project_files(self, context):
+                    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+                    plugin = PluginFetcher.get_plugin_if_initialised()
 
-                api_client = plugin.get_api_client()
-                api_schema = api_client.get_cached_api_schema()
+                    if plugin is None:
+                        return []
 
-                remote_project_name = api_schema.get_root_project_attribute().get_value()
-                remote_project_files = api_client.get_remote_project_files(remote_project_name)
-                return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
+                    api_client = plugin.get_api_client()
+                    api_schema = api_client.get_cached_api_schema()
 
-            def getter(self):
-                files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+                    remote_project_name = api_schema.get_root_project_attribute().get_value()
+                    remote_project_files = api_client.get_remote_project_files(remote_project_name)
+                    return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
 
-                try:
-                    return files.index(self[prop_id])
-                except (KeyError, ValueError):
+                def getter(self):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+
                     try:
-                        self[prop_id] = files[0]
-                    except IndexError:
-                        pass
-                    return 0
+                        return files.index(self[prop_id])
+                    except (KeyError, ValueError):
+                        try:
+                            self[prop_id] = files[0]
+                        except IndexError:
+                            pass
+                        return 0
 
-            def setter(self, value):
-                files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
-                try:
-                    self[prop_id] = files[value]
-                except IndexError as e:
-                    self[prop_id] = ""
+                def setter(self, value):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+                    try:
+                        self[prop_id] = files[value]
+                    except IndexError as e:
+                        self[prop_id] = ""
 
-            properties[prop_id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
-                name=display_name,
-                description=description,
-                items=get_remote_project_files,
-                get=getter,
-                set=setter,
-                options={'SKIP_SAVE'}
-            )
+                properties[prop_id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
+                    name=display_name,
+                    description=description,
+                    items=get_remote_project_files,
+                    get=getter,
+                    set=setter,
+                    options={'SKIP_SAVE'}
+                )
 
         else:
             raise ValueError("Unrecognised String subtype '" + subtype + "'.")
@@ -995,7 +1001,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
         items = []
 
         if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.STRING.PRODUCT_VERSIONS.PRODUCT)
+            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.PRODUCT)
 
             match = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
             match = p = re.compile(match) if match is not None else None

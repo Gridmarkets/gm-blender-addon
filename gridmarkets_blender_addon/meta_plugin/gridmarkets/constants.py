@@ -66,6 +66,8 @@ class SUBTYPE_KEYS:
     class STRING:
         class PATH:
             FILE_MODE = "FILE_MODE"
+            FILE_PATH = "FILE_PATH"
+            DIR_PATH = "DIR_PATH"
 
     class ENUM:
         class PRODUCT_VERSIONS:

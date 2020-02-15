@@ -80,7 +80,13 @@
                     <DisplayName>Render File</DisplayName>
                     <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
                     <Type>STRING</Type>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                     <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
@@ -254,7 +260,13 @@
                     <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -399,7 +411,13 @@
                     <DisplayName>Render File</DisplayName>
                     <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
                     <Type>STRING</Type>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                     <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
@@ -573,7 +591,13 @@
                     <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>DIR_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -718,7 +742,13 @@
                     <DisplayName>Render File</DisplayName>
                     <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
                     <Type>STRING</Type>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                     <DefaultValue></DefaultValue>
                 </Attribute>
                 <Optional>False</Optional>
@@ -892,7 +922,13 @@
                     <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -1144,7 +1180,13 @@
                     <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -1314,7 +1356,13 @@
                     <Description>(Optional) The local path to download your results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
                     <Type>STRING</Type>
                     <DefaultValue></DefaultValue>
-                    <Subtype>FILE_PATH</Subtype>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
                 </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
@@ -1521,7 +1569,13 @@
                 <Description>The main .blend file for your project.</Description>
                 <DefaultValue></DefaultValue>
                 <Type>STRING</Type>
-                <Subtype>FILE_PATH</Subtype>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
@@ -1540,7 +1594,13 @@
                 <Description>The main .blend file for your project.</Description>
                 <DefaultValue></DefaultValue>
                 <Type>STRING</Type>
-                <Subtype>FILE_PATH</Subtype>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
@@ -1598,7 +1658,13 @@
                 <DisplayName>V-Ray re-map file</DisplayName>
                 <Description>The V-Ray re-map file for the project.</Description>
                 <Type>STRING</Type>
-                <Subtype>FILE_PATH</Subtype>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
@@ -1616,7 +1682,13 @@
                 <DisplayName>V-Ray scene file</DisplayName>
                 <Description>The main .vrscene file for the project.</Description>
                 <Type>STRING</Type>
-                <Subtype>FILE_PATH</Subtype>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
@@ -1670,7 +1742,13 @@
                 <DisplayName>SVL script</DisplayName>
                 <Description>The primary SVL batch script to run.</Description>
                 <Type>STRING</Type>
-                <Subtype>FILE_PATH</Subtype>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
             </Attribute>
             <Transitions>
                 <Transition>
