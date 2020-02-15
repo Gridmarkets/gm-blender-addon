@@ -993,7 +993,7 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
         items = []
 
         if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
-            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.STRING.FILE_PATH.PRODUCT)
+            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.STRING.PRODUCT_VERSIONS.PRODUCT)
 
             match = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
             match = p = re.compile(match) if match is not None else None

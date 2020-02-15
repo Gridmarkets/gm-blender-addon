@@ -64,11 +64,10 @@ class API_KEYS:
 
 class SUBTYPE_KEYS:
     class STRING:
-        class FILE_PATH:
-            PRODUCT = "PRODUCT"
 
     class ENUM:
         class PRODUCT_VERSIONS:
+            PRODUCT = "PRODUCT"
             MATCH = "MATCH"
 
         class MACHINE_TYPE:
