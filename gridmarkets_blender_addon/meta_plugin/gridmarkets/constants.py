@@ -64,6 +64,8 @@ class API_KEYS:
 
 class SUBTYPE_KEYS:
     class STRING:
+        class PATH:
+            FILE_MODE = "FILE_MODE"
 
     class ENUM:
         class PRODUCT_VERSIONS:

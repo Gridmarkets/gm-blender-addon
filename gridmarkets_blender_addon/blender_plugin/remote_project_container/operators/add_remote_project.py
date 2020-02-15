@@ -62,7 +62,7 @@ class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
             value = project_attribute.get_value()
 
             # check file paths exist
-            if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+            if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
                 if value not in files:
                     self.report({'ERROR'}, "File path '" + str(value) + "' does not exist under project '" +
                                 project_name + "'.")

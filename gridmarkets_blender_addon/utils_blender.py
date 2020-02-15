@@ -752,7 +752,7 @@ def get_project_files(files: typing.List[pathlib.Path], project_attribute = None
 
     value = project_attribute.get_value()
 
-    if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+    if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
         # if the attribute is a file path add it's value to the files array
         files.append(pathlib.Path(bpy.path.abspath(value)))
 
@@ -932,7 +932,9 @@ def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dic
             properties[prop_id + JobPreset.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
                 options={'SKIP_SAVE'}
             )
-        elif subtype == StringSubtype.FILE_PATH.value:
+        elif subtype == StringSubtype.PATH.value:
+
+
             properties[prop_id] = bpy.props.StringProperty(
                 name=display_name,
                 description=description,

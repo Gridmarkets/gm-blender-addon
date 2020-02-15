@@ -58,7 +58,7 @@ def get_value(property_group, attribute: Attribute, prop_id: str = None) -> any:
         else:
             return machine_count_value
 
-    if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+    if attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
         return bpy.path.abspath(getattr(property_group, prop_id))
 
     return getattr(property_group, prop_id)

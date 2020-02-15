@@ -125,7 +125,7 @@ def convert_packed_project(packed_project: 'PackedProject', plugin: 'Plugin') ->
     while attribute.get_type() != AttributeType.NULL:
         value = packed_project.get_attribute(attribute.get_key())
 
-        if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+        if attribute.get_type() == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
             # update the file path attribute
             value = (pathlib.Path('/') / root_dir / packed_project.get_relative_file_path(
                 pathlib.Path(value))).as_posix()

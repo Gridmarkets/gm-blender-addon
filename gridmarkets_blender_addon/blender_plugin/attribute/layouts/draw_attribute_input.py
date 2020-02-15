@@ -53,7 +53,7 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
 
     # some attributes require a different input if using a remote source
     if remote_source:
-        if (attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value) or \
+        if (attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value) or \
                 (attribute.get_key() == api_constants.API_KEYS.PROJECT_NAME and attribute_type == AttributeType.STRING):
 
             prop_id = prop_id + constants.REMOTE_SOURCE_SUFFIX
@@ -91,7 +91,7 @@ def draw_attribute_input(self, context, prop_container, attribute: Attribute, pr
             row.prop(prop_container, prop_id, text="")
             row.prop(prop_container, prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT, text="")
 
-    elif remote_source and attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.FILE_PATH.value:
+    elif remote_source and attribute_type == AttributeType.STRING and attribute.get_subtype() == StringSubtype.PATH.value:
         row = col.row(align=True)
         row.prop(prop_container, prop_id, text="")
         sub = row.row(align=True)

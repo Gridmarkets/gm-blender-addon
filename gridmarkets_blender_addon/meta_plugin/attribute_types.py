@@ -33,7 +33,7 @@ from .errors import InvalidAttributeError
 class StringSubtype(enum.Enum):
     NONE = "NONE"
     FRAME_RANGES = "FRAME_RANGES"
-    FILE_PATH = "FILE_PATH"
+    PATH = "PATH"
 
 
 class StringAttributeType(Attribute):
