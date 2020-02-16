@@ -41,6 +41,7 @@ __all__ = 'APIClient', \
           'LoggingCoordinator', \
           'MachineOption', \
           'PackedProject', \
+          'PackedSceneBuilder', \
           'Plugin', \
           'PluginFetcher', \
           'PluginUtils', \
@@ -85,6 +86,7 @@ from .logger import Logger
 from .logging_coordinator import LoggingCoordinator
 from .machine_option import MachineOption
 from .packed_project import PackedProject
+from .packed_scene_builder import PackedSceneBuilder
 from .plugin import Plugin
 from .plugin_fetcher import PluginFetcher
 from .plugin_utils import PluginUtils

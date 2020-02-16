@@ -25,7 +25,7 @@ from abc import ABC, abstractmethod
 
 if typing.TYPE_CHECKING:
     from . import PluginVersion, LoggingCoordinator, PreferencesContainer, APIClient, UserInterface, \
-        RemoteProjectContainer, ApplicationPoolAttributeSource, FactoryCollection, PluginUtils
+        RemoteProjectContainer, ApplicationPoolAttributeSource, FactoryCollection, PluginUtils, PackedSceneBuilder
 
 
 class Plugin(ABC):
@@ -60,6 +60,10 @@ class Plugin(ABC):
 
     @abstractmethod
     def get_application_pool_attribute_source(self) -> 'ApplicationPoolAttributeSource':
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_packed_scene_builder(self) -> 'PackedSceneBuilder':
         raise NotImplementedError
 
     @abstractmethod

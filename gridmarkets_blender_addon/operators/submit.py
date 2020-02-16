@@ -25,8 +25,6 @@ from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.operators.base_operator import BaseOperator
 from gridmarkets_blender_addon import constants, utils_blender
 from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
-from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
-from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
 from gridmarkets_blender_addon.meta_plugin.errors import *
 
 from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
@@ -119,23 +117,8 @@ class GRIDMARKETS_OT_Submit(BaseOperator):
                                     product_version: str,
                                     attributes: typing.Dict[str, any],
                                     job_preset: 'JobPreset'):
-        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-
-        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
-
-        if product == api_constants.PRODUCTS.BLENDER:
-            packed_project = BlenderSceneExporter().export(temp_dir)
-        elif product == api_constants.PRODUCTS.VRAY:
-            packed_project = VRaySceneExporter().export(temp_dir)
-        else:
-            raise RuntimeError("Unknown project type")
-
-        packed_project.set_name(project_name)
-        for key, value in attributes.items():
-            # If the key is not already in the packed project's attribute list
-            if key not in packed_project.get_attributes():
-                # Then set the attribute
-                packed_project.set_attribute(key, value)
+        packed_scene_builder = self.get_plugin().get_packed_scene_builder()
+        packed_project = packed_scene_builder.get_current_scene(project_name, product, product_version, attributes)
 
         api_client = self.get_plugin().get_api_client()
         return api_client.submit_new_project(packed_project, job_preset, delete_local_files_after_upload=False)

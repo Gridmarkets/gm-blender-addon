@@ -23,8 +23,6 @@ __all__ = 'APIClient'
 from abc import ABC, abstractmethod
 import typing
 
-from .errors import InvalidEmailError, InvalidAccessKeyError, InvalidUserError
-
 if typing.TYPE_CHECKING:
     from . import Product, User, FactoryCollection, APISchema, PackedProject, RemoteProject, JobPreset, UserInfo, \
         MachineOption, Plugin
