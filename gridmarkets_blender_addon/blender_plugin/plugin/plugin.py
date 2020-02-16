@@ -34,7 +34,7 @@ from gridmarkets_blender_addon.blender_plugin.api_client.api_client import APICl
 from gridmarkets_blender_addon.blender_plugin.user_interface.user_interface import UserInterface
 from gridmarkets_blender_addon.blender_plugin.remote_project_container.remote_project_container import \
     RemoteProjectContainer
-from gridmarkets_blender_addon.meta_plugin.application_attribute_sources.application_pool_attribute_source import ApplicationPoolAttributeSource
+from gridmarkets_blender_addon.blender_plugin.application_attribtue_source.blender_attribute_source import BlenderAttributeSource
 from gridmarkets_blender_addon.blender_plugin.packed_scene_builder.packed_scene_builder import PackedSceneBuilder
 from gridmarkets_blender_addon.blender_plugin.plugin_utils.plugin_utils import PluginUtils
 from gridmarkets_blender_addon.meta_plugin.factory_collection import FactoryCollection
@@ -58,7 +58,7 @@ class Plugin(MetaPlugin):
         self._user_interface = UserInterface(self)
         self._remote_project_container = RemoteProjectContainer(self)
         self._plugin_utils = PluginUtils()
-        self._application_pool_attribute_source = ApplicationPoolAttributeSource(self)
+        self._application_attribute_source = BlenderAttributeSource(self)
         self._packed_scene_builder = PackedSceneBuilder(self)
 
     def get_name(self) -> str:
@@ -82,8 +82,8 @@ class Plugin(MetaPlugin):
     def get_remote_project_container(self) -> RemoteProjectContainer:
         return self._remote_project_container
 
-    def get_application_pool_attribute_source(self) -> ApplicationPoolAttributeSource:
-        return self._application_pool_attribute_source
+    def get_application_attribute_source(self) -> 'BlenderAttributeSource':
+        return self._application_attribute_source
 
     def get_packed_scene_builder(self) -> 'PackedSceneBuilder':
         return self._packed_scene_builder

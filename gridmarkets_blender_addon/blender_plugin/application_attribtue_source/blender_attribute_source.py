@@ -20,43 +20,40 @@
 
 __all__ = 'BlenderAttributeSource'
 
-import re
-from ..gridmarkets import constants as meta_constants
-from .application_attribute_source import ApplicationAttributeSource
-from ..errors import ApplicationAttributeNotFound
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.application_attribute_source import ApplicationAttributeSource
+from gridmarkets_blender_addon.meta_plugin.errors import ApplicationAttributeNotFound
 
 import re
-
 
 
 class BlenderAttributeSource(ApplicationAttributeSource):
-    APP = 'blender'
 
     def get_attribute_value(self, app: str, app_version: str, key: str):
         import bpy
 
-        if app != self.APP:
+        if app != api_constants.PRODUCTS.BLENDER:
             raise ValueError
 
-        if key == meta_constants.API_KEYS.APP_VERSION:
+        if key == api_constants.API_KEYS.APP_VERSION:
             return app_version
 
-        if re.match(meta_constants.BLENDER_VERSIONS.SERIES_2_8X, app_version):
-            if key == meta_constants.API_KEYS.OUTPUT_FORMAT:
+        if re.match(api_constants.BLENDER_VERSIONS.SERIES_2_8X, app_version):
+            if key == api_constants.API_KEYS.OUTPUT_FORMAT:
                 return bpy.context.scene.render.image_settings.file_format
-            elif key == meta_constants.API_KEYS.FRAMES:
+            elif key == api_constants.API_KEYS.FRAMES:
                 from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
                 return get_blender_frame_range(bpy.context)
-            elif key == meta_constants.API_KEYS.GPU:
+            elif key == api_constants.API_KEYS.GPU:
                 return bpy.context.scene.cycles.device == 'GPU'
 
-        if re.match(meta_constants.BLENDER_VERSIONS.SERIES_2_7X, app_version):
-            if key == meta_constants.API_KEYS.OUTPUT_FORMAT:
+        if re.match(api_constants.BLENDER_VERSIONS.SERIES_2_7X, app_version):
+            if key == api_constants.API_KEYS.OUTPUT_FORMAT:
                 return bpy.context.scene.render.image_settings.file_format
-            elif key == meta_constants.API_KEYS.FRAMES:
+            elif key == api_constants.API_KEYS.FRAMES:
                 from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
                 return get_blender_frame_range(bpy.context)
-            elif key == meta_constants.API_KEYS.GPU:
+            elif key == api_constants.API_KEYS.GPU:
                 return bpy.context.scene.cycles.device == 'GPU'
 
         raise ApplicationAttributeNotFound(app, app_version, key)

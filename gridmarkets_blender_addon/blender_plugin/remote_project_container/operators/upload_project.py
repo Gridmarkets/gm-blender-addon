@@ -109,7 +109,7 @@ class GRIDMARKETS_OT_upload_project(BaseOperator):
         product_version = product_version_attribute.get_value()
 
         # set the other attributes to their application inferred value
-        app_attribute_source = plugin.get_application_pool_attribute_source()
+        app_attribute_source = plugin.get_application_attribute_source()
         app_attribute_source.set_project_attribute_values(project_name, product, product_version)
 
         attributes = utils_blender.get_project_attributes(force_transition=True)

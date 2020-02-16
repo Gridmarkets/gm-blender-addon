@@ -94,8 +94,8 @@ class JobPresetAttribute:
             if self.get_key() == 'app_version':
                 return version
 
-            application_pool_attribute_source = plugin.get_application_pool_attribute_source()
-            return application_pool_attribute_source.get_attribute_value(app, version, self.get_key())
+            application_attribute_source = plugin.get_application_attribute_source()
+            return application_attribute_source.get_attribute_value(app, version, self.get_key())
 
         # project source
         elif inference_source == InferenceSource.get_project_inference_source():

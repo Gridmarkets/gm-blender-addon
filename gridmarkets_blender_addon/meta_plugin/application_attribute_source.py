@@ -18,23 +18,20 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-__all__ = 'ApplicationPoolAttributeSource'
+__all__ = 'ApplicationAttributeSource'
 
 from abc import ABC, abstractmethod
 import typing
 
-from ..attribute import AttributeType
-from ..errors import ApplicationAttributeNotFound
-from ..gridmarkets import constants as api_constants
-
-from .blender_attribute_source import BlenderAttributeSource
+from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+from gridmarkets_blender_addon.meta_plugin.errors import ApplicationAttributeNotFound
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 if typing.TYPE_CHECKING:
-    from .application_attribute_source import ApplicationAttributeSource
-    from .. import Plugin
+    from gridmarkets_blender_addon.meta_plugin import Plugin
 
 
-class ApplicationPoolAttributeSource(ABC):
+class ApplicationAttributeSource(ABC):
 
     def __init__(self, plugin: 'Plugin'):
         self._plugin = plugin
@@ -42,11 +39,9 @@ class ApplicationPoolAttributeSource(ABC):
     def get_plugin(self) -> 'Plugin':
         return self._plugin
 
+    @abstractmethod
     def get_attribute_value(self, app: str, version: str, key: str):
-        if app == 'blender':
-            return self.get_blender_attribute_source().get_attribute_value(app, version, key)
-        else:
-            raise ValueError("Unrecognised application: " + str(app))
+        raise NotImplementedError
 
     def get_project_attribute_values(self, project_name: str, app: str, version: str) -> typing.Dict:
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
@@ -88,9 +83,9 @@ class ApplicationPoolAttributeSource(ABC):
         return attributes
 
     def set_project_attribute_values(self, project_name: str, app: str, version: str) -> None:
+        plugin = self.get_plugin()
 
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        # todo don't use "get_cached_api_schema"
         project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
 
         # set project name
@@ -122,9 +117,3 @@ class ApplicationPoolAttributeSource(ABC):
 
             project_attribute = project_attribute.transition(project_attribute.get_value(),
                                                              force_transition=True)
-
-    def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':
-        return BlenderAttributeSource()
-
-    def get_vray_attribute_source(self) -> 'ApplicationAttributeSource':
-        raise NotImplementedError

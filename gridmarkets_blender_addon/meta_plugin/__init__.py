@@ -21,7 +21,7 @@
 __all__ = 'APIClient', \
           'APISchema', \
           'APISchemaFactory', \
-          'ApplicationPoolAttributeSource', 'ApplicationAttributeSource', 'BlenderAttributeSource', \
+          'ApplicationAttributeSource', \
           'AttributeType', 'Attribute', \
           'CachedValue', \
           'ExcThread', \
@@ -66,7 +66,7 @@ __version__ = '1.0.0'
 from .api_client import APIClient
 from .api_schema import APISchema
 from .api_schema_factory import APISchemaFactory
-from .application_attribute_sources import *
+from .application_attribute_source import ApplicationAttributeSource
 from .attribute import AttributeType, Attribute
 from .cached_value import CachedValue
 from .exc_thread import ExcThread

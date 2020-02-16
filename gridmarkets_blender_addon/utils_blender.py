@@ -798,7 +798,7 @@ def get_current_scene_project_attributes(context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
     api_client = plugin.get_api_client()
-    application_pool = plugin.get_application_pool_attribute_source()
+    attribute_source = plugin.get_application_attribute_source()
 
     project_name = ""
     if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
@@ -808,7 +808,7 @@ def get_current_scene_project_attributes(context):
         product = api_constants.PRODUCTS.BLENDER
         product_version = get_closest_matching_product_version()
 
-    return application_pool.get_project_attribute_values(project_name, product, product_version)
+    return attribute_source.get_project_attribute_values(project_name, product, product_version)
 
 
 def get_submission_project_type_id() -> str:

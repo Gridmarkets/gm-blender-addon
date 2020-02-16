@@ -17,18 +17,3 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-__all__ = 'ApplicationAttributeSource'
-
-from abc import ABC, abstractmethod
-import typing
-
-if typing.TYPE_CHECKING:
-    from .. import Plugin
-
-
-class ApplicationAttributeSource(ABC):
-
-    @abstractmethod
-    def get_attribute_value(self, app: str, version: str, key: str):
-        raise NotImplementedError
