@@ -27,6 +27,8 @@ from ..attribute import AttributeType
 from ..errors import ApplicationAttributeNotFound
 from ..gridmarkets import constants as api_constants
 
+from .blender_attribute_source import BlenderAttributeSource
+
 if typing.TYPE_CHECKING:
     from .application_attribute_source import ApplicationAttributeSource
     from .. import Plugin
@@ -121,11 +123,8 @@ class ApplicationPoolAttributeSource(ABC):
             project_attribute = project_attribute.transition(project_attribute.get_value(),
                                                              force_transition=True)
 
-
-    @abstractmethod
     def get_blender_attribute_source(self) -> 'ApplicationAttributeSource':
-        raise NotImplementedError
+        return BlenderAttributeSource()
 
-    @abstractmethod
     def get_vray_attribute_source(self) -> 'ApplicationAttributeSource':
         raise NotImplementedError

@@ -21,6 +21,10 @@
 __all__ = 'ApplicationAttributeSource'
 
 from abc import ABC, abstractmethod
+import typing
+
+if typing.TYPE_CHECKING:
+    from .. import Plugin
 
 
 class ApplicationAttributeSource(ABC):
