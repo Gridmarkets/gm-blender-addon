@@ -83,10 +83,8 @@ class ApplicationAttributeSource(ABC):
         return attributes
 
     def set_project_attribute_values(self, project_name: str, app: str, version: str) -> None:
-        plugin = self.get_plugin()
-
-        # todo don't use "get_cached_api_schema"
-        project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
+        project_attribute = self.get_plugin().get_api_client().get_api_schema(
+            self.get_plugin().get_factory_collection()).get_root_project_attribute()
 
         # set project name
         project_attribute.set_value(project_name)
