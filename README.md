@@ -14,7 +14,7 @@ A Blender add-on for uploading Blender Projects to GridMarkets and for specifyin
   - [Authentication](#authentication)
   - [Submitting a Job](#submitting-a-job)
     - [Submit and upload at the same time](#submit-and-upload-at-the-same-time)
-    - [Resubmit a job without reuploading:](#resubmit-a-job-without-reuploading:)
+    - [Resubmit a job without reuploading](#resubmit-a-job-without-reuploading)
   - [Uploading Projects without Submitting](#uploading-projects-without-submitting)
   - [Importing Existing Projects](#importing-existing-projects)
   - [Job Presets](#job-presets)
