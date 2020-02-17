@@ -114,7 +114,7 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>render_engine</Key>
+                    <Key>engine</Key>
                     <DisplayName>Render Engine</DisplayName>
                     <Description>The render engine to use when rendering the scene.</Description>
                     <Type>ENUM</Type>
@@ -445,7 +445,7 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>render_engine</Key>
+                    <Key>engine</Key>
                     <DisplayName>Render Engine</DisplayName>
                     <Description>The render engine to use when rendering the scene.</Description>
                     <Type>ENUM</Type>
@@ -776,7 +776,7 @@
 
             <JobAttribute>
                 <Attribute>
-                    <Key>render_engine</Key>
+                    <Key>engine</Key>
                     <DisplayName>Render Engine</DisplayName>
                     <Description>The render engine to use when rendering the scene.</Description>
                     <Type>ENUM</Type>
