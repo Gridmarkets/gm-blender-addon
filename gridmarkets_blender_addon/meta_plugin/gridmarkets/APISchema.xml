@@ -594,8 +594,8 @@
                     <Subtype>PATH</Subtype>
                     <SubtypeKwargs>
                         <SubtypeKwarg>
-                            <Key>DIR_MODE</Key>
-                            <Value>FILE_PATH</Value>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
                         </SubtypeKwarg>
                     </SubtypeKwargs>
                 </Attribute>
