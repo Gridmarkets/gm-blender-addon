@@ -18,6 +18,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'User'
+
+
 class User:
 
     def __init__(self, auth_email: str, auth_access_key: str):

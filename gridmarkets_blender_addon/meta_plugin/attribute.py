@@ -18,18 +18,35 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
-from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
+__all__ = 'AttributeType', 'Attribute'
 
+import enum
 import typing
+from abc import ABC, abstractmethod
+
+
+class AttributeType(enum.Enum):
+    STRING = "STRING"
+    ENUM = "ENUM"
+    NULL = "NULL"
+    BOOLEAN = "BOOLEAN"
+    INTEGER = "INTEGER"
 
 
 class Attribute(ABC):
 
-    def __init__(self, key:str, display_name: str, description: str):
+    def __init__(self,
+                 key:str,
+                 display_name: str,
+                 description: str,
+                 attribute_type: AttributeType,
+                 subtype_kwargs: typing.Dict):
+
         self._key = key
         self._display_name = display_name
         self._description = description
+        self._attribute_type = attribute_type
+        self._subtype_kwargs = subtype_kwargs
 
     def get_key(self) -> str:
         return self._key
@@ -41,43 +58,15 @@ class Attribute(ABC):
         return self._description
 
     def get_type(self) -> AttributeType:
+        return self._attribute_type
+
+    def get_subtype_kwargs(self) -> typing.Dict:
+        return self._subtype_kwargs
+
+    @abstractmethod
+    def get_default_value(self) -> typing.Optional[any]:
         raise NotImplementedError
 
-
-class StringAttribute:
-    def get_type(self) -> AttributeType:
-        return AttributeType.STRING
-
-
-class EnumItem:
-
-    def __init__(self, key: str, display_name: str, description: str):
-        self._key = key
-        self._display_name = display_name
-        self._description = description
-
-    def get_key(self) -> str:
-        return self._key
-
-    def get_display_name(self) -> str:
-        return self._display_name
-
-    def get_description(self) -> str:
-        return self._description
-
-
-class EnumAttribute:
-
-    def __init__(self, items: typing.List[EnumItem]):
-        self._items = items
-
-    def get_type(self) -> AttributeType:
-        return AttributeType.ENUM.value
-
-    def get_items(self) -> typing.List[EnumItem]:
-        return self._items
-
-
-class StringAttribute:
-    def get_type(self) -> AttributeType:
-        return AttributeType.STRING.value
+    @abstractmethod
+    def validate_value(self, value: any) -> None:
+        raise NotImplementedError

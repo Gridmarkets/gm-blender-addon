@@ -18,16 +18,28 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import ABC, abstractmethod
+__all__ = 'UserInterface'
 
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
-from gridmarkets_blender_addon.meta_plugin.user import User
+from abc import ABC
+import typing
+
+if typing.TYPE_CHECKING:
+    from . import User, Plugin
 
 
-class UserInterface(ABC, PluginAccessor):
+class UserInterface(ABC):
+
+    def __init__(self, plugin: 'Plugin'):
+        self._plugin = plugin
+
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
 
     # email
     def get_auth_email(self) -> str:
+        raise NotImplementedError
+
+    def set_auth_email(self, email: str) -> None:
         raise NotImplementedError
 
     def get_auth_email_validity_flag(self) -> bool:
@@ -44,6 +56,9 @@ class UserInterface(ABC, PluginAccessor):
 
     # access key
     def get_auth_access_key(self) -> str:
+        raise NotImplementedError
+
+    def set_auth_access_key(self, auth_access_key) -> None:
         raise NotImplementedError
 
     def get_auth_access_key_validity_flag(self) -> bool:
@@ -85,7 +100,7 @@ class UserInterface(ABC, PluginAccessor):
         raise NotImplementedError
 
     # load profile
-    def load_profile(self, user_profile: User):
+    def load_profile(self, user_profile: 'User'):
         raise NotImplementedError
 
     # logging
@@ -105,4 +120,11 @@ class UserInterface(ABC, PluginAccessor):
         raise NotImplementedError
 
     def set_show_logger_names(self, enabled: bool) -> None:
+        raise NotImplementedError
+
+    # job preset
+    def get_show_hidden_job_preset_attributes(self) -> bool:
+        raise NotImplementedError
+
+    def set_show_hidden_job_preset_attributes(self, value: bool) -> None:
         raise NotImplementedError

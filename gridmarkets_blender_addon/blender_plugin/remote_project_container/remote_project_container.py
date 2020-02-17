@@ -19,22 +19,21 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 
-from typing import List, Optional
-
+from gridmarkets_blender_addon.meta_plugin import utils
 from gridmarkets_blender_addon.meta_plugin.remote_project_container import RemoteProjectContainer as \
     MetaRemoteProjectContainer
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
 
-from gridmarkets_blender_addon import constants
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
 
-@attach_blender_plugin
 class RemoteProjectContainer(MetaRemoteProjectContainer):
 
-    def __init__(self):
-        MetaRemoteProjectContainer.__init__(self, [])
+    def __init__(self, plugin: 'Plugin'):
+        MetaRemoteProjectContainer.__init__(self, plugin, [])
 
     def focus_item(self, item: RemoteProject, clear_selection=True, update_props: bool = True) -> None:
 
@@ -49,8 +48,6 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
     def append(self, item: RemoteProject, focus_new_item: bool = True, update_props: bool = True) -> None:
 
         if update_props:
-            from gridmarkets_blender_addon import utils
-
             remote_projects = bpy.context.scene.props.remote_project_container.remote_projects
             remote_project_props = remote_projects.add()
             remote_project_props.id = utils.get_unique_id(remote_projects)
@@ -81,3 +78,7 @@ class RemoteProjectContainer(MetaRemoteProjectContainer):
                 return self.get_at(i)
 
         raise ValueError("no remote project with id: " + str(id))
+
+    def reset(self) -> None:
+        MetaRemoteProjectContainer.reset(self)
+        bpy.context.scene.props.remote_project_container.remote_projects.clear()

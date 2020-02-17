@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginUtils'
+
 from abc import ABC, abstractmethod
 
 

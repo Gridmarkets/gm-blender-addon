@@ -24,10 +24,14 @@ import bpy
 class FrameRangeProps(bpy.types.PropertyGroup):
 
     def get_frame_start(self):
-        return self['frame_start']
+        if 'frame_start' in self:
+            return self['frame_start']
+        return 0
 
     def get_frame_end(self):
-        return self['frame_end']
+        if 'frame_end' in self:
+            return self['frame_end']
+        return 0
 
     def set_frame_start(self, value):
         if 'frame_end' in self and value > self['frame_end']:
@@ -45,13 +49,15 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         name="Range Name",
         description="Adding a name to your frame ranges makes them searchable",
         default="",
-        maxlen=256
+        maxlen=256,
+        options={'SKIP_SAVE'}
     )
 
     enabled: bpy.props.BoolProperty(
         name="Enabled",
         description="If disabled the frame range will be ignored by Gridmarekts",
-        default=True
+        default=True,
+        options={'SKIP_SAVE'}
     )
 
     frame_start: bpy.props.IntProperty(
@@ -60,7 +66,8 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         default=1,
         min=0,
         get=get_frame_start,
-        set=set_frame_start
+        set=set_frame_start,
+        options={'SKIP_SAVE'}
     )
 
     frame_end: bpy.props.IntProperty(
@@ -69,12 +76,14 @@ class FrameRangeProps(bpy.types.PropertyGroup):
         default=255,
         min=0,
         get=get_frame_end,
-        set=set_frame_end
+        set=set_frame_end,
+        options={'SKIP_SAVE'}
     )
 
     frame_step: bpy.props.IntProperty(
         name="Step Size",
         description="Number of frames to skip forward while rendering back each frame",
         default=1,
-        min=1
+        min=1,
+        options={'SKIP_SAVE'}
     )

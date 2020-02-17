@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'ExcThread'
+
 import typing
 import threading
 from queue import Queue

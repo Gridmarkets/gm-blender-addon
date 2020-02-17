@@ -2,377 +2,1811 @@
 <APISchema>
 
     <JobDefinitions>
-        <JobDefinition id="BLENDER_CYCLES">
+        <JobDefinition id="BLENDER_2_8X_CYCLES">
 
-            <DisplayName>Blender Cycles</DisplayName>
+            <DisplayName>Blender 2.8x Cycles</DisplayName>
 
-            <Attribute key="name">
-                <DisplayName>Name</DisplayName>
-                <Description>The name of the job.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>Cycles Job</DefaultValue>
+                </Attribute>
                 <Optional>False</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>STRING</Type>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="frame_ranges">
-                <DisplayName>Frame ranges</DisplayName>
-                <Description>The frame ranges to render.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>blender</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>MATCH</Key>
+                            <Value>^([2]\.)([8]\d)</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>PROJECT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>render</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Render File</DisplayName>
+                    <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
+                    <Type>STRING</Type>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>frames</Key>
+                    <DisplayName>Frame Ranges</DisplayName>
+                    <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>1 1 1</DefaultValue>
+                    <Subtype>FRAME_RANGES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>engine</Key>
+                    <DisplayName>Render Engine</DisplayName>
+                    <Description>The render engine to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>CYCLES</Key>
+                            <DisplayName>Cycles</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>CYCLES</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_prefix</Key>
+                    <DisplayName>Output Prefix</DisplayName>
+                    <Description>The prefix to add to render results.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>STRING</Type>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="output_path">
-                <DisplayName>Output Path</DisplayName>
-                <Description>The path to output the render results to.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_format</Key>
+                    <DisplayName>Output Format</DisplayName>
+                    <Description>The output format to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>TGA</Key>
+                            <DisplayName>TGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>RAWTGA</Key>
+                            <DisplayName>RAWTGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG</Key>
+                            <DisplayName>JPEG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG2000</Key>
+                            <DisplayName>JPEG 2000</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>IRIS</Key>
+                            <DisplayName>IRIS</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>PNG</Key>
+                            <DisplayName>PNG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA</Key>
+                            <DisplayName>Targa</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA_RAW</Key>
+                            <DisplayName>Targa Raw</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>BMP</Key>
+                            <DisplayName>BMP</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>CINEON</Key>
+                            <DisplayName>Cineon</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>DPX</Key>
+                            <DisplayName>DPX</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>OPEN_EXR_MULTILAYER</Key>
+                            <DisplayName>OpenEXR Multilayer</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>EXR</Key>
+                            <DisplayName>OpenEXR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>HDR</Key>
+                            <DisplayName>Radiance HDR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TIFF</Key>
+                            <DisplayName>TIFF</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>PNG</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>STRING</Type>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="output_prefix">
-                <DisplayName>Output Prefix</DisplayName>
-                <Description>The prefix to add to render results.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>STRING</Type>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="output_format">
-                <DisplayName>Output Format</DisplayName>
-                <Description>The output format to use when rendering the scene.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>True</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>TGA</Key>
-                        <DisplayName>TGA</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>RAWTGA</Key>
-                        <DisplayName>RAWTGA</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>JPEG</Key>
-                        <DisplayName>JPEG</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>JPEG2000</Key>
-                        <DisplayName>JPEG 2000</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>IRIS</Key>
-                        <DisplayName>IRIS</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>PNG</Key>
-                        <DisplayName>PNG</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>TARGA</Key>
-                        <DisplayName>Targa</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>TARGA_RAW</Key>
-                        <DisplayName>Targa Raw</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>BMP</Key>
-                        <DisplayName>BMP</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>CINEON</Key>
-                        <DisplayName>Cineon</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>DPX</Key>
-                        <DisplayName>DPX</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>OPEN_EXR_MULTILAYER</Key>
-                        <DisplayName>OpenEXR Multilayer</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>EXR</Key>
-                        <DisplayName>OpenEXR</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>HDR</Key>
-                        <DisplayName>Radiance HDR</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>TIFF</Key>
-                        <DisplayName>TIFF</DisplayName>
-                        <Description></Description>
-                    </Item>
-                </Items>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="render_engine">
-                <DisplayName>Render Engine</DisplayName>
-                <Description>The render engine to use when rendering the scene.</Description>
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>CYCLES</Key>
-                        <DisplayName>Cycles</DisplayName>
-                        <Description></Description>
-                    </Item>
-                </Items>
-            </Attribute>
+            </JobAttribute>
 
-            <Attribute key="render_device">
-                <DisplayName>Render Device</DisplayName>
-                <Description>The render device to use when rendering the scene.</Description>
+        </JobDefinition>
+
+        <JobDefinition id="BLENDER_2_79_CYCLES">
+
+            <DisplayName>Blender 2.79 Cycles</DisplayName>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>Cycles Job</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>blender</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>MATCH</Key>
+                            <Value>^([2]\.)([1-7]\d)</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>PROJECT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>render</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Render File</DisplayName>
+                    <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
+                    <Type>STRING</Type>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>frames</Key>
+                    <DisplayName>Frame Ranges</DisplayName>
+                    <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>1 1 1</DefaultValue>
+                    <Subtype>FRAME_RANGES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>engine</Key>
+                    <DisplayName>Render Engine</DisplayName>
+                    <Description>The render engine to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>CYCLES</Key>
+                            <DisplayName>Cycles</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>CYCLES</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_prefix</Key>
+                    <DisplayName>Output Prefix</DisplayName>
+                    <Description>The prefix to add to render results.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
                 <Optional>True</Optional>
                 <InferenceSources>
                     <InferenceSource>USER_DEFINED</InferenceSource>
                 </InferenceSources>
-                <Type>ENUM</Type>
-                <Items>
-                    <Item>
-                        <Key>CPU</Key>
-                        <DisplayName>CPU</DisplayName>
-                        <Description></Description>
-                    </Item>
-                    <Item>
-                        <Key>GPU</Key>
-                        <DisplayName>GPU</DisplayName>
-                        <Description></Description>
-                    </Item>
-                </Items>
-            </Attribute>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_format</Key>
+                    <DisplayName>Output Format</DisplayName>
+                    <Description>The output format to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>TGA</Key>
+                            <DisplayName>TGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>RAWTGA</Key>
+                            <DisplayName>RAWTGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG</Key>
+                            <DisplayName>JPEG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG2000</Key>
+                            <DisplayName>JPEG 2000</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>IRIS</Key>
+                            <DisplayName>IRIS</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>PNG</Key>
+                            <DisplayName>PNG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA</Key>
+                            <DisplayName>Targa</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA_RAW</Key>
+                            <DisplayName>Targa Raw</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>BMP</Key>
+                            <DisplayName>BMP</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>CINEON</Key>
+                            <DisplayName>Cineon</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>DPX</Key>
+                            <DisplayName>DPX</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>OPEN_EXR_MULTILAYER</Key>
+                            <DisplayName>OpenEXR Multilayer</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>EXR</Key>
+                            <DisplayName>OpenEXR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>HDR</Key>
+                            <DisplayName>Radiance HDR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TIFF</Key>
+                            <DisplayName>TIFF</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>PNG</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>True</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+        </JobDefinition>
+
+        <JobDefinition id="BLENDER_2_79_INTERNAL">
+
+            <DisplayName>Blender 2.79 Internal</DisplayName>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>Cycles Job</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>blender</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>MATCH</Key>
+                            <Value>^([2]\.)([1-7]\d)</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>PROJECT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>render</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Render File</DisplayName>
+                    <Description>The path to your .blend file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.blend'.</Description>
+                    <Type>STRING</Type>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>FILE_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>frames</Key>
+                    <DisplayName>Frame Ranges</DisplayName>
+                    <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>1 1 1</DefaultValue>
+                    <Subtype>FRAME_RANGES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>engine</Key>
+                    <DisplayName>Render Engine</DisplayName>
+                    <Description>The render engine to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>INTERNAL</Key>
+                            <DisplayName>Internal</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>INTERNAL</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_prefix</Key>
+                    <DisplayName>Output Prefix</DisplayName>
+                    <Description>The prefix to add to render results.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_format</Key>
+                    <DisplayName>Output Format</DisplayName>
+                    <Description>The output format to use when rendering the scene.</Description>
+                    <Type>ENUM</Type>
+                    <Items>
+                        <Item>
+                            <Key>TGA</Key>
+                            <DisplayName>TGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>RAWTGA</Key>
+                            <DisplayName>RAWTGA</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG</Key>
+                            <DisplayName>JPEG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>JPEG2000</Key>
+                            <DisplayName>JPEG 2000</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>IRIS</Key>
+                            <DisplayName>IRIS</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>PNG</Key>
+                            <DisplayName>PNG</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA</Key>
+                            <DisplayName>Targa</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TARGA_RAW</Key>
+                            <DisplayName>Targa Raw</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>BMP</Key>
+                            <DisplayName>BMP</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>CINEON</Key>
+                            <DisplayName>Cineon</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>DPX</Key>
+                            <DisplayName>DPX</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>OPEN_EXR_MULTILAYER</Key>
+                            <DisplayName>OpenEXR Multilayer</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>EXR</Key>
+                            <DisplayName>OpenEXR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>HDR</Key>
+                            <DisplayName>Radiance HDR</DisplayName>
+                            <Description></Description>
+                        </Item>
+                        <Item>
+                            <Key>TIFF</Key>
+                            <DisplayName>TIFF</DisplayName>
+                            <Description></Description>
+                        </Item>
+                    </Items>
+                    <DefaultValue>PNG</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>blender</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+        </JobDefinition>
+
+        <JobDefinition id="VRAY">
+
+            <DisplayName>V-Ray</DisplayName>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>V-Ray Job</DefaultValue>
+                    <MinLength>1</MinLength>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>vray</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>vray</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>render</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Render File</DisplayName>
+                    <Description>The path to your .vrscene file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.vrscene'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remap_file</Key>
+                    <DisplayName>Remap File</DisplayName>
+                    <Description>The path to your .remap file expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The remap file path would then be '/sample project/sample.remap'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>frames</Key>
+                    <DisplayName>Frame Ranges</DisplayName>
+                    <Description>The frame ranges to render. Specified in the following format 'start [end] [step],[start [end] [step]],...'.</Description>
+                    <Type>STRING</Type>
+                    <Subtype>FRAME_RANGES</Subtype>
+                    <DefaultValue>1 1 1</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_width</Key>
+                    <DisplayName>Output Width</DisplayName>
+                    <Description>Defines the render output width</Description>
+                    <Type>INTEGER</Type>
+                    <DefaultValue>1920</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_height</Key>
+                    <DisplayName>Output Height</DisplayName>
+                    <Description>Defines the render output height</Description>
+                    <Type>INTEGER</Type>
+                    <DefaultValue>1080</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_prefix</Key>
+                    <DisplayName>Output Prefix</DisplayName>
+                    <Description>The prefix to add to render results.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>GM_</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>output_format</Key>
+                    <DisplayName>Output Format</DisplayName>
+                    <Description>The output format to use when rendering the scene.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>PNG</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your render results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your render results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your render results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>vray</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>render</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>False</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+        </JobDefinition>
+
+        <JobDefinition id="MOE">
+
+            <DisplayName>MOE</DisplayName>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>name</Key>
+                    <DisplayName>Job Name</DisplayName>
+                    <Description>The name of the job.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>MOE Job</DefaultValue>
+                    <MinLength>3</MinLength>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app</Key>
+                    <DisplayName>Product Type</DisplayName>
+                    <Description>The name of the product / app to use.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>moe</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>app_version</Key>
+                    <DisplayName>Product Version</DisplayName>
+                    <Description>The version of the product / app to use.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>PRODUCT_VERSIONS</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>moe</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>operation</Key>
+                    <DisplayName>Operation</DisplayName>
+                    <Description>The operation supported by the specified product version to carry out.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue>simulation</DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>CONSTANT</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>path</Key>
+                    <DisplayName>Job File</DisplayName>
+                    <Description>The path to your .svl job script expressed relative to the remote project folder. If your project name is 'sample_project' then remote root becomes '/sample project'. The render file path would then be '/sample project/sample.svl'.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>False</Optional>
+                <InferenceSources>
+                    <InferenceSource>PROJECT</InferenceSource>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>remote_output_folder_name</Key>
+                    <DisplayName>Output Folder Name</DisplayName>
+                    <Description>(Optional) The name of the folder your results will be output to. If your project name is 'sample_project' and you specify 'example_name' for your output folder name then your results will be output to '/sample project/example_name/'. A timestamped value is used by default if none is provided.</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>local_download_path</Key>
+                    <DisplayName>Download Path</DisplayName>
+                    <Description>(Optional) The local path to download your results. If no path is specified it will save the results to a folder called '{desktop}/{project_name}/render_results/{timestamp}/' </Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                    <Subtype>PATH</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>FILE_MODE</Key>
+                            <Value>DIR_PATH</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                    <InferenceSource>APPLICATION</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>auto_download</Key>
+                    <DisplayName>Auto Download</DisplayName>
+                    <Description>If enabled Envoy will automatically download all new (or modified) files saved to the remote output folder to your local download path.</Description>
+                    <Type>BOOLEAN</Type>
+                    <DefaultValue>True</DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>params</Key>
+                    <DisplayName>Run Options</DisplayName>
+                    <Description>Any run-specific options (e.g. -lig blah.mdb)</Description>
+                    <Type>STRING</Type>
+                    <DefaultValue></DefaultValue>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>machine_type</Key>
+                    <DisplayName>Machine Type</DisplayName>
+                    <Description>The type of machine to use for the job.</Description>
+                    <Type>ENUM</Type>
+                    <Subtype>MACHINE_TYPE</Subtype>
+                    <SubtypeKwargs>
+                        <SubtypeKwarg>
+                            <Key>PRODUCT</Key>
+                            <Value>moe</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>OPERATION</Key>
+                            <Value>simulation</Value>
+                        </SubtypeKwarg>
+                        <SubtypeKwarg>
+                            <Key>USE_GPU_DEFAULT</Key>
+                            <Value>False</Value>
+                        </SubtypeKwarg>
+                    </SubtypeKwargs>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
+
+            <JobAttribute>
+                <Attribute>
+                    <Key>instances</Key>
+                    <DisplayName>Render Instances</DisplayName>
+                    <Description>The maximum number of instances you want to run your job on. Note by default it will use the maximum number of instances you can use based on your service level.</Description>
+                    <Type>INTEGER</Type>
+                    <Subtype>INSTANCES</Subtype>
+                </Attribute>
+                <Optional>True</Optional>
+                <InferenceSources>
+                    <InferenceSource>USER_DEFINED</InferenceSource>
+                </InferenceSources>
+            </JobAttribute>
 
         </JobDefinition>
     </JobDefinitions>
 
     <ProjectAttributes>
 
-        <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
-            <DisplayName>Render Engine</DisplayName>
-            <Description>The render engine the project is set to use.</Description>
-            <ValidProject>True</ValidProject>
-            <Type>ENUM</Type>
-            <Items>
-                <Item>
-                    <Key>INTERNAL</Key>
-                    <DisplayName>Blender Internal</DisplayName>
-                    <Description>The internal blender engine.</Description>
-                </Item>
-                <Item>
-                    <Key>CYCLES</Key>
-                    <DisplayName>Cycles</DisplayName>
-                    <Description>Blender Cycles</Description>
-                </Item>
-            </Items>
+        <ProjectAttribute id="BLENDER_2_79_CYCLES_PROJECT">
+            <Attribute>
+                <Key>BLENDER_2_79_CYCLES_PROJECT</Key>
+                <DisplayName>Blender 2.79 (Cycles) Project</DisplayName>
+                <Description>A blender 2.79 project setup to use the Blender Cycles render engine.</Description>
+                <Type>NULL</Type>
+            </Attribute>
             <Transitions></Transitions>
-            <CompatibleJobTypes>
-                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
-            </CompatibleJobTypes>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>BLENDER_2_79_CYCLES</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_RENDER_ENGINE">
-            <DisplayName>Render Engine</DisplayName>
-            <Description>The render engine the project is set to use.</Description>
-            <ValidProject>True</ValidProject>
-            <Type>ENUM</Type>
-            <Items>
-                <Item>
-                    <Key>CYCLES</Key>
-                    <DisplayName>Cycles</DisplayName>
-                    <Description>Blender Cycles</Description>
-                </Item>
-                <Item>
-                    <Key>EEVEE</Key>
-                    <DisplayName>Eevee</DisplayName>
-                    <Description>Blender Eevee</Description>
-                </Item>
-            </Items>
+        <ProjectAttribute id="BLENDER_2_79_INTERNAL_PROJECT">
+            <Attribute>
+                <Key>BLENDER_2_79_INTERNAL_PROJECT</Key>
+                <DisplayName>Blender 2.79 (Internal) Project</DisplayName>
+                <Description>A blender 2.79 project setup to use the Blender Internal render engine.</Description>
+                <Type>NULL</Type>
+            </Attribute>
             <Transitions></Transitions>
-            <CompatibleJobTypes>
-                <JobDefinitionId>BLENDER_CYCLES</JobDefinitionId>
-            </CompatibleJobTypes>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>BLENDER_2_79_INTERNAL</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_8X_CYCLES_PROJECT">
+            <Attribute>
+                <Key>BLENDER_2_8X_CYCLES_PROJECT</Key>
+                <DisplayName>Blender 2.8X (Cycles) Project</DisplayName>
+                <Description>A blender 2.8X project setup to use the Blender Cycles render engine.</Description>
+                <Type>NULL</Type>
+            </Attribute>
+            <Transitions></Transitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>BLENDER_2_8X_CYCLES</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_8X_EEVEE_PROJECT">
+            <Attribute>
+                <Key>BLENDER_2_8X_EEVEE_PROJECT</Key>
+                <DisplayName>Blender 2.8X (Eevee) Project</DisplayName>
+                <Description>A blender 2.8X project setup to use the Blender Eevee render engine.</Description>
+                <Type>NULL</Type>
+            </Attribute>
+            <Transitions></Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_79_RENDER_ENGINE">
+            <Attribute>
+                <Key>engine</Key>
+                <DisplayName>Render Engine</DisplayName>
+                <Description>The render engine the project is set to use.</Description>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>INTERNAL</Key>
+                        <DisplayName>Blender Internal</DisplayName>
+                        <Description>The internal blender engine.</Description>
+                    </Item>
+                    <Item>
+                        <Key>CYCLES</Key>
+                        <DisplayName>Cycles</DisplayName>
+                        <Description>Blender Cycles.</Description>
+                    </Item>
+                </Items>
+                <DefaultValue>CYCLES</DefaultValue>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_CYCLES_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>CYCLES</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_79_INTERNAL_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>INTERNAL</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="BLENDER_2_8X_RENDER_ENGINE">
+            <Attribute>
+                <Key>engine</Key>
+                <DisplayName>Render Engine</DisplayName>
+                <Description>The render engine the project is set to use.</Description>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>CYCLES</Key>
+                        <DisplayName>Cycles</DisplayName>
+                        <Description>Blender Cycles.</Description>
+                    </Item>
+                    <Item>
+                        <Key>EEVEE</Key>
+                        <DisplayName>Eevee</DisplayName>
+                        <Description>Blender Eevee.</Description>
+                    </Item>
+                </Items>
+                <DefaultValue>CYCLES</DefaultValue>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_8X_CYCLES_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>CYCLES</TransitionFormula>
+                </Transition>
+                <Transition>
+                    <ProjectAttributeId>BLENDER_2_8X_EEVEE_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>EEVEE</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_2_79_MAIN_PROJECT_FILE">
-            <Key>MAIN_FILE</Key>
-            <DisplayName>Main project file</DisplayName>
-            <Description>The main .blend file for your project.</Description>
-            <ValidProject>False</ValidProject>
-            <Type>STRING</Type>
+            <Attribute>
+                <Key>path</Key>
+                <DisplayName>Main project file</DisplayName>
+                <Description>The main .blend file for your project.</Description>
+                <DefaultValue></DefaultValue>
+                <Type>STRING</Type>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>(.*)(.blend)$</TransitionFormula>
+                    <RejectionMessage>File must have ".blend" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
-        <ProjectAttribute id="BLENDER_2_80_MAIN_PROJECT_FILE">
-            <Key>MAIN_FILE</Key>
-            <DisplayName>Main project file</DisplayName>
-            <Description>The main .blend file for your project.</Description>
-            <ValidProject>False</ValidProject>
-            <Type>STRING</Type>
+        <ProjectAttribute id="BLENDER_2_8X_MAIN_PROJECT_FILE">
+            <Attribute>
+                <Key>path</Key>
+                <DisplayName>Main project file</DisplayName>
+                <Description>The main .blend file for your project.</Description>
+                <DefaultValue></DefaultValue>
+                <Type>STRING</Type>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <ProjectAttributeId>BLENDER_2_8X_RENDER_ENGINE</ProjectAttributeId>
+                    <TransitionFormula>(.*)(.blend)$</TransitionFormula>
+                    <RejectionMessage>File must have ".blend" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="BLENDER_VERSION">
-            <Key>VERSION</Key>
-            <DisplayName>Version</DisplayName>
-            <Description>The version of Blender</Description>
-            <ValidProject>False</ValidProject>
-            <Type>ENUM</Type>
-            <Items>
-                <Item>
-                    <Key>2.79</Key>
-                    <DisplayName>2.79</DisplayName>
-                    <Description>Blender 2.79</Description>
-                </Item>
-                <Item>
-                    <Key>2.80</Key>
-                    <DisplayName>2.80</DisplayName>
-                    <Description>Blender 2.80</Description>
-                </Item>
-            </Items>
+            <Attribute>
+                <Key>app_version</Key>
+                <DisplayName>Version</DisplayName>
+                <Description>The version of Blender.</Description>
+                <Type>ENUM</Type>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>blender</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
             <Transitions>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_79_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>2.79</TransitionFormula>
+                    <ProjectAttributeId>BLENDER_2_79_MAIN_PROJECT_FILE</ProjectAttributeId>
+                    <TransitionFormula>^([2]\.)([1-7]\d)</TransitionFormula>
                 </Transition>
                 <Transition>
-                    <ProjectAttributeId>BLENDER_2_80_RENDER_ENGINE</ProjectAttributeId>
-                    <TransitionFormula>2.80</TransitionFormula>
+                    <ProjectAttributeId>BLENDER_2_8X_MAIN_PROJECT_FILE</ProjectAttributeId>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="VRAY_PROJECT">
+            <Attribute>
+                <Key>VRAY_PROJECT</Key>
+                <DisplayName>V-Ray Project</DisplayName>
+                <Description>A V-Ray project.</Description>
+                <Type>NULL</Type>
+            </Attribute>
+            <Transitions></Transitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>VRAY</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_REMAP_FILE">
-            <DisplayName>V-Ray re-map file</DisplayName>
-            <Description>The V-Ray re-map file for the project.</Description>
-            <ValidProject>True</ValidProject>
-            <Type>STRING</Type>
-            <Transitions></Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <Attribute>
+                <Key>VRAY_REMAP_FILE</Key>
+                <DisplayName>V-Ray re-map file</DisplayName>
+                <Description>The V-Ray re-map file for the project.</Description>
+                <Type>STRING</Type>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>VRAY_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>(.*)(.remap)$</TransitionFormula>
+                    <RejectionMessage>File must have ".remap" file extension.</RejectionMessage>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_SCENE_FILE">
-            <Key>MAIN_FILE</Key>
-            <DisplayName>V-Ray scene file</DisplayName>
-            <Description>The main .vrscene file for the project.</Description>
-            <ValidProject>False</ValidProject>
-            <Type>STRING</Type>
+            <Attribute>
+                <Key>path</Key>
+                <DisplayName>V-Ray scene file</DisplayName>
+                <Description>The main .vrscene file for the project.</Description>
+                <Type>STRING</Type>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_REMAP_FILE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>(.*)(.vrscene)$</TransitionFormula>
+                    <RejectionMessage>File must have ".vrscene" file extension.</RejectionMessage>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="VRAY_VERSION">
-            <Key>VERSION</Key>
-            <DisplayName>Version</DisplayName>
-            <Description>The version of V-Ray</Description>
-            <ValidProject>False</ValidProject>
-            <Type>ENUM</Type>
-            <Items>
-                <Item>
-                    <Key>3.60.03</Key>
-                    <DisplayName>3.60.03</DisplayName>
-                    <Description>V-Ray 3.60.03</Description>
-                </Item>
-                <Item>
-                    <Key>3.60.04</Key>
-                    <DisplayName>3.60.04</DisplayName>
-                    <Description>V-Ray 3.60.04</Description>
-                </Item>
-                <Item>
-                    <Key>3.60.05</Key>
-                    <DisplayName>3.60.05</DisplayName>
-                    <Description>V-Ray 3.60.05</Description>
-                </Item>
-                <Item>
-                    <Key>4.02.05</Key>
-                    <DisplayName>4.02.05</DisplayName>
-                    <Description>V-Ray 4.02.05</Description>
-                </Item>
-                <Item>
-                    <Key>4.10.01</Key>
-                    <DisplayName>4.10.01</DisplayName>
-                    <Description>V-Ray 4.10.01</Description>
-                </Item>
-                <Item>
-                    <Key>4.10.02</Key>
-                    <DisplayName>4.10.02</DisplayName>
-                    <Description>V-Ray 4.10.02</Description>
-                </Item>
-            </Items>
+            <Attribute>
+                <Key>app_version</Key>
+                <DisplayName>Version</DisplayName>
+                <Description>The version of V-Ray.</Description>
+                <Type>ENUM</Type>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>vray</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>VRAY_SCENE_FILE</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_PROJECT">
+            <Attribute>
+                <Key>MOE_PROJECT</Key>
+                <DisplayName>MOE Project</DisplayName>
+                <Description>A MOE project.</Description>
+                <Type>NULL</Type>
+            </Attribute>
+            <Transitions></Transitions>
+            <CompatibleJobDefinitions>
+                <CompatibleJobDefinition>MOE</CompatibleJobDefinition>
+            </CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_SVL_FILE">
+            <Attribute>
+                <Key>path</Key>
+                <DisplayName>SVL script</DisplayName>
+                <Description>The primary SVL batch script to run.</Description>
+                <Type>STRING</Type>
+                <Subtype>PATH</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>FILE_MODE</Key>
+                        <Value>FILE_PATH</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>MOE_PROJECT</ProjectAttributeId>
+                    <TransitionFormula>(.*)(.svl)$</TransitionFormula>
+                    <RejectionMessage>File must have ".svl" file extension.</RejectionMessage>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
+        </ProjectAttribute>
+
+        <ProjectAttribute id="MOE_VERSION">
+            <Attribute>
+                <Key>app_version</Key>
+                <DisplayName>Version</DisplayName>
+                <Description>The version of MOE.</Description>
+                <Type>ENUM</Type>
+                <Subtype>PRODUCT_VERSIONS</Subtype>
+                <SubtypeKwargs>
+                    <SubtypeKwarg>
+                        <Key>PRODUCT</Key>
+                        <Value>moe</Value>
+                    </SubtypeKwarg>
+                </SubtypeKwargs>
+            </Attribute>
+            <Transitions>
+                <Transition>
+                    <ProjectAttributeId>MOE_SVL_FILE</ProjectAttributeId>
+                    <TransitionFormula>.*</TransitionFormula>
+                </Transition>
+            </Transitions>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
 
         <ProjectAttribute id="PRODUCT">
-            <Key>PRODUCT</Key>
-            <DisplayName>Product</DisplayName>
-            <Description>A GridMarkets product.</Description>
-            <ValidProject>False</ValidProject>
-            <Type>ENUM</Type>
-            <Items>
-                <Item>
-                    <Key>blender</Key>
-                    <DisplayName>Blender</DisplayName>
-                    <Description>Blender is a professional, free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D printed models, interactive 3D applications and video games</Description>
-                </Item>
-                <Item>
-                    <Key>vray</Key>
-                    <DisplayName>V-Ray</DisplayName>
-                    <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997</Description>
-                </Item>
-            </Items>
+            <Attribute>
+                <Key>app</Key>
+                <DisplayName>Product</DisplayName>
+                <Description>A GridMarkets product.</Description>
+                <Type>ENUM</Type>
+                <Items>
+                    <Item>
+                        <Key>blender</Key>
+                        <DisplayName>Blender</DisplayName>
+                        <Description>Blender is a professional, free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D printed models, interactive 3D applications and video games.</Description>
+                    </Item>
+                    <Item>
+                        <Key>vray</Key>
+                        <DisplayName>V-Ray</DisplayName>
+                        <Description>V-Ray is a computer-generated imagery rendering software application developed by the Bulgarian company Chaos Group, that was established in Sofia in 1997.</Description>
+                    </Item>
+                    <Item>
+                        <Key>moe</Key>
+                        <DisplayName>MOE</DisplayName>
+                        <Description>Description: Molecular Operating Environment (MOE) is a drug discovery software platform that integrates visualization, modeling and simulations, as well as methodology development, in one package. MOE scientific applications are used by biologists, medicinal chemists and computational chemists in pharmaceutical, biotechnology and academic research.</Description>
+                    </Item>
+                </Items>
+            </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>BLENDER_VERSION</ProjectAttributeId>
@@ -382,24 +1816,29 @@
                     <ProjectAttributeId>VRAY_VERSION</ProjectAttributeId>
                     <TransitionFormula>vray</TransitionFormula>
                 </Transition>
+                <Transition>
+                    <ProjectAttributeId>MOE_VERSION</ProjectAttributeId>
+                    <TransitionFormula>moe</TransitionFormula>
+                </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
 
         </ProjectAttribute>
 
         <ProjectAttribute id="GM_PROJECT_NAME">
-            <Key>PROJECT_NAME</Key>
-            <DisplayName>Project name</DisplayName>
-            <Description>The name of the project as specified in Envoy.</Description>
-            <ValidProject>False</ValidProject>
-            <Type>STRING</Type>
+            <Attribute>
+                <Key>project_name</Key>
+                <DisplayName>Project name</DisplayName>
+                <Description>The name of the project as specified in Envoy.</Description>
+                <Type>STRING</Type>
+            </Attribute>
             <Transitions>
                 <Transition>
                     <ProjectAttributeId>PRODUCT</ProjectAttributeId>
-                    <TransitionFormula>*</TransitionFormula>
+                    <TransitionFormula>.*</TransitionFormula>
                 </Transition>
             </Transitions>
-            <CompatibleJobTypes></CompatibleJobTypes>
+            <CompatibleJobDefinitions></CompatibleJobDefinitions>
         </ProjectAttribute>
     </ProjectAttributes>
 </APISchema>

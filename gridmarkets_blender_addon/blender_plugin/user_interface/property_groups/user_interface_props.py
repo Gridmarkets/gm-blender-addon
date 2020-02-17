@@ -20,6 +20,7 @@
 
 import bpy
 from gridmarkets_blender_addon.blender_plugin.user.property_groups.user_props import UserProps
+from gridmarkets_blender_addon import constants
 
 
 class UserInterfaceProps(bpy.types.PropertyGroup):
@@ -140,5 +141,19 @@ class UserInterfaceProps(bpy.types.PropertyGroup):
 
     running_operation_message: bpy.props.StringProperty(
         default="",
+        options={'SKIP_SAVE', 'HIDDEN'}
+    )
+
+    # job preset
+    show_hidden_job_preset_attributes: bpy.props.BoolProperty(
+        name="Show Hidden Job Preset Attributes",
+        default=False,
+        options={'SKIP_SAVE'}
+    )
+
+    # UI Layout
+    ui_layout: bpy.props.EnumProperty(
+        name='UI Layout',
+        items=constants.LAYOUTS,
         options={'SKIP_SAVE', 'HIDDEN'}
     )

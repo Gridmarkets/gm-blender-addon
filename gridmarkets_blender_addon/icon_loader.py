@@ -72,9 +72,28 @@ class IconLoader:
                                 os.path.join(my_icons_dir, constants.GM_GREYSCALE_LOGO),
                                 'IMAGE')
 
-        # load a preview thumbnail of the icon and store in the previews collection
+        preview_collection.load(constants.MOE_LOGO_ID,
+                                os.path.join(my_icons_dir, constants.MOE_LOGO),
+                                'IMAGE')
+
         preview_collection.load(constants.VRAY_LOGO_ID,
                                 os.path.join(my_icons_dir, constants.VRAY_LOGO),
+                                'IMAGE')
+
+        preview_collection.load(constants.PACK_ICON_ID,
+                                os.path.join(my_icons_dir, constants.PACK_ICON),
+                                'IMAGE')
+
+        preview_collection.load(constants.UPLOAD_ICON_ID,
+                                os.path.join(my_icons_dir, constants.UPLOAD_ICON),
+                                'IMAGE')
+
+        preview_collection.load(constants.USER_ICON_ID,
+                                os.path.join(my_icons_dir, constants.USER_ICON),
+                                'IMAGE')
+
+        preview_collection.load(constants.UPLOAD_PROJECT_ICON_ID,
+                                os.path.join(my_icons_dir, constants.UPLOAD_PROJECT_ICON),
                                 'IMAGE')
 
         preview_collection.load(constants.CUSTOM_SPINNER_ICON_0_ID,

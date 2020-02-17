@@ -24,9 +24,14 @@ import addon_utils
 import inspect
 import pathlib
 import collections
+import typing
 import json
+import re
 
 from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.attribute import *
+from gridmarkets_blender_addon.meta_plugin.attribute_types import *
 from gridmarkets_blender_addon.invalid_input_error import InvalidInputError
 
 from gridmarkets.envoy_client import EnvoyClient
@@ -204,28 +209,33 @@ def get_project_status(project):
         log.error("API Error: " + str(e.user_message))
 
 
-def get_blend_file_name():
+def get_project_name(default_name = constants.PROJECT_PREFIX):
     # get method logger
     log = get_wrapped_logger(__name__ + '.' + inspect.stack()[0][3])
+    log.info("Getting project name...")
 
-    # if the file has been saved
     if bpy.context.blend_data.is_saved:
-        # use the name of the saved .blend file
         blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-        log.info(".blend file is saved, using '%s' as packed file name." % blend_file_name)
-    else:
-        # otherwise create a name for the packed .blend file
-        blend_file_name = 'main_GM_blend_file_packed.blend'
-        log.info(".blend file is not saved, using '%s' as packed file name." % blend_file_name)
 
-    return blend_file_name
+        if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
+            blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
+
+        log.info(".blend file is saved, using '%s' as project name." % blend_file_name)
+        return blend_file_name
+    else:
+        log.info(".blend file is not saved, using '%s' as project name." % default_name)
+        return default_name
+
+
+def get_blend_file_name():
+    return get_project_name(default_name='main_GM_blend_file_packed') + constants.BLEND_FILE_EXTENSION
 
 
 def get_blender_frame_range(context):
     scene = context.scene
     return str(scene.frame_start) + ' ' + str(scene.frame_end) + ' ' + str(scene.frame_step)
 
-
+"""
 def get_default_blender_job(context, render_file):
     scene = context.scene
 
@@ -240,10 +250,11 @@ def get_default_blender_job(context, render_file):
         output_format = scene.render.image_settings.file_format,    # OUTPUT_FORMAT
         engine = scene.render.engine,                               # RENDER_ENGINE
     )
+"""
 
-
+"""
 def get_job_output_path(context, job=None):
-    """ Gets the output path for either the provided job or the currently selested job if no job provided
+    Gets the output path for either the provided job or the currently selested job if no job provided
 
     :param context: The context
     :type context: bpy.context
@@ -251,7 +262,7 @@ def get_job_output_path(context, job=None):
     :type job: properties.JobProps
     :return: The output path as it is entered in either the blender ui or custom output field
     :rtype: str
-    """
+
 
     scene = context.scene
     props = scene.props
@@ -268,8 +279,9 @@ def get_job_output_path(context, job=None):
         return job.output_path
 
     return context.scene.render.filepath
+"""
 
-
+"""
 def get_job_output_path_abs(context, job=None):
     path = get_job_output_path(context, job)
 
@@ -286,8 +298,9 @@ def get_job_output_path_abs(context, job=None):
             return constants.BLENDER_TEMP_DIRECTORY
 
     return path
+"""
 
-
+"""
 def get_job_frame_ranges(context, job=None):
     scene = context.scene
     props = scene.props
@@ -315,24 +328,16 @@ def get_job_frame_ranges(context, job=None):
 
     else:
         return get_blender_frame_range(context)
+"""
 
 
-def do_frame_ranges_overlap(job):
-    """ Detects if the job has overlapping frame ranges, returns false if use_custom_frame_ranges is false.
-
-    :param job: The job to check
-    :type job: property_groups.job_props.JobProps
-    :return: True if frame ranges overlap, otherwise false
-    :rtype: bool
-    """
-
-    if hasattr(job, "use_custom_frame_ranges") and not job.use_custom_frame_ranges:
-        return False
+def do_frame_ranges_overlap(frame_ranges) -> bool:
+    """ Detects if the the provided frame ranges overlap, respects disabled frame ranges. """
 
     # buffer to store frames already seen
     frames_buffer = []
 
-    for frame_range in job.frame_ranges:
+    for frame_range in frame_ranges:
 
         if not frame_range.enabled:
             continue
@@ -378,16 +383,20 @@ def get_supported_render_engines():
     return {"CYCLES", "VRAY_RENDER_RT"}
 
 
-def get_user_friendly_name_for_engine(engine: str):
-    if engine == "CYCLES":
+def get_user_friendly_name_for_engine(engine: str = None):
+
+    if engine is None:
+        engine = bpy.context.scene.render.engine
+
+    if engine == constants.RENDER_ENGINE_CYCLES:
         return "Cycles"
-    elif engine == "BLENDER_EEVEE":
+    elif engine == constants.RENDER_ENGINE_EEVEE:
         return "Eevee"
-    elif engine == "BLENDER_RENDER":
+    elif engine == constants.RENDER_ENGINE_BLENDER_INTERNAL:
         return "Blender Internal"
-    elif engine == "BLENDER_WORKBENCH":
+    elif engine == constants.RENDER_ENGINE_BLENDER_WORKBENCH:
         return "Blender Workbench"
-    elif engine == "VRAY_RENDER_RT":
+    elif engine == constants.RENDER_ENGINE_VRAY_RT:
         return "V-Ray"
     else:
         # if not know just return the enum name for it
@@ -395,7 +404,7 @@ def get_user_friendly_name_for_engine(engine: str):
 
 
 def get_supported_products(scene, context):
-    from gridmarkets_blender_addon.api_constants import PRODUCTS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import PRODUCTS
 
     return [
         (PRODUCTS.BLENDER, "Blender", ""),
@@ -404,7 +413,7 @@ def get_supported_products(scene, context):
 
 
 def get_supported_blender_versions(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_VERSIONS
 
     return [
         (BLENDER_VERSIONS.V_2_81A, "2.81a", ""),
@@ -414,7 +423,7 @@ def get_supported_blender_versions(scene, context):
 
 
 def get_supported_blender_279_engines(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_ENGINES
 
     return [
         (BLENDER_ENGINES.CYCLES, "Cycles", ""),
@@ -423,7 +432,7 @@ def get_supported_blender_279_engines(scene, context):
 
 
 def get_supported_blender_280_engines(scene, context):
-    from gridmarkets_blender_addon.api_constants import BLENDER_ENGINES
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_ENGINES
 
     return [
         (BLENDER_ENGINES.CYCLES, "Cycles", ""),
@@ -431,8 +440,18 @@ def get_supported_blender_280_engines(scene, context):
     ]
 
 
+def get_closest_matching_product_version() -> typing.Optional[str]:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+
+    blender_version = bpy.app.version
+    version_string = str(blender_version[0]) + '.' + str(blender_version[1]) + '.' + str(blender_version[2])
+
+    plugin = PluginFetcher.get_plugin()
+    return plugin.get_api_client().get_closest_matching_product_version(api_constants.PRODUCTS.BLENDER, version_string)
+
+
 def map_blender_version_to_api_product_version():
-    from gridmarkets_blender_addon.api_constants import BLENDER_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import BLENDER_VERSIONS
     blender_version = bpy.app.version
 
     major = blender_version[0]
@@ -456,7 +475,7 @@ def map_blender_version_to_api_product_version():
 
 
 def get_supported_vray_versions(scene, context):
-    from gridmarkets_blender_addon.api_constants import VRAY_VERSIONS
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets.constants import VRAY_VERSIONS
 
     return [
         (VRAY_VERSIONS.V_3_60_03, "3.60.03", ""),
@@ -467,7 +486,7 @@ def get_supported_vray_versions(scene, context):
         (VRAY_VERSIONS.V_4_10_02, "4.10.02", ""),
     ]
 
-
+"""
 def get_job_output_format(context, job=None):
     scene = context.scene
     props = scene.props
@@ -486,8 +505,9 @@ def get_job_output_format(context, job=None):
 
     else:
         return scene.render.image_settings.file_format
+"""
 
-
+"""
 def get_job_output_prefix(context, job=None):
     scene = context.scene
     props = scene.props
@@ -510,8 +530,9 @@ def get_job_output_prefix(context, job=None):
         return job.output_prefix
 
     return None
+"""
 
-
+"""
 def get_job(context, render_file, enable_logging=True):
     scene = context.scene
     props = scene.props
@@ -552,7 +573,7 @@ def get_job(context, render_file, enable_logging=True):
         raise InvalidInputError(message="Invalid job option")
 
     return job
-
+"""
 
 def get_addon(module_name):
     """ Gets a blender add-on
@@ -639,7 +660,6 @@ def is_addon_enabled(addon_name: str):
 def get_selected_project_options(scene, context, id):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     from gridmarkets_blender_addon.icon_loader import IconLoader
-    from gridmarkets_blender_addon import api_constants
     preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
 
     project_options = [
@@ -660,12 +680,12 @@ def get_selected_project_options(scene, context, id):
 
         # iterate through uploaded projects and add them as options
         for i, project in enumerate(remote_projects):
-            project_product = project.get_attribute("PRODUCT")
+            project_product = project.get_attribute(api_constants.API_KEYS.APP)
 
             # get the correct icon
-            if project_product == "vray":
+            if project_product == api_constants.PRODUCTS.VRAY:
                 icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            elif project_product == "blender":
+            elif project_product == api_constants.PRODUCTS.BLENDER:
                 icon = constants.ICON_BLENDER
             else:
                 icon = constants.ICON_PROJECT
@@ -689,3 +709,385 @@ def get_selected_project_options(scene, context, id):
                     (str(i + 1), project.get_name(), '', icon, remote_project_container.get_project_id(project)))
 
     return project_options
+
+
+def get_project_attributes_rec(project_attribute, attributes, force_transition=False):
+    attribute = project_attribute.get_attribute()
+
+    if attribute.get_type() == AttributeType.NULL:
+        attributes[api_constants.API_KEYS.PROJECT_TYPE_ID] = project_attribute.get_id()
+        return attributes
+
+    # add attribute value
+    value = project_attribute.get_value()
+    attributes[attribute.get_key()] = value
+
+    next_project_attribute = project_attribute.transition(value, force_transition)
+    return get_project_attributes(next_project_attribute, attributes, force_transition=force_transition)
+
+
+def get_project_attributes(project_attribute=None, attributes=None, force_transition=False):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    root = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
+
+    attributes = attributes if attributes is not None else {}
+    project_attribute = root if project_attribute is None else project_attribute
+
+    return get_project_attributes_rec(project_attribute, attributes, force_transition=force_transition)
+
+
+def get_project_files(files: typing.List[pathlib.Path], project_attribute = None) -> typing.List[pathlib.Path]:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    root = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
+
+    # if project attribute is none use the root attribute
+    project_attribute = root if project_attribute is None else project_attribute
+
+    attribute = project_attribute.get_attribute()
+
+    if attribute.get_type() == AttributeType.NULL:
+        return files
+
+    value = project_attribute.get_value()
+
+    # if the attribute is a file path
+    if attribute.get_type() == AttributeType.STRING and \
+            attribute.get_subtype() == StringSubtype.PATH.value and \
+            attribute.get_subtype_kwargs().get(api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_MODE) == api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_PATH:
+        # add it's value to the files array
+        files.append(pathlib.Path(value))
+
+    return get_project_files(files, project_attribute.transition(value))
+
+
+def get_project_attributes_sequence(force_transition=False) -> typing.List['ProjectAttribute']:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    project_attributes = []
+
+    project_attribute = plugin.get_api_client().get_cached_api_schema().get_root_project_attribute()
+
+    while True:
+        project_attributes.append(project_attribute)
+
+        if project_attribute.get_attribute().get_type() == AttributeType.NULL:
+            return project_attributes
+
+        value = project_attribute.get_value()
+        project_attribute = project_attribute.transition(value, force_transition=force_transition)
+
+
+def draw_render_engine_warning_popup(self, context):
+    layout = self.layout
+
+    message = constants.COMPANY_NAME + " does not currently support packing projects using the '" + \
+              context.scene.render.engine + "' render engine."
+
+    layout.label(text=message, icon=constants.ICON_ERROR)
+    layout.separator_spacer()
+    layout.label(text="The render engines we currently support for blender are:")
+
+    for engine in get_supported_render_engines():
+        self.layout.label(text='• ' + get_user_friendly_name_for_engine(engine))
+
+
+def get_current_scene_project_attributes(context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_client = plugin.get_api_client()
+    attribute_source = plugin.get_application_attribute_source()
+
+    project_name = ""
+    if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+        product = api_constants.PRODUCTS.VRAY
+        product_version = api_client.get_product_versions(product)[0]
+    else:
+        product = api_constants.PRODUCTS.BLENDER
+        product_version = get_closest_matching_product_version()
+
+    return attribute_source.get_project_attribute_values(project_name, product, product_version)
+
+
+def get_submission_project_type_id() -> str:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    context = bpy.context
+    project_option = context.scene.props.project_options
+
+    if project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+        project_attributes = get_current_scene_project_attributes(context)
+        return project_attributes[api_constants.API_KEYS.PROJECT_TYPE_ID]
+    else:
+        remote_project_container = plugin.get_remote_project_container()
+        remote_project = remote_project_container.get_project_with_id(project_option)
+        return remote_project.get_attribute(api_constants.API_KEYS.PROJECT_TYPE_ID)
+
+
+def get_matching_job_definitions() -> typing.List['JobDefinition']:
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    api_schema = plugin.get_api_client().get_cached_api_schema()
+    project_attribute = api_schema.get_project_attribute_with_id(get_submission_project_type_id())
+    return project_attribute.get_compatible_job_definitions()
+
+
+def get_product_logo(product: str) -> typing.Tuple[str, int]:
+    from gridmarkets_blender_addon import icon_loader
+
+    preview_collection = icon_loader.IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
+
+    icon = constants.ICON_NONE
+    icon_value = 0
+
+    if product == api_constants.PRODUCTS.BLENDER:
+        icon = constants.ICON_BLENDER
+    elif product == api_constants.PRODUCTS.VRAY:
+        icon_value = preview_collection[constants.VRAY_LOGO_ID].icon_id
+    elif product == api_constants.PRODUCTS.MOE:
+        icon_value = preview_collection[constants.MOE_LOGO_ID].icon_id
+    else:
+        icon = constants.ICON_BLANK
+
+    return icon, icon_value
+
+
+def get_blender_props_for_attribute(attribute: Attribute, properties: typing.Dict[str, bpy.types.Property], prop_id: str):
+
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.property_groups.frame_range_props import FrameRangeProps
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+
+    display_name = attribute.get_display_name()
+    description = attribute.get_description()
+    attribute_type = attribute.get_type()
+    default = attribute.get_default_value()
+    subtype_kwargs = attribute.get_subtype_kwargs()
+
+    if attribute_type == AttributeType.NULL:
+        return
+    elif attribute_type == AttributeType.STRING:
+        string_attribute: StringAttributeType = attribute
+        subtype = string_attribute.get_subtype()
+
+        max_length = string_attribute.get_max_length()
+
+        if subtype == StringSubtype.NONE.value:
+            properties[prop_id] = bpy.props.StringProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                maxlen=0 if max_length is None else max_length,
+                options={'SKIP_SAVE'}
+            )
+
+            if attribute.get_key() == api_constants.API_KEYS.PROJECT_NAME:
+
+                def get_remote_root_directories(self, context):
+                    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+                    plugin = PluginFetcher.get_plugin_if_initialised()
+
+                    if plugin is None:
+                        return []
+
+                    api_client = plugin.get_api_client()
+                    projects = api_client.get_cached_root_directories()
+
+                    return list(map(lambda project: (project, project, ''), projects))
+
+                def getter(self):
+                    root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
+                    try:
+                        return root_directories.index(self[prop_id])
+                    except (KeyError, ValueError):
+                        try:
+                            self[prop_id] = root_directories[0]
+                        except IndexError:
+                            pass
+                        return 0
+
+                def setter(self, value):
+                    root_directories = list(map(lambda x: x[0], get_remote_root_directories(self, None)))
+                    try:
+                        self[prop_id] = root_directories[value]
+                    except IndexError as e:
+                        self[prop_id] = ""
+
+                properties[prop_id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
+                    name=display_name,
+                    description=description,
+                    items=get_remote_root_directories,
+                    get=getter,
+                    set=setter,
+                    options={'SKIP_SAVE'}
+                )
+
+        elif subtype == StringSubtype.FRAME_RANGES.value:
+            properties[prop_id + JobPreset.FRAME_RANGE_COLLECTION] = bpy.props.CollectionProperty(
+                type=FrameRangeProps,
+                options={'SKIP_SAVE'}
+            )
+
+            properties[prop_id + JobPreset.FRAME_RANGE_FOCUSED] = bpy.props.IntProperty(
+                options={'SKIP_SAVE'}
+            )
+        elif subtype == StringSubtype.PATH.value:
+
+            file_mode = subtype_kwargs[api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_MODE]
+
+            properties[prop_id] = bpy.props.StringProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                subtype=file_mode,
+                maxlen=0 if max_length is None else max_length,
+                options={'SKIP_SAVE'}
+            )
+
+            if file_mode == api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_PATH:
+
+                def get_remote_project_files(self, context):
+                    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+                    plugin = PluginFetcher.get_plugin_if_initialised()
+
+                    if plugin is None:
+                        return []
+
+                    api_client = plugin.get_api_client()
+                    api_schema = api_client.get_cached_api_schema()
+
+                    remote_project_name = api_schema.get_root_project_attribute().get_value()
+                    remote_project_files = api_client.get_remote_project_files(remote_project_name)
+                    return list(map(lambda x: (x.get_key(), x.get_key(), ''), remote_project_files))
+
+                def getter(self):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+
+                    try:
+                        return files.index(self[prop_id])
+                    except (KeyError, ValueError):
+                        try:
+                            self[prop_id] = files[0]
+                        except IndexError:
+                            pass
+                        return 0
+
+                def setter(self, value):
+                    files = list(map(lambda x: x[0], get_remote_project_files(self, None)))
+                    try:
+                        self[prop_id] = files[value]
+                    except IndexError as e:
+                        self[prop_id] = ""
+
+                properties[prop_id + constants.REMOTE_SOURCE_SUFFIX] = bpy.props.EnumProperty(
+                    name=display_name,
+                    description=description,
+                    items=get_remote_project_files,
+                    get=getter,
+                    set=setter,
+                    options={'SKIP_SAVE'}
+                )
+
+        else:
+            raise ValueError("Unrecognised String subtype '" + subtype + "'.")
+
+    elif attribute_type == AttributeType.ENUM:
+        enum_attribute: EnumAttributeType = attribute
+        subtype = enum_attribute.get_subtype()
+        items = []
+
+        if subtype == EnumSubtype.PRODUCT_VERSIONS.value:
+            product = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.PRODUCT)
+
+            match = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.PRODUCT_VERSIONS.MATCH)
+            match = p = re.compile(match) if match is not None else None
+
+            def _get_product_versions(self, context):
+                versions = plugin.get_api_client().get_product_versions(product)
+
+                if match is not None:
+                    versions = [s for s in versions if p.match(s)]
+
+                return list(map(lambda version: (version, version, ''), versions))
+
+            items = _get_product_versions
+
+        elif subtype == EnumSubtype.MACHINE_TYPE.value:
+
+            app = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.PRODUCT)
+            operation = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.OPERATION)
+            use_gpu_default = subtype_kwargs.get(api_constants.SUBTYPE_KEYS.ENUM.MACHINE_TYPE.USE_GPU_DEFAULT) == "True"
+
+            def _get_machine_types(self, context):
+                machine_options = plugin.get_api_client().get_machines(app, operation)
+
+                machine_option_items = []
+                for i, machine_option in enumerate(machine_options):
+
+                    # give the default machine id 0 so it starts selected
+                    if machine_option.is_default() and machine_option.is_gpu_machine() == use_gpu_default:
+                        n = 0
+                    else:
+                        # otherwise give a higher id
+                        n = i + 1
+
+                    machine_option_items.append((machine_option.get_id(), machine_option.get_name(), "", n))
+                return machine_option_items
+
+            items = _get_machine_types
+        else:
+            enum_items = enum_attribute.get_items()
+            for enum_item in enum_items:
+                items.append((enum_item.get_key(), enum_item.get_display_name(), enum_item.get_description()))
+
+        properties[prop_id] = bpy.props.EnumProperty(
+            name=display_name,
+            description=description,
+            items=items,
+            default=default,
+            options={'SKIP_SAVE'}
+        )
+
+    elif attribute_type == AttributeType.BOOLEAN:
+        properties[prop_id] = bpy.props.BoolProperty(
+            name=display_name,
+            description=description,
+            default=default,
+            options={'SKIP_SAVE'}
+        )
+
+    elif attribute_type == AttributeType.INTEGER:
+        integer_attribute: IntegerAttributeType = attribute
+
+        if integer_attribute.get_subtype() == IntegerSubtype.INSTANCES.value:
+            user_info = plugin.get_api_client().get_user_info()
+
+            integer_attribute._default_value = user_info.get_job_throughout_limit()
+
+            properties[prop_id + constants.INSTANCES_SUBTYPE_PROPERTY_USE_DEFAULT] = bpy.props.BoolProperty(
+                name="Use default machine instance count",
+                description="Use the default number of machine instances as defined by your service level",
+                default=True,
+                options={'SKIP_SAVE'}
+            )
+
+            properties[prop_id] = bpy.props.IntProperty(
+                name=display_name,
+                description=description,
+                default=user_info.get_job_throughout_limit(),
+                min=0,
+                soft_min=0,
+                step=1,
+                options={'SKIP_SAVE'}
+            )
+        else:
+            properties[prop_id] = bpy.props.IntProperty(
+                name=display_name,
+                description=description,
+                default=default,
+                options={'SKIP_SAVE'}
+            )

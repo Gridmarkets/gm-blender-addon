@@ -18,14 +18,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'PluginError'
+
 import sys
 import traceback
+import typing
 
 
 class PluginError(Exception):
 
-    def __init__(self, message=None):
+    def __init__(self, message: typing.Optional[str] = None):
         Exception.__init__(self, message)
+
         self._message = message
 
         try:
@@ -44,6 +48,8 @@ class PluginError(Exception):
         return self._message
 
     def __repr__(self):
-        return "%s(message=%r)" % (
-            self.__class__.__name__,
-            self._message)
+
+        class_name = self.__class__.__name__
+        msg = self._message or '<empty message>'
+
+        return "%s(message=%r)" % (class_name, msg)

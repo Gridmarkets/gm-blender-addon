@@ -18,12 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 
-def draw_remote_project(self, context):
+
+def draw_remote_project(layout: bpy.types.UILayout, context: bpy.types.Context):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    from gridmarkets_blender_addon import constants
     plugin = PluginFetcher.get_plugin()
-
-    layout = self.layout
 
     remote_project = plugin.get_remote_project_container().get_focused_item()
 
@@ -43,8 +44,14 @@ def draw_remote_project(self, context):
         col1.label(text="Root directory:")
         col2.label(text=str(remote_project.get_root_dir()))
 
-        col1.label(text="Main project file:")
-        col2.label(text=str(remote_project.get_main_file()))
+        col1.label(text="File Count:")
+        col2.label(text=str(len(list(remote_project.get_files()))))
+
+        col1.label(text="Files")
+        col2.label(text="")
+        for file in list(remote_project.get_files()):
+            col1.label(text="")
+            col2.label(text=file.as_posix())
 
         row = box.row()
         split = row.split(factor=0.2)
@@ -69,5 +76,3 @@ def draw_remote_project(self, context):
         for key, attribute in remote_project.get_attributes().items():
             keys.label(text=key)
             values.label(text=str(attribute))
-
-

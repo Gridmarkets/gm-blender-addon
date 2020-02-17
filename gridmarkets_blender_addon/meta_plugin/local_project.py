@@ -18,11 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.meta_plugin.project import Project
+__all__ = 'LocalProject'
 
 from abc import abstractmethod
 import pathlib
 import typing
+
+from .project import Project
 
 
 class LocalProject(Project):
@@ -30,14 +32,12 @@ class LocalProject(Project):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
                  files: typing.Set[pathlib.Path],
                  attributes: typing.Dict[str, any]):
 
         Project.__init__(self,
                          name,
                          root_dir,
-                         main_file,
                          files,
                          attributes)
 
@@ -48,3 +48,9 @@ class LocalProject(Project):
     @abstractmethod
     def delete(self) -> None:
         raise NotImplementedError
+
+    def get_size(self) -> int:
+        project_size = 0
+        for file in self.get_files():
+            project_size += file.stat().st_size
+        return project_size

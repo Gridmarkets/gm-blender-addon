@@ -18,31 +18,39 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from typing import List
+__all__ = ['JobAttribute']
 
-from gridmarkets_blender_addon.meta_plugin.attribute import Attribute
-from gridmarkets_blender_addon.meta_plugin.attribute_type import AttributeType
-from gridmarkets_blender_addon.meta_plugin.attribute_inference_source import AttributeInferenceSource
+import typing
+
+if typing.TYPE_CHECKING:
+    from . import Attribute, InferenceSource
 
 
-class JobAttribute(Attribute):
+class JobAttribute:
 
     def __init__(self,
-                 key:str,
-                 display_name: str,
-                 description: str,
-                 inference_sources: List[AttributeInferenceSource],
+                 attribute: 'Attribute',
+                 inference_sources: typing.List['InferenceSource'],
                  is_optional: bool):
 
-        Attribute.__init__(self, key, display_name, description)
+        if inference_sources is None or len(inference_sources) < 1:
+            raise ValueError("JobAttribute has no inference sources")
+
+        self._attribute = attribute
         self._inference_sources = inference_sources
         self._is_optional = is_optional
+
+    def get_attribute(self) -> 'Attribute':
+        return self._attribute
 
     def is_optional(self) -> bool:
         return self._is_optional
 
-    def get_inference_sources(self) -> List[AttributeInferenceSource]:
+    def get_inference_sources(self) -> typing.List['InferenceSource']:
         return self._inference_sources
 
-    def get_type(self) -> AttributeType:
-        raise NotImplementedError
+    def set_inference_sources(self, inference_sources):
+        self._inference_sources = inference_sources
+
+    def get_default_inference_source(self) -> 'InferenceSource':
+        return self.get_inference_sources()[0]

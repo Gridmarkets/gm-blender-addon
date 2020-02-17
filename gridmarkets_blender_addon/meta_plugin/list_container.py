@@ -18,27 +18,34 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'ListContainer'
+
 from abc import ABC
-from typing import Generic, Optional, TypeVar, List
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
+import typing
+
+T = typing.TypeVar('T')
+
+if typing.TYPE_CHECKING:
+    from . import Plugin
 
 
-T = TypeVar('T')
+class ListContainer(ABC, typing.Generic[T]):
 
-
-class ListContainer(ABC, Generic[T], PluginAccessor):
-
-    def __init__(self, items: List[T]):
+    def __init__(self, plugin: 'Plugin', items: typing.List[T]):
+        self._plugin = plugin
         self._items = items
         self._selected = []
 
-    def get_focused_item(self) -> Optional[T]:
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
+
+    def get_focused_item(self) -> typing.Optional[T]:
         if len(self._selected) == 0:
             return None
 
         return self._selected[-1]
 
-    def focus_item(self, item: T, clear_selection=True) -> None:
+    def focus_item(self, item: T, clear_selection: bool = True) -> None:
         if not self.contains(item):
             raise ValueError("Can not focus an item not in the list")
 
@@ -47,7 +54,7 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
 
         self._selected.append(item)
 
-    def get_selected(self) -> List[T]:
+    def get_selected(self) -> typing.List[T]:
         return self._selected
 
     def deselect(self, item) -> None:
@@ -64,7 +71,7 @@ class ListContainer(ABC, Generic[T], PluginAccessor):
     def deselect_all(self):
         self._selected = []
 
-    def get_all(self) -> List[T]:
+    def get_all(self) -> typing.List[T]:
         return self._items
 
     def get_at(self, index: int) -> T:

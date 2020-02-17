@@ -18,11 +18,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from abc import abstractmethod
-import pathlib
-from typing import List, Set, Dict
+__all__ = 'PackedProject'
 
-from gridmarkets_blender_addon.meta_plugin.local_project import LocalProject
+import pathlib
+import typing
+
+from .local_project import LocalProject
+from .utils import remove_directory
 
 
 class PackedProject(LocalProject):
@@ -30,14 +32,12 @@ class PackedProject(LocalProject):
     def __init__(self,
                  name: str,
                  root_dir: pathlib.Path,
-                 main_file: pathlib.Path,
-                 files: Set[pathlib.Path],
-                 attributes: Dict[str, any]):
+                 files: typing.Set[pathlib.Path],
+                 attributes: typing.Dict[str, any]):
 
         LocalProject.__init__(self,
                               name,
                               root_dir,
-                              main_file,
                               files,
                               attributes)
 
@@ -45,17 +45,15 @@ class PackedProject(LocalProject):
         root_dir = self.get_root_dir()
 
         if not file.is_absolute():
-            raise ValueError("file must be absolute")
+            raise ValueError("file \"" + str(file) + "\" must be absolute")
 
         if file.anchor != root_dir.anchor:
-            raise ValueError("file must be on same drive as project directory")
+            raise ValueError("file \"" + str(file) + "\" must be on same drive as project directory (\"" +
+                             str(root_dir.anchor) + "\")")
 
         return file.relative_to(root_dir)
 
-    def get_relative_main_file(self) -> pathlib.Path:
-        return self.get_relative_file_path(self.get_main_file())
-
-    def get_relative_files(self) -> Set[pathlib.Path]:
+    def get_relative_files(self) -> typing.Set[pathlib.Path]:
         relative_files = map(self.get_relative_file_path, self.get_files())
         return set(relative_files)
 
@@ -64,7 +62,5 @@ class PackedProject(LocalProject):
             return True
 
     def delete(self) -> None:
-        from gridmarkets_blender_addon.meta_plugin.utils import remove_directory
-
         if self.exists():
             remove_directory(self.get_root_dir())

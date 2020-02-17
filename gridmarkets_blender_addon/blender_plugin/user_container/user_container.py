@@ -20,24 +20,25 @@
 
 import bpy
 
-from typing import List, Optional
+import typing
 
 from gridmarkets_blender_addon.meta_plugin.user_container import UserContainer as MetaUserContainer
-from gridmarkets_blender_addon.blender_plugin.decorators.attach_blender_plugin import attach_blender_plugin
 from gridmarkets_blender_addon.blender_plugin.user.user import User
 
 from gridmarkets_blender_addon import constants
 
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
-@attach_blender_plugin
+
 class UserContainer(MetaUserContainer):
 
-    def __init__(self):
+    def __init__(self, plugin: 'Plugin'):
         preferences = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences
 
         # get users
         users_props = preferences.saved_profiles.user_profiles
-        users: List[User] = []
+        users: typing.List[User] = []
 
         for user_props in users_props:
             user = User(user_props.auth_email, user_props.auth_accessKey)
@@ -54,7 +55,7 @@ class UserContainer(MetaUserContainer):
             except IndexError:
                 default_user = None
 
-        MetaUserContainer.__init__(self, users, default_user)
+        MetaUserContainer.__init__(self, plugin, users, default_user)
 
         # get focused user
         focused_user_index =  preferences.saved_profiles.focused_user
@@ -97,12 +98,12 @@ class UserContainer(MetaUserContainer):
 
         MetaUserContainer.remove(self, item)
 
-    def get_default_user(self) -> Optional[User]:
+    def get_default_user(self) -> typing.Optional[User]:
         saved_profiles = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences.saved_profiles
         default_user_index = saved_profiles.default_user
         return self.get_at(default_user_index)
 
-    def set_default_user(self, user: Optional[User]) -> None:
+    def set_default_user(self, user: typing.Optional[User]) -> None:
         saved_profiles = bpy.context.preferences.addons[constants.ADDON_PACKAGE_NAME].preferences.saved_profiles
 
         if user is None:

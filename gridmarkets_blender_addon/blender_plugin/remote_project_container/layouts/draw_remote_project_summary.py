@@ -3,7 +3,7 @@ def draw_remote_project_summary(layout, project_name, project_type,
                                 vray_version, remap_file):
 
     import bpy
-    from gridmarkets_blender_addon import api_constants
+    from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
     box = layout.box()
     split = box.split(factor=0.25)

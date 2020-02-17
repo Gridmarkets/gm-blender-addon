@@ -19,14 +19,21 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import typing
 
-from queue import Queue, Empty
+from gridmarkets_blender_addon.meta_plugin import utils
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.errors import *
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import constants, utils, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
+
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
 
 
-class GRIDMARKETS_OT_Submit(bpy.types.Operator):
+class GRIDMARKETS_OT_Submit(BaseOperator):
     """Class to represent the 'Submit' operation."""
 
     bl_idname = constants.OPERATOR_SUBMIT_ID_NAME
@@ -40,65 +47,53 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
         maxlen=256
     )
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    user_interface = None
-    remote_project_container = None
+    root_directories = []
 
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
-        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
+    def handle_expected_result(self, result: any) -> bool:
+        if type(result) == NotSignedInError:
+            self.report_and_log({'ERROR'}, result.user_message)
+            return True
 
-        if event.type == 'TIMER':
-            self.user_interface.increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) == NotSignedInError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == NotSignedInError:
+            msg = "Could not upload your current scene. You are not signed in."
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-                    elif type(result) == AuthenticationError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == APIClientError:
+            self.report_and_log({'ERROR'}, result.user_message)
+            return True
 
-                    elif type(result) == InsufficientCreditsError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == UnsupportedApplicationError:
+            self.report({'ERROR'}, result.user_message)
+            return True
 
-                    elif type(result) == InvalidRequestError:
-                        self.report({'ERROR'}, result.user_message)
+        elif type(result) == RemoteProject:  # a remote project is returned when submitting a new project
+            return True
 
-                    elif type(result) == APIError:
-                        self.report({'ERROR'}, result.user_message)
+        elif result is None:  # None is returned when submitting to an existing project
+            return True
 
-                    elif type(result) == RemoteProject:
-                        self.remote_project_container.append(result)
+        return False
 
-                    elif result is None:
-                        pass
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
+        self.setup_operator()
+        plugin = self.get_plugin()
 
-                    else:
-                        raise RuntimeError("Method returned unexpected result:", result)
-
-                self.thread.join()
-                self.user_interface.set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
-
-    def invoke(self, context, event):
         props = context.scene.props
         remote_projects = props.remote_project_container.remote_projects
 
         # only show project name pop up dialog if submitting a new project
         if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+
+            # set root directories
+            api_client = plugin.get_api_client()
+            self.root_directories = api_client.get_root_directories(ignore_cache=True)
+
             # if the file has been saved use the name of the file as the prefix
             if bpy.context.blend_data.is_saved:
                 blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
@@ -112,55 +107,143 @@ class GRIDMARKETS_OT_Submit(bpy.types.Operator):
                                                                     name_prefix=constants.PROJECT_PREFIX)
 
             # create popup
-            return context.window_manager.invoke_props_dialog(self, width=400)
+            return context.window_manager.invoke_props_dialog(self, width=500)
         else:
             return self.execute(context)
 
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        props = context.scene.props
-        self.remote_project_container = plugin.get_remote_project_container()
-        self.user_interface = plugin.get_user_interface()
+    def _execute_submit_new_project(self,
+                                    project_name: str,
+                                    product: str,
+                                    product_version: str,
+                                    attributes: typing.Dict[str, any],
+                                    job_preset: 'JobPreset'):
+        packed_scene_builder = self.get_plugin().get_packed_scene_builder()
+        packed_project = packed_scene_builder.get_current_scene(project_name, product, product_version, attributes)
 
-        wm = context.window_manager
-        self.bucket = Queue()
-        self.thread = ExcThread(self.bucket, self._execute,
-                                args=(props.project_options, self.project_name), kwargs={})
+        api_client = self.get_plugin().get_api_client()
+        return api_client.submit_new_project(packed_project, job_preset, delete_local_files_after_upload=False)
 
-        # summary view can not be open when submitting otherwise crash (since submitting blender scenes still accesses
-        # the context)
-        props.submission_summary_open = False
-        self.thread.start()
-
-        self.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-
-        self.user_interface.set_is_running_operation_flag(True)
-        self.user_interface.set_running_operation_message("Submitting project...")
-        return {'RUNNING_MODAL'}
-
-    @staticmethod
-    def _execute(selected_project_option, project_name: str):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-        from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
-
-        plugin = PluginFetcher.get_plugin()
+    def submit_new_project(self, context: bpy.types.Context):
+        plugin = self.get_plugin()
+        user_interface = plugin.get_user_interface()
         api_client = plugin.get_api_client()
+        api_schema = api_client.get_cached_api_schema()
 
-        if selected_project_option == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
-            temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
+        # check render engine
+        if not user_interface.is_render_engine_supported():
+            return {'FINISHED'}
 
-            packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
-            return api_client.submit_new_blender_project(packed_project)
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = project_name_attribute.get_value()
+
+        # set product (either blender or vray)
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product = api_constants.PRODUCTS.VRAY
         else:
-            remote_project_container = plugin.get_remote_project_container()
-            remote_project = remote_project_container.get_project_with_id(selected_project_option)
-            api_client.submit_existing_blender_project(remote_project)
-            return None
+            product = api_constants.PRODUCTS.BLENDER
+        product_attribute.set_value(product)
 
+        # set and get product version
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.VRAY_VERSION)
+            product_version_attribute.set_value(api_client.get_product_versions(api_constants.PRODUCTS.VRAY)[0])
+        else:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
+
+            # set the product version to the closest matching version of blender supported
+            closest_blender_version = utils_blender.get_closest_matching_product_version()
+            if closest_blender_version is not None:
+                product_version_attribute.set_value(closest_blender_version)
+        product_version = product_version_attribute.get_value()
+
+        # set the other attributes to their application inferred value
+        app_attribute_source = plugin.get_application_attribute_source()
+        app_attribute_source.set_project_attribute_values(project_name, product, product_version)
+
+        attributes = utils_blender.get_project_attributes(force_transition=True)
+
+        # get the job preset
+        from gridmarkets_blender_addon.property_groups.main_props import get_selected_job_option
+        job_preset = get_selected_job_option(context)
+
+        if job_preset is None:
+            self.report_and_log({"ERROR"}, "No Job Preset option selected for submission")
+
+        ################################################################################################################
+
+        method = self._execute_submit_new_project
+
+        args = (
+            project_name,
+            product,
+            product_version,
+            attributes,
+            job_preset
+        )
+
+        kwargs = {}
+
+        running_operation_message = "Submitting project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
+
+    def submit_to_existing_project(self, context: bpy.types.Context):
+        plugin = self.get_plugin()
+
+        # get the remote project
+        props = context.scene.props
+        remote_project_container = plugin.get_remote_project_container()
+        remote_project = remote_project_container.get_project_with_id(props.project_options)
+
+        # get the job preset
+        from gridmarkets_blender_addon.property_groups.main_props import get_selected_job_option
+        job_preset = get_selected_job_option(context)
+
+        if job_preset is None:
+            self.report_and_log({"ERROR"}, "No Job Preset option selected for submission")
+
+        ################################################################################################################
+
+        method = plugin.get_api_client().submit_to_remote_project
+
+        args = (
+            remote_project,
+            job_preset
+        )
+
+        kwargs = {}
+
+        running_operation_message = "Submitting project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
+
+    def execute(self, context: bpy.types.Context):
+        plugin = self.get_plugin()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
+        props = context.scene.props
+
+        # set the project name attribute
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+
+        project_name_attribute.set_value(self.project_name)
+
+        if props.project_options == constants.PROJECT_OPTIONS_NEW_PROJECT_VALUE:
+            return self.submit_new_project(context)
+        else:
+            return self.submit_to_existing_project(context)
+
+    def draw(self, context: bpy.types.Context):
+        layout = self.layout
+        layout.prop(self, "project_name")
+
+        if self.project_name in self.root_directories:
+            layout.label(text="A remote project already exists with this name. Existing files will be overwritten.", icon=constants.ICON_ERROR)
 
 
 classes = (

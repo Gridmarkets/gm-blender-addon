@@ -19,7 +19,42 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants
+
+import typing
+
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.project_attribute import ProjectAttribute
+
+
+def get_blender_props_for_project_attributes(project_attribute: ProjectAttribute,
+                                             properties: typing.Dict[str, bpy.types.Property],
+                                             indent: int):
+
+    utils_blender.get_blender_props_for_attribute(project_attribute.get_attribute(),
+                                                  properties,
+                                                  project_attribute.get_id())
+
+    for child_attribute in project_attribute.get_children():
+        get_blender_props_for_project_attributes(child_attribute, properties, indent + 4)
+
+
+def register_schema(api_client):
+    # register Project Attribute props
+    api_schema = api_client.get_cached_api_schema()
+    root_project_attribute = api_schema.get_root_project_attribute()
+
+    properties = {}
+    get_blender_props_for_project_attributes(root_project_attribute, properties, 0)
+
+    # register property group
+    GRIDMARKETS_PROPS_project_attributes = type("GRIDMARKETS_PROPS_project_attributes", (bpy.types.PropertyGroup,),
+                                                {"__annotations__": properties})
+
+    bpy.utils.register_class(GRIDMARKETS_PROPS_project_attributes)
+    setattr(bpy.types.Scene,
+            constants.PROJECT_ATTRIBUTES_POINTER_KEY,
+            bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes))
 
 
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
@@ -29,14 +64,14 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        log = PluginFetcher.get_plugin().get_logging_coordinator().get_logger(self.bl_idname)
+        plugin = PluginFetcher.get_plugin()
 
+        log = plugin.get_logging_coordinator().get_logger(self.bl_idname)
         log.info("Opening " + constants.COMPANY_NAME + " add-on preferences menu...")
 
         for window in context.window_manager.windows:
             screen = window.screen
             if screen.name == constants.INJECTED_SCREEN_NAME:
-
                 # create a new context for the delete and close operations
                 c = {"screen": screen, "window": window}
 
@@ -95,14 +130,21 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
 
             screen.name = constants.INJECTED_SCREEN_NAME
 
+            # flip the header region to the top if on the bottom
+            for region in area.regions:
+                if region.alignment == "BOTTOM":
+                    override = bpy.context.copy()
+                    override['window'] = window
+                    override['screen'] = screen
+                    override['area'] = area
+                    override['region'] = region
+                    bpy.ops.screen.region_flip(override)
+
         finally:
             # reset render settings
             render.resolution_x = old_settings['x']
             render.resolution_y = old_settings['y']
             render.resolution_percentage = old_settings['res_percent']
-
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
 
         api_client = plugin.get_api_client()
 

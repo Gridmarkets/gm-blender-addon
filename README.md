@@ -12,7 +12,12 @@ A Blender add-on for uploading Blender Projects to GridMarkets and for specifyin
   - [Reloading Add-ons](#reloading-add-ons)
 - [Using the Add-on](#using-the-add-on)
   - [Authentication](#authentication)
-  - [Submitting a Project](#submitting-a-project)
+  - [Submitting a Job](#submitting-a-job)
+    - [Submit and upload at the same time](#submit-and-upload-at-the-same-time)
+    - [Resubmit a job without reuploading:](#resubmit-a-job-without-reuploading:)
+  - [Uploading Projects without Submitting](#uploading-projects-without-submitting)
+  - [Importing Existing Projects](#importing-existing-projects)
+  - [Job Presets](#job-presets)
   - [Submitting a V-Ray Scene](#submitting-a-v-ray-scene)
 
 ![image showing a preview of the add-on](static/floating_window.png)
@@ -26,7 +31,7 @@ how to build the add-on from source.
 
 | Blender Version   | Add-on Download Link|
 |-------------------|--------|
-| 2.80, 2.81  | [gridmarkets_blender_addon.zip (blender 2.8*)](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon.zip)  |
+| 2.80, 2.81, 2.82  | [gridmarkets_blender_addon.zip (blender 2.8*)](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon.zip)  |
 | 2.79  | [gridmarkets_blender_addon.zip (blender 2.79)](https://github.com/Gridmarkets/gm-blender-addon/releases/download/v1.2.0/gridmarkets_blender_addon_v2_79.zip)  |
 
 ### Building from Sources
@@ -44,6 +49,11 @@ output to the `./dist` directory by default or you can use the `-d` argument to 
 ### Installing the Zipped Add-on
 You can then import the built .zip file into Blender by going to `edit -> preferences -> Add-ons -> install`. Activate the 
 add-on by searching `GridMarkets blender addon` and ticking it's checkbox.
+
+>
+>Note: If you already have the GridMarkets Blender add-on installed and want to update to a newer version it is best to 
+**uninstall the previous version and then restart blender** before installing the new version. Otherwise you may 
+encounter errors.
 
 ![gif showing how to install add-ons inside Blender](static/blender_addon_install_walkthrough.gif)
 
@@ -98,8 +108,9 @@ using this account when opened.
 
 ![image showing multiple accounts](static/multiple_accounts.gif)
 
-### Submitting a Project
+### Submitting a Job
 
+#### Submit and upload at the same time:
 Once opened you have the option of submitting your current scene using blender's render settings in an easy one click
 submit process. There is no requirement to save the .blend file before submitting, the add-on will automatically save a 
 copy of the currently open scene to a temporary directory. It will then create a packed version of the same file using 
@@ -107,19 +118,40 @@ BAT and upload via the API. The temporary packed files will be deleted after the
 
 ![GIF showing the submission settings tab](static/submission_view.gif)
 
+#### Resubmit a job without reuploading:
+
+You can submit jobs to projects you have already uploaded by selecting a different project option from the projects dropdown button.
+![GIF showing the submission settings tab](static/re_submit_job.gif)
+
+### Uploading Projects without Submitting
+
+If you want to upload a project without submitting a job to it you can use the **Upload Current Scene** or 
+**Upload Packed Project** options under the **Upload** menu. This is useful if you want to check that your project has 
+been uploaded correctly before submitting a job to it.
+
+### Importing Existing Projects
+You can import projects that you uploaded in the past (so long as they are still in Envoy) by using the **Manually 
+specify details for existing Remote Project** option under the **misc** menu.
+
+### Job Presets
+
 You can also can define custom jobs that override blender's render and output settings to give you more control in the 
 __Job Presets__ tab. 
 
 ![image showing the job presets tab](static/job_presets_view.png)
 
-Or you can upload projects in the __Projects__ tab and run jobs against them later. This is useful if you want to check
-that your project has been uploaded correctly before submitting a job to it.
+Job preset attributes can infer their value form different sources. These include:
 
-![GIF showing the projects tab](static/project_upload.gif)
+| Inference Source Name | Description |
+|---|----|
+| Constant | Use the pre-defined constant value for this attribute |
+| User Defined | Use the value specified by the user in the form field |
+| Application | Use the value specified by the application |
+| Project | Read the value from the project's attributes when you submit |
 
 ### Submitting a V-Ray scene
 
-If you are using [V-Ray for Blender](https://docs.chaosgroup.com/display/VFBlender/Quick+Start+Guide) you can submit
+(For blender 2.79) If you are using [V-Ray for Blender](https://docs.chaosgroup.com/display/VFBlender/Quick+Start+Guide) you can submit
 V-Ray projects from Blender to GridMarkets using this add-on. To submit a V-Ray project just select the V-Ray engine 
 and the `Submission Settings` view will change to include a V-Ray project submission form. Job Presets are currently 
 only supported for blender's render engines so the `Job Presets` tab will not display while the V-Ray render engine is

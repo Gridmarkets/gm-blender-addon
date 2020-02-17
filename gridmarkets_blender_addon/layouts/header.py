@@ -18,25 +18,68 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from gridmarkets_blender_addon.icon_loader import IconLoader
+import bpy
+
 from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.menus import *
+from gridmarkets_blender_addon.operators.set_ui_layout import GRIDMARKETS_OT_set_layout
 
 
-def draw_header(self, context):
+def _draw_header_button(layout: bpy.types.UILayout, t):
     from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
     plugin = PluginFetcher.get_plugin()
-    layout = self.layout
+    user_interface = plugin.get_user_interface()
+    ui_layout = user_interface.get_layout()
+
+    row = layout.row()
+    row.operator(GRIDMARKETS_OT_set_layout.bl_idname, text=t[1]).layout = t[0]
+    if ui_layout == t[0]:
+        row.enabled = False
+
+
+def draw_header(self, context: bpy.types.Context):
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    layout: bpy.types.UILayout = self.layout
     user_interface = plugin.get_user_interface()
     signed_in_user = plugin.get_api_client().get_signed_in_user()
 
-    # get the company icon
-    preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-    iconGM = preview_collection[constants.GRIDMARKETS_LOGO_ID]
-
-    # display company icon and version
     row = layout.row()
-    row.alignment = "CENTER"
-    row.label(text=constants.ADDON_NAME, icon_value=iconGM.icon_id)
+
+    menu_row = row.row(align=True)
+    menu_row.alignment = 'LEFT'
+
+    # only show layout menus if signed in
+    if plugin.get_api_client().is_user_signed_in():
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_gm_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
+
+        row = menu_row.row(align=True)
+        row.emboss = 'PULLDOWN_MENU'
+        row.scale_x = 0.9
+        row.operator(GRIDMARKETS_OT_set_layout.bl_idname,
+                     text=GRIDMARKETS_MT_submit_options.bl_label).layout = constants.SUBMISSION_SETTINGS_VALUE
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_project_upload_options.bl_idname)
+
+        column = menu_row.column()
+        column.menu(GRIDMARKETS_MT_project_packing_options.bl_idname)
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_misc_options.bl_idname)
+
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_help_menu.bl_idname)
+    else:
+        row = menu_row.row(align=True)
+        row.menu(GRIDMARKETS_MT_gm_menu.bl_idname,
+                 text='  ' + constants.ADDON_NAME,
+                 icon_value=GRIDMARKETS_MT_gm_menu.get_icon())
+
+        row = menu_row.row(align=True)
+        row.label(text=plugin.get_version().to_string())
+        row.enabled = False
 
     # signed in indicator
     sub = row.row(align=True)
@@ -45,15 +88,15 @@ def draw_header(self, context):
         sub.label(text=user_interface.get_running_operation_message(),
                   icon_value=utils_blender.get_spinner(user_interface.get_running_operation_spinner()).icon_id)
 
-    else:
-        if signed_in_user:
-            sub.label(text="Signed in as: " + signed_in_user.get_auth_email())
-        else:
-            sub.label(text="Not signed in", icon=constants.ICON_ERROR)
+    # right aligned content
+    layout.separator_spacer()
 
-    # version label
-    sub = row.row(align=True)
-    sub.enabled = False
-    sub.label(text='GM Blender Add-on Version ' + plugin.get_version().to_string())
+    if signed_in_user:
+        _draw_header_button(layout, constants.REMOTE_PROJECTS_LAYOUT_TUPLE)
+        _draw_header_button(layout, constants.JOB_PRESETS_LAYOUT_TUPLE)
 
+        row = layout.row(align=True)
+        row.alignment = 'RIGHT'
 
+        row.label(text=signed_in_user.get_auth_email())
+        row.menu(GRIDMARKETS_MT_auth_menu.bl_idname, text="", icon_value=GRIDMARKETS_MT_auth_menu.get_icon())

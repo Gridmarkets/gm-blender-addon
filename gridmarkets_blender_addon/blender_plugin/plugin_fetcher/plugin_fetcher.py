@@ -19,7 +19,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from gridmarkets_blender_addon.meta_plugin.plugin_fetcher import PluginFetcher as MetaPluginFetcher
-from typing import Optional
+import typing
+
+if typing.TYPE_CHECKING:
+    from gridmarkets_blender_addon.blender_plugin.plugin.plugin import Plugin
 
 
 class PluginFetcher(MetaPluginFetcher):
@@ -36,7 +39,7 @@ class PluginFetcher(MetaPluginFetcher):
         return PluginFetcher._plugin
 
     @staticmethod
-    def get_plugin_if_initialised() -> Optional['Plugin']:
+    def get_plugin_if_initialised() -> typing.Optional['Plugin']:
 
         if PluginFetcher._plugin is None:
             return None

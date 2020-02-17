@@ -19,7 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.blender_plugin.remote_project import get_blender_icon_tuple_for_remote_project
 
 
 class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
@@ -27,22 +27,13 @@ class GRIDMARKETS_UL_remote_project(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.icon_loader import IconLoader
         plugin = PluginFetcher.get_plugin()
 
         remote_project = plugin.get_remote_project_container().get_at(index)
+        icons = get_blender_icon_tuple_for_remote_project(remote_project)
 
-        preview_collection = IconLoader.get_preview_collections()[constants.MAIN_COLLECTION_ID]
-        product = remote_project.get_attribute("PRODUCT")
-        if product == "vray":
-            icon = preview_collection[constants.VRAY_LOGO_ID].icon_id
-            layout.label(text=remote_project.get_name(), icon_value=icon)
-        elif product == "blender":
-            layout.label(text=remote_project.get_name(), icon=constants.ICON_BLENDER)
-        else:
-            layout.label(text=remote_project.get_name())
-
-
+        layout.alignment = "LEFT"
+        layout.label(text=remote_project.get_name(), icon=icons[0], icon_value=icons[1])
 
 
 classes = (

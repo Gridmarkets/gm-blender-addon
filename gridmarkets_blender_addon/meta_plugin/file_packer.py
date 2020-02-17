@@ -18,14 +18,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'FilePacker'
+
 from abc import ABC, abstractmethod
 import pathlib
+import typing
 
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+if typing.TYPE_CHECKING:
+    from . import PackedProject
 
 
 class FilePacker(ABC):
 
     @abstractmethod
-    def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
+    def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> 'PackedProject':
         raise NotImplementedError

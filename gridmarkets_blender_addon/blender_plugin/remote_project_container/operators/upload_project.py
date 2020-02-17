@@ -20,232 +20,131 @@
 
 import bpy
 
-from queue import Queue, Empty
+import typing
 
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
-    draw_remote_project_summary
-from gridmarkets_blender_addon.scene_exporters.blender_scene_exporter import BlenderSceneExporter
-from gridmarkets_blender_addon.scene_exporters.vray_scene_exporter import VRaySceneExporter
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.blender_plugin.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+
+from gridmarkets_blender_addon.meta_plugin.errors import *
 
 
-class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
+class GRIDMARKETS_OT_upload_project(BaseOperator):
     bl_idname = constants.OPERATOR_UPLOAD_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_UPLOAD_PROJECT_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
-    bl_description = "Upload the current scene as a new project."
+    bl_description = "Upload the current scene as a new project"
     bl_options = {'REGISTER'}
 
-    # getters, setters and properties are all copied from <properties.FrameRangeProps>
-    project_name: bpy.props.StringProperty(
-        name="Project Name",
-        description="The name of your project",
-        default="",
-        maxlen=256
-    )
+    def handle_expected_result(self, result: any) -> bool:
 
-    project_type: bpy.props.EnumProperty(
-        name="Project Type",
-        items=utils_blender.get_supported_products
-    )
+        if isinstance(result, RemoteProject):
+            return True
 
-    blender_280_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_280_engines
-    )
+        elif type(result) == FilePackingError:
+            msg = "Could not finish packing your project. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-    blender_279_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_279_engines
-    )
+        elif type(result) == NotSignedInError:
+            msg = "Could not upload your current scene. You are not signed in."
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-    blender_version: bpy.props.EnumProperty(
-        name="Blender version",
-        items=utils_blender.get_supported_blender_versions
-    )
+        elif type(result) == APIClientError:
+            msg = "Could not upload your current scene. " + result.user_message
+            self.report_and_log({'ERROR'}, msg)
+            return True
 
-    vray_version: bpy.props.EnumProperty(
-        name="V-Ray version",
-        items=utils_blender.get_supported_vray_versions
-    )
+        return False
 
-    project_file: bpy.props.StringProperty(
-        name="Project file",
-        subtype="FILE_PATH",
-        default="<Generated during upload>",
-    )
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event):
+        self.setup_operator()
 
-    remap_file: bpy.props.StringProperty(
-        name="Re-map file",
-        subtype="FILE_PATH",
-        default="<Generated during upload>",
-        description="The name of the remap file",
-    )
-
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    user_interface = None
-    remote_project_container = None
-
-    def modal(self, context, event):
-        from gridmarkets_blender_addon.meta_plugin.errors.not_signed_in_error import NotSignedInError
-        from gridmarkets.errors import AuthenticationError, InsufficientCreditsError, InvalidRequestError, APIError
-        from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-
-        if event.type == 'TIMER':
-            self.user_interface.increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
-
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) == NotSignedInError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == AuthenticationError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == InsufficientCreditsError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == InvalidRequestError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == APIError:
-                        self.report({'ERROR'}, result.user_message)
-
-                    elif type(result) == RemoteProject:
-                        self.remote_project_container.append(result)
-
-                    else:
-                        raise RuntimeError("Method returned unexpected result:", result)
-
-                self.thread.join()
-                self.user_interface.set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
-
-        return {'PASS_THROUGH'}
-
-    def invoke(self, context, event):
-        scene = context.scene
-        props = scene.props
-
-        # if the file has been saved use the name of the file as the prefix
-        if bpy.context.blend_data.is_saved:
-            blend_file_name = bpy.path.basename(bpy.context.blend_data.filepath)
-
-            if blend_file_name.endswith(constants.BLEND_FILE_EXTENSION):
-                blend_file_name = blend_file_name[:-len(constants.BLEND_FILE_EXTENSION)] + "_"
-
-            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=blend_file_name)
-        else:
-            self.project_name = utils.create_unique_object_name(props.projects, name_prefix=constants.PROJECT_PREFIX)
-
-        if scene.render.engine == "VRAY_RENDER_RT":
-            self.project_type = api_constants.PRODUCTS.VRAY
-        else:
-            self.project_type = api_constants.PRODUCTS.BLENDER
-
-            try:
-                self.blender_280_engine = scene.render.engine
-            except TypeError:
-                self.report({"WARNING"}, scene.render.engine + " is not supported with this product type")
-                return {"FINISHED"}
-            self.blender_version = utils_blender.map_blender_version_to_api_product_version()
-
-        # create popup
-        return context.window_manager.invoke_props_dialog(self, width=400)
-
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
-        self.remote_project_container = plugin.get_remote_project_container()
-        self.user_interface = plugin.get_user_interface()
-
-        wm = context.window_manager
-        self.bucket = Queue()
-        self.thread = ExcThread(self.bucket, self._execute, args=(self.project_type, self.project_name), kwargs={})
-        self.thread.start()
-
-        self.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-
-        self.user_interface.set_is_running_operation_flag(True)
-        self.user_interface.set_running_operation_message("Uploading project...")
-        return {'RUNNING_MODAL'}
-
-    @staticmethod
-    def _execute(project_type: str, project_name: str):
-        from gridmarkets_blender_addon.temp_directory_manager import TempDirectoryManager
-
-        temp_dir = TempDirectoryManager.get_temp_directory_manager().get_temp_directory()
-
-        if project_type == api_constants.PRODUCTS.BLENDER:
-            packed_project = BlenderSceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
-
-        elif project_type == api_constants.PRODUCTS.VRAY:
-            packed_project = VRaySceneExporter().export(temp_dir)
-            packed_project.set_name(project_name)
-        else:
-            raise RuntimeError("Unknown project type")
-
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        plugin = PluginFetcher.get_plugin()
+        plugin = self.get_plugin()
         api_client = plugin.get_api_client()
-        return api_client.upload_project(packed_project, delete_local_files_after_upload=False)
+        api_schema = api_client.get_cached_api_schema()
 
-    def draw(self, context):
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = project_name_attribute.get_value()
+
+        root_directories = api_client.get_root_directories(ignore_cache=True)
+
+        if project_name in root_directories:
+            return context.window_manager.invoke_props_dialog(self, width=500)
+
+        return self.execute(context)
+
+    def execute(self, context: bpy.types.Context):
+        plugin = self.get_plugin()
+        user_interface = plugin.get_user_interface()
+        api_schema = plugin.get_api_client().get_cached_api_schema()
+
+        # check render engine
+        if not user_interface.is_render_engine_supported():
+            return {'FINISHED'}
+
+        # get project name
+        project_name_attribute = api_schema.get_project_attribute_with_id(
+            api_constants.PROJECT_ATTRIBUTE_IDS.PROJECT_NAME)
+        project_name = project_name_attribute.get_value()
+
+        # set and get product (either blender or vray)
+        product_attribute = api_schema.get_project_attribute_with_id(api_constants.PROJECT_ATTRIBUTE_IDS.PRODUCT)
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product = api_constants.PRODUCTS.VRAY
+        else:
+            product = api_constants.PRODUCTS.BLENDER
+        product_attribute.set_value(product)
+
+        # get product version
+        if context.scene.render.engine == constants.RENDER_ENGINE_VRAY_RT:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.VRAY_VERSION)
+        else:
+            product_version_attribute = api_schema.get_project_attribute_with_id(
+                api_constants.PROJECT_ATTRIBUTE_IDS.BLENDER_VERSION)
+        product_version = product_version_attribute.get_value()
+
+        # set the other attributes to their application inferred value
+        app_attribute_source = plugin.get_application_attribute_source()
+        app_attribute_source.set_project_attribute_values(project_name, product, product_version)
+
+        attributes = utils_blender.get_project_attributes(force_transition=True)
+
+        ################################################################################################################
+
+        method = self._execute
+
+        args = (
+            project_name,
+            product,
+            product_version,
+            attributes
+        )
+
+        kwargs = {}
+
+        running_operation_message = "Uploading project..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
+
+    def _execute(self, project_name: str, product: str, product_version: str, attributes: typing.Dict[str, any]):
+        packed_scene_builder = self.get_plugin().get_packed_scene_builder()
+        packed_project = packed_scene_builder.get_current_scene(project_name, product, product_version, attributes)
+
+        api_client = self.get_plugin().get_api_client()
+        return api_client.upload_project(packed_project, True, delete_local_files_after_upload=False)
+
+    def draw(self, context: bpy.types.Context):
         layout = self.layout
         layout.separator()
-
-        layout.prop(self, "project_name")
-
-        sub = layout.row()
-        sub.enabled = False
-        sub.prop(self, "project_type")
-
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
-            sub = layout.row()
-            sub.enabled = False
-            sub.prop(self, "blender_version")
-
-            sub = layout.row()
-            sub.enabled = False
-            sub.prop(self, "project_file")
-
-            sub1 = layout.row()
-            sub1.enabled = False
-
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
-                sub1.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
-                sub1.prop(self, "blender_279_engine")
-
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            layout.prop(self, "vray_version")
-
-            sub = layout.row()
-            sub.enabled = False
-            sub.prop(self, "project_file")
-
-            sub = layout.row()
-            sub.enabled = False
-            sub.prop(self, "remap_file")
-
+        layout.label(text="A remote project already exists with this name. Existing files will be overwritten.",
+                     icon=constants.ICON_ERROR)
         layout.separator()
-
-        draw_remote_project_summary(layout, self.project_name, self.project_type,
-                                    self.blender_version, self.project_file, self.blender_280_engine,
-                                    self.blender_279_engine,
-                                    self.vray_version, self.remap_file)
+        layout.label(text="Press ok to continue.")
 
 
 classes = (

@@ -19,118 +19,85 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import pathlib
-from gridmarkets_blender_addon import api_constants, constants, utils, utils_blender
-from gridmarkets_blender_addon.project.remote.remote_blender_project import RemoteBlenderProject
-from gridmarkets_blender_addon.project.remote.remote_vray_project import RemoteVRayProject
-from gridmarkets_blender_addon.blender_plugin.remote_project_container.layouts.draw_remote_project_summary import \
-    draw_remote_project_summary
+import types
+from gridmarkets_blender_addon import constants, utils_blender
+from gridmarkets_blender_addon.meta_plugin.attribute import AttributeType
+from gridmarkets_blender_addon.meta_plugin.attribute_types import StringSubtype
+from gridmarkets_blender_addon.meta_plugin.errors.rejected_transition_input_error import \
+    RejectedTransitionInputError
+from gridmarkets_blender_addon.meta_plugin.gridmarkets.remote_project import RemoteProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
 
 class GRIDMARKETS_OT_add_remote_project(bpy.types.Operator):
     bl_idname = constants.OPERATOR_ADD_REMOTE_PROJECT_ID_NAME
     bl_label = constants.OPERATOR_ADD_REMOTE_PROJECT_LABEL
-    bl_icon = constants.ICON_BLEND_FILE
     bl_options = set()
-
-    project_name: bpy.props.StringProperty(
-        name="Project Name",
-        default="",
-        maxlen=256
-    )
-
-    project_type: bpy.props.EnumProperty(
-        name="Project Type",
-        items=utils_blender.get_supported_products
-    )
-
-    blender_280_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_280_engines
-    )
-
-    blender_279_engine: bpy.props.EnumProperty(
-        name="Blender engine",
-        items=utils_blender.get_supported_blender_279_engines
-    )
-
-    blender_version: bpy.props.EnumProperty(
-        name="Blender version",
-        items=utils_blender.get_supported_blender_versions
-    )
-
-    vray_version: bpy.props.EnumProperty(
-        name="V-Ray version",
-        items=utils_blender.get_supported_vray_versions
-    )
-
-    project_file: bpy.props.StringProperty(
-        name="Project file",
-        description="The name of your project",
-    )
-
-    remap_file: bpy.props.StringProperty(
-        name="Re-map file",
-        description="The name of the remap file",
-    )
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
 
     def execute(self, context):
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        dir = pathlib.Path(self.project_name)
-
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
-            main_file = pathlib.Path(self.project_file + constants.BLEND_FILE_EXTENSION)
-            remote_project = RemoteBlenderProject(dir, main_file)
-
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            main_file = pathlib.Path(self.project_file + constants.VRAY_SCENE_FILE_EXTENSION)
-            remap_file = dir / pathlib.Path(self.remap_file)
-            remote_project = RemoteVRayProject(dir, main_file, remap_file)
-
         plugin = PluginFetcher.get_plugin()
-        plugin.get_remote_project_container().append(remote_project)
+        api_client = plugin.get_api_client()
+        api_schema = api_client.get_cached_api_schema()
+        root = api_schema.get_root_project_attribute()
 
-        # reset string inputs, enum inputs don't really need to reset to default values
-        self.project_name = ""
-        self.project_file = ""
-        self.remap_file = ""
+        project_name = root.get_value()
 
-        utils_blender.force_redraw_addon()
-        return {'FINISHED'}
+        # check the project exists
+        if project_name not in api_client.get_root_directories(ignore_cache=True):
+            self.report({'ERROR'}, "Project '" + project_name + "' no longer exists.")
+            return {'FINISHED'}
 
-    def draw(self, context):
-        layout = self.layout
+        # get the files for this project
+        envoy_files = api_client.get_remote_project_files(project_name)
+        files = list(map(lambda x: x.get_key(), envoy_files))
 
-        layout.separator()
+        def _do_file_paths_exist(project_attribute):
 
-        layout.prop(self, "project_name")
-        layout.prop(self, "project_type")
+            attribute = project_attribute.get_attribute()
 
-        if self.project_type == api_constants.PRODUCTS.BLENDER:
-            layout.prop(self, "blender_version")
-            layout.prop(self, "project_file")
-            project_file = self.project_file + constants.BLEND_FILE_EXTENSION
+            if attribute.get_type() == AttributeType.NULL:
+                return True
 
-            if self.blender_version == api_constants.BLENDER_VERSIONS.V_2_80 or self.blender_version == api_constants.BLENDER_VERSIONS.V_2_81A:
-                layout.prop(self, "blender_280_engine")
-            elif self.blender_version == api_constants.BLENDER_VERSIONS.V_2_79B:
-                layout.prop(self, "blender_279_engine")
+            value = project_attribute.get_value()
 
-        elif self.project_type == api_constants.PRODUCTS.VRAY:
-            layout.prop(self, "vray_version")
-            layout.prop(self, "project_file")
-            project_file = self.project_file + constants.VRAY_SCENE_FILE_EXTENSION
-            layout.prop(self, "remap_file")
+            # check file paths exist
+            if attribute.get_type() == AttributeType.STRING and \
+                    attribute.get_subtype() == StringSubtype.PATH.value and \
+                    attribute.get_subtype_kwargs().get(api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_MODE) == api_constants.SUBTYPE_KEYS.STRING.PATH.FILE_PATH:
 
-        layout.separator()
+                if value not in files:
+                    self.report({'ERROR'}, "File path '" + str(value) + "' does not exist under project '" +
+                                project_name + "'.")
+                    return False
 
-        draw_remote_project_summary(layout, self.project_name, self.project_type,
-                                    self.blender_version, project_file, self.blender_280_engine,
-                                    self.blender_279_engine,
-                                    self.vray_version, self.remap_file)
+            return _do_file_paths_exist(project_attribute.transition(value))
+
+        # check files actually exist on the remote project
+        if not _do_file_paths_exist(root):
+            return {'FINISHED'}
+
+        try:
+            attributes = utils_blender.get_project_attributes()
+
+            remote_project = RemoteProject(attributes.get(api_constants.API_KEYS.PROJECT_NAME),
+                                           attributes.get(api_constants.API_KEYS.APP),
+                                           set(),
+                                           attributes,
+                                           api_client)
+
+            plugin.get_remote_project_container().append(remote_project)
+
+            # switch to the projects layout
+            plugin.get_user_interface().set_layout(constants.REMOTE_PROJECTS_LAYOUT_VALUE)
+
+            utils_blender.force_redraw_addon()
+            return {'FINISHED'}
+
+        except ValueError as e:
+            return {'FINISHED'}
+        except RejectedTransitionInputError as e:
+            return {'FINISHED'}
 
 
 classes = (

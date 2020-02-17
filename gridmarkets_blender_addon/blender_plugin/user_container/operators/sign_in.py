@@ -20,106 +20,127 @@
 
 import bpy
 
-from queue import Queue, Empty
+from gridmarkets_blender_addon.operators.base_operator import BaseOperator
+from gridmarkets_blender_addon import constants
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
 
-from gridmarkets_blender_addon import constants, utils_blender
-
+from gridmarkets_blender_addon.meta_plugin.user import User
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
 from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
-from gridmarkets_blender_addon.meta_plugin.errors.api_error import APIError
-from gridmarkets_blender_addon.meta_plugin.exc_thread import ExcThread
+from gridmarkets_blender_addon.meta_plugin.errors.api_client_error import APIClientError
 
 
-class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
+def add_default_job_preset():
+    from gridmarkets_blender_addon.blender_plugin.job_preset.job_preset import JobPreset
+    from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
+    plugin = PluginFetcher.get_plugin()
+    job_presets = plugin.get_preferences_container().get_job_preset_container().get_all()
+
+    # do not add if there is already a preset with that name
+    for job_preset in job_presets:
+        if job_preset.get_name() == constants.DEFAULT_JOB_PRESET_NAME:
+            return
+
+    def add_default_job_preset(job_definition_id: str, name: str):
+        job_preset_container = plugin.get_preferences_container().get_job_preset_container()
+
+        # do not add if already added
+        job_presets = job_preset_container.get_all()
+        for job_preset in job_presets:
+            if job_preset.get_id() == id:
+                return
+
+        job_definitions = plugin.get_api_client().get_cached_api_schema().get_job_definitions()
+        for job_definition in job_definitions:
+            if job_definition.get_definition_id() == job_definition_id:
+                job_preset_container.append(JobPreset(name, job_definition, is_locked=True))
+
+    # add default job presets
+    add_default_job_preset(api_constants.JOB_DEFINITION_IDS.BLENDER_2_8X_CYCLES, constants.DEFAULT_JOB_PRESET_NAME)
+
+
+
+class GRIDMARKETS_OT_sign_in_new_user(BaseOperator):
     bl_idname = "gridmarkets.sign_in_new_user"
     bl_label = "Sign-in new user"
     bl_options = {"REGISTER"}
     bl_description = "Sign in " + constants.COMPANY_NAME
 
-    bucket = None
-    timer = None
-    thread: ExcThread = None
-    user_interface = None
-    api_client = None
+    def handle_expected_result(self, result: any) -> bool:
+        user_interface = self.get_plugin().get_user_interface()
 
-    def modal(self, context, event):
-        if event.type == 'TIMER':
-            self.user_interface.increment_running_operation_spinner()
-            utils_blender.force_redraw_addon()
+        if result is None:
+            user_interface.set_auth_email_validity_flag(True)
+            user_interface.set_auth_access_key_validity_flag(True)
+            user_interface.set_auth_email_validity_message("")
+            user_interface.set_auth_access_key_validity_message("")
+            user_interface.set_user_validity_flag(True)
+            user_interface.set_user_validity_message("")
+            user_interface.set_layout(constants.SUBMISSION_SETTINGS_VALUE)
+            return True
 
-            if not self.thread.isAlive():
-                try:
-                    result = self.bucket.get(block=False)
-                except Empty:
-                    raise RuntimeError("bucket is Empty")
-                else:
-                    if type(result) == InvalidEmailError:
-                        self.user_interface.set_auth_email_validity_flag(False)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_auth_email_validity_message(result.user_message)
-                        self.user_interface.set_auth_access_key_validity_message("")
+        elif type(result) == InvalidEmailError:
+            user_interface.set_auth_email_validity_flag(False)
+            user_interface.set_auth_access_key_validity_flag(True)
+            user_interface.set_auth_email_validity_message(result.user_message)
+            user_interface.set_auth_access_key_validity_message("")
+            return True
 
-                    elif type(result) == InvalidAccessKeyError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(False)
-                        self.user_interface.set_auth_email_validity_message("")
-                        self.user_interface.set_auth_access_key_validity_message(result.user_message)
+        elif type(result) == InvalidAccessKeyError:
+            user_interface.set_auth_email_validity_flag(True)
+            user_interface.set_auth_access_key_validity_flag(False)
+            user_interface.set_auth_email_validity_message("")
+            user_interface.set_auth_access_key_validity_message(result.user_message)
+            return True
 
-                    elif type(result) == InvalidUserError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_user_validity_flag(False)
-                        self.user_interface.set_user_validity_message(result.user_message)
+        elif type(result) == InvalidUserError:
+            user_interface.set_auth_email_validity_flag(True)
+            user_interface.set_auth_access_key_validity_flag(True)
+            user_interface.set_user_validity_flag(False)
+            user_interface.set_user_validity_message(result.user_message)
+            return True
 
-                    elif type(result) == APIError:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_user_validity_flag(False)
-                        self.user_interface.set_user_validity_message(result.user_message)
+        elif type(result) == APIClientError:
+            user_interface.set_auth_email_validity_flag(True)
+            user_interface.set_auth_access_key_validity_flag(True)
+            user_interface.set_user_validity_flag(False)
+            user_interface.set_user_validity_message(result.user_message)
+            return True
 
-                    elif result is None:
-                        self.user_interface.set_auth_email_validity_flag(True)
-                        self.user_interface.set_auth_access_key_validity_flag(True)
-                        self.user_interface.set_auth_email_validity_message("")
-                        self.user_interface.set_auth_access_key_validity_message("")
-                        self.user_interface.set_user_validity_flag(True)
-                        self.user_interface.set_user_validity_message("")
+        return False
 
-                    else:
-                        raise RuntimeError("Sign-in method returned unexpected result:", result)
+    def execute(self, context: bpy.types.Context):
+        self.setup_operator()
 
-                self.thread.join()
-                self.user_interface.set_is_running_operation_flag(False)
-                context.window_manager.event_timer_remove(self.timer)
-                utils_blender.force_redraw_addon()
-                return {'FINISHED'}
+        plugin = self.get_plugin()
+        api_client = plugin.get_api_client()
 
-        return {'PASS_THROUGH'}
-
-    def execute(self, context):
-        from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-        from gridmarkets_blender_addon.meta_plugin.user import User
-
-        wm = context.window_manager
-        plugin = PluginFetcher.get_plugin()
-        self.api_client = plugin.get_api_client()
-
-        self.user_interface = plugin.get_user_interface()
-        auth_email = self.user_interface.get_auth_email()
-        auth_access_key = self.user_interface.get_auth_access_key()
+        user_interface = plugin.get_user_interface()
+        auth_email = user_interface.get_auth_email()
+        auth_access_key = user_interface.get_auth_access_key()
         user = User(auth_email, auth_access_key)
 
-        self.bucket = Queue()
-        self.thread = ExcThread(self.bucket, self.api_client.sign_in, args=(user,), kwargs={"skip_validation": False})
-        self.thread.start()
+        def sign_in(user, skip_validation=False):
+            result = api_client.sign_in(user, skip_validation=skip_validation)
+            add_default_job_preset()
+            return result
 
-        self.timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
+        ################################################################################################################
 
-        self.user_interface.set_is_running_operation_flag(True)
-        self.user_interface.set_running_operation_message("Signing in...")
-        return {'RUNNING_MODAL'}
+        method = sign_in
+
+        args = (
+            user,
+        )
+
+        kwargs = {
+            "skip_validation": False,
+        }
+
+        running_operation_message = "Signing in..."
+
+        return self.boilerplate_execute(context, method, args, kwargs, running_operation_message)
 
 
 classes = (

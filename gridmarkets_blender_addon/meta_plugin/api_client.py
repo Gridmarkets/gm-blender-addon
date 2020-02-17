@@ -18,35 +18,29 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'APIClient'
+
 from abc import ABC, abstractmethod
-from typing import Optional
+import typing
 
-from gridmarkets_blender_addon.meta_plugin.user import User
-from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
-from gridmarkets_blender_addon.meta_plugin.remote_project import RemoteProject
-from gridmarkets_blender_addon.meta_plugin.plugin_accessor import PluginAccessor
-from gridmarkets_blender_addon.meta_plugin.api_schema import APISchema
+if typing.TYPE_CHECKING:
+    from . import Product, User, FactoryCollection, APISchema, PackedProject, RemoteProject, JobPreset, UserInfo, \
+        MachineOption, Plugin
 
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_email_error import InvalidEmailError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_access_key_error import InvalidAccessKeyError
-from gridmarkets_blender_addon.meta_plugin.errors.invalid_user_error import InvalidUserError
 
-class APIClient(ABC, PluginAccessor):
+class APIClient(ABC):
 
-    def __init__(self):
+    def __init__(self, plugin: 'Plugin'):
+        self._plugin = plugin
         self._signed_in_user = None
 
-    def sign_in(self, user: User, skip_validation: bool = False) -> None:
+    def get_plugin(self) -> "Plugin":
+        return self._plugin
+
+    def sign_in(self, user: 'User', skip_validation: bool = False) -> None:
 
         if not skip_validation:
-            try:
-                self.validate_credentials(user.get_auth_email(), user.get_auth_key())
-            except InvalidEmailError as e:
-                raise e
-            except InvalidAccessKeyError as e:
-                raise e
-            except InvalidUserError as e:
-                raise e
+            self.validate_credentials(user.get_auth_email(), user.get_auth_key())
 
         self._signed_in_user = user
 
@@ -60,7 +54,6 @@ class APIClient(ABC, PluginAccessor):
 
         user_container.append(user)
 
-
     def sign_out(self) -> None:
         self._signed_in_user = None
 
@@ -71,11 +64,13 @@ class APIClient(ABC, PluginAccessor):
     def connected(self) -> bool:
         raise NotImplementedError
 
-    def get_signed_in_user(self) -> Optional[User]:
-        return self._signed_in_user
+    def get_signed_in_user(self) -> typing.Optional['User']:
+        if self.is_user_signed_in():
+            return self._signed_in_user
+        return None
 
     @abstractmethod
-    def get_api_schema(self) -> APISchema:
+    def get_api_schema(self, factory_collection: 'FactoryCollection') -> 'APISchema':
         raise NotImplementedError
 
     @staticmethod
@@ -85,22 +80,47 @@ class APIClient(ABC, PluginAccessor):
 
     @abstractmethod
     def upload_project(self,
-                       packed_project: PackedProject,
-                       delete_local_files_after_upload: bool = False) -> RemoteProject:
+                       packed_project: 'PackedProject',
+                       upload_root_dir: bool,
+                       delete_local_files_after_upload: bool = False) -> 'RemoteProject':
         raise NotImplementedError
 
-    """
     @abstractmethod
     def submit_new_project(self,
-                           project: PackedProject,
-                           job: Job,
-                           delete_local_files_after_upload: bool = False) -> RemoteProject:
+                           packed_project: 'PackedProject',
+                           job_preset: 'JobPreset',
+                           delete_local_files_after_upload: bool = False) -> 'RemoteProject':
         raise NotImplemented
 
-    
     @abstractmethod
     def submit_to_remote_project(self,
-                                 project, RemoteProject
-                                 job: Job) -> RemoteProject:
+                                 remote_project: 'RemoteProject',
+                                 job_preset: 'JobPreset') -> None:
         raise NotImplemented
-    """
+
+    @abstractmethod
+    def update_remote_project_status(self, remote_project: 'RemoteProject') -> None:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_products(self, ignore_cache=False) -> typing.List['Product']:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_products_with_app_type(self, app_type: str) -> typing.List['Product']:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_product_app_types(self, ignore_cache=False) -> typing.List[str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_user_info(self, ignore_cache=False) -> 'UserInfo':
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_machines(self,
+                     app: str,
+                     operation: str,
+                     ignore_cache: bool = False) -> typing.List['MachineOption']:
+        raise NotImplementedError

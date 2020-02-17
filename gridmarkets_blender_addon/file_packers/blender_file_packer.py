@@ -22,6 +22,9 @@ import pathlib
 
 from gridmarkets_blender_addon.meta_plugin.file_packer import FilePacker
 from gridmarkets_blender_addon.meta_plugin.packed_project import PackedProject
+from gridmarkets_blender_addon.meta_plugin.gridmarkets import constants as api_constants
+from gridmarkets_blender_addon.meta_plugin.errors import FilePackingError
+from gridmarkets_blender_addon.meta_plugin import utils
 
 
 class BlenderFilePacker(FilePacker):
@@ -30,7 +33,6 @@ class BlenderFilePacker(FilePacker):
     def pack(self, target_file: pathlib.Path, output_dir: pathlib.Path) -> PackedProject:
         from gridmarkets_blender_addon.bat_progress_callback import BatProgressCallback
         from gridmarkets_blender_addon.blender_plugin.plugin_fetcher.plugin_fetcher import PluginFetcher
-
         plugin = PluginFetcher.get_plugin()
         logging_coordinator = plugin.get_logging_coordinator()
         log = logging_coordinator.get_logger(__name__)
@@ -44,11 +46,18 @@ class BlenderFilePacker(FilePacker):
             log.info("Removing '%s'..." % str(pack_info_file))
             pack_info_file.unlink()
 
-        return PackedProject(output_dir.stem,
+        project_name = output_dir.stem
+
+        files = utils.get_files_in_directory(output_dir)
+        attributes = {
+            api_constants.API_KEYS.PATH: str(output_dir / target_file.name),
+        }
+
+        log.info("Finished packing project \"" + str(target_file) + "\" to \"" + str(output_dir) + "\"")
+        return PackedProject(project_name,
                              output_dir,
-                             output_dir / target_file.name,
-                             set(),
-                             {"PRODUCT": "blender"})
+                             files,
+                             attributes)
 
     @staticmethod
     def pack_blend_file(blend_file_path, target_dir_path, progress_cb=None):
@@ -96,11 +105,14 @@ class BlenderFilePacker(FilePacker):
 
             # attempt to pack the project
             try:
-                log.info("Plan packing operation...")
+                log.info("Execute packing operation...")
                 packer.execute()
             except pack.transfer.FileTransferError as ex:
                 log.warning(str(len(ex.files_remaining)) + " files couldn't be copied, starting with " +
                             str(ex.files_remaining[0]))
                 raise SystemExit(1)
+            except Exception as e:
+                log.error(utils.get_exception_with_traceback(e))
+                raise FilePackingError("A Blender Asset Tracer (BAT) error occurred while packing the project.")
             finally:
                 log.info("Exiting packing operation...")

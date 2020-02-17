@@ -18,43 +18,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+__all__ = 'LogHistoryContainer'
+
 import typing
 
-from gridmarkets_blender_addon.meta_plugin.log_item import LogItem
-from gridmarkets_blender_addon.meta_plugin.list_container import ListContainer
+from .log_item import LogItem
+from .list_container import ListContainer
+
+if typing.TYPE_CHECKING:
+    from . import Plugin
 
 
-class LogHistoryContainer(ListContainer, LogItem):
+class LogHistoryContainer(ListContainer[LogItem]):
 
-    def __init__(self, log_item: typing.List[LogItem]):
-        ListContainer.__init__(self, log_item)
-
-    def get_focused_item(self) -> typing.Optional[LogItem]:
-        return ListContainer.get_focused_item(self)
-
-    def focus_item(self, log_item: LogItem, clear_selection=True) -> None:
-        ListContainer.focus_item(self, log_item, clear_selection=clear_selection)
-
-    def get_selected(self) -> typing.List[LogItem]:
-        return ListContainer.get_selected(self)
-
-    def get_all(self) -> typing.List[LogItem]:
-        return ListContainer.get_all(self)
-
-    def get_at(self, index: int) -> LogItem:
-        return ListContainer.get_at(self, index)
-
-    def append(self, log_item: LogItem, focus_new_item: bool = True) -> None:
-        ListContainer.append(self, log_item, focus_new_item=focus_new_item)
-
-    def remove(self, log_item: LogItem) -> None:
-        ListContainer.remove(self, log_item)
-
-    def contains(self, log_item: LogItem) -> bool:
-        return ListContainer.contains(self, log_item)
-
-    def get_index(self, log_item: LogItem) -> int:
-        return ListContainer.get_index(self, log_item)
-
-    def is_selected(self, log_item: LogItem) -> bool:
-        return ListContainer.is_selected(self, log_item)
+    def __init__(self, plugin: 'Plugin', log_items: typing.List['LogItem']):
+        ListContainer.__init__(self, plugin, log_items)

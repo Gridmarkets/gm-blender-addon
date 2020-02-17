@@ -67,17 +67,19 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
         min=1
     )
 
+    property_group_attribute: bpy.props.StringProperty()
+    focused_item_attribute: bpy.props.StringProperty()
+    collection_attribute: bpy.props.StringProperty()
+
     def invoke(self, context, event):
+        from gridmarkets_blender_addon.meta_plugin.utils import get_deep_attribute
 
-        props = context.scene.props
-        selected_job = props.jobs[props.selected_job]
-
-        # don't create popup if custom frame ranges are not enabled
-        if not selected_job.use_custom_frame_ranges:
-            return {"FINISHED"}
+        property_group = get_deep_attribute(bpy.context.scene, self.property_group_attribute)
+        focused_item = getattr(property_group, self.focused_item_attribute)
+        collection = getattr(property_group, self.collection_attribute)
 
         # Select the selected frame range for the selected job
-        frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
+        frame_range = collection[focused_item]
 
         # set values for popup field inputs to default to
         self.name = frame_range.name
@@ -91,15 +93,17 @@ class GRIDMARKETS_OT_edit_frame_range(bpy.types.Operator):
 
     def execute(self, context):
         """ Called after the user clicks the 'ok' button on the popup """
+        from gridmarkets_blender_addon.meta_plugin.utils import get_deep_attribute
 
-        props = context.scene.props
-        selected_job = props.jobs[props.selected_job]
+        property_group = get_deep_attribute(bpy.context.scene, self.property_group_attribute)
+        focused_item = getattr(property_group, self.focused_item_attribute)
+        collection = getattr(property_group, self.collection_attribute)
 
         # add a frame range to the list
-        frame_range = selected_job.frame_ranges[selected_job.selected_frame_range]
+        frame_range = collection[focused_item]
 
         frame_range.name = self.name
-        frame_range.enabled = True
+        frame_range.enabled = self.enabled if len(collection) > 1 else True
         frame_range.frame_start = self.frame_start
         frame_range.frame_end = self.frame_end
         frame_range.frame_step = self.frame_step
