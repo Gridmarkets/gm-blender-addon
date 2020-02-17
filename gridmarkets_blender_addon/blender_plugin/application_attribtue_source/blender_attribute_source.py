@@ -46,6 +46,8 @@ class BlenderAttributeSource(ApplicationAttributeSource):
                 return get_blender_frame_range(bpy.context)
             elif key == api_constants.API_KEYS.GPU:
                 return bpy.context.scene.cycles.device == 'GPU'
+            elif key == api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH:
+                return bpy.context.scene.render.filepath
 
         if re.match(api_constants.BLENDER_VERSIONS.SERIES_2_7X, app_version):
             if key == api_constants.API_KEYS.OUTPUT_FORMAT:
@@ -55,5 +57,7 @@ class BlenderAttributeSource(ApplicationAttributeSource):
                 return get_blender_frame_range(bpy.context)
             elif key == api_constants.API_KEYS.GPU:
                 return bpy.context.scene.cycles.device == 'GPU'
+            elif key == api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH:
+                return bpy.context.scene.render.filepath
 
         raise ApplicationAttributeNotFound(app, app_version, key)
