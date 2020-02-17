@@ -46,7 +46,7 @@ class Plugin(MetaPlugin):
 
     def __init__(self):
         version = bl_info['version']
-        self._version = PluginVersion(version[1], version[4], version[0])
+        self._version = PluginVersion(version[0], version[1], version[2])
 
         api_schema_factory = APISchemaFactory()
         project_attribute_factory = ProjectAttributeFactory()
