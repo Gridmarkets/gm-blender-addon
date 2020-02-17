@@ -47,6 +47,9 @@ class GRIDMARKETS_OT_toggle_job_preset_locked_state(bpy.types.Operator):
             job_preset.toggle_locked_state()
             utils_blender.force_redraw_addon()
 
+        # Set back to an empty string
+        self.job_preset_id = ""
+
         return {'FINISHED'}
 
 
