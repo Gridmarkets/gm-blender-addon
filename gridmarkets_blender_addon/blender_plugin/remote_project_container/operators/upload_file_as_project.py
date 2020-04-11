@@ -90,7 +90,7 @@ class GRIDMARKETS_OT_upload_file_as_project(bpy.types.Operator, ImportHelper):
 
     bucket = None
     timer = None
-    thread: ExcThread = None
+    thread = None
     user_interface = None
     remote_project_container = None
 

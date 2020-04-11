@@ -182,7 +182,7 @@ class GridMarketsAPISchema(APISchema):
                         JobAttribute.__init__(self, key, display_name, description, inference_sources, is_optional)
 
                     enum_items_element = get_sub_element(attribute_element, TAG_ITEMS)
-                    enum_items: typing.List[EnumItem] = []
+                    enum_items = []
                     for enum_item_element in enum_items_element:
                         enum_item_key = get_text(enum_item_element, TAG_KEY)
                         enum_item_display_name = get_text(enum_item_element, TAG_DISPLAY_NAME)
@@ -293,7 +293,7 @@ class GridMarketsAPISchema(APISchema):
                     ProjectAttribute.__init__(self, id, key, display_name, description, is_valid_project, transitions)
 
                 enum_items_element = get_sub_element(project_attribute_element, TAG_ITEMS)
-                enum_items: typing.List[EnumItem] = []
+                enum_items = []
                 for enum_item_element in enum_items_element:
                     enum_item_key = get_text(enum_item_element, TAG_KEY)
                     enum_item_display_name = get_text(enum_item_element, TAG_DISPLAY_NAME)

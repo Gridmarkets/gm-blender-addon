@@ -42,7 +42,7 @@ class GridMarketsAPIClient(MetaAPIClient):
 
     def __init__(self):
         MetaAPIClient.__init__(self)
-        self._envoy_client: Optional[EnvoyClient] = None
+        self._envoy_client = None
         self._api_schema = GridMarketsAPISchema()
 
     def sign_in(self, user: User, skip_validation: bool = False) -> None:

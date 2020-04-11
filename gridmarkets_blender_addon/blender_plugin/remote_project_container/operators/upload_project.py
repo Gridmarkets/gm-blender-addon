@@ -85,7 +85,7 @@ class GRIDMARKETS_OT_upload_project(bpy.types.Operator):
 
     bucket = None
     timer = None
-    thread: ExcThread = None
+    thread = None
     user_interface = None
     remote_project_container = None
 

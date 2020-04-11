@@ -39,7 +39,7 @@ class GRIDMARKETS_OT_sign_in_new_user(bpy.types.Operator):
 
     bucket = None
     timer = None
-    thread: ExcThread = None
+    thread = None
     user_interface = None
     api_client = None
 

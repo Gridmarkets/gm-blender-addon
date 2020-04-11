@@ -37,7 +37,7 @@ class UserContainer(MetaUserContainer):
 
         # get users
         users_props = preferences.saved_profiles.user_profiles
-        users: List[User] = []
+        users = []
 
         for user_props in users_props:
             user = User(user_props.auth_email, user_props.auth_accessKey)

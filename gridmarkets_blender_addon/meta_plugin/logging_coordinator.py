@@ -32,8 +32,8 @@ class LoggingCoordinator:
 
     def __init__(self, log_history_container: LogHistoryContainer):
         self._log_history_container = log_history_container
-        self._multi_thread_counter: int = 0
-        self._queue: queue.Queue = queue.Queue()
+        self._multi_thread_counter = 0
+        self._queue = queue.Queue()
 
     def is_thread_safe_mode_enabled(self) -> bool:
         return self._multi_thread_counter > 0
