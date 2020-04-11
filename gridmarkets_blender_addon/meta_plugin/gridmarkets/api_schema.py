@@ -107,7 +107,7 @@ class GridMarketsAPISchema(APISchema):
         TAG_COMPATIBLE_JOB_TYPES = "CompatibleJobTypes"
         TAG_JOB_DEFINITION_ID = "JobDefinitionId"
 
-        tree = ET.parse(SCHEMA_DEFINITION_FILE)
+        tree = ET.parse(str(SCHEMA_DEFINITION_FILE))
         root = tree.getroot()
 
         if root.tag != TAG_API_SCHEMA:

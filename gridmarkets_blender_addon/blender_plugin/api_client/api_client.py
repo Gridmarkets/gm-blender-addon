@@ -299,7 +299,7 @@ class APIClient(GridMarketsAPIClient):
         # add files to project
         # only files and folders within the project path can be added, use relative or full path
         # any other paths passed will be ignored
-        project.add_folders(packed_project.get_root_dir())
+        project.add_folders(str(packed_project.get_root_dir()))
 
         render_file = '/' + packed_project.get_name() + '/' + str(packed_project.get_relative_main_file())
 
