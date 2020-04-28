@@ -57,6 +57,20 @@ def register_schema(api_client):
             bpy.props.PointerProperty(type=GRIDMARKETS_PROPS_project_attributes))
 
 
+def close_render_results_image(context):
+    # Iterates through every window, screen, area and space to find any image editor spaces that are open and are
+    # viewing the blender's render results
+    windows = context.window_manager.windows
+    for window in windows:
+        screen = window.screen
+        for area in screen.areas:
+            for space in area.spaces:
+                if space.type == "IMAGE_EDITOR":
+                    # if the image editor is viewing the render results then close the render results
+                    if space.image.name == "Render Result":
+                        space.image = None
+
+
 class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
     bl_idname = constants.OPERATOR_OPEN_ADDON_ID_NAME
     bl_label = constants.OPERATOR_OPEN_ADDON_LABEL
@@ -101,6 +115,9 @@ class GRIDMARKETS_OT_open_preferences(bpy.types.Operator):
             render.resolution_x = constants.DEFAULT_WINDOW_WIDTH * scale_factor
             render.resolution_y = constants.DEFAULT_WINDOW_HIEGHT * scale_factor
             render.resolution_percentage = 100
+
+            # close any render result images as it messes up the opening process
+            close_render_results_image(context)
 
             # Call image editor window. This window just happens to use the render resolution settings for its
             # dimensions.
