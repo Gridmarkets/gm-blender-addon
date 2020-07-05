@@ -67,7 +67,7 @@ def close_render_results_image(context):
             for space in area.spaces:
                 if space.type == "IMAGE_EDITOR":
                     # if the image editor is viewing the render results then close the render results
-                    if space.image.name == "Render Result":
+                    if hasattr(space.image, 'name') and space.image.name == "Render Result":
                         space.image = None
 
 
