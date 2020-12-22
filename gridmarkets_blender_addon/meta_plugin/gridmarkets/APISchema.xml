@@ -4,7 +4,7 @@
     <JobDefinitions>
         <JobDefinition id="BLENDER_2_8X_CYCLES">
 
-            <DisplayName>Blender 2.8x Cycles</DisplayName>
+            <DisplayName>Blender 2.8+ Cycles</DisplayName>
 
             <JobAttribute>
                 <Attribute>
@@ -48,7 +48,7 @@
                         </SubtypeKwarg>
                         <SubtypeKwarg>
                             <Key>MATCH</Key>
-                            <Value>^([2]\.)([8]\d)</Value>
+                            <Value>^([2-9]\.)([8-9]\d)</Value>
                         </SubtypeKwarg>
                     </SubtypeKwargs>
                 </Attribute>

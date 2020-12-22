@@ -38,26 +38,14 @@ class BlenderAttributeSource(ApplicationAttributeSource):
         if key == api_constants.API_KEYS.APP_VERSION:
             return app_version
 
-        if re.match(api_constants.BLENDER_VERSIONS.SERIES_2_8X, app_version):
-            if key == api_constants.API_KEYS.OUTPUT_FORMAT:
-                return bpy.context.scene.render.image_settings.file_format
-            elif key == api_constants.API_KEYS.FRAMES:
-                from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
-                return get_blender_frame_range(bpy.context)
-            elif key == api_constants.API_KEYS.GPU:
-                return bpy.context.scene.cycles.device == 'GPU'
-            elif key == api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH:
-                return bpy.context.scene.render.filepath
-
-        if re.match(api_constants.BLENDER_VERSIONS.SERIES_2_7X, app_version):
-            if key == api_constants.API_KEYS.OUTPUT_FORMAT:
-                return bpy.context.scene.render.image_settings.file_format
-            elif key == api_constants.API_KEYS.FRAMES:
-                from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
-                return get_blender_frame_range(bpy.context)
-            elif key == api_constants.API_KEYS.GPU:
-                return bpy.context.scene.cycles.device == 'GPU'
-            elif key == api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH:
-                return bpy.context.scene.render.filepath
+        if key == api_constants.API_KEYS.OUTPUT_FORMAT:
+            return bpy.context.scene.render.image_settings.file_format
+        elif key == api_constants.API_KEYS.FRAMES:
+            from gridmarkets_blender_addon.utils_blender import get_blender_frame_range
+            return get_blender_frame_range(bpy.context)
+        elif key == api_constants.API_KEYS.GPU:
+            return bpy.context.scene.cycles.device == 'GPU'
+        elif key == api_constants.API_KEYS.LOCAL_DOWNLOAD_PATH:
+            return bpy.context.scene.render.filepath
 
         raise ApplicationAttributeNotFound(app, app_version, key)
