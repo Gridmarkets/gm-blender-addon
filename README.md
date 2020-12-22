@@ -31,7 +31,7 @@ how to build the add-on from source.
 
 | Blender Version   | Add-on Download Link|
 |-------------------|--------|
-| 2.80, 2.81, 2.82  | [gridmarkets_blender_addon.zip (blender 2.8*)](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon.zip)  |
+| 2.8+  | [gridmarkets_blender_addon.zip (blender 2.8+)](https://github.com/Gridmarkets/gm-blender-addon/releases/latest/download/gridmarkets_blender_addon.zip)  |
 | 2.79  | [gridmarkets_blender_addon.zip (blender 2.79)](https://github.com/Gridmarkets/gm-blender-addon/releases/download/v1.2.0/gridmarkets_blender_addon_v2_79.zip)  |
 
 ### Building from Sources
