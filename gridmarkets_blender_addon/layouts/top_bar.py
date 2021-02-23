@@ -44,4 +44,4 @@ def draw_top_bar(self, context) -> None:
         text = 'Open GridMarkets add-on'
 
     self.layout.emboss = "PULLDOWN_MENU"
-    self.layout.operator(constants.OPERATOR_OPEN_ADDON_ID_NAME, icon_value=iconGM.icon_id, text=text)
+    self.layout.operator(constants.OPERATOR_OPEN_SUBMIT2GM_ID_NAME, icon_value=iconGM.icon_id, text=text)

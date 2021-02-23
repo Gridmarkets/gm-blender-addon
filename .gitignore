@@ -13,3 +13,5 @@ gridmarkets_blender_addon/wheel/
 
 # ignore auto-generated Windows image .obv files
 **/contents.obv
+
+gridmarkets_blender_addon/config.py
