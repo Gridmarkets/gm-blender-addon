@@ -120,17 +120,6 @@ class IconLoader:
             IconLoader._initialised = False
 
 
-def register():
-    # initialise the singleton
-    IconLoader.initialise()
-
-
-def unregister():
-    # clean up instance
-    IconLoader.clean_up()
-
-
-
 def draw_top_bar(self, context: bpy.types.Context) -> None:
     """ Draws the top bar button that opens the add-on window
 
@@ -220,6 +209,7 @@ def register():
     for cls in classes:
         register_class(cls)
 
+    IconLoader.initialise()
     bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar)
 
 
@@ -227,6 +217,7 @@ def unregister():
     from bpy.utils import unregister_class
 
     bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar)
+    IconLoader.clean_up()
 
     # unregister classes
     for cls in reversed(classes):

@@ -24,6 +24,7 @@ A Blender add-on for uploading Blender Projects to GridMarkets and for specifyin
 
 ## Installing the Add-on
 
+The recommended way to install the add-on is through GridMarkets Envoy.
 To install the add-on you must first either download one of the pre-built zip files or follow the below instructions for
 how to build the add-on from source.
 
