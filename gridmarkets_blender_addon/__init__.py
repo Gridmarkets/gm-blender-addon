@@ -32,7 +32,6 @@ bl_info = {
 
 import bpy
 
-import importlib
 import os
 import sys
 import typing
@@ -174,8 +173,9 @@ class GRIDMARKETS_OT_open_submit2gm(bpy.types.Operator):
         # Import the submit2gm package
         submit2gm_init_path = os.path.join(submit2gm_package_path, "__init__.py")
 
-        spec = importlib.util.spec_from_file_location('submit2gm', submit2gm_init_path)
-        module = importlib.util.module_from_spec(spec)
+        from importlib import util as importlib_util
+        spec = importlib_util.spec_from_file_location('submit2gm', submit2gm_init_path)
+        module = importlib_util.module_from_spec(spec)
 
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
