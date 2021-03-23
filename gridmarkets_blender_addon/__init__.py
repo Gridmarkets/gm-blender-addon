@@ -36,7 +36,11 @@ import os
 import sys
 import typing
 
-from gridmarkets_blender_addon import config
+import configparser
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
+ENVOY_PYTHON_PATH = config['default']['ENVOY_PYTHON_PATH']
+SUBMIT2GM_PATH = config['default']['SUBMIT2GM_PATH']
 
 # the icons folder contains custom icons for the UI
 ICONS_FOLDER = "icons"
@@ -164,11 +168,8 @@ class GRIDMARKETS_OT_open_submit2gm(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     def import_submit2gm(self):
-        # Read config file to find submit2gm install location
-        submit2gm_path = config.SUBMIT2GM_PATH
-
         # Get the location of the submit2gm python package
-        submit2gm_package_path = os.path.join(os.path.dirname(submit2gm_path), 'submit2gm')
+        submit2gm_package_path = os.path.join(os.path.dirname(SUBMIT2GM_PATH), 'submit2gm')
 
         # Import the submit2gm package
         submit2gm_init_path = os.path.join(submit2gm_package_path, "__init__.py")
@@ -184,7 +185,7 @@ class GRIDMARKETS_OT_open_submit2gm(bpy.types.Operator):
         self.import_submit2gm()
 
         from submit2gm.command_port_server_utils import start_command_port_server
-        envoy_python_path = config.ENVOY_PYTHON_PATH
+        envoy_python_path = ENVOY_PYTHON_PATH
         logger_name = 'gridmarkets_blender_addon'
         product = 'blender'
         meta_info = 'gridmarkets_blender_addon version: ' + str(bl_info.get('version', '')) + '\n'
