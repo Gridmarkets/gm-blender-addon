@@ -143,6 +143,7 @@ def draw_top_bar(self, context: bpy.types.Context) -> None:
     self.layout.operator(OPERATOR_OPEN_SUBMIT2GM_ID_NAME, icon_value=iconGM.icon_id, text=TOP_BAR_LABEL)
 
 
+@bpy.app.handlers.persistent
 def process_qt_events() -> float:
     try:
         from submit2gm.command_port_server_utils import process_events
@@ -234,7 +235,7 @@ def register():
     bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar)
 
     # Start a timer for processing qt events
-    bpy.app.timers.register(process_qt_events)
+    bpy.app.timers.register(process_qt_events, persistent=True)
 
     import atexit
     atexit.register(close_application)
@@ -244,7 +245,8 @@ def unregister():
     from bpy.utils import unregister_class
 
     # Unregister the qt event timer
-    bpy.app.timers.unregister(process_qt_events)
+    if bpy.app.timers.is_registered(process_qt_events):
+        bpy.app.timers.unregister(process_qt_events)
 
     bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar)
     IconLoader.clean_up()
