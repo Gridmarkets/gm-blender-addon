@@ -153,6 +153,16 @@ def process_qt_events() -> float:
     return 0.01
 
 
+def close_application() -> None:
+    try:
+        from submit2gm.command_port_server_utils import close_window
+        envoy_python_path = ENVOY_PYTHON_PATH
+        close_window(envoy_python_path)
+    except ImportError as e:
+        print(e)
+        pass
+
+
 def evaluate_code(code: str, return_variables: typing.List[str]):
 
     # Execute the provided code
@@ -225,6 +235,9 @@ def register():
 
     # Start a timer for processing qt events
     bpy.app.timers.register(process_qt_events)
+
+    import atexit
+    atexit.register(close_application)
 
 
 def unregister():
