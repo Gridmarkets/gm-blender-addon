@@ -1,7 +1,7 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
 # GridMarkets Blender Add-on - A Blender Add-on for rendering scenes / files on the Grid Computing network GridMarkets
-# Copyright (C) 2019  GridMarkets
+# Copyright (C) 2021  GridMarkets
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ bl_info = {
     "name": "GridMarkets Blender Add-on",
     "description": "Allows users to submit Blender jobs to the GridMarkets render farm from within Blender.",
     "author": "GridMarkets",
-    "version": (1, 4, 3),
+    "version": (2, 1, 1),
     "blender": (2, 80, 0),
     "location": "Info > Header",
     "warning": "", # used for warning icon and text in add-ons panel
@@ -30,156 +30,230 @@ bl_info = {
     "category": "Render"
 }
 
+import bpy
+
 import os
 import sys
-import importlib
+import typing
 
-# list of modules to import
-modulesNames = ['meta_plugin.scene_exporter',
-                'file_packers.blender_file_packer',
-                'scene_exporters.blender_scene_exporter',
-                'scene_exporters.vray_scene_exporter',
-                'constants',
-                #'blender_plugin.plugin_fetcher.plugin_fetcher', # don't reload otherwise state is lost on add-on reload
-                'utils_blender',
-                'icon_loader',
-                'property_groups.main_props',
-                'addon_preferences',
-                'blender_plugin.remote_project_container.operators.add_remote_project',
-                'operators.trace_project',
-                'operators.submit',
-                'operators.open_manager_portal',
-                'operators.open_cost_calculator',
-                'operators.open_envoy_url',
-                'operators.open_help_url',
-                'operators.project_list_actions',
-                'operators.job_list_actions',
-                'menus',
-                'blender_plugin.remote_project_container.operators.upload_project',
-                'blender_plugin.remote_project_container.operators.upload_packed_project',
-                'blender_plugin.remote_project_container.operators.pack_current_scene',
-                'blender_plugin.remote_project_container.operators.pack_blend_file',
-                'blender_plugin.remote_project_container.operators.refresh_project_list',
-                'blender_plugin.remote_project_container.operators.refresh_project_file_list',
-                'operators.frame_range_list_actions',
-                'operators.edit_frame_range',
-                'operators.open_preferences',
-                'operators.open_register_account_link',
-                'operators.open_repository',
-                'operators.open_addon',
-                'operators.toggle_submission_summary',
-                'operators.toggle_frame_ranges_view',
-                'operators.toggle_output_format_view',
-                'operators.toggle_output_path_view',
-                'operators.toggle_output_prefix_view',
-                'operators.toggle_render_engine_view',
-                'operators.copy_support_email',
-                'operators.copy_temporary_file_location',
-                'operators.get_selected_project_status',
-                'operators.test_operator',
-                'operators.null_operator',
-                'operators.set_ui_layout',
-                'list_items.frame_range',
-                'list_items.job',
-                'list_items.project',
-                'blender_plugin.attribute.layouts.draw_attribute_input',
-                'blender_plugin.remote_project.list_items.remote_project_list',
-                'blender_plugin.job_attribute.operators.set_inference_source',
-                'blender_plugin.job_preset_attribute.layouts.draw_job_preset_attribute',
-                'blender_plugin.job_preset.layouts.draw_job_preset',
-                'blender_plugin.job_preset.list_items.job_preset_list',
-                'blender_plugin.job_preset.operators.open_job_preset_definition_popup',
-                'blender_plugin.job_preset_container.layouts.draw_job_preset_container',
-                'blender_plugin.job_preset_container.menus.create_new_job_preset',
-                'blender_plugin.job_preset_container.operators.create_new_job_preset',
-                'blender_plugin.job_preset_container.operators.remove_focused_job_preset',
-                'blender_plugin.job_preset_container.operators.toggle_job_preset_locked_state',
-                'blender_plugin.job_preset_container.operators.set_focused_job_preset',
-                'blender_plugin.log_item.list_items.log_item_list',
-                'blender_plugin.log_history_container.layouts.draw_logging_console',
-                'blender_plugin.log_history_container.menus.display_options',
-                'blender_plugin.log_history_container.operators.toggle_logging_console',
-                'blender_plugin.logging_coordinator.operators.clear_logs',
-                'blender_plugin.logging_coordinator.operators.copy_logs_to_clipboard',
-                'blender_plugin.logging_coordinator.operators.save_logs_to_file',
-                'blender_plugin.remote_project.operators.open_remote_project_definition_popup',
-                'blender_plugin.remote_project.layouts.draw_remote_project',
-                'blender_plugin.remote_project_container.layouts.draw_remote_project_container',
-                'blender_plugin.user.list_items.user_list',
-                'blender_plugin.user_container.layouts',
-                'blender_plugin.user_container.operators.delete_focused_profile',
-                'blender_plugin.user_container.operators.load_focused_profile',
-                'blender_plugin.user_container.operators.set_focused_profile_as_default',
-                'blender_plugin.user_container.operators.show_user_credits',
-                'blender_plugin.user_container.operators.sign_in',
-                'blender_plugin.user_container.operators.sign_out',
-                'blender_plugin.user_container.operators.switch_user',
-                'blender_plugin.user_interface.operators.toggle_show_log_dates',
-                'blender_plugin.user_interface.operators.toggle_show_log_times',
-                'blender_plugin.user_interface.operators.toggle_show_logger_names',
-                'blender_plugin.plugin.plugin',
-                'layouts.empty',
-                'layouts.header',
-                'layouts.preferences',
-                'layouts.sidebar',
-                'layouts.submission_settings',
-                'layouts.body',
-                'layouts.top_bar',
-                'panel_overloaders.panel_overloader',
-                'panel_overloaders.addons',
-                'panel_overloaders.header',
-                'panel_overloaders.navigation_bar',
-                'panel_overloaders.save_preferences',
-                'gui_entry_point']
+import configparser
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
+ENVOY_PYTHON_PATH = config['default']['ENVOY_PYTHON_PATH']
+SUBMIT2GM_PATH = config['default']['SUBMIT2GM_PATH']
+
+# the icons folder contains custom icons for the UI
+ICONS_FOLDER = "icons"
+GRIDMARKETS_LOGO_ID = "gridmarkets_logo"
+GM_GREYSCALE_LOGO = "logo_greyscale.png"
+MAIN_COLLECTION_ID = "main"
+OPERATOR_OPEN_SUBMIT2GM_ID_NAME = "gridmarkets.open_submit2gm"
+OPERATOR_OPEN_SUBMIT2GM_LABEL = "Open Submit2gm"
+TOP_BAR_LABEL = 'Open GridMarkets add-on'
+
 
 # pre-append the lib folder to sys.path so local dependencies can be found. Pre-append so that these paths take
 # precedence over blender's existing packed modules which can be different versions
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
 
-# create a dictionary to hold the full names of modules
-modulesFullNames = {}
 
-# Iterate though all the module names
-for currentModuleName in modulesNames:
-    # And add the module's full name to modulesFullNames
-    modulesFullNames[currentModuleName] = ('{}.{}'.format(__name__, currentModuleName))
+class IconLoader:
+    """ Singleton class for loading custom icons """
 
-# iterate through modules and attempt to load the module 
-for currentModuleFullName in modulesFullNames.values():
+    # Used to store any previews for images
+    _icon_preview_collections = {}
+    _initialised = False
 
-    # sys.modules is a dictionary that maps module names to modules which have been loaded. This can be manipulated to
-    # force reloading of specific modules (as well as other tricks)
-    # Checking if the currentModuleFullName can be found in the sys.modules dictionary
-    if currentModuleFullName in sys.modules:
+    @staticmethod
+    def get_preview_collections():
+        """ Getter
+        :return: Returns the icon preview collections dictionary that stores all loaded icon previews
+        :rtype: Dictionary of previews
+        """
+        if not IconLoader._initialised:
+            IconLoader._register_icons()
 
-        # importlib is package that defines pythons import function. When an import statement is written it is using
-        # importlib.__import__() under the hood, it is just another way to do the same thing. Here importlib.reload is
-        # used to reloads a previously imported module. We do this so that if the modules source code has been changed
-        # in an external editor Python wont use the old version if it has already been imported.
-        importlib.reload(sys.modules[currentModuleFullName])
+        return IconLoader._icon_preview_collections
 
-    else:
-        # This imports the module and makes it global. Calling globals() will return a dictionary of all the global
-        # symbols (methods, variables, etc..). By doing globals()[currentModuleFullName] we add an entry in to global
-        # symbol table for each module.
-        globals()[currentModuleFullName] = importlib.import_module(currentModuleFullName)
-        setattr(globals()[currentModuleFullName], 'modulesNames', modulesFullNames)
+    @staticmethod
+    def initialise():
+        """ Initialise the singleton
+
+        :return: The new instance of an IconLoader
+        :rtype: IconLoader
+        """
+
+        if not IconLoader._initialised:
+            IconLoader._register_icons()
+        else:
+            raise Exception("Attempted to initialise IconLoader twice.")
+
+    @staticmethod
+    def _register_icons():
+        """ loads icons from the /icons folder and stores their previews"""
+
+        from bpy.utils import previews
+
+        # create new icon previews collection
+        preview_collection = bpy.utils.previews.new()
+
+        # path to the folder where the icon is
+        # the path is calculated relative to this py file inside the add-on folder
+        my_icons_dir = os.path.join(os.path.dirname(__file__), ICONS_FOLDER)
+
+        # load a preview thumbnail of the icon and store in the previews collection
+        preview_collection.load(GRIDMARKETS_LOGO_ID,
+                                os.path.join(my_icons_dir, GM_GREYSCALE_LOGO),
+                                'IMAGE')
+
+        IconLoader._icon_preview_collections[MAIN_COLLECTION_ID] = preview_collection
+
+        IconLoader._initialised = True
+
+    @staticmethod
+    def clean_up():
+        """ Removes all the previews from the preview collection and then removes the collection itself """
+
+        if IconLoader._initialised:
+            # clear the preview collections object of icons
+            for preview_collection in IconLoader._icon_preview_collections.values():
+                bpy.utils.previews.remove(preview_collection)
+
+            IconLoader._icon_preview_collections.clear()
+            IconLoader._initialised = False
 
 
-# register modules
+def draw_top_bar(self, context: bpy.types.Context) -> None:
+    """ Draws the top bar button that opens the add-on window
+
+    :param self: The menu instance that's drawing this button
+    :type self: bpy.types.Menu
+    :param context: The blender context
+    :type context: bpy.context
+    :rtype: void
+    """
+
+    self.layout.separator()
+
+    # get the GridMarkets icon
+    preview_collection = IconLoader.get_preview_collections()[MAIN_COLLECTION_ID]
+    iconGM = preview_collection[GRIDMARKETS_LOGO_ID]
+
+    self.layout.emboss = "PULLDOWN_MENU"
+    self.layout.operator(OPERATOR_OPEN_SUBMIT2GM_ID_NAME, icon_value=iconGM.icon_id, text=TOP_BAR_LABEL)
+
+
+@bpy.app.handlers.persistent
+def process_qt_events() -> float:
+    try:
+        from submit2gm.command_port_server_utils import process_events
+        process_events()
+    except ImportError:
+        pass
+
+    return 0.01
+
+
+def close_application() -> None:
+    try:
+        from submit2gm.command_port_server_utils import disconnect_from_submit2gm
+        envoy_python_path = ENVOY_PYTHON_PATH
+        disconnect_from_submit2gm(envoy_python_path)
+    except ImportError as e:
+        print(e)
+        pass
+
+
+def evaluate_code(code: str, return_variables: typing.List[str]):
+
+    # Execute the provided code
+    try:
+        exec(code)
+    except Exception as e:
+        print("exception:", e)
+        raise e
+
+    results = {}
+
+    for variable in return_variables:
+        results[variable] = eval(variable)
+
+    return results
+
+
+class GRIDMARKETS_OT_open_submit2gm(bpy.types.Operator):
+    """ Opens the GridMarkets Submit2gm app."""
+
+    bl_idname = OPERATOR_OPEN_SUBMIT2GM_ID_NAME
+    bl_label = OPERATOR_OPEN_SUBMIT2GM_LABEL
+    bl_options = {'REGISTER'}
+
+    def import_submit2gm(self):
+        # Get the location of the submit2gm python package
+        submit2gm_package_path = os.path.join(os.path.dirname(SUBMIT2GM_PATH), 'submit2gm')
+
+        # Import the submit2gm package
+        submit2gm_init_path = os.path.join(submit2gm_package_path, "__init__.py")
+
+        from importlib import util as importlib_util
+        spec = importlib_util.spec_from_file_location('submit2gm', submit2gm_init_path)
+        module = importlib_util.module_from_spec(spec)
+
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+
+    def execute(self, context: bpy.types.Context):
+        self.import_submit2gm()
+
+        from submit2gm.command_port_server_utils import start_command_port_server
+        envoy_python_path = ENVOY_PYTHON_PATH
+        logger_name = 'gridmarkets_blender_addon'
+        product = 'blender'
+        meta_info = 'gridmarkets_blender_addon version: ' + str(bl_info.get('version', '')) + '\n'
+        meta_info += 'blender version: ' + str(bpy.app.version)
+        evaluate_code_cb = evaluate_code
+        debug_mode = True
+
+        start_command_port_server(envoy_python_path, logger_name, product, meta_info, evaluate_code_cb, debug_mode)
+
+        return {"FINISHED"}
+
+
+classes = (
+    GRIDMARKETS_OT_open_submit2gm,
+)
+
+
 def register():
-    for name in modulesFullNames.values():
-        if name in sys.modules:
-            if hasattr(sys.modules[name], 'register'):
-                sys.modules[name].register()
+    from bpy.utils import register_class
+
+    # register classes
+    for cls in classes:
+        register_class(cls)
+
+    IconLoader.initialise()
+    bpy.types.TOPBAR_MT_editor_menus.append(draw_top_bar)
+
+    # Start a timer for processing qt events
+    bpy.app.timers.register(process_qt_events, persistent=True)
+
+    import atexit
+    atexit.register(close_application)
 
 
-# unregister modules
 def unregister():
-    for name in modulesFullNames.values():
-        if name in sys.modules:
-            if hasattr(sys.modules[name], 'unregister'):
-                sys.modules[name].unregister()
+    from bpy.utils import unregister_class
+
+    # Unregister the qt event timer
+    if bpy.app.timers.is_registered(process_qt_events):
+        bpy.app.timers.unregister(process_qt_events)
+
+    bpy.types.TOPBAR_MT_editor_menus.remove(draw_top_bar)
+    IconLoader.clean_up()
+
+    # unregister classes
+    for cls in reversed(classes):
+        unregister_class(cls)
 
 
 if __name__ == "__main__":
