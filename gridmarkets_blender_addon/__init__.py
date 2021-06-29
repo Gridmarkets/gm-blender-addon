@@ -156,9 +156,9 @@ def process_qt_events() -> float:
 
 def close_application() -> None:
     try:
-        from submit2gm.command_port_server_utils import close_window
+        from submit2gm.command_port_server_utils import disconnect_from_submit2gm
         envoy_python_path = ENVOY_PYTHON_PATH
-        close_window(envoy_python_path)
+        disconnect_from_submit2gm(envoy_python_path)
     except ImportError as e:
         print(e)
         pass
