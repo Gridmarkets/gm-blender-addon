@@ -40,7 +40,10 @@ import configparser
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
 ENVOY_PYTHON_PATH = config['default']['ENVOY_PYTHON_PATH']
-SUBMIT2GM_PATH = config['default']['SUBMIT2GM_PATH']
+if config.has_section('submit2gm'):
+    SUBMIT2GM_PATH = config.get('submit2gm', 'SUBMIT2GM_PATH')
+else:
+    SUBMIT2GM_PATH = config.get('default', 'SUBMIT2GM_PATH')
 
 # the icons folder contains custom icons for the UI
 ICONS_FOLDER = "icons"
@@ -156,9 +159,8 @@ def process_qt_events() -> float:
 
 def close_application() -> None:
     try:
-        from submit2gm.command_port_server_utils import disconnect_from_submit2gm
-        envoy_python_path = ENVOY_PYTHON_PATH
-        disconnect_from_submit2gm(envoy_python_path)
+        from submit2gm.command_port_server_utils import stop_submit2gm
+        stop_submit2gm()
     except ImportError as e:
         print(e)
         pass
