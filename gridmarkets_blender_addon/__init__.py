@@ -22,7 +22,7 @@ bl_info = {
     "name": "GridMarkets Blender Add-on",
     "description": "Allows users to submit Blender jobs to the GridMarkets render farm from within Blender.",
     "author": "GridMarkets",
-    "version": (2, 1, 2),
+    "version": (2, 2, 0),
     "blender": (2, 80, 0),
     "location": "Info > Header",
     "warning": "", # used for warning icon and text in add-ons panel
